@@ -1,0 +1,21 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+</script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<div class="container">
+<h1>{{ target_object.target_title | safe }}</h1>
+<h3>by {{ target_object.target_author | safe }}</h3>
+<div class="content">
+{{ target_object.target_content | safe }}
+</div>
+<div class="citation">
+{{ target_object.target_citation | safe }}
+</div>
+</div>
