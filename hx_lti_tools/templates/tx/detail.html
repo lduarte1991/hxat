@@ -9,6 +9,9 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
+{% load staticfiles %}
+<script src="{% static "annotator-full.js" %}"></script>
+<link rel="stylesheet" href="{% static "annotator.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -19,3 +22,9 @@
 {{ target_object.target_citation | safe }}
 </div>
 </div>
+
+<script>
+jQuery(function ($) {
+    $('.container').annotator();
+});
+</script>

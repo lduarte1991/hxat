@@ -17,75 +17,112 @@ from django.contrib import messages
 
 from hx_lti_todapi.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
+from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *
 from utils import *
 import sys
 
-@csrf_exempt
-def launch_lti(request):
+def validate_request(req):
     """
-    Gets a request from an LTI consumer.
     Validates the request in order to permit or deny access to the LTI tool.
-    Passes along information to render a welcome screen to the user.
     """
-    
     # print out the request to the terminal window if in debug mode
     # this item is set in the settings, in the __init__.py file
     if settings.LTI_DEBUG:
-        for item in request.POST:
-            debug_printer('DEBUG - %s: %s \r' % (item, request.POST[item]))
+        for item in req.POST:
+            debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
     
     # verifies that request contains the information needed
-    if 'oauth_consumer_key' not in request.POST:
+    if 'oauth_consumer_key' not in req.POST:
         debug_printer('DEBUG - Consumer Key was not present in request.')
         raise PermissionDenied()
-    if 'user_id' not in request.POST:
+    if 'user_id' not in req.POST:
         debug_printer('DEBUG - Anonymous ID was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_sourcedid' not in request.POST:
+    if 'lis_person_sourcedid' not in req.POST:
         debug_printer('DEBUG - Username was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_contact_email_primary' not in request.POST:
+    if 'lis_person_contact_email_primary' not in req.POST:
         debug_printer('DEBUG - User Email was not present in request.')
         raise PermissionDenied()
-    
+
+def initialize_lti_tool_provider(req):
+    """
+    """
     # get the consumer key and secret from settings (__init__.py file)
     # will be used to compare against request to validate the tool init
     consumer_key = settings.CONSUMER_KEY
     secret = settings.LTI_SECRET
     
     # use the function from ims_lti_py app to verify and initialize tool
-    tool_provider = DjangoToolProvider(consumer_key, secret, request.POST)
+    provider = DjangoToolProvider(consumer_key, secret, req.POST)
     
     # now validate the tool via the valid_request function
     try:
         # this means that request was well formed but invalid
-        if tool_provider.valid_request(request) == False:
+        if provider.valid_request(req) == False:
             debug_printer("DEBUG - LTI Exception: Not a valid request.")
             raise PermissionDenied()
         else:
             debug_printer('DEBUG - LTI Tool Provider was valid.')
     except:
-        if not request.user.is_authorized:
+        if not req.user.is_authorized:
             # could not even access tool_provider as the request was incorrect
             debug_printer("DEBUG - Tool Provider was not initialized correctly.")
             raise PermissionDenied()
+    return provider
+
+def create_new_user(username, email, roles):
+    # now create the user and LTIProfile with the above information
+    user = User.objects.create_user(lti_username, email)
+    user.set_unusable_password()
+    user.is_superuser = False
+    user.is_staff = False
+
+    for admin_role in settings.ADMIN_ROLES:
+        for user_role in roles:
+                if admin_role.lower() == user_role.lower():
+                    user.is_superuser = True
+                    user.is_staff = True
+    user.save()
+    debug_printer('DEBUG - User was just created')
+    
+    # pull the profile automatically created once the user was above
+    lti_profile = LTIProfile.objects.get(user=user)
+    
+    lti_profile.anon_id = anon_id
+    lti_profile.roles = (",").join(all_user_roles)
+    lti_profile.save()
+    
+    return user, lti_profile
+
+@csrf_exempt
+def launch_lti(request):
+    """
+    Gets a request from an LTI consumer.
+    Passes along information to render a welcome screen to the user.
+    """
+    
+    validate_request(request)
+    tool_provider = initialize_lti_tool_provider(request)
     
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
     consumer_key_requested = request.POST['oauth_consumer_key']
     anon_id = '%s:%s' % (consumer_key_requested, get_lti_value(settings.LTI_ANON_ID, tool_provider))
     debug_printer('DEBUG - Found anonymous ID in request: %s' % anon_id)
+    
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
+    
     try:
         # try to get the profile via the anon id
         lti_profile = LTIProfile.objects.get(anon_id=anon_id)
         debug_printer('DEBUG - LTI Profile was found via anonymous id.')
     
     except LTIProfile.DoesNotExist:
-        debug_printer('DEBUG - LTI Profile was not found. New User to be created.')
+        debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         # gather the necessary data from the LTI initialization request
         email = get_lti_value(settings.LTI_EMAIL, tool_provider)
@@ -95,7 +132,7 @@ def launch_lti(request):
         # checks to see if email and username were not passed in
         # cannot create a user without them
         if not email or not lti_username:
-            debug_printer('DEBUG - Email and/or user_id wasn\'t found in post, return Permission Denied')
+            debug_printer('DEBUG - Email and/or user_id not found in post.')
             raise PermissionDenied()
         
         # checks to see if roles were passed in. Defaults to student role.
@@ -127,32 +164,13 @@ def launch_lti(request):
             else:
                 debug_printer('DEBUG - User had an acceptable role: %s' % all_user_roles)
         
-        # now create the user and LTIProfile with the above information
-        user = User.objects.create_user(lti_username, email)
-        user.set_unusable_password()
-        user.is_superuser = False
-        user.is_staff = False
-
-        for admin_role in settings.ADMIN_ROLES:
-            for user_role in roles:
-                    if admin_role.lower() == user_role.lower():
-                        user.is_superuser = True
-                        user.is_staff = True
-        user.save()
-        debug_printer('DEBUG - User was just created')
-        
-        # pull the profile automatically created once the user was above
-        lti_profile = LTIProfile.objects.get(user=user)
-        
-        lti_profile.anon_id = anon_id
-        lti_profile.roles = (",").join(all_user_roles)
-        lti_profile.save()
+        user, lti_profile = create_new_user(lti_username, email, roles)
     
     # now it's time to deal with the course_id it does not associate
     # with users as they can flow in and out in a MOOC
     try:
         debug_printer('DEBUG - Course was found %s' % course)
-        course_object = LTICourse.objects.get(course_id=course)
+        course_object = LTICourse.get_course_by_id(course)
     
     except LTICourse.DoesNotExist:
         # this should only happen if an instructor is trying to access the 
@@ -165,30 +183,17 @@ def launch_lti(request):
             # otherwise, it will just display an error message
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
             messages.warning(request, message_error)
-            course_object = LTICourse(course_id=course)
-            course_object.save()
-            course_object.course_admins.add(lti_profile)
+            course_object = LTICourse.create_course(course, lti_profile)
     
     # get all the courses the user is a part of
-    courses_for_user = LTICourse.objects.filter(course_users=lti_profile.id)
-    if not courses_for_user:
-        course_object.course_users.add(lti_profile)
-        courses_for_user += list(course_object)
-    elif not course_object in courses_for_user:
-        course_object.course_users.add(lti_profile)
-        courses_for_user += list(course_object)
-    else:
-        debug_printer('DEBUG - Course and Profile now attached.')
+    courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
     
     # then gets all the files associated with the courses 
-    files_in_courses = []
-    for course_item in courses_for_user:
-        files_found = TargetObject.objects.filter(target_courses=course_item)
-        files_in_courses += list(files_found)
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
     
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
     # then renders the page using the template
-    return render(request, 'hx_lti_initializer/testpage.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+    return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})

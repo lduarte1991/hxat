@@ -5,9 +5,10 @@ The initializer needs to set up a profile. This is the one thing consistent thro
 """
 
 from django.contrib import admin
-from hx_lti_initializer.models import LTIProfile
+from hx_lti_initializer.models import LTIProfile, LTICourse
 
 class LTIProfileAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(LTIProfile, LTIProfileAdmin)
+admin.site.register(LTICourse)

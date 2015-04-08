@@ -1,0 +1,195 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+</script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+{% load target_object_extras %}
+<style>
+.sidebar {
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    width:250px;
+}
+
+.sidebar-top {
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom: 0px;
+    width:250px;
+}
+
+.sidebar-top #user-label {
+    font-family: "arial", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sidebar a {
+    color:#66ccff;
+    font-family: "arial", sans-serif;
+    text-decoration:none;
+    font-size: 13px;
+}
+
+.bar {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.dashed-bar {
+    border-bottom: 1px dashed black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.sidebar p {
+    text-align: left;
+}
+
+.sidebar .label {
+    color: #bbbbbb;
+    text-transform: uppercase;
+    font-family: "arial", sans-serif;
+    font-size: 10px;
+}
+
+.header {
+    width: 100%;
+    height: 100px;
+    border-bottom: 4px solid #66ccff;
+    margin-bottom: 20px;
+}
+
+.section-header{
+    color: #999999;
+    text-transform: uppercase;
+    font-family: "arial", sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom:1px solid #999999;
+    margin-bottom: 10px;
+}
+
+.course-name {
+    color: black;
+    text-transform: uppercase;
+    font-family: "arial", sans-serif;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    font-family: "arial", sans-serif;
+}
+
+th {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-family: "arial", sans-serif;
+}
+
+.settingslink {
+    font-size: 12px;
+    float: left;
+    margin-top: -15px;
+}
+
+.leftfloat{
+    margin-top: 4px;
+    margin-left: -30px;
+}
+</style>
+<div class="header">
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-3">
+            <div class="sidebar-top">
+			    <div id="user-label">{{ user.username }}</div>
+            </div>
+            <div class="sidebar">
+			    <p>
+			        <a class="link" href="./passwordreset">Reset password</a> <br />
+			        <a class="link" href="./changeusername">Change username</a> <br />
+                    <a class="link" href="./changeemail">Change email</a> <br />
+			    </p>
+                <div class="dashed-bar"></div>
+                <p>
+                    <span class="label">Email: </span><br />
+                    {{ user.email }}
+                </p>
+                <div class="dashed-bar"></div>
+                <p>
+                    <a class="link" href="./tutorial">View Tutorial</a>
+                </p>
+             </div>
+		</div>
+		<div class="col-md-1"></div>
+		<div class="col-md-8">
+            <div class="section-header">
+                Courses
+            </div>
+            {% for course in courses %}
+            <div class="course-name">
+                {{ course.course_name }}
+            </div>
+            {% if 'Administrator' in roles or 'Instructor' in roles %}
+            <a class="settingslink" href="{{ course.get_admin_url }}" target="_blank">Change Course Settings</a>
+            {% endif %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Title
+                        </th>
+                        <th>
+                            Author
+                        </th>
+                        <th>
+                            Date Created
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in course.targetobject_set.all %}
+                    <tr>
+                        <td>
+                            {% if 'Administrator' in roles or 'Instructor' in roles %}
+                            <a class="settingslink leftfloat" href="{{ file.get_admin_url }}" target="_blank">Edit</a>
+                            {% endif %}
+                            <a href="annotation/{{ file.id }}">{{ file.target_title }}</a>
+                        </td>
+                        <td>
+                            {{ file.target_author }}
+                        </td>
+                        <td title="{{ file.target_created }}">
+                            {{ file.target_created | timesince }} ago
+                        </td>
+                        {% if 'Administrator' in roles or 'Instructor' in roles %}
+                        <td>
+                            <a href="annotationsettings">Annotation Settings</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+		</div>
+	</div>
+</div>

@@ -19,7 +19,6 @@ class TargetObject(LTI_TodApi):
     target_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     target_creator = models.ForeignKey(LTIProfile)
     target_courses = models.ManyToManyField(LTICourse)
-    
     ANNOTATION_TYPES = (
         ('tx', 'Text Annotation'),
         ('vd', 'Video Annotation'),

@@ -57,4 +57,29 @@ class LTICourse(models.Model):
     course_users = models.ManyToManyField(LTIProfile, related_name='course_student_user_profiles')
     class Meta:
         verbose_name = "Course"
-    pass
+    
+    @staticmethod
+    def get_all_courses():
+        return LTICourse.objects.all()
+    
+    @staticmethod
+    def get_courses_of_user(user_requested, course_object):
+        courses_for_user = list(LTICourse.objects.filter(course_users = user_requested.id))
+        if not courses_for_user:
+            course_object.course_users.add(user_requested)
+            courses_for_user += [course_object]
+        elif not course_object in courses_for_user:
+            course_object.course_users.add(lti_profile)
+            courses_for_user += [course_object]
+        return courses_for_user
+    
+    @staticmethod
+    def get_course_by_id(course_id):
+        return LTICourse.objects.get(course_id=course_id)
+
+    @staticmethod
+    def create_course(course_id, lti_profile):
+        course_object = LTICourse(course_id = course_id)
+        course_object.save()
+        course_object.course_admins.add(lti_profile)
+        return course_object
