@@ -10,8 +10,21 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% load staticfiles %}
-<script src="{% static "annotator-full.js" %}"></script>
-<link rel="stylesheet" href="{% static "annotator.css" %}">
+<script src="{% static "vemdors/Annotator/annotator.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.auth.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.document.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.filter.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.kitchensink.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.markdown.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.permissions.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.store.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.tags.js" %}"></script>
+<script src="{% static "vemdors/Annotator/annotator.unsupported.js" %}"></script>
+<script src="{% static "AController.js" %}"></script>
+<script src="{% static "AnnotationMain.js" %}"></script>
+<script src="{% static "AnnotationCore.js" %}"></script>
+<script src="{% static "TargetObjectController.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -25,6 +38,30 @@
 
 <script>
 jQuery(function ($) {
-    $('.container').annotator();
+    $(function() {
+		var options = {
+			commonInfo: {
+				mediaType: "text", // {{ media_type }}
+				context_id: {{ course }}
+				collection_id: {{ collection }}
+				object_id: {{ object.id }}
+			},
+			annotationMainOptions: {
+
+			},
+			annotationCoreOptions: {
+				annotationElement: jQuery(".container"),
+				initOptions: {
+					'plugins': [
+						'Store',
+					],
+				},
+			},
+			targetObjectControllerOptions: {
+
+			},
+		}
+		AController(options);
+	});
 });
 </script>
