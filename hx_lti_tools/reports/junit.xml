@@ -1,0 +1,1 @@
+<testsuite errors="0" failures="0" name="Django Project Tests" skips="0" tests="2" time="0.011"><testcase classname="hx_lti_initializer.tests.LTIInitializerUtilsTests" name="test_get_lti_value" time="0.000146" /><testcase classname="hx_lti_initializer.tests.LTIInitializerUtilsTests" name="test_get_lti_value_negation" time="0.000365" /></testsuite>

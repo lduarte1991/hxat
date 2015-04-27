@@ -1,0 +1,318 @@
+************* Module hx_lti_initializer.urls
+hx_lti_initializer/urls.py:13: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/urls.py:14: [C0303(trailing-whitespace), ] Trailing whitespace
+************* Module hx_lti_initializer.views
+hx_lti_initializer/views.py:4: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:4: [C0301(line-too-long), ] Line too long (205/160)
+hx_lti_initializer/views.py:35: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:57: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:60: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:85: [W0311(bad-indentation), ] Bad indentation. Found 16 spaces, expected 12
+hx_lti_initializer/views.py:86: [W0311(bad-indentation), ] Bad indentation. Found 20 spaces, expected 16
+hx_lti_initializer/views.py:87: [W0311(bad-indentation), ] Bad indentation. Found 20 spaces, expected 16
+hx_lti_initializer/views.py:90: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:93: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:97: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:106: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:109: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:115: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:118: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:123: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:126: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:131: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:137: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:141: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:145: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:151: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:158: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:166: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:168: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:174: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:176: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:187: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:190: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:191: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:193: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:197: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/views.py:199: [C0304(missing-final-newline), ] Final newline missing
+hx_lti_initializer/views.py:199: [C0301(line-too-long), ] Line too long (252/160)
+hx_lti_initializer/views.py:22: [W0401(wildcard-import), ] Wildcard import models
+hx_lti_initializer/views.py:22: [W0403(relative-import), ] Relative import 'models', should be 'hx_lti_initializer.models'
+hx_lti_initializer/views.py:23: [W0401(wildcard-import), ] Wildcard import utils
+hx_lti_initializer/views.py:23: [W0403(relative-import), ] Relative import 'utils', should be 'hx_lti_initializer.utils'
+hx_lti_initializer/views.py:50: [C0112(empty-docstring), initialize_lti_tool_provider] Empty function docstring
+hx_lti_initializer/views.py:59: [E1121(too-many-function-args), initialize_lti_tool_provider] Too many positional arguments for constructor call
+hx_lti_initializer/views.py:78: [E0602(undefined-variable), create_new_user] Undefined variable 'lti_username'
+hx_lti_initializer/views.py:94: [E0602(undefined-variable), create_new_user] Undefined variable 'anon_id'
+hx_lti_initializer/views.py:95: [E0602(undefined-variable), create_new_user] Undefined variable 'all_user_roles'
+hx_lti_initializer/views.py:101: [R0914(too-many-locals), launch_lti] Too many local variables (18/15)
+hx_lti_initializer/views.py:163: [E0602(undefined-variable), launch_lti] Undefined variable 'PermissionedDenied'
+hx_lti_initializer/views.py:167: [W0612(unused-variable), launch_lti] Unused variable 'user'
+hx_lti_initializer/views.py:101: [R0912(too-many-branches), launch_lti] Too many branches (13/12)
+hx_lti_initializer/views.py:101: [R0915(too-many-statements), launch_lti] Too many statements (52/50)
+hx_lti_initializer/views.py:8: [W0611(unused-import), ] Unused HttpResponseRedirect imported from django.http
+hx_lti_initializer/views.py:9: [W0611(unused-import), ] Unused RequestContext imported from django.template
+hx_lti_initializer/views.py:13: [W0611(unused-import), ] Unused get_object_or_404 imported from django.shortcuts
+hx_lti_initializer/views.py:13: [W0611(unused-import), ] Unused render_to_response imported from django.shortcuts
+hx_lti_initializer/views.py:18: [W0611(unused-import), ] Unused TargetObject imported from hx_lti_todapi.models
+hx_lti_initializer/views.py:22: [W0614(unused-wildcard-import), ] Unused import user_post_save from wildcard import
+hx_lti_initializer/views.py:22: [W0614(unused-wildcard-import), ] Unused import models from wildcard import
+hx_lti_initializer/views.py:22: [W0614(unused-wildcard-import), ] Unused import post_save from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import sys from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import abstractmethod from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import base64 from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import ABCMeta from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import abstractproperty from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import TODAPI_LTI from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import types from wildcard import
+hx_lti_initializer/views.py:23: [W0614(unused-wildcard-import), ] Unused import WeakSet from wildcard import
+************* Module hx_lti_initializer.tests
+hx_lti_initializer/tests.py:32: [C0303(trailing-whitespace), ] Trailing whitespace
+hx_lti_initializer/tests.py:36: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "lti_message_type": "basic-lti-launch-request",
+          ^ |
+hx_lti_initializer/tests.py:37: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "lti_version": "LTI-1p0",
+          ^ |
+hx_lti_initializer/tests.py:38: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
+          ^ |
+hx_lti_initializer/tests.py:39: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "lis_result_sourcedid": "261-154-728-17-784",
+          ^ |
+hx_lti_initializer/tests.py:40: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "lis_outcome_service_url": "http://localhost/lis_grade_passback",
+          ^ |
+hx_lti_initializer/tests.py:41: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "launch_presentation_return_url": "http://example.com/lti_return",
+          ^ |
+hx_lti_initializer/tests.py:42: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "custom_param1": "custom1",
+          ^ |
+hx_lti_initializer/tests.py:43: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "custom_param2": "custom2",
+          ^ |
+hx_lti_initializer/tests.py:44: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "ext_lti_message_type": "extension-lti-launch",
+          ^ |
+hx_lti_initializer/tests.py:45: [C0330(bad-continuation), ] Wrong hanging indentation.
+          "roles": "Learner,Instructor,Observer"
+          ^ |
+hx_lti_initializer/tests.py:24: [W0401(wildcard-import), ] Wildcard import utils
+hx_lti_initializer/tests.py:24: [W0403(relative-import), ] Relative import 'utils', should be 'hx_lti_initializer.utils'
+hx_lti_initializer/tests.py:47: [E1121(too-many-function-args), LTIInitializerUtilsTests.setUp] Too many positional arguments for constructor call
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import ABCMeta from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import base64 from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import user_post_save from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import abstractmethod from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import models from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import abstractproperty from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import settings from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import TargetObject from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import sys from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import debug_printer from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import LTICourse from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import User from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import LTIProfile from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import post_save from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import TOD_Implementation from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import TODAPI_LTI from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import types from wildcard import
+hx_lti_initializer/tests.py:24: [W0614(unused-wildcard-import), ] Unused import WeakSet from wildcard import
+************* Module hx_lti_initializer.utils
+hx_lti_initializer/utils.py:2: [W0401(wildcard-import), ] Wildcard import abstract_base_classes.target_object_database_api
+hx_lti_initializer/utils.py:3: [W0401(wildcard-import), ] Wildcard import models
+hx_lti_initializer/utils.py:3: [W0403(relative-import), ] Relative import 'models', should be 'hx_lti_initializer.models'
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import abstractmethod from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import TargetObject from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import ABCMeta from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import abstractproperty from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import LTICourse from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import LTIProfile from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import TOD_Implementation from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import TODAPI_LTI from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import types from wildcard import
+hx_lti_initializer/utils.py:2: [W0614(unused-wildcard-import), ] Unused import WeakSet from wildcard import
+hx_lti_initializer/utils.py:3: [W0614(unused-wildcard-import), ] Unused import user_post_save from wildcard import
+hx_lti_initializer/utils.py:3: [W0614(unused-wildcard-import), ] Unused import models from wildcard import
+hx_lti_initializer/utils.py:3: [W0614(unused-wildcard-import), ] Unused import User from wildcard import
+hx_lti_initializer/utils.py:3: [W0614(unused-wildcard-import), ] Unused import post_save from wildcard import
+hx_lti_initializer/utils.py:4: [W0611(unused-import), ] Unused import base64
+************* Module hx_lti_initializer.models
+hx_lti_initializer/models.py:104: [E0602(undefined-variable), LTICourse.get_courses_of_user] Undefined variable 'lti_profile'
+************* Module hx_lti_initializer.templatetags.target_object_extras
+hx_lti_initializer/templatetags/target_object_extras.py:15: [C0304(missing-final-newline), ] Final newline missing
+
+
+Report
+======
+239 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |13     |13         |=          |61.54       |23.08    |
++---------+-------+-----------+-----------+------------+---------+
+|class    |9      |9          |=          |22.22       |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|method   |10     |10         |=          |60.00       |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|function |9      |9          |=          |66.67       |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+External dependencies
+---------------------
+::
+
+    abstract_base_classes 
+      \-target_object_database_api (hx_lti_initializer.views)
+    django 
+      \-conf (hx_lti_initializer.templatetags.target_object_extras,hx_lti_initializer.utils,hx_lti_initializer.views,hx_lti_initializer.migrations.0001_initial,hx_lti_initializer)
+      | \-urls (hx_lti_initializer.urls)
+      \-contrib 
+      | \-admin (hx_lti_initializer.admin)
+      | \-auth (hx_lti_initializer.views)
+      | | \-models (hx_lti_initializer.models)
+      | \-messages (hx_lti_initializer.views)
+      \-core 
+      | \-exceptions (hx_lti_initializer.views)
+      \-db 
+      | \-migrations (hx_lti_initializer.migrations.0002_ltiprofile_anon_id,hx_lti_initializer.migrations.0003_lticourse,hx_lti_initializer.migrations.0001_initial)
+      | \-models (hx_lti_initializer.models,hx_lti_initializer.migrations.0002_ltiprofile_anon_id,hx_lti_initializer.migrations.0003_lticourse,hx_lti_initializer.migrations.0001_initial)
+      |   \-signals (hx_lti_initializer.models)
+      \-http (hx_lti_initializer.views)
+      \-shortcuts (hx_lti_initializer.views)
+      \-template (hx_lti_initializer.templatetags.target_object_extras,hx_lti_initializer.views)
+      \-test (hx_lti_initializer.tests)
+      \-utils 
+      | \-translation (hx_lti_initializer.models)
+      \-views 
+        \-decorators 
+          \-csrf (hx_lti_initializer.views)
+    hx_lti_initializer 
+      \-models (hx_lti_initializer.views,hx_lti_initializer.admin)
+    hx_lti_todapi 
+      \-models (hx_lti_initializer.utils,hx_lti_initializer.views)
+    ims_lti_py 
+      \-tool_provider (hx_lti_initializer.tests,hx_lti_initializer.views)
+
+
+
+Raw metrics
+-----------
+
++----------+-------+------+---------+-----------+
+|type      |number |%     |previous |difference |
++==========+=======+======+=========+===========+
+|code      |319    |60.65 |317      |+2.00      |
++----------+-------+------+---------+-----------+
+|docstring |113    |21.48 |104      |+9.00      |
++----------+-------+------+---------+-----------+
+|comment   |42     |7.98  |42       |=          |
++----------+-------+------+---------+-----------+
+|empty     |52     |9.89  |49       |+3.00      |
++----------+-------+------+---------+-----------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |0        |=          |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |0.000    |=          |
++-------------------------+------+---------+-----------+
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |46     |58       |-12.00     |
++-----------+-------+---------+-----------+
+|refactor   |3      |3        |=          |
++-----------+-------+---------+-----------+
+|warning    |62     |62       |=          |
++-----------+-------+---------+-----------+
+|error      |7      |7        |=          |
++-----------+-------+---------+-----------+
+
+
+
+% errors / warnings by module
+-----------------------------
+
++-----------------------------------------------------+------+--------+---------+-----------+
+|module                                               |error |warning |refactor |convention |
++=====================================================+======+========+=========+===========+
+|hx_lti_initializer.views                             |71.43 |38.71   |100.00   |69.57      |
++-----------------------------------------------------+------+--------+---------+-----------+
+|hx_lti_initializer.tests                             |14.29 |32.26   |0.00     |23.91      |
++-----------------------------------------------------+------+--------+---------+-----------+
+|hx_lti_initializer.models                            |14.29 |0.00    |0.00     |0.00       |
++-----------------------------------------------------+------+--------+---------+-----------+
+|hx_lti_initializer.utils                             |0.00  |29.03   |0.00     |0.00       |
++-----------------------------------------------------+------+--------+---------+-----------+
+|hx_lti_initializer.urls                              |0.00  |0.00    |0.00     |4.35       |
++-----------------------------------------------------+------+--------+---------+-----------+
+|hx_lti_initializer.templatetags.target_object_extras |0.00  |0.00    |0.00     |2.17       |
++-----------------------------------------------------+------+--------+---------+-----------+
+
+
+
+Messages
+--------
+
++-----------------------+------------+
+|message id             |occurrences |
++=======================+============+
+|unused-wildcard-import |43          |
++-----------------------+------------+
+|trailing-whitespace    |31          |
++-----------------------+------------+
+|bad-continuation       |10          |
++-----------------------+------------+
+|unused-import          |6           |
++-----------------------+------------+
+|wildcard-import        |5           |
++-----------------------+------------+
+|undefined-variable     |5           |
++-----------------------+------------+
+|relative-import        |4           |
++-----------------------+------------+
+|bad-indentation        |3           |
++-----------------------+------------+
+|too-many-function-args |2           |
++-----------------------+------------+
+|missing-final-newline  |2           |
++-----------------------+------------+
+|line-too-long          |2           |
++-----------------------+------------+
+|unused-variable        |1           |
++-----------------------+------------+
+|too-many-statements    |1           |
++-----------------------+------------+
+|too-many-locals        |1           |
++-----------------------+------------+
+|too-many-branches      |1           |
++-----------------------+------------+
+|empty-docstring        |1           |
++-----------------------+------------+
+
+
+
+Global evaluation
+-----------------
+Your code has been rated at 3.89/10 (previous run: 3.39/10, +0.50)
+

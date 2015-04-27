@@ -67,10 +67,7 @@ def initialize_lti_tool_provider(req):
         else:
             debug_printer('DEBUG - LTI Tool Provider was valid.')
     except:
-        if not req.user.is_authorized:
-            # could not even access tool_provider as the request was incorrect
-            debug_printer("DEBUG - Tool Provider was not initialized correctly.")
-            raise PermissionDenied()
+        raise PermissionDenied()
     return provider
 
 def create_new_user(username, email, roles):
@@ -110,11 +107,27 @@ def launch_lti(request):
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
     consumer_key_requested = request.POST['oauth_consumer_key']
-    anon_id = '%s:%s' % (consumer_key_requested, get_lti_value(settings.LTI_ANON_ID, tool_provider))
+    anon_id = '%s:%s' % (consumer_key_requested, get_lti_value('user_id', tool_provider))
     debug_printer('DEBUG - Found anonymous ID in request: %s' % anon_id)
     
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
+    collection = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+    object = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+    
     debug_printer('DEBUG - Found course being accessed: %s' % course)
+    
+    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    if "Student" in roles:
+        targ_obj = TargetObject.objects.get(pk=object)
+        return render(request, '%s/detail.html' % targ_obj.target_type, {
+            'email': get_lti_value('lis_person_contact_email_primary', tool_provider),
+            'user_id': get_lti_value('lis_person_sourcedid', tool_provider),
+            'roles': roles,
+            'collection': collection,
+            'course': course,
+            'object': object,
+            'target_object': targ_obj,
+        })
     
     try:
         # try to get the profile via the anon id
@@ -125,9 +138,8 @@ def launch_lti(request):
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         # gather the necessary data from the LTI initialization request
-        email = get_lti_value(settings.LTI_EMAIL, tool_provider)
-        roles = get_lti_value(settings.LTI_ROLES, tool_provider)
-        lti_username = get_lti_value(settings.LTI_USERNAME, tool_provider)
+        email = get_lti_value('lis_person_contact_email_primary', tool_provider)
+        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
         
         # checks to see if email and username were not passed in
         # cannot create a user without them

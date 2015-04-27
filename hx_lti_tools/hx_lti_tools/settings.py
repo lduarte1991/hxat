@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_jenkins',
     'testapp',
     'bootstrap3',
     'ims_lti_py',
@@ -98,3 +99,13 @@ MESSAGE_TAGS = {
             messages.WARNING: 'warning warning',
             messages.ERROR: 'danger error'
 }
+
+PROJECT_APPS = (
+    'hx_lti_initializer',
+)
+
+JENKINS_TASKS = (
+    'django_jenkins.tasks.run_pep8',
+    'django_jenkins.tasks.run_pylint',
+    'django_jenkins.tasks.run_csslint',
+)

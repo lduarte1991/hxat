@@ -7,19 +7,23 @@ import sys
 # import Sample Target Object Model
 from hx_lti_todapi.models import TargetObject
 
+
 def get_lti_value(key, tool_provider):
-    """ 
-    Searches for the given key in the tool_provider. If not found returns None 
     """
-    
+    Searches for the given key in the tool_provider. If not found returns None
+    """
+
     lti_value = None
-    
-    try:
-        lti_value = getattr(tool_provider,key)
-    except AttributeError:
-        print "Attribute: %s not found in LTI tool_provider" % key
+    if "custom" in key:
+        lti_value = tool_provider.custom_params[key]
+    else:
+        try:
+            lti_value = getattr(tool_provider, key)
+        except AttributeError:
+            print "Attribute: %s not found in LTI tool_provider" % key
 
     return lti_value
+
 
 def debug_printer(debug_text):
     """

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from models import *
 
-def open_target_object(request, target_obj_id):
+def open_target_object(request, collection_id, target_obj_id):
     try:
         targ_obj = TargetObject.objects.get(pk=target_obj_id)
     except TargetObject.DoesNotExist:
