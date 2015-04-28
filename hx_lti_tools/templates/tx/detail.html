@@ -10,21 +10,21 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% load staticfiles %}
-<script src="{% static "vendors/Annotator/annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.auth.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.document.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.filter.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.kitchensink.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.markdown.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.permissions.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.store.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.tags.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator.unsupported.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.auth.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.document.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.filter.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.kitchensink.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.markdown.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.permissions.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.store.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.tags.js" %}"></script>
+<script src="{% static "vendors/SplitAnnotator/annotator.unsupported.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/SplitAnnotator/annotator.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -42,9 +42,11 @@ jQuery(function ($) {
 		var options = {
 			commonInfo: {
 				mediaType: "text", // {{ media_type }}
-				context_id: {{ course }}
-				collection_id: {{ collection }}
-				object_id: {{ object.id }}
+				context_id: "{{ course }}",
+				collection_id: {{ collection }},
+				object_id: {{ object }},
+				token: "{{ token }}",
+
 			},
 			annotationMainOptions: {
 
@@ -53,6 +55,8 @@ jQuery(function ($) {
 				annotationElement: jQuery(".container"),
 				initOptions: {
 					'plugins': [
+						// order matters, auth before store
+						'Auth',
 						'Store',
 					],
 				},

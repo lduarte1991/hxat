@@ -85,32 +85,40 @@
 	};
 
 	$.AnnotationCore.prototype.setUpPlugins = function() {
-	    for (plugins in this.initOptions.plugins){
-	    	options = {
-	    		 // The endpoint of the store on your server.
-                prefix: "",
-                annotationData: {
-                    uri: 'http://test.com',
-                    citation: "${source}"
-                },
-                urls: {
-                    // These are the default URLs.
-                    create:  '/create',
-                    read:    '/read/:id',
-                    update:  '/update/:id',
-                    destroy: '/delete/:id',
-                    search:  '/search'
-                },
-                loadFromSearch:{
-                    limit:1,
-                    offset:0,
-                    uri:'http://test.com',
-                    media:'text',
-                    userid:'${user.email}',
-                }
-	    	};
-	    	this.annotation_tool.addPlugin(this.initOptions.plugins[plugins], options);
-
+	    for (plugin in this.initOptions.plugins){
+	    	pluginName = this.initOptions.plugins[plugin];
+	    	var options = {};
+	    	if (pluginName === "Store") {
+		    	options = {
+		    		 // The endpoint of the store on your server.
+	                prefix: "http://54.148.223.225:8080/catch/annotator",
+	                annotationData: {
+	                    uri: 'http://test.com',
+	                    citation: "fake source"
+	                },
+	                urls: {
+	                    // These are the default URLs.
+	                    create:  '/create',
+	                    read:    '/read/:id',
+	                    update:  '/update/:id',
+	                    destroy: '/delete/:id',
+	                    search:  '/search'
+	                },
+	                loadFromSearch:{
+	                    limit:1,
+	                    offset:0,
+	                    uri:'http://test.com',
+	                    media:'text',
+	                    userid: this.initOptions.,
+	                }
+		    	};
+		    	
+		    } else if (pluginName === 'Auth') {
+		    	options = {
+		    		token: this.initOptions.token,
+		    	};
+		    }
+		    this.annotation_tool.addPlugin(pluginName, options);
 	    }
 	}
 

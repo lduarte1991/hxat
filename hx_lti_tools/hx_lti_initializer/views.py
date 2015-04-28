@@ -127,6 +127,7 @@ def launch_lti(request):
             'course': course,
             'object': object,
             'target_object': targ_obj,
+            'token': retrieve_token(get_lti_value('lis_person_contact_email_primary', tool_provider), ''),
         })
     
     try:
