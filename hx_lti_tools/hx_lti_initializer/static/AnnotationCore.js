@@ -63,7 +63,10 @@
 	    // target source, it can exist in multiple assignments and multiple courses. context_id
 	    // refers to the course it belongs to and collection_id is the assignment the object belongs to
 	    if (typeof store.annotationData.uri === 'undefined'){
-	        store.annotationData.uri = annotatorOptions.object_id;
+	    	//once CATCH can handle context_id and collection_id, we can store just the object_id as the URI
+	        //store.annotationData.uri = annotatorOptions.object_id;
+	        var tempUri = "" + annotatorOptions.object_id + ":" + annotatorOptions.context_id + ":" + annotatorOptions.collection_id;
+
 	    }
 	    if (typeof store.annotationData.context_id === 'undefined'){
 	        store.annotationData.context_id = annotatorOptions.context_id;
@@ -89,12 +92,14 @@
 	    	pluginName = this.initOptions.plugins[plugin];
 	    	var options = {};
 	    	if (pluginName === "Store") {
+	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
-		    		 // The endpoint of the store on your server.
+		    		// The endpoint of the store on your server.
 	                prefix: "http://54.148.223.225:8080/catch/annotator",
 	                annotationData: {
-	                    uri: 'http://test.com',
-	                    citation: "fake source"
+	                    uri: tempUri,
+	                    citation: "fake source",
+	                    media: this.initOptions.mediaType,
 	                },
 	                urls: {
 	                    // These are the default URLs.
@@ -105,11 +110,8 @@
 	                    search:  '/search'
 	                },
 	                loadFromSearch:{
-	                    limit:1,
-	                    offset:0,
-	                    uri:'http://test.com',
-	                    media:'text',
-	                    userid: this.initOptions.,
+	                    uri: tempUri,
+	                    media: this.initOptions.mediaType,
 	                }
 		    	};
 		    	
@@ -117,6 +119,54 @@
 		    	options = {
 		    		token: this.initOptions.token,
 		    	};
+		    } else if (pluginName === 'Permissions') {
+		    	options = {
+	                user: {
+	                    id: this.initOptions.user_id,
+	                    name: this.initOptions.username,
+	                },
+	                permissions: {
+	                        'read':   [],
+	                        'update': [this.initOptions.user_id,],
+	                        'delete': [this.initOptions.user_id,],
+	                        'admin':  [this.initOptions.user_id,]
+	                },
+	                showViewPermissionsCheckbox: false,
+	                showEditPermissionsCheckbox: false,
+	                userString: function (user) {
+	                    if (user && user.name)
+	                        return user.name;
+	                    return user;
+	                },
+	                userId: function (user) {
+	                    if (user && user.id)
+	                        return user.id;
+	                    return user;
+	                },
+	                userAuthorize: function(action, annotation, user) {
+	                    var token, tokens, _i, _len;
+	                    if (annotation.permissions) {
+	                      tokens = annotation.permissions[action] || [];
+	                      if (tokens.length === 0) {
+	                        return true;
+	                      }
+	                      for (item in tokens) {
+	                        token = tokens[item];
+	                        if (this.userId(user) === token) {
+	                          return true;
+	                        }
+	                      }
+	                      return false;
+	                    } else if (annotation.user) {
+	                      if (user) {
+	                        return this.userId(user) === this.userId(annotation.user);
+	                      } else {
+	                        return false;
+	                      }
+	                    }
+	                    return true;
+	                  },
+			    }
 		    }
 		    this.annotation_tool.addPlugin(pluginName, options);
 	    }

@@ -1,0 +1,30 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+{% load staticfiles %}
+<script src="{% static "vendors/underscore-min.js" %}"></script>
+
+<div id="annotation-area"></div>
+
+<script>
+	jQuery.get( '{{target_object.target_type}}/detail.html', function (data) {
+		var context = {
+			title: "{{ target_object.target_title | safe }}",
+			author: "{{ target_object.target_author | safe }}",
+			text: "{% filter escapejs %}{{ target_object.target_content | safe }}{% endfilter %}",
+			citation: "{{ target_object.target_citation | safe }}",
+			course: "{{ course }}",
+			collection: {{ collection }},
+			object: {{ object }},
+			token: "{{ token }}",
+		};
+		jQuery("#annotation-area").html(_.template(data,context));
+	});
+</script>

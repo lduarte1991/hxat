@@ -115,19 +115,20 @@ def launch_lti(request):
     object = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
     
     debug_printer('DEBUG - Found course being accessed: %s' % course)
+    user_id = get_lti_value('user_id', tool_provider)
     
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     if "Student" in roles:
         targ_obj = TargetObject.objects.get(pk=object)
-        return render(request, '%s/detail.html' % targ_obj.target_type, {
-            'email': get_lti_value('lis_person_contact_email_primary', tool_provider),
-            'user_id': get_lti_value('lis_person_sourcedid', tool_provider),
+        return render(request, 'tx/detail.html', {
+            'user_id': user_id,
+            'username': get_lti_value('lis_person_sourcedid', tool_provider),
             'roles': roles,
             'collection': collection,
             'course': course,
             'object': object,
             'target_object': targ_obj,
-            'token': retrieve_token(get_lti_value('lis_person_contact_email_primary', tool_provider), ''),
+            'token': retrieve_token(user_id, ''),
         })
     
     try:
