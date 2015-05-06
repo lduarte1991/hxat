@@ -90,7 +90,7 @@
 	$.AnnotationCore.prototype.setUpPlugins = function() {
 	    for (plugin in this.initOptions.plugins){
 	    	pluginName = this.initOptions.plugins[plugin];
-	    	var options = {};
+	    	options = {};
 	    	if (pluginName === "Store") {
 	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
@@ -166,10 +166,38 @@
 	                    }
 	                    return true;
 	                  },
-			    }
+			    } 
+			} else if(pluginName === "RichText") {
+		    	options = {
+		    		tinymce:{
+		                selector: "li.annotator-item textarea",
+		                plugins: "media image codemirror",
+		                menubar: false,
+		                toolbar_items_size: 'small',
+		                extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
+		                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
+        				auto_focus: "annotator-field-0",
+        			}
+        		}
+		    } else if (pluginName === "HighlightTags") {
+		    	options = {
+		            tag: "test1:red;test2:blue",
+		    	}
+		    } else if (pluginName === "Grouping") {
+		    	options = {
+		    		optionsOVA: {
+			    		posBigNew: 'none', 
+			    		default_tab: 'Public',
+			    		annotation_tool: this.annotation_tool,
+			    	}
+		    	}
 		    }
 		    this.annotation_tool.addPlugin(pluginName, options);
 	    }
-	}
+	};
+
+	$.AnnotationCore.prototype.getAnnotationTool = function() {
+		return this.annotation_tool;
+	};
 
 }(AController));

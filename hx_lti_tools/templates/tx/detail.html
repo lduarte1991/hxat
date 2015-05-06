@@ -10,6 +10,7 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% load staticfiles %}
+<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
 <script src="{% static "vendors/SplitAnnotator/annotator.js" %}"></script>
 <script src="{% static "vendors/SplitAnnotator/annotator.auth.js" %}"></script>
 <script src="{% static "vendors/SplitAnnotator/annotator.document.js" %}"></script>
@@ -24,7 +25,13 @@
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/tags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/SplitAnnotator/annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/tags-annotator.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -61,6 +68,8 @@ jQuery(function ($) {
 						'Auth',
 						'Permissions',
 						'Store',
+						'RichText',
+						'HighlightTags',
 					],
 				},
 			},
@@ -69,6 +78,16 @@ jQuery(function ($) {
 			},
 		}
 		AController(options);
+		if (typeof Annotator.Plugin["Grouping"] === 'function') {
+			options = {
+	    		optionsOVA: {
+		    		posBigNew: 'none', 
+		    		default_tab: 'Public',
+		    		annotation_tool: AController.annotationCore.annotation_tool,
+		    	}
+	    	}
+            AController.annotationCore.annotation_tool.addPlugin("Grouping", options);
+		}
 	});
 });
 </script>
