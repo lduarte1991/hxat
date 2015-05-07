@@ -34,10 +34,72 @@
 		// sets up the store for the common settings for the tool, specifically Annotation Database
 		this.setUpCommonAttributes();
 
-		if (mediaType === "text") {
-			// create the annotation core holder to be able to access it throughout the tool
-			this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
-			this.setUpPlugins();
+		this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
+		this.setUpPlugins();
+
+		if (mediaType == "video") {
+			// Video-JS
+		    /*    
+		        mplayers -> Array with the html of all the video-js
+		        mplayer -> Array with all the video-js that will be in the plugin
+		    */
+		    var mplayers = this.element.find('div .video-js').toArray();
+		    var mplayer = this.mplayer = {};
+		    for (var index in mplayers) {
+		        var id = mplayers[index].id;
+		        var mplayer_ = videojs(mplayers[index], annotatorOptions.optionsVideoJS);
+		        // solve a problem with firefox. In Firefox the src() function is loaded before charge the optionsVideoJS, and the techOrder are not loaded
+		        if (vjs.IS_FIREFOX && typeof annotatorOptions.optionsVideoJS.techOrder !== 'undefined'){
+		            mplayer_.options_.techOrder = annotatorOptions.optionsVideoJS.techOrder;
+		            mplayer_.src(mplayer_.options_['sources']);
+		        }
+		        this.mplayer[id] = mplayer_;
+		    }
+		    
+		    
+		    // Video-JS
+		    this.annotation_tool.an = {}; // annotations video-js plugin to annotator
+		    for (var index in this.mplayer) {
+		        // to be their own options is necessary to extend deeply the options with all the childrens
+		        this.mplayer[index].rangeslider(jQuery.extend(true, {}, annotatorOptions.optionsRS));
+		        this.mplayer[index].annotations(jQuery.extend(true, {}, annotatorOptions.optionsOVA));
+		        this.annotation_tool.an[index]=this.mplayer[index].annotations;
+		    }
+
+		    // Local function to setup the keyboard listener
+		    var focusedPlayer = this.focusedPlayer = ''; // variable to know the focused player
+		    var lastfocusPlayer = this.lastfocusPlayer = ''; 
+		    
+		    function onKeyUp(e) {
+		        // skip the text areas
+		        if (e.target.nodeName.toLowerCase() !== 'textarea')
+		            mplayer[focusedPlayer].annotations.pressedKey(e.which);
+		    };
+		    
+		    (this._setupKeyboard = function() {
+		        jQuery(document).mousedown(function(e) {
+		            focusedPlayer = '';
+		            
+		            // Detects if a player was click
+		            for (var index in mplayer) {
+		                if (jQuery(mplayer[index].el_).find(e.target).length)
+		                    focusedPlayer = mplayer[index].id_;
+		            }
+		            
+		            // Enter if we change the focus between player or go out of the player
+		            if (lastfocusPlayer !== focusedPlayer) {
+		                jQuery(document).off("keyup", onKeyUp); // Remove the last listener
+		                // set the key listener
+		                if (focusedPlayer !== '')
+		                    jQuery(document).on("keyup", onKeyUp);
+		            }
+		            
+		            lastfocusPlayer = focusedPlayer;
+		        });
+		        
+		    }) (this);
+		    this.annotation_tool.mplayer = this.mplayer;
+    		this.annotation_tool.editor.VideoJS = -1;
 		}
 	};
 

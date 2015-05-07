@@ -8,10 +8,10 @@
  *     4) Dashboard Object - displays annotations
  */
 
-window.AController = window.AController || function(options) {
-	AController.main = new AController.AnnotationMain(options);
-	AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions);
-	//AController.annotationServer = new AController.AnnotationServer(options.annotationServerOptions);
-	AController.annotationCore = new AController.AnnotationCore(options.annotationCoreOptions, options.commonInfo);
-	//AController.dashboardObjectController = new AController.DashboardController(options.dashboardObjectOptions);
+window.AController = window.AController || function(aControllerOptions) {
+	AController.main = new AController.AnnotationMain(aControllerOptions);
+	AController.targetObjectController = new AController.TargetObjectController(aControllerOptions.targetObjectOptions);
+	//AController.annotationServer = new AController.AnnotationServer(aControllerOptions.annotationServerOptions);
+	AController.annotationCore = new AController.AnnotationCore(aControllerOptions.annotationCoreOptions, aControllerOptions.commonInfo);
+	//AController.dashboardObjectController = new AController.DashboardController(aControllerOptions.dashboardObjectOptions);
 }

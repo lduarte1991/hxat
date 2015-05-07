@@ -120,7 +120,17 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     if "Student" in roles:
         targ_obj = TargetObject.objects.get(pk=object)
-        return render(request, 'tx/detail.html', {
+        extraContent = {}
+        if (targ_obj.target_type == 'vd'):
+            srcurl = targ_obj.target_content
+            if 'youtu' in srcurl:
+                typeSource = 'video/youtube'
+            else:
+                disassembled = urlparse(srcurl)
+                file_ext = splitext(basename(disassembled.path))[1]
+                typeSource = 'video/' + file_ext.replace('.', '')
+            extraContent = {'typeSource': typeSource}
+        return render(request, '%s/detail.html' % targ_obj.target_type, {
             'user_id': user_id,
             'username': get_lti_value('lis_person_sourcedid', tool_provider),
             'roles': roles,
@@ -129,6 +139,7 @@ def launch_lti(request):
             'object': object,
             'target_object': targ_obj,
             'token': retrieve_token(user_id, ''),
+            'typeSource': 'video/youtube',
         })
     
     try:
