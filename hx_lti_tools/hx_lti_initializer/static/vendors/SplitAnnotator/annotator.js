@@ -1609,9 +1609,9 @@
       controls = this.element.find('.annotator-controls');
       console.log(controls);
       if (this.element.hasClass(this.classes.invert.y)) {
-        //controls.insertBefore(list);
+        controls.insertBefore(list);
       } else if (controls.is(':first-child')) {
-        //controls.insertAfter(list);
+        controls.insertAfter(list);
       }
       return this;
     };

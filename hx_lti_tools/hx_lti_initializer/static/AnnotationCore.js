@@ -181,7 +181,7 @@
         		}
 		    } else if (pluginName === "HighlightTags") {
 		    	options = {
-		            tag: "test1:red;test2:blue",
+		            tag: "test1:red,test2:blue",
 		    	}
 		    } else if (pluginName === "Grouping") {
 		    	options = {
@@ -190,6 +190,10 @@
 			    		default_tab: 'Public',
 			    		annotation_tool: this.annotation_tool,
 			    	}
+		    	}
+		    } else if (pluginName === "Touch") {
+		    	options = {
+		    		force: false,
 		    	}
 		    }
 		    this.annotation_tool.addPlugin(pluginName, options);

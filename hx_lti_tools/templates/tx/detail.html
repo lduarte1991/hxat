@@ -1,5 +1,4 @@
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-</script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -10,28 +9,23 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% load staticfiles %}
+{% load staticfiles %}
 <script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.auth.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.document.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.filter.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.kitchensink.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.markdown.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.permissions.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.store.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.tags.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.unsupported.js" %}"></script>
+<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/tags-annotator.js" %}"></script>
+<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/SplitAnnotator/annotator.css" %}">
+<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/tags-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
+<link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -42,7 +36,8 @@
 {{ target_object.target_citation | safe }}
 </div>
 </div>
-
+<div id="CatchDiv">
+</div>
 
 <script>
 jQuery(function ($) {
@@ -61,15 +56,16 @@ jQuery(function ($) {
 
 			},
 			annotationCoreOptions: {
-				annotationElement: jQuery(".container"),
+				annotationElement: jQuery(".content"),
 				initOptions: {
 					'plugins': [
 						// order matters, auth before store
 						'Auth',
 						'Permissions',
 						'Store',
-						'RichText',
 						'HighlightTags',
+						'RichText',
+						//'Touch',
 					],
 				},
 			},

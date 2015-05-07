@@ -20,6 +20,7 @@ li.token-input-token p {
     display: inline;
     padding: 0;
     margin: 0;
+    line-height: 2em;
 }
 
 li.token-input-token span {
@@ -93,5 +94,5 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .token-input-list{
-    padding:0px;
+    padding:0px !important;
 }
