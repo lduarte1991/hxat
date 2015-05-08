@@ -37,7 +37,52 @@
 		this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
 		this.setUpPlugins();
 
-		if (mediaType == "video") {
+		if(mediaType == "image") {
+			//- OpenSeaDragon
+		    this.viewer = OpenSeadragon(annotatorOptions.optionsOpenSeadragon);
+		    console.log(this.viewer);
+		    //- OpenSeaDragon Plugins
+		    this.viewer.annotation(annotatorOptions.optionsOSDA);
+		    
+		    // Set annotator.editor.OpenSeaDragon by default
+		    this.annotation_tool.editor.OpenSeaDragon=-1;
+
+		    this.annotation_tool.osda = this;
+
+			function reloadEditor(){
+		        tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
+		        tinymce.EditorManager.execCommand('mceAddEditor',true, "annotator-field-0");
+		        
+		        // if person hits into/out of fullscreen before closing the editor should close itself
+		        // ideally we would want to keep it open and reposition, this would make a great TODO in the future
+		        Annotator._instances[0].editor.hide();
+		    }
+
+		    var self = this;
+		    document.addEventListener("fullscreenchange", function () {
+		        reloadEditor();
+		    }, false);
+		 
+		    document.addEventListener("mozfullscreenchange", function () {
+		        reloadEditor();
+		    }, false);
+		 
+		    document.addEventListener("webkitfullscreenchange", function () {
+		        reloadEditor();
+		    }, false);
+		 
+		    document.addEventListener("msfullscreenchange", function () {
+		        reloadEditor();
+		    }, false);
+
+		    // for some reason the above doesn't work when person hits ESC to exit full screen...
+		    jQuery(document).keyup(function(e) {
+		        // esc key reloads editor as well
+		        if (e.keyCode == 27) { 
+		            reloadEditor();
+		        }   
+		    });
+		} else if (mediaType == "video") {
 			// Video-JS
 		    /*    
 		        mplayers -> Array with the html of all the video-js

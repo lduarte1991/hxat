@@ -22,6 +22,7 @@ from abstract_base_classes.target_object_database_api import TOD_Implementation
 from models import *
 from utils import *
 import sys
+import json
 
 def validate_request(req):
     """
@@ -129,7 +130,7 @@ def launch_lti(request):
                 disassembled = urlparse(srcurl)
                 file_ext = splitext(basename(disassembled.path))[1]
                 typeSource = 'video/' + file_ext.replace('.', '')
-            extraContent = {'typeSource': typeSource}
+            extraContent = typeSource
         return render(request, '%s/detail.html' % targ_obj.target_type, {
             'user_id': user_id,
             'username': get_lti_value('lis_person_sourcedid', tool_provider),
@@ -139,7 +140,10 @@ def launch_lti(request):
             'object': object,
             'target_object': targ_obj,
             'token': retrieve_token(user_id, ''),
-            'typeSource': 'video/youtube',
+            #Add this when talking about images\
+            'osd_json': targ_obj.target_content,
+            # Add this when talking about videos
+            #'typeSource': extraContent,
         })
     
     try:

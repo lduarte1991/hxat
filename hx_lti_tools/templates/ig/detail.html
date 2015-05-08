@@ -11,35 +11,27 @@
 {% load staticfiles %}
 {% load staticfiles %}
 <script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
+<script src="{% static "vendors/image/openseadragon.js" %}"></script>
 <script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
-<script src="{% static "vendors/video/jquery-Watch.js" %}"></script>
-<script src="{% static "vendors/video/video.dev.js" %}"></script>
-<script src="{% static "vendors/video/vjs.youtube.js" %}"></script>
-<script src="{% static "vendors/video/rangeslider.js" %}"></script>
-<script src="{% static "vendors/video/videojs-annotator.js" %}"></script>
-<script src="{% static "vendors/video/videojs.annotation.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
+<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/image-annotator.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
-<link rel="stylesheet" href="{% static "vendors/video/video-js.min.css" %}">
-<link rel="stylesheet" href="{% static "vendors/video/rangeslider.css" %}">
-<link rel="stylesheet" href="{% static "hx-annotation.css" %}">
-<link rel="stylesheet" href="{% static "vendors/ova.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
-<div class="content">
-	<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264">
-		<source src="{{ target_object.target_content | safe }}" type='{{ typeSource }}' />
-	</video>
+<div id="content">
 </div>
 <div class="citation">
-<a href="{{ target_object.target_citation | safe }}">Source Channel</a>
+{{ target_object.target_citation | safe }}
 </div>
 </div>
 <div id="CatchDiv">
@@ -50,7 +42,7 @@ jQuery(function ($) {
     $(function() {
 		var options = {
 			commonInfo: {
-				mediaType: "video", // {{ media_type }}
+				mediaType: "image", // {{ media_type }}
 				context_id: "{{ course }}",
 				collection_id: {{ collection }},
 				object_id: {{ object }},
@@ -62,28 +54,30 @@ jQuery(function ($) {
 
 			},
 			annotationCoreOptions: {
-				annotationElement: jQuery(".content"),
+				annotationElement: jQuery("#content"),
 				initOptions: {
 					'plugins': [
 						// order matters, auth before store
 						'Auth',
 						'Permissions',
 						'Store',
-						'VideoJS',
 						'RichText',
+						'OpenSeaDragon',
+						'HighlightTags',
 						//'Touch',
 					],
-					optionsVideoJS: {
-						techOrder: [
-							"html5",
-							"flash",
-							"youtube",
-						],
-					},
-					optionsRS: {},
-					optionsOVA: {
-						posBigNew:'none',
-					},
+					optionsOpenSeadragon:{
+			            'id': "content",
+			            'annotation_mode': "everyone",
+			            'prefixUrl': "{% static "vendors/image/icons/" %}",
+			            'navigatorSizeRatio': 0.25,
+		                'wrapHorizontal':     false,
+		                'showNavigator': true,
+		                'navigatorPosition': "BOTTOM_LEFT",
+		                'showNavigationControl': true,
+                		'tileSources': {{ osd_json | safe }},
+			        },
+			        optionsOSDA:{},
 				},
 			},
 			targetObjectControllerOptions: {
