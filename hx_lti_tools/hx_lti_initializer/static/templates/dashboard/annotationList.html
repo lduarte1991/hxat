@@ -1,0 +1,44 @@
+<div class="annotationListButtons">
+       <%= PublicPrivate %>
+   </div>
+   <div class="annotationList">
+       <%= MediaSelector %>
+       <div class="header">
+           <div class="annotationRow">
+               <div class="expandableIcon field">
+                   &nbsp;  <!-- TODO: better way to ensure width upon hide -->
+               </div>
+
+               <div class="annotatedBy field">
+                    User
+               </div>
+
+               <div class="body field">
+                    Annotation
+               </div>  
+                
+                <% if (videoFormat) { %>
+                   <div class="start field">
+                        Start
+                   </div>
+
+                   <div class="end field">
+                        End
+                   </div>
+                <% } %>
+               <div class="totalreplies field">
+                    No. of Replies
+               </div>
+                
+               <div class="annotatedAt field">
+                    Date posted
+               </div>
+           </div>
+       </div>
+       <% _.each(annotationItems, function(item) { %>
+          <%= item %>
+       <% }); %>
+   </div>
+   <div class="annotationListButtons">
+       <div class="moreButtonCatch">More</div>
+   </div>

@@ -202,7 +202,7 @@
 	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
 		    		// The endpoint of the store on your server.
-	                prefix: "http://54.148.223.225:8080/catch/annotator",
+	                prefix: "http://catch-dev.harvardx.harvard.edu:8080/catch/annotator",
 	                annotationData: {
 	                    uri: tempUri,
 	                    citation: "fake source",

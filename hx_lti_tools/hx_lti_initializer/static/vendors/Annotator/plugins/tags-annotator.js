@@ -287,9 +287,9 @@ Annotator.Plugin.HighlightTags = (function(_super) {
     // hit submit and is just viewing the annotation.
     HighlightTags.prototype.updateViewer = function(field, annotation) {
         if (typeof annotation.tags != "undefined") {
-            
+            console.log(annotation.tags)
             // if there are no tags, the space for tags in the pop up is removed and function ends
-            if (annotation.tags.length == 0) {
+            if (annotation.tags.length === 0 || annotation.tags[0] === "") {
                 $(field).remove();
                 return;
             }

@@ -255,11 +255,9 @@ Annotator.Plugin.HighlightTags.prototype.updateField = function(field, annotatio
 };
 
 Annotator.Plugin.HighlightTags.prototype.updateViewer = function(field, annotation) {
-	console.log("Updating Viewer");
 	var self = Annotator._instances[0].plugins.HighlightTags;
 	if (typeof annotation.tags !== "undefined") {
-		console.log("Does have tags");
-		if (annotation.tags.length === 0) {
+		if (annotation.tags.length === 0 || annotation.tags[0] === "") {
 			$(field).remove();
 			return;
 		}
@@ -271,7 +269,7 @@ Annotator.Plugin.HighlightTags.prototype.updateViewer = function(field, annotati
         for (tagnum = 0; tagnum < annotation.tags.length; ++tagnum){
             if (typeof self.annotator.plugins["Flagging"] !== 'undefined') {
                 // once again we ingore flags
-                if (annotation.tags[tagnum].indexOf("flagged-") == -1) {
+                if (annotation.tags[tagnum].indexOf("flagged-") === -1) {
                     
                     // once again, defaults are black for text and powder blue default from token function
                     var rgbColor = "";

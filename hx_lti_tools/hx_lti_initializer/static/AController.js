@@ -13,5 +13,5 @@ window.AController = window.AController || function(aControllerOptions) {
 	AController.targetObjectController = new AController.TargetObjectController(aControllerOptions.targetObjectOptions);
 	//AController.annotationServer = new AController.AnnotationServer(aControllerOptions.annotationServerOptions);
 	AController.annotationCore = new AController.AnnotationCore(aControllerOptions.annotationCoreOptions, aControllerOptions.commonInfo);
-	//AController.dashboardObjectController = new AController.DashboardController(aControllerOptions.dashboardObjectOptions);
+	AController.dashboardController = new AController.DashboardController(aControllerOptions.dashboardControllerOptions, aControllerOptions.commonInfo);
 }

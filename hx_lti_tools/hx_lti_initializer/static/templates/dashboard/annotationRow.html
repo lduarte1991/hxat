@@ -1,0 +1,36 @@
+<div class="annotationRow item">
+    <div class="expandableIcon field">
+        <img src="<%= root %>/expandableIcon.png" alt="View Details" />
+        &nbsp;
+    </div>
+
+    <div class="annotatedBy field">
+        <%= user.name %>
+    </div>
+
+    <div class="body field">
+        <% if (plainText) { %>
+            <%= plainText.replace("<p>", "").replace("</p>", "") %>
+        <% } else { %>
+            -
+        <% }%>
+    </div>
+
+    <% if (media === "video") { %>
+        <div class="start field">
+            <%= rangeTime.start %>
+        </div>
+
+        <div class="end field">
+            <%= rangeTime.end %>
+        </div>
+    <% } %>
+    <div class="totalreplies field">
+        <%= totalComments %>
+    </div>
+
+    <div class="annotatedAt field" title="<%= updated %>">
+        <% var date = new Date(updated);%>
+        <% print(jQuery.timeago(date)); %>
+    </div>
+</div>
