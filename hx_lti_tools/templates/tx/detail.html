@@ -25,6 +25,7 @@
 <script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
@@ -69,6 +70,7 @@ jQuery(function ($) {
 						'Store',
 						'HighlightTags',
 						'RichText',
+						'Reply',
 						//'Touch',
 					],
 				},
@@ -87,7 +89,7 @@ jQuery(function ($) {
 					imageRootUrl: "{% static "vendors/catch/img"%}",
 					instructor_email: "fake@fake.com",
 				},
-			}
+			},
 		}
 		AController(options);
 		if (typeof Annotator.Plugin["Grouping"] === 'function') {

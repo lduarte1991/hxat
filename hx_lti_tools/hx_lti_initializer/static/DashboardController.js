@@ -580,6 +580,98 @@
         }
     };
 
+    $.DashboardController.prototype._onPlaySelectionClick = function(evt) {
+        var id = parseInt(jQuery(evt.target).find('.idAnnotation').html(), 10);
+        var uri = jQuery(evt.target).find('.uri').html();
+        var container = jQuery(evt.target).find('.container').html();
+        if (this.initOptions.externalLink) {
+            uri += (uri.indexOf('?') >= 0) ? '&ovaId=' + id : '?ovaId=' + id;
+            location.href = uri;
+        } else {
+            var isContainer = typeof this.annotator.an !== 'undefined' && typeof this.annotator.an[container] !== 'undefined';
+            var ovaInstance = isContainer ? this.annotator.an[container] : null;
+            if (ovaInstance !== null) {
+                var allannotations = this.annotator.plugins['Store'].annotations,
+                    ovaId = id,
+                    player = ovaInstance.player;
+
+                for (var item in allannotations) {
+                    var an = allannotations[item];
+                    if (typeof an.id !== 'undefined' && an.id === ovaId) { // this is the annotation
+                        if (this._isVideoJS(an)) { // It is a video
+                            if (player.id_ === an.target.container && player.tech.options_.source.src === an.target.src) {
+                                var anFound = an;
+
+                                var playFunction = function(){
+                                    // Fix problem with youtube videos in the first play. The plugin don't have this trigger
+                                    if (player.techName === 'Youtube') {
+                                        var startAPI = function() {
+
+                                            ovaInstance.showAnnotation(anFound);
+                                        }
+                                        if (ovaInstance.loaded)
+                                            startAPI();
+                                        else
+                                            player.one('loadedRangeSlider', startAPI); // show Annotations once the RangeSlider is loaded
+                                    } else {
+
+                                        ovaInstance.showAnnotation(anFound);
+                                    }
+
+                                    jQuery('html, body').animate({
+                                        scrollTop: jQuery("#" + player.id_).offset().top},
+                                        'slow');
+                                };
+                                if (player.paused()) {
+                                    player.play();
+                                    player.one('playing', playFunction);
+                                } else {
+                                    playFunction();
+                                }
+
+                                return false; // this will stop the code to not set a new player.one.
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    $.DashboardController.prototype._onZoomToImageBoundsButtonClick = function(evt){
+        var zoomToBounds = jQuery(evt.target).hasClass('zoomToImageBounds')?jQuery(evt.target):jQuery(evt.target).parents('.zoomToImageBounds:first');
+        var osdaId = parseInt(zoomToBounds.find('.idAnnotation').html(), 10);
+        var uri = zoomToBounds.find('.uri').html();
+
+        var allannotations = this.annotator.plugins['Store'].annotations;
+        var osda = this.annotator.osda;
+
+        if (this.initOptions.externalLink) {
+            uri += (uri.indexOf('?') >= 0) ?'&osdaId=' + osdaId : '?osdaId=' + osdaId;
+            location.href = uri;
+        }
+        for(var item in allannotations) {
+            var an = allannotations[item];
+            // Makes sure that all images are set to transparent in case one was
+            // previously selected.
+            if (an.highlights) {
+               an.highlights[0].style.background = "rgba(0, 0, 0, 0)";
+            }
+            if (typeof an.id !== 'undefined' && an.id === osdaId) { // this is the annotation
+                var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
+                osda.viewer.viewport.fitBounds(bounds, false);
+
+                jQuery('html, body').animate({scrollTop: jQuery("#"+an.target.container).offset().top},
+                                        'slow');
+                // signifies a selected annotation once OSD has zoomed in on the
+                // appropriate area, it turns the background a bit yellow
+                if (an.highlights !== undefined) {
+                    an.highlights[0].style.background = "rgba(255, 255, 10, 0.2)";
+                }
+            }
+        }
+    };
+
     $.DashboardController.prototype._onPublicPrivateButtonClick = function(evt) {
         var action = jQuery(evt.target).find('span');
         var userId = '';
@@ -697,7 +789,7 @@
 
     $.DashboardController.prototype._onDeleteReplyButtonClick = function(evt) {
         var annotator = this.annotator;
-        var item = $(evt.target).parents('.replyItem:first');
+        var item = jQuery(evt.target).parents('.replyItem:first');
         var id = item.attr('annotationid');
         var permissions = annotator.plugins.Permissions;
         var annotation = item.data('annotation');
@@ -711,7 +803,7 @@
     };
 
     $.DashboardController.prototype.openLoadingGIF = function() {
-        jQuery('#dashboard').append('<div class=\'annotations-loading-gif\'><img src="'+this.initOptions.imageUrlRoot+'loading_bar.gif" /><br />Annotations Data Loading... Please Wait.</div>');
+        jQuery('#dashboard').append('<div class=\'annotations-loading-gif\'><img src="'+this.initOptions.imageRootUrl+'/loading_bar.gif" /><br />Annotations Data Loading... Please Wait.</div>');
     };
 
     $.DashboardController.prototype._onControlRepliesClick = function(evt) {
@@ -857,6 +949,60 @@
           left: left,
           top: top
         };
+    };
+
+    $.DashboardController.prototype._refreshReplies = function(evt) {
+        var item = jQuery(evt.target).parents('.annotationItem:first');
+        var anId = parseInt(item.attr('annotationId'), 10);
+            
+        var replyElem = jQuery(evt.target).parents('.annotationItem:first').find('.replies');
+        var annotator = this.annotator;
+        var loadFromSearchURI = annotator.plugins.Store.options.loadFromSearch.uri;
+        var self = this;
+        var action='search';
+        var loadFromSearch={
+            limit:-1,
+            parentid:anId,
+            media:"comment",
+            uri:loadFromSearchURI,        
+        };
+        var onSuccess = function(data) {
+            if (data === null) data = {};
+            annotations = data.rows || [];
+            var _i, _len;
+            for (_i = 0, _len = annotations.length; _i < _len; _i++) {
+                
+                self._formatCatch(annotations[_i]);
+            }
+            console.log(annotations);
+            replyElem.html(self.TEMPLATES.annotationReply({ 
+                annotations: annotations
+            }));
+            var replyItems = jQuery('.replies .replyItem');
+            if (typeof replyItems !== 'undefined' && replyItems.length > 0) {
+                annotations.forEach(function(ann) {
+                    replyItems.each(function(item) {
+                        var id = parseInt(jQuery(replyItems[item]).attr('annotationid'), 10);
+                        if (id === ann.id) {
+                            var perm = self.annotator.plugins.Permissions;
+                            if (!perm.options.userAuthorize('delete', ann, perm.user)) {
+                                jQuery(replyItems[item]).find('.deleteReply').remove();
+                            } else {
+                                jQuery(replyItems[item]).data('annotation', ann);
+                            }
+                        }
+                    });
+                });
+            }
+        };
+        var id, options, request, url;
+        var store = this.annotator.plugins.Store;
+        id = loadFromSearch && loadFromSearch.id;
+        url = store._urlFor(action, id);
+        options = store._apiRequestOptions(action, loadFromSearch, onSuccess);
+        request = jQuery.ajax(url, options);
+        request._id = id;
+        request._action = action;
     };
 
 }(AController));

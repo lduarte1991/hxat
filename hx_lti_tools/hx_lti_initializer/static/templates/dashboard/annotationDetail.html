@@ -32,14 +32,14 @@
         </div>
     <% } else if (media === 'video') { %>
         <div class="playMediaButton">
-            Play segment <% rangeTime.start %> - <%= rangeTime.end %>
+            Play segment <%= rangeTime.start %> - <%= rangeTime.end %>
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
             <span class="container" style="display:none"><%= target.container %></span>
         </div>
     <% } else if (media === 'image') { %>
         <div class="zoomToImageBounds">
-            <!--<img src="{{{ thumbnailLink }}}">-->
+            <img src="<%= thumbnailLink %>"/>
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>

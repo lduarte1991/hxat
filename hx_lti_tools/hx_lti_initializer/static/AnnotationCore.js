@@ -190,7 +190,7 @@
 	        store.loadFromSearch.uri = store.annotationData.uri;
 	    }
 	    if (typeof store.loadFromSearch.limit === 'undefined'){
-	        store.loadFromSearch.limit = 10000;
+	        store.loadFromSearch.limit = 2;
 	    }
 	};
 
@@ -206,7 +206,6 @@
 	                annotationData: {
 	                    uri: tempUri,
 	                    citation: "fake source",
-	                    media: this.initOptions.mediaType,
 	                },
 	                urls: {
 	                    // These are the default URLs.

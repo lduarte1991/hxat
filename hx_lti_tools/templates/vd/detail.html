@@ -1,4 +1,7 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://underscorejs.org/underscore.js"></script>
+<script src="http://timeago.yarp.com/jquery.timeago.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js"></script>
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -22,14 +25,16 @@
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
+<script src="{% static "DashboardController.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
+<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/video/video-js.min.css" %}">
 <link rel="stylesheet" href="{% static "vendors/video/rangeslider.css" %}">
-<link rel="stylesheet" href="{% static "hx-annotation.css" %}">
 <link rel="stylesheet" href="{% static "vendors/ova.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
@@ -41,8 +46,8 @@
 <div class="citation">
 <a href="{{ target_object.target_citation | safe }}">Source Channel</a>
 </div>
+<div id="dashboard" class="annotationListContainer">
 </div>
-<div id="CatchDiv">
 </div>
 
 <script>
@@ -72,6 +77,7 @@ jQuery(function ($) {
 						'Store',
 						'VideoJS',
 						'RichText',
+						'Reply',
 						//'Touch',
 					],
 					optionsVideoJS: {
@@ -89,6 +95,18 @@ jQuery(function ($) {
 			},
 			targetObjectControllerOptions: {
 
+			},
+			dashboardControllerOptions: {
+				annotationElement: jQuery("#dashboard"),
+				initOptions: {
+					template_urls: '{% static "templates/dashboard/"%}',
+					showPublicPrivateSelectors: true,
+					showMediaSelector: false,
+					pagination: 50,
+					flags: false,
+					imageRootUrl: "{% static "vendors/catch/img"%}",
+					instructor_email: "fake@fake.com",
+				},
 			},
 		};
 		AController(options);

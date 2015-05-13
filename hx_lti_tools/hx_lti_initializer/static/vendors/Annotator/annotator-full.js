@@ -1199,6 +1199,7 @@
     };
 
     Annotator.prototype.onEditorSubmit = function(annotation) {
+      console.log(annotation);
       return this.publish('annotationEditorSubmit', [this.editor, annotation]);
     };
 

@@ -141,7 +141,7 @@ def launch_lti(request):
             'target_object': targ_obj,
             'token': retrieve_token(user_id, ''),
             #Add this when talking about images\
-            #'osd_json': targ_obj.target_content,
+            'osd_json': targ_obj.target_content,
             # Add this when talking about videos
             #'typeSource': extraContent,
         })
