@@ -72,7 +72,6 @@ Annotator.Plugin.Reply = (function(_super) {
 		// if the parent number is not empty or zero, we know that this is a comment
 		if (parent !== '0') {
 			annotation.media = 'comment';
-			annotation.media = 'comment';
 		}
 		// apparently some browsers continue adding <font> tags here for nonreplies
 		// this will check and set to 0 (nonreply) if it fails

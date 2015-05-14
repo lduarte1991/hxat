@@ -40,7 +40,6 @@
 		if(mediaType == "image") {
 			//- OpenSeaDragon
 		    this.viewer = OpenSeadragon(annotatorOptions.optionsOpenSeadragon);
-		    console.log(this.viewer);
 		    //- OpenSeaDragon Plugins
 		    this.viewer.annotation(annotatorOptions.optionsOSDA);
 		    
@@ -145,6 +144,13 @@
 		    }) (this);
 		    this.annotation_tool.mplayer = this.mplayer;
     		this.annotation_tool.editor.VideoJS = -1;
+		} else {
+			this.annotation_tool.subscribe("annotationEditorSubmit", function(editor, annotation){
+				if (annotation.parent === "0" || annotation.parent === 0) {
+					console.log(annotation.parent);
+					annotation.media = "text";
+				}
+			});
 		}
 	};
 
@@ -202,10 +208,10 @@
 	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
 		    		// The endpoint of the store on your server.
-	                prefix: "http://catch-dev.harvardx.harvard.edu:8080/catch/annotator",
+	                prefix: this.initOptions.database_url,
 	                annotationData: {
 	                    uri: tempUri,
-	                    citation: "fake source",
+	                    citation: this.initOptions.citation,
 	                },
 	                urls: {
 	                    // These are the default URLs.
@@ -287,13 +293,13 @@
         		}
 		    } else if (pluginName === "HighlightTags") {
 		    	options = {
-		            tag: "test1:red,test2:blue",
+		            tag: this.initOptions.higlightTags_options,
 		    	}
 		    } else if (pluginName === "Grouping") {
 		    	options = {
 		    		optionsOVA: {
 			    		posBigNew: 'none', 
-			    		default_tab: 'Public',
+			    		default_tab: this.initOptions.default_tab,
 			    		annotation_tool: this.annotation_tool,
 			    	}
 		    	}

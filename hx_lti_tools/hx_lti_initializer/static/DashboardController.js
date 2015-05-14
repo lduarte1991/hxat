@@ -27,7 +27,7 @@
 
 		// contains any other options needed to initialize the tool
 		this.initOptions = jQuery.extend({}, defaultOptions, options.initOptions, commonInfo);
-        this.current_tab = 'public';
+        this.current_tab = this.initOptions.default_tab;
         var self = this;
 		jQuery( document ).ready(function() {
             self.init();
@@ -974,7 +974,6 @@
                 
                 self._formatCatch(annotations[_i]);
             }
-            console.log(annotations);
             replyElem.html(self.TEMPLATES.annotationReply({ 
                 annotations: annotations
             }));

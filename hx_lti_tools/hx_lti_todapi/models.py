@@ -33,7 +33,7 @@ class TargetObject(LTI_TodApi):
         return "\"" + self.target_title + "\" by " + self.target_author
     
     class Meta:
-        verbose_name = "Source"
+        verbose_name = "Source Material"
     
     def get_targets_from_creator(user_requesting, user_requested):
         if (user_requesting.user.is_staff == True):

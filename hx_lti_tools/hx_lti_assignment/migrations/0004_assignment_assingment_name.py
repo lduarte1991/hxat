@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hx_lti_assignment', '0001_initial'),
+        ('hx_lti_assignment', '0003_auto_20150514_1608'),
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.AddField(
             model_name='assignment',
-            name='allow_flags',
-            field=models.BooleanField(default=False, help_text=b'Allow users to flag items as inappropriate/offensive.'),
+            name='assingment_name',
+            field=models.CharField(default=b'No Assignment Name Given', max_length=255),
             preserve_default=True,
         ),
     ]

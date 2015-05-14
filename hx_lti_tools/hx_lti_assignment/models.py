@@ -1,5 +1,6 @@
 from django.db import models
 from hx_lti_todapi.models import TargetObject
+from hx_lti_initializer.models import LTICourse
 import uuid
 
 class Assignment(models.Model):
@@ -8,6 +9,7 @@ class Assignment(models.Model):
 	"""
 
 	assignment_id = models.CharField(max_length=100, blank=True, unique=True, default=uuid.uuid4)
+	assignment_name = models.CharField(max_length=255, blank=False, default="No Assignment Name Given")
 	assignment_objects = models.ManyToManyField(TargetObject)
 	annotation_database_url = models.CharField(max_length=255)
 	annotation_database_apikey = models.CharField(max_length=255)
@@ -21,8 +23,12 @@ class Assignment(models.Model):
 
 	TABS = (
 		('Instructor', 'Instructor'),
-		('My Notes', 'My Notes'),
+		('MyNotes', 'My Notes'),
 		('Public', 'Public'),
 	)
 
 	default_tab = models.CharField(choices=TABS, default="Public", max_length=20)
+	course = models.ForeignKey(LTICourse)
+	
+	def __str__(self):
+		return self.assignment_name

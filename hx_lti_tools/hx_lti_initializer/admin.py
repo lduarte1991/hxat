@@ -12,5 +12,8 @@ from hx_lti_initializer.models import LTIProfile, LTICourse
 class LTIProfileAdmin(admin.ModelAdmin):
     pass
 
+class LTICourseAdmin(admin.ModelAdmin):
+	fields = ['course_name', 'course_admins']
+
 admin.site.register(LTIProfile, LTIProfileAdmin)
-admin.site.register(LTICourse)
+admin.site.register(LTICourse, LTICourseAdmin)

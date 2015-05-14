@@ -88,6 +88,9 @@ class LTICourse(models.Model):
     class Meta:
         verbose_name = "Course"
 
+    def __str__(self):
+        return self.course_name
+
     @staticmethod
     def get_all_courses():
         return LTICourse.objects.all()
