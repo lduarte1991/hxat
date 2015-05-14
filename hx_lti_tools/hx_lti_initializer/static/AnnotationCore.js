@@ -147,7 +147,6 @@
 		} else {
 			this.annotation_tool.subscribe("annotationEditorSubmit", function(editor, annotation){
 				if (annotation.parent === "0" || annotation.parent === 0) {
-					console.log(annotation.parent);
 					annotation.media = "text";
 				}
 			});

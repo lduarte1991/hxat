@@ -89,12 +89,11 @@ jQuery(function ($) {
 					template_urls: '{% static "templates/dashboard/"%}',
 					showPublicPrivateSelectors: true,
 					showMediaSelector: false,
-					pagination: {{assignment.pagination_limit}},
+					pagination: {{ assignment.pagination_limit }},
 					flags: false,
 					imageRootUrl: "{% static "vendors/catch/img"%}",
 					instructor_email: "fake@fake.com",
 					default_tab: "{{ assignment.default_tab }}",
-
 				},
 			},
 		}

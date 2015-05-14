@@ -58,7 +58,7 @@ jQuery(function ($) {
 			commonInfo: {
 				mediaType: "video", // {{ media_type }}
 				context_id: "{{ course }}",
-				collection_id: {{ collection }},
+				collection_id: "{{ collection }}",
 				object_id: {{ object }},
 				token: "{{ token }}",
 				username: "{{ username }}",
@@ -91,6 +91,8 @@ jQuery(function ($) {
 					optionsOVA: {
 						posBigNew:'none',
 					},
+					'database_url': "{{ assignment.annotation_database_url }}",
+					'citation': "{{ target_object.target_citation | safe }}",
 				},
 			},
 			targetObjectControllerOptions: {
@@ -102,10 +104,11 @@ jQuery(function ($) {
 					template_urls: '{% static "templates/dashboard/"%}',
 					showPublicPrivateSelectors: true,
 					showMediaSelector: false,
-					pagination: 50,
+					pagination: {{ assignment.pagination_limit }},
 					flags: false,
 					imageRootUrl: "{% static "vendors/catch/img"%}",
 					instructor_email: "fake@fake.com",
+					default_tab: "{{ assignment.default_tab }}",
 				},
 			},
 		};
