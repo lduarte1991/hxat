@@ -39,7 +39,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'django_jenkins',
-    'testapp',
     'bootstrap3',
     'ims_lti_py',
     'hx_lti_initializer',
