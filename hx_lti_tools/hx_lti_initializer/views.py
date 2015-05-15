@@ -45,9 +45,6 @@ def validate_request(req):
     if 'lis_person_sourcedid' not in req.POST:
         debug_printer('DEBUG - Username was not present in request.')
         raise PermissionDenied()
-    if 'user_id' not in req.POST:
-        debug_printer('DEBUG - User Email was not present in request.')
-        raise PermissionDenied()
 
 def initialize_lti_tool_provider(req):
     """
