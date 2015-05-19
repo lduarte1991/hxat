@@ -204,7 +204,7 @@ def launch_lti(request):
             course_object = LTICourse.create_course(course, lti_profile)
     
     # get all the courses the user is a part of
-    courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
+    courses_for_user = LTICourse.get_courses_of_admin(lti_profile)
     
     # then gets all the files associated with the courses 
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)

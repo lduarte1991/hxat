@@ -43,3 +43,5 @@ setconf('ADMIN_ROLES', {'Administrator', 'Instructor'})
 
 # settings for Annotation Server
 setconf('DB_API_KEY', 'af17fcb6-ae16-42b7-97f6-b2d1b2d66226')
+
+default_app_config = 'hx_lti_initializer.apps.InitializerConfig'

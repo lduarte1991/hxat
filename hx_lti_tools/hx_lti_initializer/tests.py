@@ -20,12 +20,29 @@ Corner Cases Found:
     3. User tries to reach page via URL while not logged in
     4. User tries to view "Share" page while not logged in.
 """
-from django.test import TestCase
+import sys
 from utils import *
+from django.utils import six
+from cStringIO import StringIO
+from django.test import TestCase
+from contextlib import contextmanager
+from models import LTICourse, LTIProfile
+from django.contrib.auth.models import User
 from ims_lti_py.tool_provider import DjangoToolProvider
+
+@contextmanager
+def capture_err(command, *args, **kwargs):
+    err, sys.stderr = sys.stderr, six.StringIO()
+    command(*args, **kwargs)
+    sys.stderr.seek(0)
+    yield sys.stderr.read()
+    sys.stderr = err
 
 
 class LTIInitializerUtilsTests(TestCase):
+    """
+    Focuses on those functions found within hx_lti_initializer/utils.py
+    """
 
     def setUp(self):
         """
@@ -66,3 +83,120 @@ class LTIInitializerUtilsTests(TestCase):
         """
         value_found = get_lti_value('launch_presentation_return_url', self.tp)
         self.assertNotEqual(value_found, 'http://fake.com/lti_return')
+
+    def test_debug_printer(self):
+        """
+        Should check to see if the value is being printed out to stderr only if
+        the LTI_DEBUG in settings is set to True.
+        """
+        settings.LTI_DEBUG = True;
+        value_found = get_lti_value('roles', self.tp)
+        with capture_err(debug_printer, value_found) as output:
+            self.assertIn("['Learner', 'Instructor', 'Observer']", output)
+
+        settings.LTI_DEBUG = False;
+        value_found = get_lti_value('lis_outcome_service_url', self.tp)
+        with capture_err(debug_printer, value_found) as output:
+            self.assertNotIn("http://localhost/lis_grade_passback", output)
+
+    def test_retrieve_token(self):
+        """
+        Should pass the test if payload matches the userid and apikey passed in.
+        Cannot test the rest due to its usage of time/encrypted oath values.
+        """
+        expected = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAyLTI3VDE3OjAwOjQyLjQwNjQ0MSswOjAwIiwgImNvbnN1bWVyS2V5IjogImZha2Vfc2VjcmV0IiwgInVzZXJJZCI6ICJ1c2VybmFtZSIsICJ0dGwiOiA4NjQwMH0.Dx1PoF-7mqBOOSGDMZ9R_s3oaaLRPnn6CJgGGF2A5CQ"
+        response = retrieve_token("username", "fake_apikey")
+
+        # because the middle hashes are dependent on time, conly the header and footer are checked for secret key
+        self.assertEqual(expected.split('.')[0], response.split('.')[0])
+        self.assertNotEqual(expected.split('.')[2], response.split('.')[2])
+
+
+class LTIInitializerModelsTests(TestCase):
+    """
+    Focuses on models and static methods found within hx_lti_initializer/models.py
+    """
+
+    def createFakeUser(self, username, userid):
+        user = User.objects.create_user(username, userid)
+        user.set_unusable_password()
+        user.is_superuser = False
+        user.is_staff = False
+        user.save()
+        return user
+
+    def setUp(self):
+        """
+        This creates a user to test the LTIProfile autocreation
+        """
+        self.user = self.createFakeUser("FakeUsername", "AnOnYmOuSiD")
+
+    def test_LTIProfile_create(self):
+        """
+        Checks that an LTIProfile object was automatically created
+        as soon as a user object was created in setup.
+        """
+        instructor = LTIProfile.objects.get(user=self.user)
+        self.assertTrue(isinstance(instructor, LTIProfile))
+        self.assertEqual(instructor.__unicode__(), instructor.user.username)
+
+    def test_LTICourse_create_course(self):
+        """
+        Checks that you can make a course given a course id and an instructor
+        """
+        instructor = LTIProfile.objects.get(user=self.user)
+        course_object = LTICourse.create_course('test_course_id', instructor)
+        self.assertTrue(isinstance(course_object, LTICourse))
+        self.assertEqual(course_object.__unicode__(), course_object.course_name)
+
+    def test_LTICourse_get_course_by_id(self):
+        """
+        Checks that you can get a course given an id. 
+        """
+        instructor = LTIProfile.objects.get(user=self.user)
+        course_object = LTICourse.create_course('test_course_id', instructor)
+        course_to_test = LTICourse.get_course_by_id('test_course_id')
+        self.assertTrue(isinstance(course_to_test, LTICourse))
+        self.assertEqual(course_object, course_to_test)
+        self.assertEqual(course_to_test.course_id, 'test_course_id')
+
+    def test_LTICourse_get_courses_of_admin(self):
+        """
+        Checks that it returns a list of all the courses that admin is a part of.
+        """
+        instructor = LTIProfile.objects.get(user=self.user)
+        course_object = LTICourse.create_course('test_course_id', instructor)
+        list_of_courses = LTICourse.get_courses_of_admin(instructor)
+        self.assertTrue(isinstance(list_of_courses, list))
+        self.assertTrue(len(list_of_courses) == 1)
+        self.assertTrue(course_object in list_of_courses)
+
+        course_object2 = LTICourse.create_course('test_course_id2', instructor)
+        list_of_courses2 = LTICourse.get_courses_of_admin(instructor)
+        self.assertTrue(len(list_of_courses2) == 2)
+        self.assertTrue(course_object2 in list_of_courses2)
+
+    def test_LTICourse_get_all_courses(self):
+        """
+        Checks that all courses are returned regardless of admin user
+        """
+        user2 = self.createFakeUser("FakeUsername2", "AnOnYmOuSiD2")
+        instructor1 = LTIProfile.objects.get(user=self.user)
+        instructor2 = LTIProfile.objects.get(user=user2)
+        list_of_courses = LTICourse.get_all_courses()
+        self.assertTrue(isinstance(list_of_courses, list))
+        self.assertTrue(len(list_of_courses) == 0)
+
+        LTICourse.create_course('test_course_id', instructor1)
+        list_of_courses2 = LTICourse.get_all_courses()
+        self.assertTrue(isinstance(list_of_courses2, list))
+        self.assertTrue(len(list_of_courses2) == 1)
+
+        LTICourse.create_course('test_course_id2', instructor2)
+        list_of_courses3 = LTICourse.get_all_courses()
+        self.assertTrue(isinstance(list_of_courses3, list))
+        self.assertTrue(len(list_of_courses3) == 2)
+
+
+class LTIInitializerViewsTests(TestCase):
+    pass

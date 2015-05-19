@@ -19,7 +19,7 @@ class LTIProfile(models.Model):
     including anonymous_ids or platform/consumer-specific ids.
     """
 
-    # uses the Django default user to store email and user id information
+    # uses the Django default user to store username and user id information
     user = models.OneToOneField(
         User,
         related_name='annotations_user_profile',
@@ -32,15 +32,11 @@ class LTIProfile(models.Model):
         null=True,
         verbose_name=_("Roles"),
     )
+
     # saves the anonymous id for research purposes
     anon_id = models.CharField(
         max_length=255, blank=True, null=True
     )
-
-    @models.permalink
-    def get_absolute_url(self):
-        """ Returns the username as a source of the view profile url """
-        return ('view_profile', None, {'username': self.user.username})
 
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
@@ -48,7 +44,7 @@ class LTIProfile(models.Model):
 
     class Meta:
         """ The name of this section within the admin site """
-        verbose_name = _("User Profile")
+        verbose_name = _("Instructor/Administrator")
 
 
 def user_post_save(sender, instance, created, **kwargs):
@@ -68,49 +64,66 @@ post_save.connect(user_post_save, sender=User)
 
 
 class LTICourse(models.Model):
+    """
+    This model will store information about a given "Course" passed in.
+    In other words, whatever is within the context_id of the LTI request will be
+    considered a course and will hold assignments and target objects to annotate.
+    """
+
+    # this id will come from the context_id value in the LTI
     course_id = models.CharField(
         max_length=255,
-        default='No Course ID',
+        default=_('No Course ID'),
     )
+
+    # this is used for usability purposes only, course_id is the unique value
     course_name = models.CharField(
         max_length=255,
-        default='No Default Name',
+        default=_('No Default Name'),
     )
+
+    # admins are able to add other users with LTIProfiles already in the system
     course_admins = models.ManyToManyField(
         LTIProfile,
         related_name='course_admin_user_profiles',
     )
-    course_users = models.ManyToManyField(
-        LTIProfile,
-        related_name='course_student_user_profiles',
-    )
 
     class Meta:
-        verbose_name = "Course"
+        verbose_name = _("Course")
+
+    def __unicode__(self):
+        """ When asked to print itself, this object will print the name of the course """
+        return self.course_name
 
     @staticmethod
     def get_all_courses():
-        return LTICourse.objects.all()
+        """
+        Should return a QuerySet of all LTICourse items, regardless of user.
+        """
+        return list(LTICourse.objects.all())
 
     @staticmethod
-    def get_courses_of_user(user_requested, course_object):
-        courses_for_user = list(
-            LTICourse.objects.filter(course_users=user_requested.id)
-        )
-        if not courses_for_user:
-            course_object.course_users.add(user_requested)
-            courses_for_user += [course_object]
-        elif course_object not in courses_for_user:
-            course_object.course_users.add(lti_profile)
-            courses_for_user += [course_object]
+    def get_courses_of_admin(user_requested):
+        """
+        Given an administrator, it will return all LTICourse objects
+        in which that user appears within the course_admins attribute.
+        """
+        courses_for_user = list(LTICourse.objects.filter(course_admins=user_requested.id))
         return courses_for_user
 
     @staticmethod
     def get_course_by_id(course_id):
+        """
+        Should return the LTICourse with the given course_id
+        """
         return LTICourse.objects.get(course_id=course_id)
 
     @staticmethod
     def create_course(course_id, lti_profile):
+        """
+        Given a course_id and a profile, it creates a new LTICourse object
+        and adds the LTIProfile as a course_admin.
+        """
         course_object = LTICourse(course_id=course_id)
         course_object.save()
         course_object.course_admins.add(lti_profile)

@@ -32,7 +32,7 @@ def debug_printer(debug_text):
     Prints text passed in to stderr (Terminal on Mac) for debugging purposes.
     """
     if settings.LTI_DEBUG:
-        print >> sys.stderr, debug_text + '\r'
+        print >> sys.stderr, str(debug_text) + '\r'
 
 def retrieve_token(userid, secret):
     '''
