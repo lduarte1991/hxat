@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'ims_lti_py',
     'hx_lti_initializer',
+    'hx_lti_assignment',
     'target_object_database',
 )
 
