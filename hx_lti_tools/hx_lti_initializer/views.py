@@ -15,7 +15,7 @@ from django.contrib.auth import login
 from django.conf import settings
 from django.contrib import messages
 
-from hx_lti_todapi.models import TargetObject
+from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
@@ -43,9 +43,6 @@ def validate_request(req):
     if 'lis_person_sourcedid' not in req.POST:
         debug_printer('DEBUG - Username was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_contact_email_primary' not in req.POST:
-        debug_printer('DEBUG - User Email was not present in request.')
-        raise PermissionDenied()
 
 def initialize_lti_tool_provider(req):
     """
@@ -70,9 +67,9 @@ def initialize_lti_tool_provider(req):
         raise PermissionDenied()
     return provider
 
-def create_new_user(username, email, roles):
+def create_new_user(username, user_id, roles):
     # now create the user and LTIProfile with the above information
-    user = User.objects.create_user(lti_username, email)
+    user = User.objects.create_user(username, user_id)
     user.set_unusable_password()
     user.is_superuser = False
     user.is_staff = False
@@ -88,8 +85,8 @@ def create_new_user(username, email, roles):
     # pull the profile automatically created once the user was above
     lti_profile = LTIProfile.objects.get(user=user)
     
-    lti_profile.anon_id = anon_id
-    lti_profile.roles = (",").join(all_user_roles)
+    lti_profile.anon_id = user_id
+    lti_profile.roles = (",").join(roles)
     lti_profile.save()
     
     return user, lti_profile
@@ -107,78 +104,85 @@ def launch_lti(request):
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
     consumer_key_requested = request.POST['oauth_consumer_key']
-    anon_id = '%s:%s' % (consumer_key_requested, get_lti_value('user_id', tool_provider))
-    debug_printer('DEBUG - Found anonymous ID in request: %s' % anon_id)
+    user_id = get_lti_value('user_id', tool_provider)
+    debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
     
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
-    collection = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-    object = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+    collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+    object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
     
     debug_printer('DEBUG - Found course being accessed: %s' % course)
-    user_id = get_lti_value('user_id', tool_provider)
+    debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
+    debug_printer('DEBUG - Found object being accessed: %s' % object_id)
     
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+
     if "Student" in roles:
-        targ_obj = TargetObject.objects.get(pk=object)
-        return render(request, 'tx/detail.html', {
+        try:
+            assignment = Assignment.objects.get(assignment_id=collection_id)
+            targ_obj = TargetObject.objects.get(pk=object_id)
+        except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+            raise PermissionDenied()
+
+        original = {
             'user_id': user_id,
             'username': get_lti_value('lis_person_sourcedid', tool_provider),
             'roles': roles,
-            'collection': collection,
+            'collection': collection_id,
             'course': course,
-            'object': object,
+            'object': object_id,
             'target_object': targ_obj,
-            'token': retrieve_token(user_id, ''),
-        })
+            'token': retrieve_token(user_id, assignment.annotation_database_secret_token),
+            'assignment': assignment,
+        }
+
+        if (targ_obj.target_type == 'vd'):
+            srcurl = targ_obj.target_content
+            if 'youtu' in srcurl:
+                typeSource = 'video/youtube'
+            else:
+                disassembled = urlparse(srcurl)
+                file_ext = splitext(basename(disassembled.path))[1]
+                typeSource = 'video/' + file_ext.replace('.', '')
+            original.update({'typeSource': typeSource})
+        elif (targ_obj.target_type == 'ig'):
+            original.update({'osd_json': targ_obj.target_content})
+
+        return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
         # try to get the profile via the anon id
-        lti_profile = LTIProfile.objects.get(anon_id=anon_id)
+        lti_profile = LTIProfile.objects.get(anon_id=user_id)
         debug_printer('DEBUG - LTI Profile was found via anonymous id.')
     
     except LTIProfile.DoesNotExist:
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         # gather the necessary data from the LTI initialization request
-        email = get_lti_value('lis_person_contact_email_primary', tool_provider)
         lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
         
         # checks to see if email and username were not passed in
         # cannot create a user without them
-        if not email or not lti_username:
+        if not lti_username:
             debug_printer('DEBUG - Email and/or user_id not found in post.')
             raise PermissionDenied()
         
         # checks to see if roles were passed in. Defaults to student role.
-        if settings.ALL_ROLES:
-            all_user_roles = []
-            
-            if not roles:
-                debug_printer('DEBUG - ALL_ROLES is set but user was not passed in any roles via the request. Defaults to student.')
-                all_user_roles += "Student"
-            
-            else:
-                # makes sure that roles is a list and not just a string
-                if not isinstance(roles, list):
-                    roles = [roles]
-                all_user_roles += roles
-            
-            # checks to make sure that role is actually allowed/expected
-            role_allowed = False
-            for role_type in settings.ALL_ROLES:
-                for user_role in roles:
-                    if role_type.lower() == user_role.lower():
-                        role_allowed = True
-            
-            # if role is not allowed then denied (problem with platform)
-            # if role is missing, default to Student (problem with request)
-            if not role_allowed:
-                debug_printer('DEBUG - User does not have an acceptable role. Check with platform.')
-                raise PermissionedDenied()
-            else:
-                debug_printer('DEBUG - User had an acceptable role: %s' % all_user_roles)
+        all_user_roles = []
         
-        user, lti_profile = create_new_user(lti_username, email, roles)
+        if not roles:
+            debug_printer('DEBUG - ALL_ROLES is set but user was not passed in any roles via the request. Defaults to student.')
+            all_user_roles += "Student"
+        
+        else:
+            # makes sure that roles is a list and not just a string
+            if not isinstance(roles, list):
+                roles = [roles]
+            all_user_roles += roles
+        
+        debug_printer('DEBUG - User had an acceptable role: %s' % all_user_roles)
+        
+        user, lti_profile = create_new_user(lti_username, user_id, roles)
     
     # now it's time to deal with the course_id it does not associate
     # with users as they can flow in and out in a MOOC
@@ -192,7 +196,7 @@ def launch_lti(request):
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
         message_error = "Sorry, the course you are trying to reach does not exist."
         messages.error(request, message_error)
-        if 'Administrator' in roles:
+        if 'Administrator' in roles or 'Instructor' in roles:
             # if the user is an administrator, the missing course is created
             # otherwise, it will just display an error message
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."

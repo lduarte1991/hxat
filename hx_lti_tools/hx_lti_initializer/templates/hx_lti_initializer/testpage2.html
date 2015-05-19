@@ -9,12 +9,11 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-{% load target_object_extras %}
 <style>
 .sidebar {
     text-align: center;
     border: 1px solid black;
-    padding: 10px;
+    padding-right: 20px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     width:250px;
@@ -113,34 +112,113 @@ th {
     margin-top: 4px;
     margin-left: -30px;
 }
+
+ul {
+    text-align: left;
+    font-size: 11px;
+}
+
+li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#assignments > tbody > tr:nth-child(odd) > td {
+    cursor: pointer;
+}
+
+#assignments > tbody > tr:nth-child(odd) > td:hover {
+    background-color: #66ccff;
+}
+
+#assignments > tbody > tr:last-child > td:hover {
+    background-color: inherit;
+}
+
+.expandicon {
+    float: right;
+    height: 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_expand_more_48px-128.png);
+}
+
+.closeicon {
+    float: right;
+    height: 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_up_48px-32.png);
+    
+}
+
+.copypaste{
+    padding: 20px;
+    text-align: center;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: rgba(0,5,54,0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.copypaste p{
+    text-align: center;
+}
+
+.copypaste pre {
+    text-align: center;
+}
+
 </style>
+<script>
+    jQuery(document).ready(function(){
+        jQuery('#assignments .clickable').click(function(event){
+            $(event.currentTarget).find('span').toggleClass('closeicon expandicon');
+        });
+    });
+    var printHelp = function(course_id, collection_id, object_id){
+        var el = '#copypaste-' + course_id;
+        jQuery(el).html("\
+            <p>\
+                In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
+            </p>\
+            <pre>\
+            collection_id="+collection_id+"\
+            </pre>\
+            <pre>\
+            object_id="+object_id+"\
+            </pre>\
+        ");
+        jQuery(el).addClass('copypaste');
+    }
+</script>
 <div class="header">
 </div>
 <div class="container">
-	<div class="row">
-		<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-3">
             <div class="sidebar-top">
-			    <div id="user-label">{{ user.username }}</div>
+                <div id="user-label">{{ user.username }}</div>
             </div>
             <div class="sidebar">
-			    <p>
-			        <a class="link" href="./passwordreset">Reset password</a> <br />
-			        <a class="link" href="./changeusername">Change username</a> <br />
-                    <a class="link" href="./changeemail">Change email</a> <br />
-			    </p>
-                <div class="dashed-bar"></div>
                 <p>
-                    <span class="label">Email: </span><br />
-                    {{ user.email }}
+                    <ul>
+                        <li>To add a new course, simply initialize LTI tool as an administrator/instructor.</li>
+                        <li>Change course settings to edit the name and any people to be considered "admins"</li>
+                    </ul>
                 </p>
+                <!--<div class="dashed-bar"></div>
                 <div class="dashed-bar"></div>
                 <p>
                     <a class="link" href="./tutorial">View Tutorial</a>
-                </p>
+                </p>-->
              </div>
-		</div>
-		<div class="col-md-1"></div>
-		<div class="col-md-8">
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-8">
             <div class="section-header">
                 Courses
             </div>
@@ -151,45 +229,86 @@ th {
             {% if 'Administrator' in roles or 'Instructor' in roles %}
             <a class="settingslink" href="{{ course.get_admin_url }}" target="_blank">Change Course Settings</a>
             {% endif %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>
-                            Title
-                        </th>
-                        <th>
-                            Author
-                        </th>
-                        <th>
-                            Date Created
-                        </th>
-                    </tr>
-                </thead>
+            <div id="copypaste-{{course.id}}"></div>
+            <table class="table table-striped" id="assignments">
                 <tbody>
-                    {% for file in course.targetobject_set.all %}
-                    <tr>
+                    {% for assignment in course.assignment_set.all %}
+                    <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
                         <td>
                             {% if 'Administrator' in roles or 'Instructor' in roles %}
-                            <a class="settingslink leftfloat" href="{{ file.get_admin_url }}" target="_blank">Edit</a>
+                            <a class="settingslink leftfloat" href="{{ assignment.get_admin_url }}" target="_blank">Edit</a>
                             {% endif %}
-                            <a href="annotation/{{ file.id }}">{{ file.target_title }}</a>
+                            {{ assignment.assignment_name }}
+                            <span class="expandicon"></span>
                         </td>
+                    </tr>
+                    <tr>
                         <td>
-                            {{ file.target_author }}
+                            <table class="table table-striped collapse" id="target-objects-{{ assignment.id }}">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Title
+                                        </th>
+                                        <th>
+                                            Author
+                                        </th>
+                                        <th>
+                                            Date Created
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for file in assignment.assignment_objects.all %}
+                                    <tr>
+                                        <td>
+                                            {% if 'Administrator' in roles or 'Instructor' in roles %}
+                                            <a class="settingslink leftfloat" href="{{ file.get_admin_url }}" target="_blank">Edit</a>
+                                            {% endif %}
+                                            <a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">{{ file.target_title }}</a>
+                                        </td>
+                                        <td>
+                                            {{ file.target_author }}
+                                        </td>
+                                        <td title="{{ file.target_created }}">
+                                            {{ file.target_created | timesince }} ago
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td style="text-align:center;" colspan="3">
+                                            <form action="/admin/hx_lti_todapi/targetobject/add/" method="get" target="_blank">
+                                            {{ form.as_p }}
+                                            {% buttons %}
+                                                
+                                                <button type="submit" class="btn btn-primary">
+                                                  {% bootstrap_icon "star" %} Add New Source Material
+                                                </button>
+                                              {% endbuttons %}
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </td>
-                        <td title="{{ file.target_created }}">
-                            {{ file.target_created | timesince }} ago
-                        </td>
-                        {% if 'Administrator' in roles or 'Instructor' in roles %}
-                        <td>
-                            <a href="annotationsettings">Annotation Settings</a>
-                        </td>
-                        {% endif %}
                     </tr>
                     {% endfor %}
+                    <tr>
+                        <td style="text-align:center;">
+                            <form action="/admin/hx_lti_assignment/assignment/add/" method="get" target="_blank">
+                            {{ form.as_p }}
+                            {% buttons %}
+                                
+                                <button type="submit" class="btn btn-primary">
+                                  {% bootstrap_icon "star" %} Add New Assignment
+                                </button>
+                              {% endbuttons %}
+                            </form>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             {% endfor %}
-		</div>
-	</div>
+        </div>
+    </div>
 </div>

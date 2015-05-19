@@ -8,6 +8,6 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_intializer")),
-    url(r'^lti_init/launch_lti/annotation/', include('hx_lti_todapi.urls', namespace="hx_lti_todapi")),
+    url(r'^lti_init/launch_lti/annotation/', include('target_object_database.urls', namespace="target_object_database")),
     url(r'^accounts/profile/', TemplateView.as_view(template_name='index.html')) 
 )

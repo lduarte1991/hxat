@@ -17,7 +17,7 @@ class TargetObject(LTI_TodApi):
     target_citation = models.TextField()
     target_created = models.DateTimeField(auto_now_add=True, auto_now=False)
     target_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
-    target_creator = models.ForeignKey(LTIProfile)
+    target_creator = models.ForeignKey(LTIProfile, null=True)
     target_courses = models.ManyToManyField(LTICourse)
     ANNOTATION_TYPES = (
         ('tx', 'Text Annotation'),

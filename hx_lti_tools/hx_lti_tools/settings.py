@@ -39,11 +39,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_extensions',
     'django_jenkins',
-    'testapp',
     'bootstrap3',
     'ims_lti_py',
     'hx_lti_initializer',
-    'hx_lti_todapi',
+    'target_object_database',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,5 +1,7 @@
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-</script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://underscorejs.org/underscore.js"></script>
+<script src="http://timeago.yarp.com/jquery.timeago.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js"></script>
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -10,21 +12,25 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% load staticfiles %}
-<script src="{% static "vendors/SplitAnnotator/annotator.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.auth.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.document.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.filter.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.kitchensink.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.markdown.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.permissions.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.store.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.tags.js" %}"></script>
-<script src="{% static "vendors/SplitAnnotator/annotator.unsupported.js" %}"></script>
+{% load staticfiles %}
+<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
+<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/SplitAnnotator/annotator.css" %}">
+<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
+<link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">
 <div class="container">
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
@@ -34,9 +40,9 @@
 <div class="citation">
 {{ target_object.target_citation | safe }}
 </div>
+<div id="dashboard" class="annotationListContainer">
 </div>
-
-
+</div>
 <script>
 jQuery(function ($) {
     $(function() {
@@ -44,31 +50,61 @@ jQuery(function ($) {
 			commonInfo: {
 				mediaType: "text", // {{ media_type }}
 				context_id: "{{ course }}",
-				collection_id: {{ collection }},
+				collection_id: "{{ collection }}",
 				object_id: {{ object }},
 				token: "{{ token }}",
 				username: "{{ username }}",
 				user_id: "{{ user_id }}",
 			},
 			annotationMainOptions: {
-
 			},
 			annotationCoreOptions: {
-				annotationElement: jQuery(".container"),
+				annotationElement: jQuery(".content"),
 				initOptions: {
 					'plugins': [
 						// order matters, auth before store
 						'Auth',
 						'Permissions',
 						'Store',
+						'HighlightTags',
+						'RichText',
+						'Reply',
+						//'Touch',
 					],
+					'database_url': "{{ assignment.annotation_database_url }}",
+					'citation': "{{ target_object.target_citation | safe }}",
+					{% if assignment.allow_highlights %}
+					'higlightTags_options': "{{ assignment.highlights_options }}",
+					{% endif %}
 				},
 			},
 			targetObjectControllerOptions: {
-
+			},
+			dashboardControllerOptions: {
+				annotationElement: jQuery("#dashboard"),
+				initOptions: {
+					template_urls: '{% static "templates/dashboard/"%}',
+					showPublicPrivateSelectors: true,
+					showMediaSelector: false,
+					pagination: {{ assignment.pagination_limit }},
+					flags: false,
+					imageRootUrl: "{% static "vendors/catch/img"%}",
+					instructor_email: "fake@fake.com",
+					default_tab: "{{ assignment.default_tab }}",
+				},
 			},
 		}
 		AController(options);
+		if (typeof Annotator.Plugin["Grouping"] === 'function') {
+			options = {
+	    		optionsOVA: {
+		    		posBigNew: 'none', 
+		    		default_tab: 'Public',
+		    		annotation_tool: AController.annotationCore.annotation_tool,
+		    	}
+	    	}
+            AController.annotationCore.annotation_tool.addPlugin("Grouping", options);
+		}
 	});
 });
 </script>

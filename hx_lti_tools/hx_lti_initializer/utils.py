@@ -7,7 +7,7 @@ import sys
 import datetime
 
 # import Sample Target Object Model
-from hx_lti_todapi.models import TargetObject
+from target_object_database.models import TargetObject
 
 
 def get_lti_value(key, tool_provider):

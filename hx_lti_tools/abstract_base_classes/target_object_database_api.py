@@ -6,7 +6,7 @@
 
 """
 from abc import *
-from hx_lti_todapi.models import TargetObject
+from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse, LTIProfile
 
 class TODAPI_LTI:
