@@ -22,13 +22,18 @@ Corner Cases Found:
 """
 import sys
 from utils import *
+from views import *
+from test_helper import *
 from django.utils import six
 from cStringIO import StringIO
 from django.test import TestCase
 from contextlib import contextmanager
 from models import LTICourse, LTIProfile
 from django.contrib.auth.models import User
+from django.test.client import RequestFactory
+from django.core.exceptions import PermissionDenied
 from ims_lti_py.tool_provider import DjangoToolProvider
+
 
 @contextmanager
 def capture_err(command, *args, **kwargs):
@@ -131,6 +136,12 @@ class LTIInitializerModelsTests(TestCase):
         """
         self.user = self.createFakeUser("FakeUsername", "AnOnYmOuSiD")
 
+    def tearDown(self):
+        """
+        Deletes user variable created
+        """
+        del self.user
+
     def test_LTIProfile_create(self):
         """
         Checks that an LTIProfile object was automatically created
@@ -199,4 +210,84 @@ class LTIInitializerModelsTests(TestCase):
 
 
 class LTIInitializerViewsTests(TestCase):
-    pass
+    """
+    Focuses on the views methods found within hx_lti_initializer/views.py
+    """
+
+    def setUp(self):
+        rf = RequestFactory()
+        self.good_request = rf.post('/launch_lti/', { 
+            "lti_message_type": "basic-lti-launch-request",
+            "oauth_consumer_key": "123key",
+            "lti_version": "LTI-1p0",
+            "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
+            "lis_result_sourcedid": "261-154-728-17-784",
+            "lis_outcome_service_url": "http://localhost/lis_grade_passback",
+            "launch_presentation_return_url": "http://example.com/lti_return",
+            "custom_param1": "custom1",
+            "custom_param2": "custom2",
+            "oauth_signature": "aVQIRM6OkBku6yk3Guqyz+VUdgU=",
+            "user_id": "234jfhrwekljrsfw8abcd35cseddda",
+            "ext_lti_message_type": "extension-lti-launch",
+            "roles": "Learner,Instructor,Observer",
+            "lis_person_sourcedid": "fakeusername",
+        })
+        self.bad_request = rf.post('/launch_lti/', { 
+            "lti_message_type": "basic-lti-launch-request",
+            "lti_version": "LTI-1p0",
+            "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
+            "lis_result_sourcedid": "261-154-728-17-784",
+            "lis_outcome_service_url": "http://localhost/lis_grade_passback",
+            "launch_presentation_return_url": "http://example.com/lti_return",
+            "custom_param1": "custom1",
+            "custom_param2": "custom2",
+            "oauth_signature": "aVQIRM6OkBku6yk3Guqyz+VUdgU=",
+            "user_id": "234jfhrwekljrsfw8abcd35cseddda",
+            "ext_lti_message_type": "extension-lti-launch",
+            "roles": "Learner,Instructor,Observer",
+            "lis_person_sourcedid": "fakeusername",
+        })
+        self.tool_consumer = create_test_tc()
+        self.other_request = rf.post('/launch_lti/', self.tool_consumer.generate_launch_data())
+
+
+    def tearDown(self):
+        """
+        Deletes variables created in set up
+        """
+        del self.good_request
+        del self.bad_request
+        del self.tool_consumer
+        del self.other_request
+
+    def test_validate_request(self):
+        """
+        Simply checks to see if a bad request raises an exception while a 
+        good one does not
+        """
+        self.assertRaises(PermissionDenied, validate_request, self.bad_request)
+        self.assertTrue(validate_request(self.good_request) == None)
+
+    def test_initialize_lti_tool_provider(self):
+        """
+        Checks to see if initialize_lti_tool_provider actually does check that the
+        request was valid.
+        """
+        self.assertIsInstance(initialize_lti_tool_provider(self.other_request), DjangoToolProvider)
+
+    def test_create_new_user(self):
+        """
+        Checks to see that a user and its linking LTIProfile are created.
+        """
+        username = self.good_request.POST["lis_person_sourcedid"]
+        user_id = self.good_request.POST["user_id"]
+        roles = self.good_request.POST["roles"]
+        newuser, newprofile = create_new_user(username, user_id, roles)
+        self.assertIsInstance(newuser, User)
+        self.assertIsInstance(newprofile, LTIProfile)
+        self.assertEqual(newuser.username, username)
+        self.assertEqual(newprofile.user.username, username)
+        self.assertEqual(newprofile.anon_id, user_id)
+
+    def test_launch_lti(self):
+        pass

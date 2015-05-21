@@ -56,15 +56,12 @@ def initialize_lti_tool_provider(req):
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
     
     # now validate the tool via the valid_request function
-    try:
-        # this means that request was well formed but invalid
-        if provider.valid_request(req) == False:
-            debug_printer("DEBUG - LTI Exception: Not a valid request.")
-            raise PermissionDenied()
-        else:
-            debug_printer('DEBUG - LTI Tool Provider was valid.')
-    except:
+    # this means that request was well formed but invalid
+    if provider.valid_request(req) == False:
+        debug_printer("DEBUG - LTI Exception: Not a valid request.")
         raise PermissionDenied()
+    else:
+        debug_printer('DEBUG - LTI Tool Provider was valid.')
     return provider
 
 def create_new_user(username, user_id, roles):
