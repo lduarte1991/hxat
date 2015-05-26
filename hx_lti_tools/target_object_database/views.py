@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import Http404
 from models import *
 
 def open_target_object(request, collection_id, target_obj_id):

@@ -16,7 +16,7 @@ class LTICourseAdmin(admin.ModelAdmin):
 	fields = ['course_id', 'course_name', 'course_admins']
 	readonly_fields = ['course_id']
 	
-	def course_id(self, instance):
+	def course_id(self, instance): # pragma: no cover
 		return str(course_id)
 
 admin.site.register(LTIProfile, LTIProfileAdmin)

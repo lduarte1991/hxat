@@ -30,5 +30,6 @@ class Assignment(models.Model):
 	default_tab = models.CharField(choices=TABS, default="Public", max_length=20)
 	course = models.ForeignKey(LTICourse)
 	hidden = models.BooleanField(default=False)
+	
 	def __str__(self):
 		return self.assignment_name

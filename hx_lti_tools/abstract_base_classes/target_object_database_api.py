@@ -43,14 +43,16 @@ class TOD_Implementation(TODAPI_LTI):
             files_in_courses[course_item.course_name] = list(files_found)
         return files_in_courses
     
+    @staticmethod
     def get_own_targets_as_user(user_requesting):
         """
         This function should return all the files 
         """
-        courses_for_user = LTICourse.objects.filter(course_users=User_requesting.id)
+        courses_for_user = LTICourse.objects.filter(course_admins=user_requesting.id)
         files_in_courses = []
         for course_item in courses_for_user:
             files_found = TargetObject.objects.filter(target_courses=course_item)
             files_in_courses += list(files_found)
         return files_in_courses
+
 TODAPI_LTI.register(TOD_Implementation)

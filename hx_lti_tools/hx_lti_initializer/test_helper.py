@@ -25,7 +25,7 @@ def create_test_tp():
     '''
     Returns a new ToolProvider.
     '''
-    return ToolProvider('hi', 'oi', create_params_tp())
+    return ToolProvider('hi', 'oi', create_params_tp()) # pragma: no cover
 
 def create_params_tc():
     '''
@@ -36,6 +36,7 @@ def create_params_tc():
             #'resource_link_id': '120988f929-274612',
             'user_id': '292832126',
             'roles': 'Instructor',
+            'lis_person_sorucedid': "lduarte1991",
             'lis_person_name_full': 'Jane Q. Public',
             'lis_person_contact_email_primary': 'user@school.edu',
             'context_id': '456434513',

@@ -161,7 +161,7 @@ def launch_lti(request):
         # checks to see if email and username were not passed in
         # cannot create a user without them
         if not lti_username:
-            debug_printer('DEBUG - Email and/or user_id not found in post.')
+            debug_printer('DEBUG - user_id not found in post.')
             raise PermissionDenied()
         
         # checks to see if roles were passed in. Defaults to student role.

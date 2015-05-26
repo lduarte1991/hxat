@@ -26,13 +26,16 @@ from views import *
 from test_helper import *
 from django.utils import six
 from cStringIO import StringIO
-from django.test import TestCase
 from contextlib import contextmanager
 from models import LTICourse, LTIProfile
 from django.contrib.auth.models import User
+from django.core.urlresolvers import resolve
 from django.test.client import RequestFactory
+from django.core.wsgi import get_wsgi_application
+from django.test import TestCase, override_settings
 from django.core.exceptions import PermissionDenied
 from ims_lti_py.tool_provider import DjangoToolProvider
+from django.core.servers.basehttp import get_internal_wsgi_application
 
 
 @contextmanager
@@ -79,7 +82,10 @@ class LTIInitializerUtilsTests(TestCase):
         Should return the attribute within the LTI tool provider.
         """
         value_found = get_lti_value('launch_presentation_return_url', self.tp)
+        value_found2 = get_lti_value('custom_param1', self.tp)
         self.assertEqual(value_found, 'http://example.com/lti_return')
+        self.assertEqual(value_found2, 'custom1')
+        self.assertEqual(get_lti_value('fake_param', self.tp), None)
 
     def test_get_lti_value_negation(self):
         """
@@ -247,6 +253,22 @@ class LTIInitializerViewsTests(TestCase):
             "roles": "Learner,Instructor,Observer",
             "lis_person_sourcedid": "fakeusername",
         })
+        self.small_request = rf.post('/launch_lti/', {
+            "test" : "one",
+            "oauth_consumer_key": "123key",
+            "user_id": "234jfhrwekljrsfw8abcd35cseddda",
+            "lis_person_sourcedid": "fakeusername",
+        })
+        self.missing_user_id = rf.post('/launch_lti/', {
+            "test" : "one",
+            "oauth_consumer_key": "123key",
+            "lis_person_sourcedid": "fakeusername",
+        })
+        self.missing_username = rf.post('/launch_lti/', {
+            "test" : "one",
+            "oauth_consumer_key": "123key",
+            "user_id": "234jfhrwekljrsfw8abcd35cseddda",
+        })
         self.tool_consumer = create_test_tc()
         self.other_request = rf.post('/launch_lti/', self.tool_consumer.generate_launch_data())
 
@@ -259,6 +281,9 @@ class LTIInitializerViewsTests(TestCase):
         del self.bad_request
         del self.tool_consumer
         del self.other_request
+        del self.small_request
+        del self.missing_user_id
+        del self.missing_username
 
     def test_validate_request(self):
         """
@@ -267,6 +292,11 @@ class LTIInitializerViewsTests(TestCase):
         """
         self.assertRaises(PermissionDenied, validate_request, self.bad_request)
         self.assertTrue(validate_request(self.good_request) == None)
+        self.assertRaises(PermissionDenied, validate_request, self.missing_user_id)
+        self.assertRaises(PermissionDenied, validate_request, self.missing_username)
+        settings.LTI_DEBUG = True;
+        with capture_err(validate_request, self.small_request) as output:
+            self.assertEqual(output, "DEBUG - test: one \r\r\nDEBUG - oauth_consumer_key: 123key \r\r\nDEBUG - lis_person_sourcedid: fakeusername \r\r\nDEBUG - user_id: 234jfhrwekljrsfw8abcd35cseddda \r\r\n")
 
     def test_initialize_lti_tool_provider(self):
         """
@@ -291,3 +321,26 @@ class LTIInitializerViewsTests(TestCase):
 
     def test_launch_lti(self):
         pass
+
+
+class LTIInitializerUrlsTests(TestCase):
+    """
+    """
+
+    def test_urls(self):
+        url = resolve('/lti_init/launch_lti/')
+        self.assertEqual(str(url.view_name), 'hx_lti_initializer:launch_lti')
+
+class LTIInitializerWSGITests(TestCase):
+    """
+    """
+    def test_success(self):
+        """
+        If ``WSGI_APPLICATION`` is a dotted path, the referenced object is
+        returned.
+        """
+        app = get_internal_wsgi_application()
+
+        from hx_lti_tools.wsgi import application
+
+        self.assertIs(app, application)

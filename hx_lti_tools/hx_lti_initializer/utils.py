@@ -22,7 +22,8 @@ def get_lti_value(key, tool_provider):
         try:
             lti_value = getattr(tool_provider, key)
         except AttributeError:
-            print "Attribute: %s not found in LTI tool_provider" % key
+            debug_printer("%s not found in LTI tool_provider" % key)
+            return None
 
     return lti_value
 

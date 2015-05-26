@@ -6,3 +6,4 @@ include
 *.DS_Store
 *.pyc
 *.sh
+htmlcov
