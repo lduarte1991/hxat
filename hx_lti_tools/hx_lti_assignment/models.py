@@ -16,7 +16,7 @@ class Assignment(models.Model):
 	annotation_database_secret_token = models.CharField(max_length=255)
 	include_instructor_tab = models.BooleanField(help_text="Include a tab for instructor annotations.", default=False)
 	allow_highlights = models.BooleanField(help_text="Allow predetermined tags with colors.", default=False)
-	highlights_options = models.CharField(max_length=255)
+	highlights_options = models.CharField(max_length=255, blank=True)
 	allow_touch = models.BooleanField(help_text="Allow touch devices to use tool (warning, still experimental).", default=False)
 	pagination_limit = models.IntegerField(help_text="How many annotations should show up when you hit the 'More' button?")
 	allow_flags = models.BooleanField(help_text="Allow users to flag items as inappropriate/offensive.", default=False)

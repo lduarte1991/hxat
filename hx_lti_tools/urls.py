@@ -16,6 +16,11 @@ urlpatterns = patterns(
         name="edit_course",
     ),
     url(
+        r'^assignment/create_new/$',
+        'hx_lti_initializer.views.create_new_assignment',
+        name="create_new_assignment",
+    ),
+    url(
         r'^launch_lti/$',
         'hx_lti_initializer.views.launch_lti',
         name="launch_lti",

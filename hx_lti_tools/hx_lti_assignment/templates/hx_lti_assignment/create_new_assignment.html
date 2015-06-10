@@ -1,0 +1,112 @@
+{% extends 'hx_lti_initializer/base.html' %}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block content %}
+	<script>
+	jQuery(document).ready(function(){
+		if(jQuery('#id_allow_highlights').val()){
+			jQuery('#id_highlights_options').parent().toggleClass('hidden');
+		}
+        jQuery('#id_allow_highlights').change(function(event){
+        	jQuery('#id_highlights_options').parent().toggleClass('hidden')
+            if (jQuery('#id_highlights_options').parent().hasClass('hidden')) {
+            	jQuery('#id_highlights_options').val("");	
+            }
+        });
+    });
+    </script>
+	<h2>Assignment Form</h2>
+
+	{% if form.errors %}
+		{{ form.errors }}
+	{% endif %}
+	<form method="POST" class="post-form">{% csrf_token %}
+		{{ form.non_field_errors }}
+		<div class="form-group">
+			<label for="id_assignment_name">Assignment name:</label> 
+			<input id="id_assignment_name" maxlength="255" name="assignment_name" class="form-control" type="text" value="{{ form.assignment_name.value }}">
+		</div>
+		<div class="form-group">
+			<label for="id_assignment_objects">Assignment objects:</label> 
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_assignment_objects" name="assignment_objects">
+				{% for id,choice in form.fields.assignment_objects.choices %}
+				<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+
+			<a href="/admin/target_object_database/targetobject/add/">Add a new Target</a>
+		</div>
+		<div class="form-group">
+			<label for="id_course">Course for this Assignment:</label> 
+			<select class="form-control selectpicker" data-live-search="true" id="id_course" name="course">
+				{% for id,choice in form.fields.course.choices %}
+				<option value="{{ id }}" {% if id == form.course.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+		</div>
+		<fieldset>
+			<legend>Annotation Database Settings</legend>
+			<div class="form-group">
+				<label for="id_annotation_database_url">Annotation Database URL:</label> 
+				<input id="id_annotation_database_url" maxlength="255" name="annotation_database_url" class="form-control" type="text" value="{{ form.annotation_database_url.value }}">
+			</div>
+			<div class="form-group">
+				<label for="id_annotation_database_apikey">Annotation Database API Key:</label> 
+				<input id="id_annotation_database_apikey" maxlength="255" name="annotation_database_apikey" class="form-control" type="text" value="{{ form.annotation_database_apikey.value }}">
+			</div>
+			<div class="form-group">
+				<label for="id_annotation_database_secret_token">Annotation Secret Token:</label> 
+				<input id="id_annotation_database_secret_token" maxlength="255" name="annotation_database_secret_token" class="form-control" type="text" value="{{ form.annotation_database_secret_token.value }}">
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Annotator Settings</legend>
+			<div class="checkbox">
+				<label><input type="checkbox" id="id_allow_highlights" name="allow_highlights" {% if form.allow_highlights.value %} checked {% endif %}>Enable Colored Highlights
+			</div>
+			<div class="form-group hidden">
+				<label for="id_highlights_options">Predetermined Tags and Colors:</label> 
+				<input id="id_highlights_options" maxlength="255" name="highlights_options" class="form-control" type="text" value="{{ form.highlights_options.value }}">
+			</div>
+			<div class="checkbox">
+				<label><input type="checkbox" id="id_allow_touch" name="allow_touch" {% if form.allow_touch.value %} checked {% endif %}>Enable Touch Device Support
+			</div>
+			<div class="checkbox">
+				<label><input type="checkbox" id="id_allow_flags" name="allow_flags" {% if form.allow_flags.value %} checked {% endif %}>Enable Flagging
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Annotation Table Settings</legend>
+			<div class="checkbox">
+				<label><input type="checkbox" id="id_include_instructor_tab" name="include_instructor_tab" {% if form.include_instructor_tab.value %} checked {% endif %}>Enable Instructor Tab
+			</div>
+			<div class="form-group">
+			<label for="id_default_tab">Default Tab</label> 
+			<select class="form-control selectpicker" data-live-search="true" id="id_default_tab" name="default_tab">
+				{% for id,choice in form.fields.default_tab.choices %}
+				<option value="{{ id }}" {% if id == form.default_tab.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+		</div>
+			<div class="form-group">
+				<label for="id_pagination_limit">Number of Annotations per Page:</label> 
+				<input id="id_pagination_limit" name="pagination_limit" class="form-control" type="number" value="{{ form.pagination_limit.value }}">
+			</div>
+		</fieldset>
+		{% buttons %}
+		<button type="submit" class="save btn btn-primary">
+		{% bootstrap_icon "star" %} Save
+		</button>
+		<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save btn btn-danger">
+		{% bootstrap_icon "remove" %} Cancel
+		</a>
+		{% endbuttons %}
+	</form>
+{% endblock %}

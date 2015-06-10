@@ -5,22 +5,25 @@ This is basically the controller part of the app. It will set up the tool provid
 """
 
 from ims_lti_py.tool_provider import DjangoToolProvider
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404, render_to_response, render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render_to_response, render, redirect
 from django.contrib.auth import login
 from django.conf import settings
 from django.contrib import messages
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
+from hx_lti_initializer.forms import CourseForm
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *
 from utils import *
+import json
 import sys
 
 def validate_request(req):
@@ -40,12 +43,13 @@ def validate_request(req):
     if 'user_id' not in req.POST:
         debug_printer('DEBUG - Anonymous ID was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_sourcedid' not in req.POST:
-        debug_printer('DEBUG - Username was not present in request.')
+    if 'lis_person_sourcedid' not in req.POST and 'lis_person_fullname' not in req.POST:
+        debug_printer('DEBUG - Username or Name was not present in request.')
         raise PermissionDenied()
 
 def initialize_lti_tool_provider(req):
     """
+    Starts the provider given the consumer_key and secret.
     """
     # get the consumer key and secret from settings (__init__.py file)
     # will be used to compare against request to validate the tool init
@@ -105,16 +109,16 @@ def launch_lti(request):
     debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
     
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
-    collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-    object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-    
     debug_printer('DEBUG - Found course being accessed: %s' % course)
-    debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
-    debug_printer('DEBUG - Found object being accessed: %s' % object_id)
-    
+
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
 
     if "Student" in roles:
+        collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+        debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
+        debug_printer('DEBUG - Found object being accessed: %s' % object_id)
+
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
@@ -155,8 +159,10 @@ def launch_lti(request):
     except LTIProfile.DoesNotExist:
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
-        # gather the necessary data from the LTI initialization request
-        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+        lti_username = get_lti_value('lis_person_name_full', tool_provider)
+        if lti_username == None:
+            # gather the necessary data from the LTI initialization request
+            lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
         
         # checks to see if email and username were not passed in
         # cannot create a user without them
@@ -201,14 +207,74 @@ def launch_lti(request):
             course_object = LTICourse.create_course(course, lti_profile)
     
     # get all the courses the user is a part of
-    courses_for_user = LTICourse.get_courses_of_admin(lti_profile)
+    #courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
     
     # then gets all the files associated with the courses 
-    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
+    #files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
     
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
+    return redirect('hx_lti_initializer:course_admin_hub')
+
     # then renders the page using the template
-    return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+    #return render(
+    #    request,
+    #    'hx_lti_initializer/testpage2.html',
+    #    {
+    #        'user': lti_profile.user,
+    #        'email': lti_profile.user.email,
+    #        'user_id': lti_profile.user.get_username(), 
+    #        'roles': lti_profile.roles, 
+    #        'courses': courses_for_user, 
+    #        'files': files_in_courses,
+    #    }
+    #)
+
+@login_required
+def edit_course(request, id):
+    course = get_object_or_404(LTICourse, pk=id)
+    if request.method == "POST":
+        form = CourseForm(request.POST, instance=course)
+        if form.is_valid():
+            course = form.save()
+            course.save()
+
+            messages.success(request, 'Course was successfully edited!')
+            return redirect('hx_lti_initializer:course_admin_hub')
+        else:
+            raise PermissionDenied()
+    else: 
+        form = CourseForm(instance=course)
+    return render(
+        request,
+        'hx_lti_initializer/edit_course.html', 
+        {
+            'form': form,
+            'user': request.user,
+        }
+    )
+
+
+
+@login_required
+def course_admin_hub(request):
+    """
+    """
+    lti_profile = LTIProfile.objects.get(user=request.user)
+    courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
+
+    return render(
+        request,
+        'hx_lti_initializer/testpage2.html',
+        {
+            'user': request.user,
+            'email': request.user.email,
+            'user_id': request.user.get_username(),
+            'roles': lti_profile.roles,
+            'courses': courses_for_user,
+            'files': files_in_courses,
+        }
+    )
