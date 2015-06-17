@@ -120,7 +120,7 @@ def launch_lti(request):
     
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
 
-    if "Student" in roles:
+    if set(roles).intersection(settings.STUDENT_ROLES):
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
@@ -175,7 +175,7 @@ def launch_lti(request):
         
         if not roles:
             debug_printer('DEBUG - ALL_ROLES is set but user was not passed in any roles via the request. Defaults to student.')
-            all_user_roles += "Student"
+            all_user_roles += settings.STUDENT_ROLES
         
         else:
             # makes sure that roles is a list and not just a string
@@ -199,7 +199,7 @@ def launch_lti(request):
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
         message_error = "Sorry, the course you are trying to reach does not exist."
         messages.error(request, message_error)
-        if 'Administrator' in roles:
+        if set(roles).intersection(settings.ADMIN_ROLES):
             # if the user is an administrator, the missing course is created
             # otherwise, it will just display an error message
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."

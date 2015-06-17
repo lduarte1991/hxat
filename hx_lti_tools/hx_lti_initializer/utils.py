@@ -43,7 +43,7 @@ def retrieve_token(userid, secret):
     the id for identification purposes in the backend.
     '''
     apikey = settings.DB_API_KEY
-    secret = apikey
+    #secret = apikey
     # the following five lines of code allows you to include the defaulttimezone in the iso format
     # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
 
