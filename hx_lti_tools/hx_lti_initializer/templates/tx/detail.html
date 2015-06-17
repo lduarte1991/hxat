@@ -1,7 +1,9 @@
-<script src="//code.jquery.com/jquery-1.9.1.js"></script>
-<script src="//underscorejs.org/underscore.js"></script>
-<!--<script src="http://timeago.yarp.com/jquery.timeago.js"></script>-->
-<script src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js"></script>
+{% load staticfiles %}
+<script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
+<script src="{% static "vendors/development/underscore.js" %}"></script>
+<script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
+<script src="{% static "vendors/development/jstz.js" %}"></script>
+
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -11,8 +13,6 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-{% load staticfiles %}
-{% load staticfiles %}
 <script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
 <script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
@@ -38,7 +38,7 @@
 {{ target_object.target_content | safe }}
 </div>
 <div class="citation">
-{{ target_object.target_citation | safe }}
+<i>{{ target_object.target_citation }}</i>
 </div>
 <div id="dashboard" class="annotationListContainer">
 </div>

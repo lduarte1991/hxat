@@ -120,6 +120,11 @@ def launch_lti(request):
         debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
         debug_printer('DEBUG - Found object being accessed: %s' % object_id)
 
+        user_name = get_lti_value('lis_person_name_full', tool_provider)
+        if user_name == None:
+            # gather the necessary data from the LTI initialization request
+            user_name = get_lti_value('lis_person_sourcedid', tool_provider)
+
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
@@ -128,7 +133,7 @@ def launch_lti(request):
 
         original = {
             'user_id': user_id,
-            'username': get_lti_value('lis_person_sourcedid', tool_provider),
+            'username': user_name,
             'roles': roles,
             'collection': collection_id,
             'course': course,
