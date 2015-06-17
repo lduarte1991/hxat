@@ -35,7 +35,7 @@ def debug_printer(debug_text):
     if settings.LTI_DEBUG:
         print >> sys.stderr, str(debug_text) + '\r'
 
-def retrieve_token(userid, secret):
+def retrieve_token(userid, apikey, secret):
     '''
     Return a token for the backend of annotations.
     It uses the course id to retrieve a variable that contains the secret
@@ -43,8 +43,8 @@ def retrieve_token(userid, secret):
     the token was issued. This will be stored with the user along with
     the id for identification purposes in the backend.
     '''
-    apikey = settings.DB_API_KEY
-    secret = apikey
+    apikey = apikey
+    secret = secret
     # the following five lines of code allows you to include the defaulttimezone in the iso format
     # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
 

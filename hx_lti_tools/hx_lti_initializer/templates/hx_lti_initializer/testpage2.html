@@ -141,17 +141,6 @@ li {
     width: 20px;
     background-repeat: no-repeat;
     background-size: contain;
-    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_expand_more_48px-128.png);
-}
-
-.closeicon {
-    float: right;
-    height: 20px;
-    width: 20px;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_up_48px-32.png);
-    
 }
 
 .copypaste{
@@ -176,7 +165,7 @@ li {
 <script>
     jQuery(document).ready(function(){
         jQuery('#assignments .clickable').click(function(event){
-            $(event.currentTarget).find('span').toggleClass('closeicon expandicon');
+            $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
         });
     });
     var printHelp = function(course_id, collection_id, object_id){
@@ -240,7 +229,7 @@ li {
                             <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
                             {% endif %}
                             {{ assignment.assignment_name }}
-                            <span class="expandicon"></span>
+                            <span class="expandicon glyphicon glyphicon-chevron-down"></span>
                         </td>
                     </tr>
                     <tr>

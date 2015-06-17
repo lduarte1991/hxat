@@ -95,11 +95,10 @@
 	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
 		    		// The endpoint of the store on your server.
-	                prefix: "http://54.148.223.225:8080/catch/annotator",
+	                prefix: this.initOptions.database_url,
 	                annotationData: {
 	                    uri: tempUri,
 	                    citation: "fake source",
-	                    media: this.initOptions.mediaType,
 	                },
 	                urls: {
 	                    // These are the default URLs.

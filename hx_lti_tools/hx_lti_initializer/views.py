@@ -18,6 +18,7 @@ from django.contrib import messages
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
+from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
@@ -43,7 +44,7 @@ def validate_request(req):
     if 'user_id' not in req.POST:
         debug_printer('DEBUG - Anonymous ID was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_sourcedid' not in req.POST and 'lis_person_fullname' not in req.POST:
+    if 'lis_person_sourcedid' not in req.POST and 'lis_person_name_full' not in req.POST:
         debug_printer('DEBUG - Username or Name was not present in request.')
         raise PermissionDenied()
 
@@ -113,7 +114,7 @@ def launch_lti(request):
 
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
 
-    if "Student" in roles:
+    if "Student" in roles or "Learner" in roles:
         collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
@@ -133,7 +134,7 @@ def launch_lti(request):
             'course': course,
             'object': object_id,
             'target_object': targ_obj,
-            'token': retrieve_token(user_id, assignment.annotation_database_secret_token),
+            'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
             'assignment': assignment,
         }
 
