@@ -42,8 +42,8 @@ def validate_request(req):
     if 'user_id' not in req.POST:
         debug_printer('DEBUG - Anonymous ID was not present in request.')
         raise PermissionDenied()
-    if 'lis_person_sourcedid' not in req.POST:
-        debug_printer('DEBUG - Username was not present in request.')
+    if 'lis_person_name_full' not in req.POST:
+        debug_printer('DEBUG - User full name was not present in request.')
         raise PermissionDenied()
 
 def initialize_lti_tool_provider(req):
@@ -129,7 +129,7 @@ def launch_lti(request):
 
         original = {
             'user_id': user_id,
-            'username': get_lti_value('lis_person_sourcedid', tool_provider),
+            'username': get_lti_value('lis_person_name_full', tool_provider),
             'roles': roles,
             'collection': collection_id,
             'course': course,
@@ -162,7 +162,7 @@ def launch_lti(request):
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         # gather the necessary data from the LTI initialization request
-        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+        lti_username = get_lti_value('lis_person_name_full', tool_provider)
         
         # checks to see if email and username were not passed in
         # cannot create a user without them
