@@ -1525,7 +1525,7 @@
       this.element.find('.annotator-save').addClass(this.classes.focus);
       this.checkOrientation();
       this.element.find(":input:first").focus();
-      this.setupDraggables();
+      //this.setupDraggables();
       return this.publish('show');
     };
 

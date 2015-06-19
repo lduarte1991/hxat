@@ -18,7 +18,6 @@
 	-webkit-box-shadow: none;
 	-o-box-shadow: none;
 	box-shadow: none;
-	color: rgb(144, 144, 144);
 }
 
 /* Images
@@ -434,7 +433,7 @@
 	border-radius: 5px 5px 0 0;
 }
 
-.annotator-editor a,
+.annotator-editor .annotator-controls a,
 .annotator-filter .annotator-filter-property label {
 	position: relative;
 	display: inline-block;
@@ -493,7 +492,7 @@
 	border-radius: 5px;
 }
 
-.annotator-editor a::after {
+.annotator-editor .annotator-controls a::after {
 	position: absolute;
 	top: 50%;
 	left: 5px;
@@ -505,9 +504,9 @@
 	background-position: 0 -90px;
 }
 
-.annotator-editor a:hover,
-.annotator-editor a:focus,
-.annotator-editor a.annotator-focus,
+.annotator-editor .annotator-controls a:hover,
+.annotator-editor .annotator-controls a:focus,
+.annotator-editor .annotator-controls a.annotator-focus,
 .annotator-filter .annotator-filter-active label,
 .annotator-filter .annotator-filter-navigation button:hover {
 	outline: none;
@@ -545,13 +544,13 @@
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.42);
 }
 
-.annotator-editor a:hover::after,
-.annotator-editor a:focus::after {
+.annotator-editor .annotator-controls a:hover::after,
+.annotator-editor .annotator-controls a:focus::after {
 	margin-top: -8px;
 	background-position: 0 -105px;
 }
 
-.annotator-editor a:active,
+.annotator-editor .annotator-controls a:active,
 .annotator-filter .annotator-filter-navigation button:active {
 	border-color: rgb(112, 12, 73);
 	background-color: rgb(209, 46, 142);
@@ -585,13 +584,13 @@
 	);
 }
 
-.annotator-editor a.annotator-save::after {
+.annotator-editor .annotator-controls a.annotator-save::after {
 	background-position: 0 -120px;
 }
 
-.annotator-editor a.annotator-save:hover::after,
-.annotator-editor a.annotator-save:focus::after,
-.annotator-editor a.annotator-save.annotator-focus::after {
+.annotator-editor .annotator-controls a.annotator-save:hover::after,
+.annotator-editor .annotator-controls a.annotator-save:focus::after,
+.annotator-editor .annotator-controls a.annotator-save.annotator-focus::after {
 	margin-top: -8px;
 	background-position: 0 -135px;
 }

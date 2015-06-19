@@ -38,6 +38,12 @@
 			// create the annotation core holder to be able to access it throughout the tool
 			this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
 			this.setUpPlugins();
+
+			this.annotation_tool.subscribe("annotationEditorSubmit", function(editor, annotation){
+				if (annotation.parent === "0" || annotation.parent === 0 || typeof Annotator.Plugin["Reply"] !== 'function') {
+					annotation.media = "text";
+				}
+			});
 		}
 	};
 
