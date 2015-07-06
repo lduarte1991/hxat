@@ -8,3 +8,4 @@ include
 *.sh
 htmlcov
 /pyenv
+http_static

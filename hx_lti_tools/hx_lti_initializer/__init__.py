@@ -20,7 +20,9 @@ setconf('LTI_DEBUG', True)
 
 # change the url to the proper point to verify they are trying to
 # access the correct location
-setconf('CONSUMER_URL', 'http://54.69.120.77:8000/lti_init/launch_lti/')
+
+# This is a hard-coded aws IP...
+#setconf('CONSUMER_URL', 'http://54.69.120.77:8000/lti_init/launch_lti/')
 
 # note that consumer key will be visible via the request
 setconf('CONSUMER_KEY', '123key')
