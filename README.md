@@ -9,37 +9,39 @@ TODO: Rest of ReadMe
 
 ## Local Install (up to wiki instructions):
 
-1. Clone the repo
+1: Clone the repo
 ```
   git clone https://github.com/Harvard-ATG/hx-annotations-lti.git
 ```
 
-2. Make a virtual environment (and activate it)
+2: Make a virtual environment (and activate it)
 ```
   virtualenv ./env
   source ./env/bin/activate
 ```
 
-3. Install requirements (TODO: update this for TLT structure)
+3: Install requirements (TODO: update this for TLT structure)
 ```
   pip install -r requirements.txt
   pip install -r TODO/requirements/local.txt
 ```
   
-4. Create the pg database and user
+4: Create the pg database and user
+
+  If on linux, execute: ```sudo su - postgres```  before running the following commands:
+
 ```
-  sudo su - postgres
       ~$ createdb hx_annotations_lti
       ~$ createuser --pwprompt hx_annotations_lti
 ```
 
-5. Misc. Setup (TODO: make sure manage.py is in project root dir - TLT structure)
+5: Misc. Setup (TODO: make sure manage.py is in project root dir - TLT structure)
 ```
   ./manage.py collectstatic
   ./manage.py syncdb
 ```
 
-6. Party
+6: Party
 ```
   ./manage.py runserver
 ```
