@@ -31,8 +31,8 @@ TODO: Rest of ReadMe
   -- (If on linux, execute: ```sudo su - postgres```  before running the following commands)
 
 ```
-      ~$ createdb hx_annotations_lti
-      ~$ createuser --pwprompt hx_annotations_lti
+    createdb hx_annotations_lti
+    createuser --pwprompt hx_annotations_lti
 ```
 
 5: Misc. Setup (TODO: make sure manage.py is in project root dir - TLT structure)
