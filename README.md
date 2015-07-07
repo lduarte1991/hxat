@@ -28,7 +28,7 @@ TODO: Rest of ReadMe
   
 4: Create the pg database and user
 
-  If on linux, execute: ```sudo su - postgres```  before running the following commands:
+  -- (If on linux, execute: ```sudo su - postgres```  before running the following commands)
 
 ```
       ~$ createdb hx_annotations_lti
