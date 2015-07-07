@@ -1,0 +1,4 @@
+Broad TODOs:
+
+-- Restructure for TLT
+-- Some fields don't accept unicode. This may mess up foreign language courses.

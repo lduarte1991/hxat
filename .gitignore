@@ -9,3 +9,4 @@ include
 htmlcov
 /pyenv
 http_static
+.idea/
