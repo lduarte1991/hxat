@@ -1,0 +1,10 @@
+Broad TODOs/Issues:
+
+-- Restructure for TLT
+-- Some backend fields don't accept unicode. This may mess up foreign language courses.
+    -- May have to restructure DB
+    -- I think this is just the primary ID field (the name I believe).
+        Everything else I've tried has been chill with Unicode.
+-- Need <br/> tags in text entry to format text to be annotated (especially brutal for poems)
+    -- Might be nice if instructors could edit the content in the Canvas RTE
+    -- Could oEmbed help us here?
