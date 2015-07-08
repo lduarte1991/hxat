@@ -56,9 +56,9 @@ MIDDLEWARE_CLASSES = (
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'hx_lti_tools.urls'
+ROOT_URLCONF = 'hx_annotations_lti.urls'
 
-WSGI_APPLICATION = 'hx_lti_tools.wsgi.application'
+WSGI_APPLICATION = 'hx_annotations_lti.wsgi.application'
 
 
 # Database

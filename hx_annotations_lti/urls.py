@@ -5,7 +5,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'hx_lti_tools.views.home', name='home'),
+    # url(r'^$', 'hx_annotations_lti.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_intializer")),
