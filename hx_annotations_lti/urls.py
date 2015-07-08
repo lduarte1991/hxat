@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_intializer")),
     url(r'^lti_init/launch_lti/annotation/', include('hx_lti_todapi.urls', namespace="hx_lti_todapi")),
     url(r'^accounts/profile/', TemplateView.as_view(template_name='index.html')),
-    url(r'^lti/', include(django_app_lti.urls, namespace="lti")) 
+    url(r'^lti/', include(django_app_lti.urls, namespace="lti"))
 )
 
 urlpatterns += staticfiles_urlpatterns()
