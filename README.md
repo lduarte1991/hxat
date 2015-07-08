@@ -25,6 +25,10 @@ TODO: Rest of ReadMe
   pip install -r requirements.txt
   pip install -r TODO/requirements/local.txt
 ```
+Known Issues: Make sure you have libxml2, libxslt and PostgreSQL installed on your machine. Also be sure to install xcode-select:
+```
+  xcode-select --install
+```
   
 4: Create the pg database and user
 
