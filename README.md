@@ -38,14 +38,15 @@ Known Issues: Make sure you have libxml2, libxslt and PostgreSQL installed on yo
     createdb hx_annotations_lti
     createuser --pwprompt hx_annotations_lti
 ```
+5: Configure a secure.py file under settings.
 
-5: Misc. Setup (TODO: make sure manage.py is in project root dir - TLT structure)
+6: Misc. Setup (TODO: make sure manage.py is in project root dir - TLT structure)
 ```
   ./manage.py collectstatic
   ./manage.py syncdb
 ```
 
-6: Party
+7: Party
 ```
   ./manage.py runserver
 ```
