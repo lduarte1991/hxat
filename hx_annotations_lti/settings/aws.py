@@ -11,26 +11,25 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.contrib import messages
+from .secure import SECURE_SETTINGS
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+#TODO: False for aws, true for local
+# SECURITY WARNING: don't run with debug turned on in production!
 LTI_DEBUG = True
+DEBUG = True
+TEMPLATE_DEBUG = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'eyc+bftd*fskn^_vt4+pr)0-ih+7sc%8i40*c=cji6*#+&2paj'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
+SECRET_KEY = SECURE_SETTINGS.get('secret_key')
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,29 +63,16 @@ WSGI_APPLICATION = 'hx_annotations_lti.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'django_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432',
-#     }
-# }
-
-#TODO: TLT Secure.py
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hx_annotations_lti',
-        'USER': 'hx_annotations_lti',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+        'NAME': SECURE_SETTINGS.get('db_default_name', 'dce_course_info'),
+            #'postgres' is in the TLT aws wiki, but won't this give access to all databases?
+        'USER': SECURE_SETTINGS.get('db_default_user', 'postgres'),
+        'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
+        'HOST': SECURE_SETTINGS.get('db_default_host', '127.0.0.1'),
+        'PORT': SECURE_SETTINGS.get('db_default_port', 5432),
+} }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
@@ -127,12 +113,12 @@ JENKINS_TASKS = (
 )
 
 # note that consumer key will be visible via the request
-CONSUMER_KEY = '123key'
+CONSUMER_KEY = SECURE_SETTINGS.get('consumer_key')
 
 # the secret token will be encoded in the request.
 # Only places visible are here and the secret given to the LTI consumer,
 # in other words, keep it hidden!
-LTI_SECRET = 'secret'
+LTI_SECRET = SECURE_SETTINGS.get('lti_secret')
 
 # needs context_id, collection_id, and object_id to open correct item in tool
 LTI_COURSE_ID = 'context_id'
@@ -147,4 +133,4 @@ ADMIN_ROLES = ['urn:lti:instrole:ims/lis/Administrator', 'urn:lti:role:ims/lis/I
 STUDENT_ROLES = ['Learner']
 
 # settings for Annotation Server
-DB_API_KEY = '5aaa60f6-ba3a-4c60-953b-ab96c2d20624'
+DB_API_KEY = SECURE_SETTINGS.get('db_api_key')
