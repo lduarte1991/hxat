@@ -205,6 +205,9 @@ def launch_lti(request):
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
             messages.warning(request, message_error)
             course_object = LTICourse.create_course(course, lti_profile)
+        else:
+            debug_printer('DEBUG - ERROR: Non-administrative user attempted to create course')
+
     
     # get all the courses the user is a part of
     courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
