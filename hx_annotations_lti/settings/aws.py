@@ -37,9 +37,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'django_extensions',
+    'django_extensions',
     #'django_jenkins',
-    #'bootstrap3',
+    'bootstrap3',
     'ims_lti_py',
     'hx_lti_initializer',
     'hx_lti_todapi',
@@ -69,8 +69,12 @@ LTI_SETUP = {
     "TOOL_TITLE": "HX Annotations",
     "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
     "LAUNCH_URL": "lti:launch",
+
+    ##These two are where we're getting trouble
     "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
     "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
+
+
     "EXTENSION_PARAMETERS": {
         "canvas.instructure.com": {
             "privacy_level": "public",
