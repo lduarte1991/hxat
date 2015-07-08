@@ -11,3 +11,4 @@ htmlcov
 http_static
 .idea/
 hx_annotations_lti/settings/secure.py
+venv
