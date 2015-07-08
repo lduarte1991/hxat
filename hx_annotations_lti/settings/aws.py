@@ -82,7 +82,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "HX Annotations (localhost XML test)",
+                "text": "Annotations (localhost)", 
             }
         }
     }
