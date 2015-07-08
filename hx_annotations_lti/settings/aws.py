@@ -13,6 +13,7 @@ import os
 from django.contrib import messages
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+CONSUMER_KEY = '123key'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/

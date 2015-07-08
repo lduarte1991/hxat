@@ -25,7 +25,7 @@ setconf('LTI_DEBUG', True)
 #setconf('CONSUMER_URL', 'http://54.69.120.77:8000/lti_init/launch_lti/')
 
 # note that consumer key will be visible via the request
-setconf('CONSUMER_KEY', '123key')
+# setconf('CONSUMER_KEY', '123key')
 
 # the secret token will be encoded in the request.
 # Only places visible are here and the secret given to the LTI consumer,
