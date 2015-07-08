@@ -68,7 +68,7 @@ AUTHENTICATION_BACKENDS = (
 LTI_SETUP = {
     "TOOL_TITLE": "HX Annotations",
     "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
-    "LAUNCH_URL": "localhost:8000/lti_init/launch_lti/",
+    "LAUNCH_URL": "lti:launch",
     "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
     "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
     "EXTENSION_PARAMETERS": {
