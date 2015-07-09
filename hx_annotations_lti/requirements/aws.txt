@@ -29,3 +29,7 @@ six==1.9.0
 snowballstemmer==1.2.0
 sphinx-rtd-theme==0.1.7
 wsgiref==0.1.2
+
+#Harvard ATG
+git+https://github.com/Harvard-ATG/django-app-lti@master#egg=django-app-lti
+git+https://github.com/Harvard-University-iCommons/django-auth-lti@master#egg=django-auth-lti
