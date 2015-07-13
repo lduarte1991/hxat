@@ -182,5 +182,5 @@ def instructor_to_annotation(request):
         #TODO: This is bad code. Make it dynamic
         #TODO: also the whole structure should be changed so we're not so flat and reliant on lti_launch
 
-        print request.session + 'Django session...................................................'
+        #print request.session + 'Django session...................................................'
         return HttpResponse('Hello')
