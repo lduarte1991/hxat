@@ -4,29 +4,30 @@ This will launch the LTI Annotation tool.
 This is basically the controller part of the app. It will set up the tool provider, create/retrive the user and pass along any other information that will be rendered to the access/init screen to the user. 
 """
 
-from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext
+from django.http                import HttpResponseRedirect, HttpResponse
+from django.template            import RequestContext
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions     import PermissionDenied
+from django.shortcuts           import get_object_or_404, render_to_response, render
+from django.contrib.auth        import login
+from django.conf                import settings
+from django.contrib             import messages
+
+from hx_lti_todapi.models       import TargetObject
+from hx_lti_assignment.models   import Assignment
+from hx_lti_initializer.models  import LTIProfile, LTICourse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404, render_to_response, render
-from django.contrib.auth import login
-from django.conf import settings
-from django.contrib import messages
-
-from hx_lti_todapi.models import TargetObject
-from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.models import LTIProfile, LTICourse
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-
 from models import *
 from utils import *
+from os.path import basename, splitext
+from urlparse import urlparse
+
 import sys
 import json
-from urlparse import urlparse
-from os.path import basename, splitext
-
 import requests
+
+
 def create_new_user(username, user_id, roles, anon_id):
     # now create the user and LTIProfile with the above information
     user = User.objects.create_user(username, user_id)
