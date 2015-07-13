@@ -274,8 +274,9 @@ li {
                                             {{ file.target_created | timesince }} ago
                                         </td>
                                         <td>
-                                            <form action="?" id="widget_edit_form" method="get">
+                                            <form action="iAnnotation" id="widget_edit_form" method="post">
                                                 <input id="" name="requested_assignment" value="{{assignment.assignment_id}}" type="hidden">
+                                                <input id="" name="oauth_consumer_key" value="123key" type="hidden">
                                                 <input id="go_to_assignment_view" name="assignment_submit" value="View Assignment" class="btn btn-default" type="submit">
                                             </form>
                                         </td>

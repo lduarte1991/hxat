@@ -56,12 +56,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_auth_lti.middleware.LTIAuthMiddleware',
+    'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'django_auth_lti.backends.LTIAuthBackend',
+    'django_auth_lti.backends.LTIAuthBackend',  
 )
 
 # Add LTI configuration settings (for django-app-lti)
@@ -90,8 +90,7 @@ LTI_SETUP = {
 
 # Add LTI oauth credentials (for django-auth-lti)
 LTI_OAUTH_CREDENTIALS = {
-    "mykey":"mysecret",
-    "myotherkey": "myothersecret",
+    "123key":"secret",
 }
 
 ROOT_URLCONF = 'hx_annotations_lti.urls'

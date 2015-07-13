@@ -4,8 +4,7 @@ This will launch the LTI Annotation tool.
 This is basically the controller part of the app. It will set up the tool provider, create/retrive the user and pass along any other information that will be rendered to the access/init screen to the user. 
 """
 
-from ims_lti_py.tool_provider import DjangoToolProvider
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 
 from django.core.exceptions import PermissionDenied
@@ -25,50 +24,7 @@ from utils import *
 import sys
 import json
 
-def validate_request(req):
-    """
-    Validates the request in order to permit or deny access to the LTI tool.
-    """
-    # print out the request to the terminal window if in debug mode
-    # this item is set in the settings, in the __init__.py file
-    if settings.LTI_DEBUG:
-        for item in req.POST:
-            debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
-    
-    # verifies that request contains the information needed
-    if 'oauth_consumer_key' not in req.POST:
-        debug_printer('DEBUG - Consumer Key was not present in request.')
-        raise PermissionDenied()
-    if 'user_id' not in req.POST:
-        debug_printer('DEBUG - Anonymous ID was not present in request.')
-        raise PermissionDenied()
-    if 'lis_person_name_full' not in req.POST:
-        debug_printer('DEBUG - User full name was not present in request.')
-        raise PermissionDenied()
-
-def initialize_lti_tool_provider(req):
-    """
-    """
-    # get the consumer key and secret from settings (__init__.py file)
-    # will be used to compare against request to validate the tool init
-    consumer_key = settings.CONSUMER_KEY
-    secret = settings.LTI_SECRET
-    
-    # use the function from ims_lti_py app to verify and initialize tool
-    provider = DjangoToolProvider(consumer_key, secret, req.POST)
-    
-    # now validate the tool via the valid_request function
-    try:
-        # this means that request was well formed but invalid
-        if provider.valid_request(req) == False:
-            debug_printer("DEBUG - LTI Exception: Not a valid request.")
-            raise PermissionDenied()
-        else:
-            debug_printer('DEBUG - LTI Tool Provider was valid.')
-    except:
-        raise PermissionDenied()
-    return provider
-
+import requests
 def create_new_user(username, user_id, roles, anon_id):
     # now create the user and LTIProfile with the above information
     user = User.objects.create_user(username, user_id)
@@ -99,26 +55,24 @@ def launch_lti(request):
     Gets a request from an LTI consumer.
     Passes along information to render a welcome screen to the user.
     """
-    
-    validate_request(request)
-    tool_provider = initialize_lti_tool_provider(request)
-    
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
+    print str(request.LTI) + 'LTI session...................................................'
+
     consumer_key_requested = request.POST['oauth_consumer_key']
-    user_id = get_lti_value('user_id', tool_provider)
+    user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
     debug_printer('DEBUG - Found anonymous ID in request: %s' % anon_id)
     
-    course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
-    collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-    object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+    course = request.LTI.get('resource_link_id')
+    collection_id = request.LTI.get('custom_collection_id')
+    object_id = request.LTI.get('custom_object_id')
     
     debug_printer('DEBUG - Found course being accessed: %s' % course)
     debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
     debug_printer('DEBUG - Found object being accessed: %s' % object_id)
     
-    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    roles = request.LTI.get('roles')
 
     if set(roles).intersection(settings.STUDENT_ROLES):
         try:
@@ -129,7 +83,7 @@ def launch_lti(request):
 
         original = {
             'user_id': user_id,
-            'username': get_lti_value('lis_person_name_full', tool_provider),
+            'username': request.LTI.get('lis_person_name_full'),
             'roles': roles,
             'collection': collection_id,
             'course': course,
@@ -162,7 +116,7 @@ def launch_lti(request):
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         # gather the necessary data from the LTI initialization request
-        lti_username = get_lti_value('lis_person_name_full', tool_provider)
+        lti_username = request.LTI.get('lis_person_name_full')
         
         # checks to see if email and username were not passed in
         # cannot create a user without them
@@ -222,3 +176,11 @@ def launch_lti(request):
     
     # then renders the page using the template
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+
+@csrf_exempt
+def instructor_to_annotation(request):
+        #TODO: This is bad code. Make it dynamic
+        #TODO: also the whole structure should be changed so we're not so flat and reliant on lti_launch
+
+        print request.session + 'Django session...................................................'
+        return HttpResponse('Hello')
