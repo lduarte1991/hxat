@@ -23,6 +23,8 @@ from models import *
 from utils import *
 import sys
 import json
+from urlparse import urlparse
+from os.path import basename, splitext
 
 import requests
 def create_new_user(username, user_id, roles, anon_id):
