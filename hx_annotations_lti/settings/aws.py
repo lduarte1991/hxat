@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = SECURE_SETTINGS.get('secret_key')
 
+# TODO: find out if this is supposed to be ['*']
 ALLOWED_HOSTS = []
 
 
