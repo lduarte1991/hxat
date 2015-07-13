@@ -26,7 +26,9 @@ from urlparse import urlparse
 import sys
 import json
 import requests
+import logging
 
+logging.basicConfig()
 
 def create_new_user(username, user_id, roles, anon_id):
     # now create the user and LTIProfile with the above information
@@ -182,7 +184,6 @@ def launch_lti(request):
 
 @csrf_exempt
 def instructor_to_annotation(request):
-        #TODO: This is bad code. Make it dynamic
         #TODO: also the whole structure should be changed so we're not so flat and reliant on lti_launch
 
         #print request.session + 'Django session...................................................'
