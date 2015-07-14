@@ -14,5 +14,4 @@ urlpatterns = patterns(
         'hx_lti_initializer.views.launch_lti',
         name="launch_lti"
     ),
-    url(r'^launch_lti/iAnnotation', 'hx_lti_initializer.views.instructor_to_annotation', name="iAnnotation"),
 )

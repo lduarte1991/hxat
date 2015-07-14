@@ -230,7 +230,10 @@ def student_view(request):
 
 
 def instructor_view(request):
-    context = {}
+    context = {
+        'course' : request.LTI.get('resource_link_id')
+
+    }
     return(render(request, 'hx_lti_initializer/instructor_index.html', context))
 
 
