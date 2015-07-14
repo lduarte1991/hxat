@@ -228,9 +228,40 @@ def launch_lti(request):
 
 
 def student_view(request):
-    context = {}
-    return(render(request, 'hx_lti_initializer/student_index.html', context))
+    consumer_key_requested = request.POST['oauth_consumer_key']
+    user_id = request.LTI.get('user_id')
+    anon_id = '%s:%s' % (consumer_key_requested, user_id)
+    course = request.LTI.get('resource_link_id')
 
+    try:
+        debug_printer('DEBUG - Course was found %s' % course)
+        course_object = LTICourse.get_course_by_id(course)
+    except:
+        #TODO: correct functionality
+        print("You're buggered - no course_object")
+
+    try:
+        # try to get the profile via the anon id
+        lti_profile = LTIProfile.objects.get(anon_id=anon_id)
+    except:
+        #TODO: make them an account
+        print("You're Rolled - no lti_profile")
+
+
+    courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
+
+
+    context = {
+        'user': lti_profile.user,
+        'email': lti_profile.user.email,
+        'user_id': lti_profile.user.get_username(),
+        'roles': lti_profile.roles,
+        'courses': courses_for_user,
+        'files': files_in_courses
+    }
+
+    return render(request, 'hx_lti_initializer/student_index.html', context)
 
 def instructor_view(request):
 
@@ -258,7 +289,7 @@ def instructor_view(request):
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
 
 
-    ctx1 = {
+    context = {
         'user': lti_profile.user,
         'email': lti_profile.user.email,
         'user_id': lti_profile.user.get_username(),
@@ -267,12 +298,7 @@ def instructor_view(request):
         'files': files_in_courses
     }
 
-
-    context = {
-        'course' : request.LTI.get('resource_link_id')
-
-    }
-    return(render(request, 'hx_lti_initializer/instructor_index.html', ctx1))
+    return render(request, 'hx_lti_initializer/instructor_index.html', context)
 
 @csrf_exempt
 def annotation_view(request):
@@ -321,15 +347,3 @@ def annotation_view(request):
         context.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, context)
-
-
-@csrf_exempt
-def instructor_to_annotation(request):
-        authenticated = request.session.get('Authenticated', False)
-        if authenticated:
-            return HttpResponse("You are Authenticated, brouhaha")
-        else:
-        #TODO: also the whole structure should be changed so we're not so flat and reliant on lti_launch
-
-        #print request.session + 'Django session...................................................'
-            return HttpResponse('Hello')
