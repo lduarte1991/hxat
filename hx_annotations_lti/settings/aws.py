@@ -133,6 +133,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
+STATICFILES_DIRS = (
+    os.path.normpath(os.path.join(os.path.dirname(BASE_DIR), 'hx_lti_initializer/static/')),
+)
+
+print STATICFILES_DIRS
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
