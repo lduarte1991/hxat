@@ -62,7 +62,7 @@ def launch_lti(request):
     """
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
-    print str(request.LTI) + 'LTI session...................................................'
+    #print str(request.LTI) + 'LTI session...................................................'
 
     consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = request.LTI.get('user_id')
@@ -80,6 +80,8 @@ def launch_lti(request):
     roles = request.LTI.get('roles')
 
     if set(roles).intersection(settings.STUDENT_ROLES):
+
+        #fails here: no object or ID I guess?
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)

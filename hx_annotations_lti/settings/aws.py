@@ -60,6 +60,8 @@ MIDDLEWARE_CLASSES = (
     'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'django_auth_lti.backends.LTIAuthBackend',  
