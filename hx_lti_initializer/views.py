@@ -270,7 +270,7 @@ def instructor_view(request):
     }
     return(render(request, 'hx_lti_initializer/instructor_index.html', ctx1))
 
-
+@csrf_exempt
 def annotation_view(request):
     # Get object_id and collection_id from POST
     # id of the target source
