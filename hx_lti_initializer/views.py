@@ -199,7 +199,7 @@ def launch_lti_old(request):
 @csrf_exempt
 def launch_lti(request):
 
-    #TODO: Authentication code
+    #TODO: Authentication code?
 
     roles = request.LTI.get('roles')
     user_id = request.LTI.get('user_id')
@@ -232,6 +232,12 @@ def student_view(request):
 def instructor_view(request):
     context = {}
     return(render(request, 'hx_lti_initializer/instructor_index.html', context))
+
+
+def annotation_view(request):
+    context = {}
+    return(render(request, 'hx_lti_initializer/annotation_view.html'), context)
+
 
 @csrf_exempt
 def instructor_to_annotation(request):
