@@ -4,7 +4,7 @@ This will launch the LTI Annotation tool.
 This is basically the controller part of the app. It will set up the tool provider, create/retrive the user and pass along any other information that will be rendered to the access/init screen to the user. 
 """
 
-from django.http                import HttpResponseRedirect, HttpResponse
+from django.http                import HttpResponseRedirect, HttpResponse, Http404
 from django.template            import RequestContext
 
 from django.core.exceptions     import PermissionDenied
@@ -276,9 +276,51 @@ def instructor_view(request):
 
 @csrf_exempt
 def annotation_view(request):
-    context = {}
-    print request.session['LTI']
-    return(render(request, 'hx_lti_initializer/annotation_view.html'), context)
+    # Get object_id and collection_id from POST
+    # id of the target source
+    object_id = request.POST.get('requested_object')
+    # id of the assignment the annotation object belongs to
+    collection_id = request.POST.get('requested_assignment')
+
+    # Check if object and collection id exist
+    if object_id is None or collection_id is None:
+        raise Http404("Assignment does not exist.")
+
+    # Get target object 
+    try:
+        assignment = Assignment.objects.get(assignment_id=collection_id)
+        targ_obj = TargetObject.objects.get(pk=object_id)
+    except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+        raise PermissionDenied()
+
+    LTI = request.session['LTI']
+
+    context = {
+        'user_id': LTI.get('user_id'),
+        'username': LTI.get('lis_person_name_full'),
+        'roles': LTI.get('roles'),
+        'collection': collection_id,
+        'course': LTI.get('resource_link_id'),
+        'object': object_id,
+        'target_object': targ_obj,
+        'token': retrieve_token(LTI.get('user_id'), assignment.annotation_database_secret_token),
+        'assignment': assignment,
+    }
+
+    # Check whether the target object is a video or image
+    if (targ_obj.target_type == 'vd'):
+        srcurl = targ_obj.target_content
+        if 'youtu' in srcurl:
+            typeSource = 'video/youtube'
+        else:
+            disassembled = urlparse(srcurl)
+            file_ext = splitext(basename(disassembled.path))[1]
+            typeSource = 'video/' + file_ext.replace('.', '')
+        context.update({'typeSource': typeSource})
+    elif (targ_obj.target_type == 'ig'):
+        context.update({'osd_json': targ_obj.target_content})
+
+    return render(request, '%s/detail.html' % targ_obj.target_type, context)
 
 
 @csrf_exempt

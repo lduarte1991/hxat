@@ -10,5 +10,6 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     '',
     url(r'^launch_lti/$', 'hx_lti_initializer.views.launch_lti', name="launch_lti"),
+    # TODO: Change this to a more sensible URL
     url(r'^launch_lti/annotation_view$', 'hx_lti_initializer.views.annotation_view', name="annotation_view"),
 )
