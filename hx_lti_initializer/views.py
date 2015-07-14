@@ -55,7 +55,7 @@ def create_new_user(username, user_id, roles, anon_id):
     return user, lti_profile
 
 @csrf_exempt
-def launch_lti(request):
+def launch_lti_old(request):
     """
     Gets a request from an LTI consumer.
     Passes along information to render a welcome screen to the user.
@@ -83,6 +83,8 @@ def launch_lti(request):
 
         #fails here: no object or ID I guess?
         try:
+            print collection_id
+            #print(Assignment.objects.get(assignment_id = collection_id) )
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
         except Assignment.DoesNotExist or TargetObject.DoesNotExist:
@@ -186,6 +188,26 @@ def launch_lti(request):
 
     # then renders the page using the template
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+
+@csrf_exempt
+def launch_lti(request):
+    roles = request.LTI.get('roles')
+    print(roles)
+
+    #TODO: Make this work for people with multiple roles
+    #if set(roles).intersection(settings.STUDENT_ROLES):
+    if roles == ['Learner']:
+        context = {}
+        return(render(request, 'hx_lti_initializer/student_view.html', context))
+    #elif set(roles).intersection(settings.ADMIN_ROLES):
+    elif roles == ['Instructor']:
+        context = {}
+        return(render(request, 'hx_lti_initializer/instructor_view.html', context))
+    else:
+        #TODO: What kind of failure functionality do we want? Redirect to fail page?
+        return HttpResponse('FAIL')
+    #return HttpResponse('Hello')
+
 
 @csrf_exempt
 def instructor_to_annotation(request):
