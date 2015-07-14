@@ -110,6 +110,7 @@ def launch_lti(request):
         elif (targ_obj.target_type == 'ig'):
             original.update({'osd_json': targ_obj.target_content})
 
+        request.session['Authenticated'] = True
         return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
@@ -178,13 +179,19 @@ def launch_lti(request):
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
-    
+
+    request.session['Authenticated'] = True
+
     # then renders the page using the template
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
 
 @csrf_exempt
 def instructor_to_annotation(request):
+        authenticated = request.session.get('Authenticated', False)
+        if authenticated:
+            return HttpResponse("You are Authenticated, brouhaha")
+        else:
         #TODO: also the whole structure should be changed so we're not so flat and reliant on lti_launch
 
         #print request.session + 'Django session...................................................'
-        return HttpResponse('Hello')
+            return HttpResponse('Hello')
