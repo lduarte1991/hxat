@@ -23,6 +23,11 @@ from utils import *
 from os.path import basename, splitext
 from urlparse import urlparse
 
+from django.views.decorators.http   import require_POST
+from django.contrib.auth.decorators import login_required
+
+
+
 import sys
 import json
 import requests
@@ -189,25 +194,44 @@ def launch_lti_old(request):
     # then renders the page using the template
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
 
+@login_required
+@require_POST
 @csrf_exempt
 def launch_lti(request):
+
+    #TODO: Authentication code
+
     roles = request.LTI.get('roles')
-    print(roles)
+    user_id = request.LTI.get('user_id')
+    username = request.LTI.get('lis_person_name_full'),
+    course = request.LTI.get('resource_link_id')
 
     #TODO: Make this work for people with multiple roles
     #if set(roles).intersection(settings.STUDENT_ROLES):
     if roles == ['Learner']:
         context = {}
-        return(render(request, 'hx_lti_initializer/student_view.html', context))
+        #return(render(request, 'hx_lti_initializer/student_index.html', context))
+
+        return student_view(request)
     #elif set(roles).intersection(settings.ADMIN_ROLES):
     elif roles == ['Instructor']:
         context = {}
-        return(render(request, 'hx_lti_initializer/instructor_view.html', context))
+        #return(render(request, 'hx_lti_initializer/instructor_index.html', context))
+        #return(render(request, 'hx_lti_initializer/testpage2.html', context))
+        return instructor_view(request)
     else:
         #TODO: What kind of failure functionality do we want? Redirect to fail page?
         return HttpResponse('FAIL')
-    #return HttpResponse('Hello')
 
+
+def student_view(request):
+    context = {}
+    return(render(request, 'hx_lti_initializer/student_index.html', context))
+
+
+def instructor_view(request):
+    context = {}
+    return(render(request, 'hx_lti_initializer/instructor_index.html', context))
 
 @csrf_exempt
 def instructor_to_annotation(request):
