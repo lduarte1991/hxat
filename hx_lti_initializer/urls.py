@@ -10,5 +10,5 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     '',
     url(r'^launch_lti/$', 'hx_lti_initializer.views.launch_lti', name="launch_lti"),
-    url(r'^annotation/$', 'hx_lti_initializer.views.annotation_view', name="annotation_view"),
+    url(r'^launch_lti/annotation_view$', 'hx_lti_initializer.views.annotation_view', name="annotation_view"),
 )

@@ -118,7 +118,7 @@
                                     {{ file.target_created | timesince }} ago
                                 </td>
                                 <td>
-                                    <form action="annotation" id="widget_edit_form" method="post">
+                                    <form action="annotation_view" id="widget_edit_form" method="post">
                                         <input name="requested_assignment" value="{{assignment.assignment_id}}" type="hidden">
                                         <input name="requested_object" value={{ file.id }} type="hidden">
                                         <input name="assignment_submit" value="View Assignment" class="btn btn-default" type="submit">

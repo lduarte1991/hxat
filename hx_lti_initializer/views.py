@@ -206,6 +206,9 @@ def launch_lti(request):
     username = request.LTI.get('lis_person_name_full'),
     course = request.LTI.get('resource_link_id')
 
+
+    request.session['LTI'] = request.LTI
+
     #TODO: Make this work for people with multiple roles
     #if set(roles).intersection(settings.STUDENT_ROLES):
     if roles == ['Learner']:
@@ -230,6 +233,7 @@ def student_view(request):
 
 
 def instructor_view(request):
+
     consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
@@ -270,9 +274,10 @@ def instructor_view(request):
     }
     return(render(request, 'hx_lti_initializer/instructor_index.html', ctx1))
 
-
+@csrf_exempt
 def annotation_view(request):
     context = {}
+    print request.session['LTI']
     return(render(request, 'hx_lti_initializer/annotation_view.html'), context)
 
 
