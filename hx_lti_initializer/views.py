@@ -67,19 +67,19 @@ def create_user(request, anon_id):
         TODO: Figure out & Explain
     '''
     #TODO: run through this HX code and see if we're good (authentication and functionality-wise)
+    #should we use HUIDs? it would feel unsafe...
+
     debug_printer('DEBUG - LTI Profile not found. New User to be created.')
 
     # gather the necessary data from the LTI initialization request
     # What if there are two people named 'John Doe'?? (or Test Student)
     #lti_username = request.LTI.get('lis_person_name_full')
 
+    #TODO: We may want to consider fixing this.
     #So we've implemented this to go by user_id rather than display name.
     #the user ids come through hashed, so I don't think we'll be storing anything sensitive.
-    #furthermore, we've had to cut the hash down to size, since it's a 40 character field and the db takes max 30
+    #furthermore, we've had to cut the hash down to size, since it's a 40 character field and the db takes max 30.
     #until the db can be modified to fit, we're going to have to do this.
-    #a full hash. (this is why we have magic number 20)
-    #TODO: We may want to consider fixing this.
-
     #TODO: try/except
     lti_username = str(request.LTI.get('user_id'))[:20]
     roles = request.LTI.get('roles')
@@ -275,6 +275,8 @@ def launch_lti(request):
     #TODO: Authentication code?
 
     roles = request.LTI.get('roles')
+    request.session['roles'] = roles
+
     user_id = request.LTI.get('user_id')
     username = request.LTI.get('lis_person_name_full'),
     course = request.LTI.get('resource_link_id')
@@ -307,6 +309,7 @@ def student_view(request):
     except:
         #TODO: correct functionality
         print("You're buggered - no course_object")
+        return HttpResponse("THERE IS NO COURSE")
 
     try:
         # try to get the profile via the anon id
@@ -315,7 +318,6 @@ def student_view(request):
     except LTIProfile.DoesNotExist:
         #TODO: what do we do with the 'user' variable?
         user, lti_profile = create_user(request, anon_id)
-        print("You're Rolled - no lti_profile")
 
     courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
@@ -341,19 +343,33 @@ def instructor_view(request):
     course = request.LTI.get('resource_link_id')
 
     try:
-        debug_printer('DEBUG - Course was found %s' % course)
-        course_object = LTICourse.get_course_by_id(course)
-    except:
-        #TODO: correct functionality
-        print("You're buggered - no course_object")
-
-    try:
         # try to get the profile via the anon id
         lti_profile = LTIProfile.objects.get(anon_id=anon_id)
     except LTIProfile.DoesNotExist:
         user, lti_profile = create_user(request, anon_id)
         print("You're Rolled - no lti_profile")
 
+    try:
+        debug_printer('DEBUG - Course was found %s' % course)
+        course_object = LTICourse.get_course_by_id(course)
+    except LTICourse.DoesNotExist:
+        # this should only happen if an instructor is trying to access the
+        # tool from a different course
+        debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
+        message_error = "Sorry, the course you are trying to reach does not exist."
+        messages.error(request, message_error)
+
+        #TODO: try/catch on the 'roles' lookup?
+        if set(request.session['roles']).intersection(settings.ADMIN_ROLES):
+            # if the user is an administrator, the missing course is created
+            # otherwise, it will just display an error message
+            message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
+            messages.warning(request, message_error)
+            course_object = LTICourse.create_course(course, lti_profile)
+        else:
+            debug_printer('DEBUG - ERROR: Non-administrative user attempted to create course')
+            course_object = []
+            #course_object = LTICourse.create_course(course, lti_profile)
 
     courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)

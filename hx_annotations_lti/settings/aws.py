@@ -173,6 +173,10 @@ LTI_ROLES = 'roles'
 
 # should be changed depending on platform roles, these are set up for edX
 ADMIN_ROLES = ['urn:lti:instrole:ims/lis/Administrator', 'urn:lti:role:ims/lis/Instructor', 'urn:lti:role:ims/lis/TeachingAssistant']
+
+#TODO: check if this is what we want
+ADMIN_ROLES += ['Administrator', 'Instructor', 'TeachingAssistant']
+
 STUDENT_ROLES = ['Learner']
 
 # settings for Annotation Server
