@@ -67,21 +67,22 @@ def create_user(request, anon_id):
         TODO: Figure out & Explain
     '''
     #TODO: run through this HX code and see if we're good (authentication and functionality-wise)
-    #should we use HUIDs? it would feel unsafe...
 
     debug_printer('DEBUG - LTI Profile not found. New User to be created.')
 
     # gather the necessary data from the LTI initialization request
     # What if there are two people named 'John Doe'?? (or Test Student)
-    #lti_username = request.LTI.get('lis_person_name_full')
+    # what if their name is longer than the db field? (30 char)
+    # Caution: this username shows up in the 'choose course admins' field.
+    lti_username = request.LTI.get('lis_person_name_full')
 
-    #TODO: We may want to consider fixing this.
-    #So we've implemented this to go by user_id rather than display name.
-    #the user ids come through hashed, so I don't think we'll be storing anything sensitive.
-    #furthermore, we've had to cut the hash down to size, since it's a 40 character field and the db takes max 30.
-    #until the db can be modified to fit, we're going to have to do this.
-    #TODO: try/except
-    lti_username = str(request.LTI.get('user_id'))[:20]
+    #TODO: We may want to consider fixing the username.
+    #So we could implement this to go by user_id rather than display name.
+    #the user ids come through hashed, so I don't think we'd be storing anything sensitive.
+    #we would have to cut the hash down to size, since it's a 40 character field and the db takes max 30.
+    #until the db can be modified to fit, it would look like this:
+        #lti_username = str(request.LTI.get('user_id'))[:20]
+
     roles = request.LTI.get('roles')
     # checks to see if email and username were not passed in
     # cannot create a user without them
