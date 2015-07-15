@@ -47,3 +47,6 @@ TODO: Rest of ReadMe
 ```
 
 **(At this point, you'll have to go to the wiki to set up on canvas)**
+
+## Troubleshooting
+If you run into issues getting into the admin site, try running ```python manage.py migrate auth``` and then ```python manage.py migrate```
