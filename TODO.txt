@@ -23,3 +23,7 @@ Broad TODOs/Issues:
 √ Duplicate student names break the tool, it seems (Test Student). Make that not happen.
 -- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
 -- Figure out what highlight options are and why they are a required field
+-- Navigation improvements:
+    -- Sometimes going back/forward works smoothly, sometimes the document expires
+    -- 'refresh' takes you back to the index. not a huge deal but something to keep in mind
+    -- add in a 'return to index' type of button

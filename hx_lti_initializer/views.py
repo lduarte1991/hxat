@@ -272,7 +272,9 @@ def launch_lti_old(request):
 @require_POST
 @csrf_exempt
 def launch_lti(request):
-
+    '''
+        TODO: explanation
+    '''
     #TODO: Authentication code?
 
     roles = request.LTI.get('roles')
@@ -299,6 +301,9 @@ def launch_lti(request):
 
 
 def student_view(request):
+    '''
+        TODO: explanation
+    '''
     consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
@@ -337,7 +342,9 @@ def student_view(request):
     return render(request, 'hx_lti_initializer/student_index.html', context)
 
 def instructor_view(request):
-
+    '''
+        TODO: explanation
+    '''
     consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
@@ -390,6 +397,10 @@ def instructor_view(request):
 
 @csrf_exempt
 def annotation_view(request):
+    '''
+        TODO: explanation
+    '''
+
     # Get object_id and collection_id from POST
     # id of the target source
     object_id = request.POST.get('requested_object')
