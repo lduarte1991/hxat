@@ -38,12 +38,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'django_jenkins',
+    #'django_jenkins',
     'bootstrap3',
     'ims_lti_py',
     'hx_lti_initializer',
     'hx_lti_todapi',
     'hx_lti_assignment',
+    'django_auth_lti',
+    'django_app_lti',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -54,7 +56,43 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_auth_lti.middleware.LTIAuthMiddleware',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_lti.backends.LTIAuthBackend',
+)
+
+# Add LTI configuration settings (for django-app-lti)
+LTI_SETUP = {
+    "TOOL_TITLE": "HX Annotations",
+    "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
+
+    ##this is where we're getting trouble
+    "LAUNCH_URL": "hx_lti_intializer:launch_lti", #"lti_init/launch_lti"
+
+    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
+    "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
+
+
+    "EXTENSION_PARAMETERS": {
+        "canvas.instructure.com": {
+            "privacy_level": "public",
+            "course_navigation": {
+                "enabled": "true",
+                "default": "enabled",
+                "text": "Annotations (localhost)", 
+            }
+        }
+    }
+}
+
+# Add LTI oauth credentials (for django-auth-lti)
+LTI_OAUTH_CREDENTIALS = {
+    "mykey":"mysecret",
+    "myotherkey": "myothersecret",
+}
 
 ROOT_URLCONF = 'hx_annotations_lti.urls'
 

@@ -207,6 +207,7 @@ def launch_lti(request):
             course_object = LTICourse.create_course(course, lti_profile)
         else:
             debug_printer('DEBUG - ERROR: Non-administrative user attempted to create course')
+            #course_object = LTICourse.create_course(course, lti_profile)
 
     
     # get all the courses the user is a part of
