@@ -419,6 +419,7 @@ def annotation_view(request):
         'target_object': targ_obj,
         'token': retrieve_token(LTI.get('user_id'), assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'email': LTI.get('lis_person_contact_email_primary')
     }
 
     # Check whether the target object is a video or image
