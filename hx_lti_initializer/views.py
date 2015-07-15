@@ -35,7 +35,8 @@ import logging
 
 logging.basicConfig()
 
-def create_new_user(username, user_id, roles, anon_id):
+'''
+def create_new_user_old(username, user_id, roles, anon_id):
     # now create the user and LTIProfile with the above information
     user = User.objects.create_user(username, user_id)
     user.set_unusable_password()
@@ -58,7 +59,77 @@ def create_new_user(username, user_id, roles, anon_id):
     lti_profile.save()
     
     return user, lti_profile
+'''
 
+
+def create_user(request, anon_id):
+    '''
+        TODO: Figure out & Explain
+    '''
+    #TODO: run through this HX code and see if we're good (authentication and functionality-wise)
+    debug_printer('DEBUG - LTI Profile not found. New User to be created.')
+
+    # gather the necessary data from the LTI initialization request
+    # What if there are two people named 'John Doe'?? (or Test Student)
+    #lti_username = request.LTI.get('lis_person_name_full')
+
+    #So we've implemented this to go by user_id rather than display name.
+    #the user ids come through hashed, so I don't think we'll be storing anything sensitive.
+    #furthermore, we've had to cut the hash down to size, since it's a 40 character field and the db takes max 30
+    #until the db can be modified to fit, we're going to have to do this.
+    #a full hash. (this is why we have magic number 20)
+    #TODO: We may want to consider fixing this.
+
+    #TODO: try/except
+    lti_username = str(request.LTI.get('user_id'))[:20]
+    roles = request.LTI.get('roles')
+    # checks to see if email and username were not passed in
+    # cannot create a user without them
+    if not lti_username:
+        debug_printer('DEBUG - Email and/or user_id not found in post.')
+        raise PermissionDenied()
+
+    # checks to see if roles were passed in. Defaults to student role.
+    all_user_roles = []
+
+    if not roles:
+        debug_printer('DEBUG - ALL_ROLES is set but user was not passed in any roles via the request. Defaults to student.')
+        all_user_roles += settings.STUDENT_ROLES
+
+    else:
+        # makes sure that roles is a list and not just a string
+        if not isinstance(roles, list):
+            roles = [roles]
+        all_user_roles += roles
+
+    debug_printer('DEBUG - User had an acceptable role: %s' % all_user_roles)
+
+    #user, lti_profile = create_new_user(lti_username, anon_id, roles, anon_id)
+    #return user, lti_profile
+
+    user = User.objects.create_user(lti_username, anon_id)
+    user.set_unusable_password()
+    user.is_superuser = False
+    user.is_staff = False
+
+    for admin_role in settings.ADMIN_ROLES:
+        for user_role in roles:
+                if admin_role.lower() == user_role.lower():
+                    user.is_superuser = True
+                    user.is_staff = True
+    user.save()
+    debug_printer('DEBUG - User was just created')
+
+    # pull the profile automatically created once the user was above
+    lti_profile = LTIProfile.objects.get(user=user)
+
+    lti_profile.anon_id = anon_id
+    lti_profile.roles = (",").join(roles)
+    lti_profile.save()
+
+    return user, lti_profile
+
+'''
 @csrf_exempt
 def launch_lti_old(request):
     """
@@ -72,6 +143,7 @@ def launch_lti_old(request):
     consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
+    request.session['anon_id'] = anon_id
     debug_printer('DEBUG - Found anonymous ID in request: %s' % anon_id)
     
     course = request.LTI.get('resource_link_id')
@@ -193,6 +265,7 @@ def launch_lti_old(request):
 
     # then renders the page using the template
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+'''
 
 @login_required
 @require_POST
@@ -206,21 +279,16 @@ def launch_lti(request):
     username = request.LTI.get('lis_person_name_full'),
     course = request.LTI.get('resource_link_id')
 
+    #print("User ID: " + request.LTI['user_id'])
 
     request.session['LTI'] = request.LTI
 
     #TODO: Make this work for people with multiple roles
     #if set(roles).intersection(settings.STUDENT_ROLES):
     if roles == ['Learner']:
-        context = {}
-        #return(render(request, 'hx_lti_initializer/student_index.html', context))
-
         return student_view(request)
     #elif set(roles).intersection(settings.ADMIN_ROLES):
     elif roles == ['Instructor']:
-        context = {}
-        #return(render(request, 'hx_lti_initializer/instructor_index.html', context))
-        #return(render(request, 'hx_lti_initializer/testpage2.html', context))
         return instructor_view(request)
     else:
         #TODO: What kind of failure functionality do we want? Redirect to fail page?
@@ -242,11 +310,12 @@ def student_view(request):
 
     try:
         # try to get the profile via the anon id
+        print anon_id
         lti_profile = LTIProfile.objects.get(anon_id=anon_id)
-    except:
-        #TODO: make them an account
+    except LTIProfile.DoesNotExist:
+        #TODO: what do we do with the 'user' variable?
+        user, lti_profile = create_user(request, anon_id)
         print("You're Rolled - no lti_profile")
-
 
     courses_for_user = LTICourse.get_courses_of_user(lti_profile, course_object)
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
@@ -254,6 +323,7 @@ def student_view(request):
 
     context = {
         'user': lti_profile.user,
+        'user_name': request.LTI.get('lis_person_name_full'),
         'email': lti_profile.user.email,
         'user_id': lti_profile.user.get_username(),
         'roles': lti_profile.roles,
@@ -280,8 +350,8 @@ def instructor_view(request):
     try:
         # try to get the profile via the anon id
         lti_profile = LTIProfile.objects.get(anon_id=anon_id)
-    except:
-        #TODO: make them an account
+    except LTIProfile.DoesNotExist:
+        user, lti_profile = create_user(request, anon_id)
         print("You're Rolled - no lti_profile")
 
 
@@ -291,6 +361,7 @@ def instructor_view(request):
 
     context = {
         'user': lti_profile.user,
+        'user_name': request.LTI.get('lis_person_name_full'),
         'email': lti_profile.user.email,
         'user_id': lti_profile.user.get_username(),
         'roles': lti_profile.roles,

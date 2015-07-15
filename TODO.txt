@@ -9,14 +9,16 @@ Broad TODOs/Issues:
     -- Might be nice if instructors could edit the content in the Canvas RTE
     -- Could oEmbed help us here?
 -- Get rid of hard-coded stuff in hx_lti_initializer.views
--- Use auth middleware to allow us to stray from the launch page
+√ Use auth middleware to allow us to stray from the launch page
 -- Examine external database system. Do we want a local one for everything, or should we keep
 	it as is with a catch on top of hat we have.
 -- Make sure annotations show up at right place on correct assignment
--- Give instructor 'delete' permission on bad comments
+-- Give instructor 'delete' permission on bad comments?
 -- Improve Instructor index
--- Create Student index
+√ Create Student index
 -- 'Dashboard' feature
 	-- List of students who have annotated something
 		-- for grading purposes?
 	-- List of a specific student's annotations
+-- Duplicate student usernames break the tool, it seems (Test Student username)
+-- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
