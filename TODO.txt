@@ -41,3 +41,5 @@ Broad TODOs/Issues:
 -- Sometimes going back/forward works smoothly,
     sometimes the document expires, sometimes 'refresh' takes you back to the index.
     Not a huge deal but something to keep in mind.
+
+-- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab. Eventually we may want to add support for TFs as well.
