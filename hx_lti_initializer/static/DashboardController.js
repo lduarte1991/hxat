@@ -430,8 +430,8 @@
                         self.initOptions.user_id = '';
                         break;
                     case 'instructor':
-                        self.initOptions.user_id = this.initOptions.instructor_email; //TODO: Figure out how to load instructor comments without breaking other stuff
-                        break;
+                         self.initOptions.user_id = this.annotator.plugins.Permissions.options.permissions.admin[0];//TODO: Figure out how to load instructor comments without breaking other stuff
+                         break;
                     default:
                         self.initOptions.user_id = this.annotator.plugins.Permissions.user.id;
                         break;
@@ -682,7 +682,7 @@
                 userId = '';
                 break;
             case 'instructor':
-                userId = this.initOptions.instructor_email; //TODO: Figure out how to load instructor comments without breaking other stuff
+                userId = this.annotator.plugins.Permissions.options.permissions.admin[0];//TODO: Figure out how to load instructor comments without breaking other stuff
                 break;
             default:
                 userId = this.annotator.plugins.Permissions.user.id;
