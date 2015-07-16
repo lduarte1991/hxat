@@ -103,7 +103,8 @@
                                     {% if 'Administrator' in roles or 'Instructor' in roles %}
                                     <a class="settingslink leftfloat" href="{{ file.get_admin_url }}" target="_blank">Edit</a>
                                     {% endif %}
-                                    <a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">{{ file.target_title }}</a>
+                                    {{ file.target_title }}
+                                    <!--<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">{{ file.target_title }}</a>-->
                                 </td>
                                 <td>
                                     {{ file.target_author }}
