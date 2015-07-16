@@ -230,7 +230,7 @@ li {
             <a class="settingslink" href="{{ course.get_admin_url }}" target="_blank">Change Course Settings</a>
             {% endif %}
             <div id="copypaste-{{course.id}}"></div>
-            <table id="assignments" class="table table-striped">
+            <table class="table table-striped" id="assignments">
                 <tbody>
                     {% for assignment in course.assignment_set.all %}
                     <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
@@ -272,13 +272,6 @@ li {
                                         </td>
                                         <td title="{{ file.target_created }}">
                                             {{ file.target_created | timesince }} ago
-                                        </td>
-                                        <td>
-                                            <form action="iAnnotation" id="widget_edit_form" method="post">
-                                                <input name="requested_assignment" value="{{assignment.assignment_id}}" type="hidden">
-                                                <input name="requested_object" value={{ file.id }} type="hidden">
-                                                <input name="assignment_submit" value="View Assignment" class="btn btn-default" type="submit">
-                                            </form>
                                         </td>
                                     </tr>
                                     {% endfor %}
