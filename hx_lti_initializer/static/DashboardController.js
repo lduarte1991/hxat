@@ -430,7 +430,7 @@
                         self.initOptions.user_id = '';
                         break;
                     case 'instructor':
-                        self.initOptions.user_id = 'c8720cac6c7f59380abeb5f7758b6882065124a5';//this.initOptions.instructor_email;
+                        self.initOptions.user_id = this.initOptions.instructor_email; //TODO: Figure out how to load instructor comments without breaking other stuff
                         break;
                     default:
                         self.initOptions.user_id = this.annotator.plugins.Permissions.user.id;
@@ -682,7 +682,7 @@
                 userId = '';
                 break;
             case 'instructor':
-                userId = 'c8720cac6c7f59380abeb5f7758b6882065124a5';//this.initOptions.instructor_email;
+                userId = this.initOptions.instructor_email; //TODO: Figure out how to load instructor comments without breaking other stuff
                 break;
             default:
                 userId = this.annotator.plugins.Permissions.user.id;
