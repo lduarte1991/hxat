@@ -8,6 +8,8 @@
 			showPublicPrivate: true,
 			pagination: 50,
 			flags: false,
+            // Canvas user_id of instructor of course
+            instructor_id: commonInfo.instructor_id
 		}
 
 		this.TEMPLATENAMES = [
@@ -430,7 +432,7 @@
                         self.initOptions.user_id = '';
                         break;
                     case 'instructor':
-                         self.initOptions.user_id = this.annotator.plugins.Permissions.options.permissions.admin[0];//TODO: Figure out how to load instructor comments without breaking other stuff
+                         self.initOptions.user_id = this.initOptions.instructor_id;
                          break;
                     default:
                         self.initOptions.user_id = this.annotator.plugins.Permissions.user.id;
@@ -682,7 +684,7 @@
                 userId = '';
                 break;
             case 'instructor':
-                userId = this.annotator.plugins.Permissions.options.permissions.admin[0];//TODO: Figure out how to load instructor comments without breaking other stuff
+                userId = this.initOptions.instructor_id;
                 break;
             default:
                 userId = this.annotator.plugins.Permissions.user.id;
