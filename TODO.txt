@@ -9,6 +9,8 @@ Broad TODOs/Issues:
 √ Navigation improvements: add in a 'return to index' type of button
 
 
+-- Refactor for TLT
+
 -- 'Dashboard' feature
 	-- List of students who have annotated something
 		-- for grading purposes?
@@ -33,6 +35,8 @@ Broad TODOs/Issues:
         Everything else I've tried has been chill with Unicode.
 
 -- Figure out what highlight options are/how we can use them, and why they are a required field
+
+-- Unit Tests :(
 
 -- Sometimes going back/forward works smoothly,
     sometimes the document expires, sometimes 'refresh' takes you back to the index.

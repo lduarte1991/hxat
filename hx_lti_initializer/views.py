@@ -329,7 +329,7 @@ def student_view(request):
 
     try:
         # try to get the profile via the anon id
-        print anon_id
+        #print anon_id
         lti_profile = LTIProfile.objects.get(anon_id=anon_id)
     except LTIProfile.DoesNotExist:
         #TODO: what do we do with the 'user' variable?
@@ -466,6 +466,14 @@ def annotation_view(request):
         context.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, context)
+
+
+def dashboard_view(request):
+    context = {
+        'students': ['student1', 'student2', 'student3']
+    }
+    return render(request, 'hx_lti_initializer/dashboard_view.html', context)
+
 
 def index_view(request):
     '''

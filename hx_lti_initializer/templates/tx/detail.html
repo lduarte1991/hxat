@@ -1,3 +1,4 @@
+<!--TODO: factor all this common code out from the detail views. -->
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://underscorejs.org/underscore.js"></script>
 <script src="http://timeago.yarp.com/jquery.timeago.js"></script>
@@ -13,25 +14,25 @@
 {% bootstrap_messages %}
 {% load staticfiles %}
 {% load staticfiles %}
-<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>
-<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
-<script src="{% static "AController.js" %}"></script>
-<script src="{% static "AnnotationMain.js" %}"></script>
-<script src="{% static "AnnotationCore.js" %}"></script>
-<script src="{% static "TargetObjectController.js" %}"></script>
-<script src="{% static "DashboardController.js" %}"></script>
-<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
-<link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">
+<script src="{% static 'vendors/tinymce/tinymce.min.js' %}"></script>
+<script src="{% static 'vendors/Annotator/annotator-full.js' %}"></script>
+<script src="{% static 'AController.js' %}"></script>
+<script src="{% static 'AnnotationMain.js' %}"></script>
+<script src="{% static 'AnnotationCore.js' %}"></script>
+<script src="{% static 'TargetObjectController.js' %}"></script>
+<script src="{% static 'DashboardController.js' %}"></script>
+<script src="{% static 'vendors/jquery-tokeninput/jquery.tokeninput.js' %}"></script>
+<script src="{% static 'vendors/Annotator/plugins/highlightTags-annotator.js' %}"></script>
+<script src="{% static 'vendors/Annotator/plugins/richText-annotator.js' %}"></script>
+<script src="{% static 'vendors/Annotator/plugins/grouping-annotator.js' %}"></script>
+<script src="{% static 'vendors/Annotator/plugins/annotator.touch.js' %}"></script>
+<script src="{% static 'vendors/Annotator/plugins/reply-annotator.js' %}"></script>
+<link rel="stylesheet" href="{% static 'vendors/Annotator/annotator.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/catch/main.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/Annotator/plugins/richText-annotator.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/Annotator/plugins/grouping-annotator.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/Annotator/plugins/annotator.touch.css' %}">
+<link rel="stylesheet" href="{% static 'vendors/jquery-tokeninput/token-input.css' %}">
 <br/>
 <div class="container">
 {% include 'hx_lti_initializer/index_button.html' %}
