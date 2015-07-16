@@ -32,7 +32,9 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
 <link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">
+<br/>
 <div class="container">
+{% include 'hx_lti_initializer/index_button.html' %}
 <h1>{{ target_object.target_title | safe }}</h1>
 <h3>by {{ target_object.target_author | safe }}</h3>
 <div class="content">

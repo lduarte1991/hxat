@@ -6,6 +6,7 @@ Broad TODOs/Issues:
 √ Improve Instructor index
 √ Create Student index
 √ Make sure annotations show up at right place on correct assignment
+√ Navigation improvements: add in a 'return to index' type of button
 
 
 -- 'Dashboard' feature
@@ -13,15 +14,7 @@ Broad TODOs/Issues:
 		-- for grading purposes?
 	-- List of a specific student's annotations
 
--- Some backend fields don't accept unicode. This may mess up foreign language courses.
-    -- May have to restructure DB
-    -- I think this is just the primary ID field (the name I believe).
-        Everything else I've tried has been chill with Unicode.
-
--- Navigation improvements:
-    -- Sometimes going back/forward works smoothly, sometimes the document expires
-    -- 'refresh' takes you back to the index. not a huge deal but something to keep in mind
-    -- add in a 'return to index' type of button
+-- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
 
 -- Duplicate student names break the tool, it seems (Test Student). Make that not happen.
     -- Also, the db max length for the id (name) field is 30. What about long names?
@@ -32,11 +25,15 @@ Broad TODOs/Issues:
     -- Might be nice if instructors could edit the content in the Canvas RTE
     -- Could oEmbed help us here?
 
--- Examine external database system. Do we want a local one for everything, or should we keep
-	it as is with a catch on top of what we have.
-
 -- Give instructor 'delete' permission on bad comments?
 
--- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
+-- Some backend fields don't accept unicode. This may mess up foreign language courses.
+    -- May have to restructure DB
+    -- I think this is just the primary ID field (the name I believe).
+        Everything else I've tried has been chill with Unicode.
 
 -- Figure out what highlight options are/how we can use them, and why they are a required field
+
+-- Sometimes going back/forward works smoothly,
+    sometimes the document expires, sometimes 'refresh' takes you back to the index.
+    Not a huge deal but something to keep in mind.

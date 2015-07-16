@@ -275,7 +275,10 @@ def launch_lti(request):
     '''
         TODO: explanation
     '''
-    #TODO: Authentication code?
+    #TODO: Make some robust and comprehensive authentication code
+    #also a try/catch with a 405 here.
+    consumer_key_requested = request.POST['oauth_consumer_key']
+    request.session['oath_consumer_key'] = consumer_key_requested
 
     roles = request.LTI.get('roles')
     request.session['roles'] = roles
@@ -304,7 +307,10 @@ def student_view(request):
     '''
         TODO: explanation
     '''
-    consumer_key_requested = request.POST['oauth_consumer_key']
+
+    #TODO: check how secure we are
+    consumer_key_requested = request.session['oath_consumer_key']
+
     user_id = request.LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
     course = request.LTI.get('resource_link_id')
@@ -345,10 +351,18 @@ def instructor_view(request):
     '''
         TODO: explanation
     '''
-    consumer_key_requested = request.POST['oauth_consumer_key']
-    user_id = request.LTI.get('user_id')
+
+    #TODO: 405 on fail consumer key
+    # we need to check how secure we are...
+    consumer_key_requested = request.session['oath_consumer_key']
+
+    LTI = request.session['LTI']
+
+    user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
-    course = request.LTI.get('resource_link_id')
+
+    print ("ROOLLLEEED????")
+    course = LTI.get('resource_link_id')
 
     try:
         # try to get the profile via the anon id
@@ -385,7 +399,7 @@ def instructor_view(request):
 
     context = {
         'user': lti_profile.user,
-        'user_name': request.LTI.get('lis_person_name_full'),
+        'user_name': LTI.get('lis_person_name_full'),
         'email': lti_profile.user.email,
         'user_id': lti_profile.user.get_username(),
         'roles': lti_profile.roles,

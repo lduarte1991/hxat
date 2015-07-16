@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
 <div class="container">
+{% include 'hx_lti_initializer/index_button.html' %}
 <h1>{{ target_object.target_title | safe }}</h1>
 <div id="content">
 </div>
