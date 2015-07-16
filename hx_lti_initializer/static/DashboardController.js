@@ -128,7 +128,7 @@
         });
     };
 
-    DashboardController.prototype.loadAnnotations = function() {
+    $.DashboardController.prototype.loadAnnotations = function() {
         var annotator = this.annotator;
         var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
         var loadedAn = this.element.find('.annotationList .annotationItem').length;
