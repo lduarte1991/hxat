@@ -365,6 +365,8 @@ def instructor_view(request):
 
     user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
+    request.session['anon_id'] = anon_id
+
 
     course = LTI.get('resource_link_id')
 
@@ -475,8 +477,22 @@ def annotation_view(request):
 
 
 def dashboard_view(request):
+    LTI = request.session['LTI']
+    anon_id = request.session['anon_id']
+
+    students = LTIProfile.objects.filter(roles='Learner')
+
+
+    ids = []
+    for student in list(students):
+        ids += student.get_id()
+
+    print ("STUDENTS: " + str(students))
+    print ("STUDENTS: " + str(ids))
+
     context = {
-        'students': ['student1', 'student2', 'student3']
+        'students': students,
+        'user_id': ids,
     }
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-
+    {% load static from staticfiles %}
     {# Load the tag library #}
     {% load bootstrap3 %}
 
@@ -26,37 +26,53 @@
         }
       );
     });
+    // TODO: make an onclick with bootstrap collapse for these thingies
+    //$(this).addClass("collapse");
     </script>
+    <!--TODO: factor all this common code out from the detail views. -->
     <script>
         function showDetail(caller) {
-            console.log($(caller).parent());
-            $(caller).parent().append("\
-                <table class='table table-hover'>\
-                <thead>\
-                  <tr>\
-                    <th>Date</th>\
-                    <th>Annotation</th>\
-                    <th>Tags</th>\
-                  </tr>\
-                </thead>\
-                <tbody>\
-                  <tr>\
-                    <td>Today</td>\
-                    <td>This course is cool</td>\
-                    <td>Tag</td>\
-                  </tr>\
-                  <tr>\
-                    <td>Yesterday</td>\
-                    <td>Something something poetry</td>\
-                    <td>Tag</td>\
-                  </tr>\
-                  <tr>\
-                    <td>10/34/12</td>\
-                    <td>Все не Так</td>\
-                    <td>Tag</td>\
-                  </tr>\
-                </tbody>\
-              </table>"
+            //TODO: any way to template this?
+            //loadAnnotationsForUser({{ user_id }});
+            // TODO: no hard code
+            $(caller).parent().append('\
+                <table class="table table-hover">\
+                    <thead>\
+                        <tr>\
+                            <th>Date</th>\
+                            <th>Assignment Object</th>\
+                            <th class="col-md-3">Line</th>\
+                            <th>Annotation</th>\
+                            <th>Tags</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody>\
+                        <tr>\
+                            <td>Today</td>\
+                            <td>Assignment 2: Finnish Polka</td>\
+                            <td>"Salivali hilly dilly finnish?"</td>\
+                            <td>This course is cool</td>\
+                            <td>Tag</td>\
+                        </tr>\
+                        <tr>\
+                            <td>Yesterday</td>\
+                            <td>Assignment 1: Zvezda</td>\
+                            <td>"En tu balcon"</td>\
+                            <td>Something something something something something something\
+                                something something long annotation overachieving student something\
+                                something one last thing this should look good.\
+                                This student really likes annotating</td>\
+                            <td>Tag</td>\
+                        </tr>\
+                        <tr>\
+                            <td>10/34/12</td>\
+                            <td>Assignment 2: Calle del Sol</td>\
+                            <td>"Все не Так"</td>\
+                            <td>Yea that\'s wack</td>\
+                            <td>Tag</td>\
+                        </tr>\
+                    </tbody>\
+                </table>'
             );
         }
     </script>
@@ -65,23 +81,25 @@
 </head>
 
 <body>
+    <br/>
+    
+    <div class="container">{% include 'hx_lti_initializer/index_button.html' %}
+    </div>
 
-<br/>
-<div class="container">{% include 'hx_lti_initializer/index_button.html' %}</div>
-<div class="container">
+    <div class="container">
+        <div class="col-md">
+            <div id="student_list" class="list-group">
+                <br/>
+                {% for student in students %}
+                <div>
+                    <span onclick="showDetail(this);" class="list-group-item" style="cursor: pointer;">{{ student }}</span>
+                    <div class="TODO"></div>
+                </div>
+                {% endfor %}
 
-    <div class="col-md">
-        <div id="student_list" class="list-group">
-            <br/>
-            {% for student in students %}
-            <div>
-                <span onclick="showDetail(this);" class="list-group-item" style="cursor: pointer;">{{ student }}</span>
-                <div class="TODO"></div>
             </div>
-            {% endfor %}
-
         </div>
     </div>
-</div>
+
 </body>
 </html>

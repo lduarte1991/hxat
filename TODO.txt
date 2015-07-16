@@ -7,6 +7,7 @@ Broad TODOs/Issues:
 √ Create Student index
 √ Make sure annotations show up at right place on correct assignment
 √ Navigation improvements: add in a 'return to index' type of button
+√ Clicking on assignment objects shouldn't show the collection ID. Make those just plain text.
 
 
 -- Refactor for TLT
@@ -26,8 +27,6 @@ Broad TODOs/Issues:
 -- Need <br/> tags in text entry to format text to be annotated (especially brutal for poems)
     -- Might be nice if instructors could edit the content in the Canvas RTE
     -- Could oEmbed help us here?
-
--- Clicking on assignment objects shouldn't show the collection ID. Make those just plain text.
 
 -- Give instructor 'delete' permission on bad comments?
 
