@@ -11,8 +11,10 @@ Broad TODOs/Issues:
 
 
 -- Refactor for TLT
+	-- all secure/variable settings should be in secure.py
 
 -- 'Dashboard' feature
+	 √ Mock-up
 	-- List of students who have annotated something
 		-- for grading purposes?
 	-- List of a specific student's annotations
@@ -40,7 +42,7 @@ Broad TODOs/Issues:
 -- Unit Tests :(
 
 -- Sometimes going back/forward works smoothly,
-    sometimes the document expires, sometimes 'refresh' takes you back to the index.
-    Not a huge deal but something to keep in mind.
+    sometimes the document expires. 'Refresh' always takes you back to the index.
+    Not a huge deal but something to keep in mind. iFrames are like that I guess.
 
 -- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab. Eventually we may want to add support for TFs as well.
