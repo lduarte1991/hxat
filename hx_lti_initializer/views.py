@@ -439,6 +439,12 @@ def annotation_view(request):
 
     LTI = request.session['LTI']
 
+    # Filter for LTIProfile with Instructor role
+    # TODO: Current invariant assumes that we have only one Instructor. 
+    instructor_profile = LTIProfile.objects.filter(roles='Instructor')[:1].get()
+    # Get instructor's user_id
+    instructor_id = instructor_profile.get_id()
+
     context = {
         'user_id': LTI.get('user_id'),
         'username': LTI.get('lis_person_name_full'),
@@ -449,7 +455,7 @@ def annotation_view(request):
         'target_object': targ_obj,
         'token': retrieve_token(LTI.get('user_id'), assignment.annotation_database_secret_token),
         'assignment': assignment,
-        'email': LTI.get('lis_person_contact_email_primary')
+        'instructor_id': instructor_id
     }
 
     # Check whether the target object is a video or image
