@@ -130,6 +130,7 @@ def create_user(request, anon_id):
 
     return user, lti_profile
 
+
 '''
 @csrf_exempt
 def launch_lti_old(request):
@@ -268,6 +269,7 @@ def launch_lti_old(request):
     return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
 '''
 
+
 @login_required
 @require_POST
 @csrf_exempt
@@ -276,7 +278,7 @@ def launch_lti(request):
         TODO: explanation
     '''
     #TODO: Make some robust and comprehensive authentication code
-    #also a try/catch with a 405 here.
+    #also a try/catch with a 403 here.
     consumer_key_requested = request.POST['oauth_consumer_key']
     request.session['oath_consumer_key'] = consumer_key_requested
 
@@ -311,9 +313,11 @@ def student_view(request):
     #TODO: check how secure we are
     consumer_key_requested = request.session['oath_consumer_key']
 
-    user_id = request.LTI.get('user_id')
+    LTI = request.session['LTI']
+
+    user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
-    course = request.LTI.get('resource_link_id')
+    course = LTI.get('resource_link_id')
 
     try:
         debug_printer('DEBUG - Course was found %s' % course)
@@ -337,7 +341,7 @@ def student_view(request):
 
     context = {
         'user': lti_profile.user,
-        'user_name': request.LTI.get('lis_person_name_full'),
+        'user_name': LTI.get('lis_person_name_full'),
         'email': lti_profile.user.email,
         'user_id': lti_profile.user.get_username(),
         'roles': lti_profile.roles,
@@ -347,12 +351,13 @@ def student_view(request):
 
     return render(request, 'hx_lti_initializer/student_index.html', context)
 
+
 def instructor_view(request):
     '''
         TODO: explanation
     '''
 
-    #TODO: 405 on fail consumer key
+    #TODO: 403 on fail consumer key
     # we need to check how secure we are...
     consumer_key_requested = request.session['oath_consumer_key']
 
@@ -361,7 +366,6 @@ def instructor_view(request):
     user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
 
-    print ("ROOLLLEEED????")
     course = LTI.get('resource_link_id')
 
     try:
@@ -408,6 +412,7 @@ def instructor_view(request):
     }
 
     return render(request, 'hx_lti_initializer/instructor_index.html', context)
+
 
 @csrf_exempt
 def annotation_view(request):
@@ -461,3 +466,19 @@ def annotation_view(request):
         context.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, context)
+
+def index_view(request):
+    '''
+        Routes the user to his/her correct index view
+    '''
+
+    #TODO: This needs to be better - what if the user has many roles?
+
+    # Can i do .contains()?
+    if set(request.session['roles']).intersection(settings.ADMIN_ROLES):
+        return instructor_view(request)
+    elif request.session['roles'] == ['Learner']:
+        return student_view(request)
+    else:
+        #TODO: 403 redirect?
+        return HttpResponse("You're Rolled: Not a student or admin")
