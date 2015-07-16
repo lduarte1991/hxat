@@ -21,6 +21,8 @@ Broad TODOs/Issues:
 
 -- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
 
+-- Update Documentation (may want to wait until we're done with everything else)
+
 -- Duplicate student names break the tool, it seems (Test Student). Make that not happen.
     -- Also, the db max length for the id (name) field is 30. What about long names?
     -- The ID/name field shows up in the admin view when you want to select course admins,
