@@ -25,6 +25,7 @@ from urlparse import urlparse
 
 from django.views.decorators.http   import require_POST
 from django.contrib.auth.decorators import login_required
+from django.template.defaulttags    import register
 
 
 
@@ -480,19 +481,25 @@ def dashboard_view(request):
     LTI = request.session['LTI']
     anon_id = request.session['anon_id']
 
-    students = LTIProfile.objects.filter(roles='Learner')
+    student_profiles = LTIProfile.objects.filter(roles='Learner')
 
 
     ids = []
-    for student in list(students):
+    for student in list(student_profiles):
         ids += student.get_id()
 
-    #print ("STUDENTS: " + str(students))
-    #print ("STUDENTS: " + str(ids))
+    #print ("Student_profiles: " + str(student_profiles))
+    #print ("Ids: " + str(ids))
+
+    students = {}
+    for student_profile in list(student_profiles):
+        students[str(student_profile)] = str(student_profile.get_id())
+
+
+    print students
 
     context = {
         'students': students,
-        'user_id': ids,
     }
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
 
@@ -512,3 +519,13 @@ def index_view(request):
     else:
         #TODO: 403 redirect?
         return HttpResponse("You're Rolled: Not a student or admin")
+
+
+@register.filter
+def get_item(dictionary, key):
+    '''
+        For some reason django doesn't play nice with dictionaries in its template
+        language, so we've got to do this.
+        Gets the value of a certain key in a dictionary.
+    '''
+    return dictionary.get(key)
