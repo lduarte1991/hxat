@@ -111,13 +111,11 @@
         var store = annotator.plugins.Store;
         var annotations = store.annotations;
         var self = this;
-        console.log(annotations);
         // goes through all the annotations currently loaded
         jQuery.each(annotations, function(key, value){
             // if the options.userID (i.e. the value we are searching for) is empty signifying
             // public or is equal to the person with update access, then we leave it alone,
             // otherwise we need to clean them up (i.e. disable them).
-            console.log(value);
             if (self.initOptions.user_id !== '' && self.initOptions.user_id !== value.permissions.update[0]) {
                 if (value.highlights !== undefined) {
                     jQuery.each(value.highlights, function(key1, value1){
@@ -126,16 +124,16 @@
                 }
             }
 
-            // Change highlight color of instructor annotations
-            if (value.user.id === self.initOptions.instructor_id) {
-                jQuery.each(value.highlights, function(key2, value2){
-                    jQuery(value2).removeClass('annotator-hl').addClass('instructor_hl');
-                    jQuery(value2).css('background-color', 'lime');
-                    console.log(value2);
+            // Add class to identify instructor annotations
+            if (value.user.id === self.initOptions.instructor_id && value.highlights !== undefined ) {
+                jQuery.each(value.highlights, function(key, value){
+                    jQuery(value).addClass('instructor-hl');
                 });
-                console.log("match found");
             }
         });
+        // Change color of instructor annotations to green
+        jQuery('head').append('<style> .instructor-hl {background: lime !important} </style>');
+
     };
 
     $.DashboardController.prototype.loadAnnotations = function() {
