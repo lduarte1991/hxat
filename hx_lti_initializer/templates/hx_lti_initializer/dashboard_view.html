@@ -110,12 +110,6 @@
                 <br/>
                 {% for student in students %}
                 <div>
-                    <!--<span class="expandicon"></span>-->
-                    <!--<span onclick="showDetail(this);" class="list-group-item" style="cursor: pointer;">{{ student }}</span>-->
-                    <!--<span class="list-group-item" data-toggle="collapse" data-target="#{{student}}" style="cursor: pointer;">{{ student }}</span>-->
-                    <!--<div id="{{ student }}" class="collapse">-->
-                        <!--Student Stuff-->
-                    <!--</div>-->
                     <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -125,7 +119,10 @@
                         </div>
                         <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <p>TODO: Dynamic Info </p>
+                                <!-- TODO: make it just show automatically -->
+                                <div onclick="showDetail(this, '{{ students|get_item:student }}');" style="cursor: pointer;">
+                                    Show Annotations
+                                </div>
                             </div>
                         </div>
                     </div>
