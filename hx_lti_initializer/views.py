@@ -487,8 +487,8 @@ def dashboard_view(request):
     for student in list(students):
         ids += student.get_id()
 
-    print ("STUDENTS: " + str(students))
-    print ("STUDENTS: " + str(ids))
+    #print ("STUDENTS: " + str(students))
+    #print ("STUDENTS: " + str(ids))
 
     context = {
         'students': students,
