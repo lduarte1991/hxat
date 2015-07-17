@@ -91,16 +91,47 @@
 
     {{ students }}
 
-    <div class="container">
+    <!--<div class="container">-->
+        <!--<div class="col-md">-->
+            <!--<div id="student_list" class="list-group">-->
+                <!--<br/>-->
+                <!--{% for student in students %}-->
+                <!--<div>-->
+                    <!--<span onclick="showDetail(this, '{{ students|get_item:student }}');" class="list-group-item" style="cursor: pointer;">{{ student }}</span>-->
+                    <!--<div class="TODO"></div>-->
+                <!--</div>-->
+                <!--{% endfor %}-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<div class="container">
         <div class="col-md">
             <div id="student_list" class="list-group">
                 <br/>
                 {% for student in students %}
                 <div>
-                    <span onclick="showDetail(this, '{{ students|get_item:student }}');" class="list-group-item" style="cursor: pointer;">{{ student }}</span>
-                    <div class="TODO"></div>
+                    <!--<span class="expandicon"></span>-->
+                    <!--<span onclick="showDetail(this);" class="list-group-item" style="cursor: pointer;">{{ student }}</span>-->
+                    <!--<span class="list-group-item" data-toggle="collapse" data-target="#{{student}}" style="cursor: pointer;">{{ student }}</span>-->
+                    <!--<div id="{{ student }}" class="collapse">-->
+                        <!--Student Stuff-->
+                    <!--</div>-->
+                    <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#{{ students|get_item:student }}"> {{ student }} </a>
+                            </h4>
+                        </div>
+                        <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <p>TODO: Dynamic Info </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
+
             </div>
         </div>
     </div>
