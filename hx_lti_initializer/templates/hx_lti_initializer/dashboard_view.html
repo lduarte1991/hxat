@@ -1,42 +1,34 @@
 <!-- TODO: base template? Any common html that can be factored out. -->
 <!-- Load static? -->
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-    {% load static from staticfiles %}
-    {# Load the tag library #}
-    {% load bootstrap3 %}
+    <head>
+        <meta charset="UTF-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-    {# Load CSS and JavaScript #}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-
-    {# Display django.contrib.messages as Bootstrap alerts #}
-    {% bootstrap_messages %}
-    <script>
-    $(document).ready(function(){
-        $(".list-group-item").hover(
-        function () {
-          $(this).addClass("active");
-        },
-        function () {
-          $(this).removeClass("active");
-        }
-      );
-    });
-    // TODO: make an onclick with bootstrap collapse for these thingies
-    //$(this).addClass("collapse");
-    </script>
-    <!--TODO: factor all this common code out from the detail views. -->
-    <script>
-        function showDetail(caller, student_id) {
-            //TODO: any way to template this?
-            //loadAnnotationsForUser({{ user_id }});
-            // TODO: no hard code
-            console.log(student_id)
-            $(caller).parent().append('\
+        {% load static from staticfiles %} {# Load the tag library #} {% load bootstrap3 %} {# Load CSS and JavaScript #} {% bootstrap_css %} {% bootstrap_javascript %} {# Display django.contrib.messages as Bootstrap alerts #} {% bootstrap_messages %}
+        <script>
+            $(document).ready(function() {
+                $(".list-group-item").hover(
+                    function() {
+                        $(this).addClass("active");
+                    },
+                    function() {
+                        $(this).removeClass("active");
+                    }
+                );
+            });
+            // TODO: make an onclick with bootstrap collapse for these thingies
+            //$(this).addClass("collapse");
+        </script>
+        <!--TODO: factor all this common code out from the detail views. -->
+        <script>
+            function showDetail(caller, student_id) {
+                //TODO: any way to template this?
+                //loadAnnotationsForUser({{ user_id }});
+                // TODO: no hard code
+                console.log(student_id);
+                $(caller).parent().append('\
                 <table class="table table-hover">\
                     <thead>\
                         <tr>\
@@ -73,65 +65,41 @@
                             <td>Tag</td>\
                         </tr>\
                     </tbody>\
-                </table>'
-            );
-        }
-         // TODO: make an onclick with bootstrap collapse for these thingies
-    //$(this).addClass("collapse");
-    </script>
-
-    <title>Instructor Dashboard</title>
-</head>
-
-<body>
-    <br/>
-
-    <div class="container">{% include 'hx_lti_initializer/index_button.html' %}
-    </div>
-
-    <!--{{ students }}-->
-
-    <!--<div class="container">-->
-        <!--<div class="col-md">-->
-            <!--<div id="student_list" class="list-group">-->
-                <!--<br/>-->
-                <!--{% for student in students %}-->
-                <!--<div>-->
-                    <!--<span onclick="showDetail(this, '{{ students|get_item:student }}');" class="list-group-item" style="cursor: pointer;">{{ student }}</span>-->
-                    <!--<div class="TODO"></div>-->
-                <!--</div>-->
-                <!--{% endfor %}-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-<div class="container">
-        <div class="col-md">
-            <div id="student_list" class="list-group">
-                <br/>
-                {% for student in students %}
-                <div>
-                    <div class="panel-group" id="accordion">
-                    <div class="panel panel-default">
-                        <div data-toggle="collapse" data-parent="#accordion" href="#{{ students|get_item:student }}" class="panel-heading list-group-item" style="cursor: pointer;">
-                            <h4 class="panel-title">
+                </table>');
+            }
+        </script>
+        <title>Instructor Dashboard</title>
+    </head>
+    <body>
+        <br/>
+        <div class="container">{% include 'hx_lti_initializer/index_button.html' %}
+        </div>
+        <div class="container">
+            <div class="col-md">
+                <div id="student_list" class="list-group">
+                    <br/> 
+                    {% for student in students %}
+                    <div>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div data-toggle="collapse" data-parent="#accordion" href="#{{ students|get_item:student }}" class="panel-heading list-group-item" style="cursor: pointer;">
+                                    <h4 class="panel-title">
                                 {{ student }}
                             </h4>
-                        </div>
-                        <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <!-- TODO: make it just show automatically -->
-                                <div class="list-group-item" onclick="showDetail(this, '{{ students|get_item:student }}');" style="cursor: pointer;">
-                                    Show Annotations
+                                </div>
+                                <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <!-- TODO: make it just show automatically -->
+                                        <div class="list-group-item" onclick="showDetail(this, '{{ students|get_item:student }}');" style="cursor: pointer;">
+                                            Show Annotations
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    {% endfor %}
                     </div>
                 </div>
-                {% endfor %}
-
             </div>
-        </div>
-    </div>
-
-</body>
+    </body>
 </html>
