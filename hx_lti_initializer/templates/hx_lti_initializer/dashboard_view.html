@@ -31,10 +31,11 @@
     </script>
     <!--TODO: factor all this common code out from the detail views. -->
     <script>
-        function showDetail(caller) {
+        function showDetail(caller, student_id) {
             //TODO: any way to template this?
             //loadAnnotationsForUser({{ user_id }});
             // TODO: no hard code
+            console.log(student_name)
             $(caller).parent().append('\
                 <table class="table table-hover">\
                     <thead>\
@@ -75,6 +76,8 @@
                 </table>'
             );
         }
+         // TODO: make an onclick with bootstrap collapse for these thingies
+    //$(this).addClass("collapse");
     </script>
 
     <title>Instructor Dashboard</title>
@@ -82,9 +85,11 @@
 
 <body>
     <br/>
-    
+
     <div class="container">{% include 'hx_lti_initializer/index_button.html' %}
     </div>
+
+    {{ students }}
 
     <div class="container">
         <div class="col-md">
@@ -92,11 +97,10 @@
                 <br/>
                 {% for student in students %}
                 <div>
-                    <span onclick="showDetail(this);" class="list-group-item" style="cursor: pointer;">{{ student }}</span>
+                    <span onclick="showDetail(this, '{{ students|get_item:student }}');" class="list-group-item" style="cursor: pointer;">{{ student }}</span>
                     <div class="TODO"></div>
                 </div>
                 {% endfor %}
-
             </div>
         </div>
     </div>
