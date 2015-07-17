@@ -317,6 +317,7 @@ def student_view(request):
 
     user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
+    print(anon_id)
     course = LTI.get('resource_link_id')
 
     try:
@@ -366,7 +367,6 @@ def instructor_view(request):
     user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
     request.session['anon_id'] = anon_id
-
 
     course = LTI.get('resource_link_id')
 
