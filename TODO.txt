@@ -19,6 +19,9 @@ Broad TODOs/Issues:
 		-- for grading purposes?
 	-- List of a specific student's annotations
 
+-- The database token appears to be included in the JavaScript, which is completely accessible to anyone
+    with a right click and a 'show page source.' No. Do not want. We need to refactor to get this out before production.
+
 -- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
 
 -- Update Documentation (may want to wait until we're done with everything else)
