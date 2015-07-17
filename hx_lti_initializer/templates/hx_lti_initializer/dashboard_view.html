@@ -89,7 +89,7 @@
     <div class="container">{% include 'hx_lti_initializer/index_button.html' %}
     </div>
 
-    {{ students }}
+    <!--{{ students }}-->
 
     <!--<div class="container">-->
         <!--<div class="col-md">-->
@@ -120,7 +120,7 @@
                         <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <!-- TODO: make it just show automatically -->
-                                <div onclick="showDetail(this, '{{ students|get_item:student }}');" style="cursor: pointer;">
+                                <div class="list-group-item" onclick="showDetail(this, '{{ students|get_item:student }}');" style="cursor: pointer;">
                                     Show Annotations
                                 </div>
                             </div>
