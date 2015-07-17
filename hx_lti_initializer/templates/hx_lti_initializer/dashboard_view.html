@@ -112,9 +112,9 @@
                 <div>
                     <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
+                        <div data-toggle="collapse" data-parent="#accordion" href="#{{ students|get_item:student }}" class="panel-heading list-group-item" style="cursor: pointer;">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#{{ students|get_item:student }}"> {{ student }} </a>
+                                {{ student }}
                             </h4>
                         </div>
                         <div id="{{ students|get_item:student }}" class="panel-collapse collapse">
