@@ -1,8 +1,8 @@
 SECURE_SETTINGS = {
     'secret_key': 'eyc+bftd*fskn^_vt4+pr)0-ih+7sc%8i40*c=cji6*#+&2paj',
 
-    'db_default_name' : 'annotationsx',
-    'db_default_user': 'annotationsx',
+    'db_default_name' : 'hx_annotations_lti',
+    'db_default_user': 'hx_annotations_lti',
     'db_default_password' : 'password',
     'db_default_host': '127.0.0.1',
     'db_default_port': '5432',
