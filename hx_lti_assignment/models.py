@@ -1,6 +1,6 @@
 from django.db import models
 from hx_lti_todapi.models import TargetObject
-from annotationsx.models import LTICourse
+from hx_lti_initializer.models import LTICourse
 import uuid
 
 class Assignment(models.Model):

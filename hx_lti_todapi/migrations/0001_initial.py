@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('annotationsx', '0003_lticourse'),
+        ('hx_lti_initializer', '0003_lticourse'),
     ]
 
     operations = [
@@ -22,8 +22,8 @@ class Migration(migrations.Migration):
                 ('target_created', models.DateTimeField(auto_now_add=True)),
                 ('target_updated', models.DateTimeField(auto_now=True)),
                 ('target_type', models.CharField(default=b'tx', max_length=2, choices=[(b'tx', b'Text Annotation'), (b'vd', b'Video Annotation'), (b'ig', b'Image Annotation')])),
-                ('target_courses', models.ManyToManyField(to='annotationsx.LTICourse')),
-                ('target_creator', models.ForeignKey(to='annotationsx.LTIProfile')),
+                ('target_courses', models.ManyToManyField(to='hx_lti_initializer.LTICourse')),
+                ('target_creator', models.ForeignKey(to='hx_lti_initializer.LTIProfile')),
             ],
             options={
                 'verbose_name': 'Source',

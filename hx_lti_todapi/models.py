@@ -1,5 +1,5 @@
 from django.db import models
-from annotationsx.models import LTIProfile, LTICourse
+from hx_lti_initializer.models import LTIProfile, LTICourse
 
 class LTI_TodApi(models.Model):
     class Meta:
