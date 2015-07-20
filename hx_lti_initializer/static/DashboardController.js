@@ -62,25 +62,25 @@
      * immediately without checking to see if we are doing some filtering or otherwise.
      * Since it's a vendor file, this is the workaround for that bug.
      */
-    // $.DashboardController.prototype.cleanUpAnnotations = function(){
-    //     var annotator = this.annotator;
-    //     var store = annotator.plugins.Store;
-    //     var annotations = store.annotations;
-    //     var self = this;
-    //     // goes through all the annotations currently loaded
-    //     jQuery.each(annotations, function(key, value){
-    //         // if the options.userID (i.e. the value we are searching for) is empty signifying
-    //         // public or is equal to the person with update access, then we leave it alone,
-    //         // otherwise we need to clean them up (i.e. disable them).
-    //         if (self.initOptions.user_id !== '' && self.initOptions.user_id !== value.permissions.update[0]) {
-    //             if (value.highlights !== undefined) {
-    //                 jQuery.each(value.highlights, function(key1, value1){
-    //                     jQuery(value1).removeClass('annotator-hl');
-    //                 });
-    //             }
-    //         }
-    //     });
-    // };
+    $.DashboardController.prototype.cleanUpAnnotations = function(){
+        var annotator = this.annotator;
+        var store = annotator.plugins.Store;
+        var annotations = store.annotations;
+        var self = this;
+        // goes through all the annotations currently loaded
+        jQuery.each(annotations, function(key, value){
+            // if the options.userID (i.e. the value we are searching for) is empty signifying
+            // public or is equal to the person with update access, then we leave it alone,
+            // otherwise we need to clean them up (i.e. disable them).
+            if (self.initOptions.user_id !== '' && self.initOptions.user_id !== value.permissions.update[0]) {
+                if (value.highlights !== undefined) {
+                    jQuery.each(value.highlights, function(key1, value1){
+                        jQuery(value1).removeClass('annotator-hl');
+                    });
+                }
+            }
+        });
+    };
 
 
 
@@ -125,14 +125,14 @@
             }
 
             // Add class to identify instructor annotations
-            if (value.user.id === self.initOptions.instructor_id && value.highlights !== undefined ) {
-                jQuery.each(value.highlights, function(key, value){
-                    jQuery(value).addClass('instructor-hl');
-                });
-            }
+            // if (value.user.id === self.initOptions.instructor_id && value.highlights !== undefined ) {
+            //     jQuery.each(value.highlights, function(key, value){
+            //         jQuery(value).addClass('instructor-hl');
+            //     });
+            // }
         });
         // Change color of instructor annotations to green
-        jQuery('head').append('<style> .instructor-hl {background: lime !important} </style>');
+        //jQuery('head').append('<style> .instructor-hl {background: lime !important} </style>');
 
     };
 
@@ -149,7 +149,7 @@
         
         // Dani had this for some reason. we can't remember. but if something
         // breaks, uncomment next line.
-        // annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
+        //annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         // Make sure to be openned all annotations for this pagination
         loadFromSearch.limit = this.initOptions.pagination+loadedAn;
