@@ -74,10 +74,8 @@ LTI_SETUP = {
 
     ##this is where we're getting trouble
     "LAUNCH_URL": "hx_lti_initializer:launch_lti", #"lti_init/launch_lti"
-
     "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
     "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
-
 
     "EXTENSION_PARAMETERS": {
         "canvas.instructure.com": {
@@ -85,7 +83,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (localhost)", 
+                "text": "Annotations (C9)", 
             }
         }
     }

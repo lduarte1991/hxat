@@ -286,9 +286,9 @@ def launch_lti(request):
     roles = request.LTI.get('roles')
     request.session['roles'] = roles
 
-    user_id = request.LTI.get('user_id')
-    username = request.LTI.get('lis_person_name_full'),
-    course = request.LTI.get('resource_link_id')
+    #user_id = request.LTI.get('user_id')
+    #username = request.LTI.get('lis_person_name_full'),
+    #course = request.LTI.get('resource_link_id')
 
     #print("User ID: " + request.LTI['user_id'])
 
@@ -319,9 +319,9 @@ def student_view(request):
     user_id = LTI.get('user_id')
     anon_id = '%s:%s' % (consumer_key_requested, user_id)
     print(anon_id)
-    course = LTI.get('resource_link_id')
 
     try:
+        course = LTI.get('resource_link_id')
         debug_printer('DEBUG - Course was found %s' % course)
         course_object = LTICourse.get_course_by_id(course)
     except:

@@ -10,7 +10,7 @@
 			flags: false,
             // Canvas user_id of instructor of course
             instructor_id: commonInfo.instructor_id
-		}
+		};
 
 		this.TEMPLATENAMES = [
             "annotationList", // Main
@@ -181,7 +181,7 @@
                 moreBut.show();
             else
                 moreBut.hide();
-        }
+        };
         
         var obj = loadFromSearch;
         var action = 'search';
@@ -618,7 +618,7 @@
                                         var startAPI = function() {
 
                                             ovaInstance.showAnnotation(anFound);
-                                        }
+                                        };
                                         if (ovaInstance.loaded)
                                             startAPI();
                                         else
