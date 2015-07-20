@@ -7,7 +7,7 @@
 """
 from abc import *
 from hx_lti_todapi.models import TargetObject
-from hx_lti_initializer.models import LTICourse, LTIProfile
+from annotationsx.models import LTICourse, LTIProfile
 
 class TODAPI_LTI:
     __metaclass__ = ABCMeta

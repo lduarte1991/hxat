@@ -15,7 +15,7 @@ from django.contrib             import messages
 
 from hx_lti_todapi.models       import TargetObject
 from hx_lti_assignment.models   import Assignment
-from hx_lti_initializer.models  import LTIProfile, LTICourse
+from annotationsx.models  import LTIProfile, LTICourse
 from django.views.decorators.csrf import csrf_exempt
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from models import *
@@ -267,7 +267,7 @@ def launch_lti_old(request):
     request.session['Authenticated'] = True
 
     # then renders the page using the template
-    return render(request, 'hx_lti_initializer/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
+    return render(request, 'annotationsx/testpage2.html', {'user': lti_profile.user, 'email': lti_profile.user.email, 'user_id': lti_profile.user.get_username(), 'roles': lti_profile.roles, 'courses': courses_for_user, 'files': files_in_courses})
 '''
 
 
@@ -351,7 +351,7 @@ def student_view(request):
         'files': files_in_courses
     }
 
-    return render(request, 'hx_lti_initializer/student_index.html', context)
+    return render(request, 'annotationsx/student_index.html', context)
 
 
 def instructor_view(request):
@@ -414,7 +414,7 @@ def instructor_view(request):
         'files': files_in_courses
     }
 
-    return render(request, 'hx_lti_initializer/instructor_index.html', context)
+    return render(request, 'annotationsx/instructor_index.html', context)
 
 
 @csrf_exempt
@@ -501,7 +501,7 @@ def dashboard_view(request):
     context = {
         'students': students,
     }
-    return render(request, 'hx_lti_initializer/dashboard_view.html', context)
+    return render(request, 'annotationsx/dashboard_view.html', context)
 
 
 def index_view(request):

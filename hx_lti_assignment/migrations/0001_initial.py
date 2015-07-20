@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('hx_lti_todapi', '0001_initial'),
-        ('hx_lti_initializer', '0003_lticourse'),
+        ('annotationsx', '0003_lticourse'),
     ]
 
     operations = [
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('allow_flags', models.BooleanField(default=False, help_text=b'Allow users to flag items as inappropriate/offensive.')),
                 ('default_tab', models.CharField(default=b'Public', max_length=20, choices=[(b'Instructor', b'Instructor'), (b'My Notes', b'My Notes'), (b'Public', b'Public')])),
                 ('assignment_objects', models.ManyToManyField(to='hx_lti_todapi.TargetObject')),
-                ('course', models.ForeignKey(to='hx_lti_initializer.LTICourse')),
+                ('course', models.ForeignKey(to='annotationsx.LTICourse')),
             ],
             options={
             },

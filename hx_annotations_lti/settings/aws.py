@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     #'django_jenkins',
     'bootstrap3',
     'ims_lti_py',
-    'hx_lti_initializer',
+    'annotationsx',
     'hx_lti_todapi',
     'hx_lti_assignment',
     'django_auth_lti',
@@ -73,9 +73,9 @@ LTI_SETUP = {
     "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
 
     ##this is where we're getting trouble
-    "LAUNCH_URL": "hx_lti_initializer:launch_lti", #"lti_init/launch_lti"
+    "LAUNCH_URL": "annotationsx:launch_lti", #"lti_init/launch_lti"
 
-    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
+    "LAUNCH_REDIRECT_URL": "annotationsx:launch_lti",
     "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
 
 
@@ -134,7 +134,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 STATICFILES_DIRS = (
-    os.path.normpath(os.path.join(os.path.dirname(BASE_DIR), 'hx_lti_initializer/static/')),
+    os.path.normpath(os.path.join(os.path.dirname(BASE_DIR), 'annotationsx/static/')),
 )
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
@@ -146,7 +146,7 @@ MESSAGE_TAGS = {
 }
 
 PROJECT_APPS = (
-    'hx_lti_initializer',
+    'annotationsx',
 )
 
 JENKINS_TASKS = (
