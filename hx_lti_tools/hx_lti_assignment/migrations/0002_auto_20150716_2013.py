@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='assignment',
-            name='highlights_options',
-            field=models.CharField(max_length=255, blank=True),
+            model_name='assignmenttargets',
+            name='target_object',
+            field=models.ForeignKey(verbose_name=b'Source Material', to='target_object_database.TargetObject', unique=True),
             preserve_default=True,
         ),
     ]

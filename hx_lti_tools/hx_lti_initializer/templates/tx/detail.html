@@ -20,6 +20,7 @@
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>
 <script src="{% static "AnnotationCore.js" %}"></script>
+<script src="{% static "DashboardController.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
 <!--<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
@@ -31,22 +32,35 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<link rel="stylesheet" href="{% static "css/dashboard.css" %}">
 <!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
 <link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">-->
 <div class="container">
-<h1>{{ target_object.target_title | safe }}</h1>
-<h3>by {{ target_object.target_author | safe }}</h3>
-<div class="content">
-{{ target_object.target_content | safe }}
-</div>
-<div class="citation">
-<i>{{ target_object.target_citation }}</i>
-</div>
-<div id="dashboard" class="annotationListContainer">
-</div>
+	<div class="row">
+  		<div class="col-md-9" id="leftCol">
+			<h1>{{ target_object.target_title | safe }}</h1>
+			<h3>by {{ target_object.target_author | safe }}</h3>
+			<div class="content">
+			{{ target_object.target_content | safe }}
+			</div>
+			<div class="citation" style="margin-top:20px;">
+			<i>{{ target_object.target_citation }}</i>
+			</div>
+			{% if prev_object %}
+			<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left">Previous</a>
+			{% endif %}
+			{% if next_object %}
+			<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right">Next</a><br />
+			{% endif %}
+		</div>
+		<div class="col-md-3" id="rightCol">
+			<div id="dashboard" class="annotationListContainer">
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 jQuery(function ($) {
@@ -60,6 +74,7 @@ jQuery(function ($) {
 				token: "{{ token }}",
 				username: "{{ username }}",
 				user_id: "{{ user_id }}",
+				is_instructor: "{{ is_instructor }}",
 			},
 			annotationMainOptions: {
 			},

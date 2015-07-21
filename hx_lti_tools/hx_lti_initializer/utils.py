@@ -1,3 +1,7 @@
+"""
+These functions will be used for the initializer module, but may also be helpful
+elsewhere. 
+"""
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import *
 from firebase_token_generator import create_token

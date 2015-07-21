@@ -37,9 +37,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'django_extensions',
     'django_jenkins',
     'bootstrap3',
+    'crispy_forms',
     'ims_lti_py',
     'hx_lti_initializer',
     'hx_lti_assignment',
@@ -109,3 +111,5 @@ JENKINS_TASKS = (
     'django_jenkins.tasks.run_pep8',
     'django_jenkins.tasks.run_pylint',
 )
+
+CRISPY_TEMPLATE_PACK = "bootstrap3"

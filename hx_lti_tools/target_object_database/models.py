@@ -34,7 +34,8 @@ class TargetObject(LTI_TodApi):
     
     class Meta:
         verbose_name = "Source"
-    
+        ordering=['target_title']
+
     def get_targets_from_creator(user_requesting, user_requested):
         if (user_requesting.user.is_staff == True):
             return TargetObject.objects.filter(target_creator=user_requested)

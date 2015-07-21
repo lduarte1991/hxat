@@ -16,11 +16,6 @@ urlpatterns = patterns(
         name="edit_course",
     ),
     url(
-        r'^assignment/create_new/$',
-        'hx_lti_initializer.views.create_new_assignment',
-        name="create_new_assignment",
-    ),
-    url(
         r'^launch_lti/$',
         'hx_lti_initializer.views.launch_lti',
         name="launch_lti",
@@ -29,5 +24,10 @@ urlpatterns = patterns(
         r'^admin_hub/$',
         'hx_lti_initializer.views.course_admin_hub',
         name="course_admin_hub",
-    )
+    ),
+    url(
+        r'^admin_hub/(?P<course_id>[0-9a-z]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
+        'hx_lti_initializer.views.access_annotation_target',
+        name="access_annotation_target"
+    ),
 )

@@ -1,4 +1,6 @@
+<!DOCTYPE html>
 {% extends 'hx_lti_initializer/base.html' %}
+{% load staticfiles %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -9,6 +11,19 @@
 {% bootstrap_messages %}
 
 {% block content %}
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<script>
+	jQuery(document).ready(function(){
+	    var options = {
+			focus: false,
+		};
+		jQuery('#id_target_content').summernote(options);
+	});
+
+</script>
 <h2>Source Form</h2>
 
 	{% if form.errors %}

@@ -174,20 +174,22 @@ li {
             <p>\
                 In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
             </p>\
-            <pre>\
-            collection_id="+collection_id+"\
-            </pre>\
-            <pre>\
-            object_id="+object_id+"\
-            </pre>\
+            <input style='width:100%' type=\"text\" value=\"collection_id="+collection_id+"\">\
+            </input><br/>\
+            <input style='width:100%' type=\"text\" value=\"object_id="+object_id+"\">\
+            </input>\
         ");
         jQuery(el).addClass('copypaste');
+        jQuery(el).find('input').first().select();
     
     }
 </script>
 <div class="header">
 </div>
 <div class="container">
+<pre>
+{{debug}}
+</pre>
     <div class="row">
         <div class="col-md-3">
             <div class="sidebar-top">
@@ -249,13 +251,15 @@ li {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for file in assignment.assignment_objects.all %}
+                                    {% load order_by %}
+                                    {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                                     <tr>
                                         <td>
                                             {% if 'Administrator' in roles or 'Instructor' in roles %}
                                             <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
                                             {% endif %}
-                                            <a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">{{ file.target_title }}</a>
+                                            <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
+                                            (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
                                         </td>
                                         <td>
                                             {{ file.target_author }}

@@ -32,7 +32,7 @@ class TOD_Implementation(TODAPI_LTI):
         This function should return a list of objects with the attributes set up above. 
         """
         course_for_user = LTICourse.get_course_by_id(course_id)
-        response = TargetObject.objects.filter(target_courses=course_for_user)
+        response = TargetObject.objects.filter(target_courses=course_for_user).order_by('assignmenttargets')
         return response
     
     @staticmethod

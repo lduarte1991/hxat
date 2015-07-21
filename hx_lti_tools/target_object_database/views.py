@@ -1,9 +1,13 @@
 from django.shortcuts import get_object_or_404, render_to_response, render, redirect
-from django.http import Http404
+from django.template import RequestContext
+from django.http import Http404, HttpResponse
+from django.utils.html import escape
 from models import *
+from serializers import *
 from forms import SourceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from rest_framework import generics
 
 def open_target_object(request, collection_id, target_obj_id):
     try:
@@ -62,3 +66,30 @@ def edit_source(request, id):
             'user': request.user,
         }
     )
+
+def handlePopAdd(request, addForm, field):
+    if request.method == "POST":
+        form = addForm(request.POST)
+        if form.is_valid():
+            try:
+                newObject = form.save()
+            except forms.ValidationError, error:
+                newObject = None
+            if newObject:
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))
+    else:
+        form = addForm()
+    pageContext = {'form': form, 'field': field, 'user':request.user}
+    return render_to_response("target_object_database/source_form.html", RequestContext(request, pageContext))
+
+@login_required
+def newSource(request):
+    return handlePopAdd(request, SourceForm, 'target_object')
+
+class SourceView(generics.ListAPIView):
+    model = TargetObject
+    serializer_class = TargetObjectSerializer
+
+    def get_queryset(self):
+        object_id = self.kwargs['object_id']
+        return TargetObject.objects.filter(pk=object_id)

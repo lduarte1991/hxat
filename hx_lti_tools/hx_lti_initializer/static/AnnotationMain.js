@@ -7,7 +7,7 @@
 
 (function($) {
 	$.AnnotationMain = function(options) {
-
+		this.options = options;
 	};
 
 	/* initForText

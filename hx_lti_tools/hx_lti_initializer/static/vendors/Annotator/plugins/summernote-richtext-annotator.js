@@ -37,6 +37,7 @@ Annotator.Plugin.SummernoteRichText.prototype.pluginInit = function() {
 
 	self.annotator.subscribe("annotationEditorHidden", function() {
 		$('#annotator-field-0').destroy();
+		$('.fullscreen').toggleClass('fullscreen');
 	});
 };
 

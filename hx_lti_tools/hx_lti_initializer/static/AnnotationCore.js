@@ -39,6 +39,7 @@
 			this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
 			this.setUpPlugins();
 
+			// need to make sure that the media is defaulted to text (even if the "reply" plugin is not instantiated)
 			this.annotation_tool.subscribe("annotationEditorSubmit", function(editor, annotation){
 				if (annotation.parent === "0" || annotation.parent === 0 || typeof Annotator.Plugin["Reply"] !== 'function') {
 					annotation.media = "text";
@@ -69,10 +70,7 @@
 	    // target source, it can exist in multiple assignments and multiple courses. context_id
 	    // refers to the course it belongs to and collection_id is the assignment the object belongs to
 	    if (typeof store.annotationData.uri === 'undefined'){
-	    	//once CATCH can handle context_id and collection_id, we can store just the object_id as the URI
-	        //store.annotationData.uri = annotatorOptions.object_id;
-	        var tempUri = "" + annotatorOptions.object_id + ":" + annotatorOptions.context_id + ":" + annotatorOptions.collection_id;
-
+	        var tempUri = "" + annotatorOptions.object_id;
 	    }
 	    if (typeof store.annotationData.context_id === 'undefined'){
 	        store.annotationData.context_id = annotatorOptions.context_id;
@@ -98,13 +96,14 @@
 	    	pluginName = this.initOptions.plugins[plugin];
 	    	var options = {};
 	    	if (pluginName === "Store") {
-	    		var tempUri = "" + this.initOptions.object_id + "_" + this.initOptions.context_id + "_" + this.initOptions.collection_id;
 		    	options = {
 		    		// The endpoint of the store on your server.
 	                prefix: this.initOptions.database_url,
 	                annotationData: {
-	                    uri: tempUri,
-	                    citation: "fake source",
+	                    uri: this.initOptions.object_id,
+	                    collectionId: this.initOptions.collection_id,
+	                    contextId: this.initOptions.context_id,
+	                    citation: this.initOptions.citation,
 	                },
 	                urls: {
 	                    // These are the default URLs.
@@ -115,7 +114,9 @@
 	                    search:  '/search'
 	                },
 	                loadFromSearch:{
-	                    uri: tempUri,
+	                    uri: this.initOptions.object_id,
+	                    collectionId: this.initOptions.collection_id,
+	                    contextId: this.initOptions.context_id,
 	                    media: this.initOptions.mediaType,
 	                }
 		    	};
@@ -125,6 +126,7 @@
 		    		token: this.initOptions.token,
 		    	};
 		    } else if (pluginName === 'Permissions') {
+		    	var self = this;
 		    	options = {
 	                user: {
 	                    id: this.initOptions.user_id,
@@ -161,12 +163,12 @@
 	                          return true;
 	                        }
 	                      }
-	                      return false;
+	                      return self.initOptions.is_instructor === "True";
 	                    } else if (annotation.user) {
 	                      if (user) {
 	                        return this.userId(user) === this.userId(annotation.user);
 	                      } else {
-	                        return false;
+	                        return self.initOptions.is_instructor === "True";
 	                      }
 	                    }
 	                    return true;

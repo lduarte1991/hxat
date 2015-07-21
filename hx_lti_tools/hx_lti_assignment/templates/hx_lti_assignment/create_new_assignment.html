@@ -9,97 +9,212 @@
 {% bootstrap_messages %}
 
 {% block content %}
+{% load staticfiles %}
+<script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
+<script src="{% static "vendors/development/jquery-ui.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
+
+
 	<script>
 	jQuery(document).ready(function(){
-		if(jQuery('#id_allow_highlights').val()){
-			jQuery('#id_highlights_options').parent().toggleClass('hidden');
+		if (jQuery('#id_allow_highlights').val()){
+			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
 		}
+		if (jQuery('#id_include_instructor_tab').val()){
+			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+		}
+		jQuery('#id_include_instructor_tab').change(function(event){
+			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+			jQuery('#id_default_tab').selectpicker('refresh');            
+        });
         jQuery('#id_allow_highlights').change(function(event){
-        	jQuery('#id_highlights_options').parent().toggleClass('hidden')
-            if (jQuery('#id_highlights_options').parent().hasClass('hidden')) {
+        	jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
+            if (jQuery('#id_highlights_options').parent().parent().hasClass('hidden')) {
             	jQuery('#id_highlights_options').val("");	
             }
         });
+        var rows = jQuery('.sortable tbody').find('tr');
+    	var total_forms = rows.length;
+		jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", total_forms);
+        var fixHelper = function(e, ui) {
+			ui.children().each(function() {
+				$(this).width($(this).width());
+			});
+			return ui;
+		};
+        jQuery('.sortable tbody').sortable({
+        	helper: fixHelper,
+        	stop: function(event, ui){
+	        	var arr = jQuery('.sortable tbody').sortable('toArray');
+	        	count = 1;
+	        	jQuery(arr).each(function(index){
+	        		var item = '#' + arr[index];
+	        		//jQuery(item).find(".field-order > input").attr("value", count);
+	        		if(arr[index].indexOf("assignmenttargets_set") == -1){
+	        			count++;
+	        		}
+	        	});
+	        	fixOrderNumbers();
+	        }
+        }).disableSelection();
+        jQuery('.post-form').submit( function(e){
+        	var target_object_list = []
+        	items = jQuery('.field-target_object');
+        	should_quit = false;
+        	items.each(function(index){
+        		name = jQuery(items[index]).find('div > button > span:visible').text();
+        		if (jQuery.inArray(name, target_object_list) !== -1) {
+        			jQuery('.sortable').css('outline', 'red 2px solid');
+        			jQuery('.sortable').css('outline-offset', '5px');
+        			jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">You should not repeat source materials in the same assignment!</p>');
+        			should_quit = true;
+        		} else {
+        			target_object_list.push(name);
+        		}
+        	});
+        	if(should_quit){
+        		return false;
+        	}
+        	return true;
+        });
     });
-    </script>
-	<h2>Assignment Form</h2>
+	
+	var fixOrderNumbers = function(){
+		var list_of_rows = jQuery('.sortable tbody').find('tr:visible');
+		jQuery(list_of_rows).each(function(index){
+			jQuery(jQuery(list_of_rows[index]).find(".field-order > input")).attr("value", index+1);
+		});
+	}
 
-	{% if form.errors %}
-		{{ form.errors }}
+	var addNewSourceMaterial = function(){
+    	var rows = jQuery('.sortable tbody').find('tr');
+    	var new_item_id = rows.length;
+    	var order = new_item_id + 1;
+    	var html = '<tr id="'+order+'" class="ui-state-default assignment-targets-table-row">\
+			\
+			<td class="field-target_object" >\
+				<select id="id_assignmenttargets_set-'+new_item_id+'-target_object" name="assignmenttargets_set-'+new_item_id+'-target_object" class="selectpicker form-control" data-live-search="true">\
+					{% for id,choice in form.fields.assignment_objects.choices %}\
+					<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>\
+			{% endfor %}\
+				</select>\
+			</td>\
+			<td>\
+				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>\
+			</td>\
+			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
+			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
+			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
+		</tr>';
+		jQuery('.sortable tbody').append(html);
+		jQuery('.selectpicker').selectpicker();
+		jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", order);
+		fixOrderNumbers();
+    };
+    var deleterow = function(link) {
+    	jQuery(jQuery(link).parent().find('input')).prop('checked',true);
+    	jQuery(link).parent().parent().addClass("hidden");
+    	fixOrderNumbers()
+		//jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value")-1);
+
+    };
+    </script>
+    <style>
+    	.sortable{
+    		width: 100%;
+    		margin-bottom: 20px;
+    	}
+
+    	.field-reorder {
+    		text-align: center;
+    		cursor: move;
+    		width: 40px;
+    	}
+
+    	.field-delete {
+    		text-align: center;
+    		width: 50px;
+    	}
+
+    	.sortable > tbody > tr > td {
+    		padding-top: 10px;
+    		padding-bottom: 10px;
+    		padding-left: 10px;
+    	}
+    </style>
+	<h2>Assignment Form</h2>
+	{% if debug %}
+		<pre>{{debug}}</pre>
 	{% endif %}
 	<form method="POST" class="post-form">{% csrf_token %}
-		{{ form.non_field_errors }}
-		<div class="form-group">
-			<label for="id_assignment_name">Assignment name:</label> 
-			<input id="id_assignment_name" maxlength="255" name="assignment_name" class="form-control" type="text" value="{{ form.assignment_name.value }}">
-		</div>
-		<div class="form-group">
-			<label for="id_assignment_objects">Assignment objects:</label> 
-			<select class="form-control selectpicker" data-live-search="true" multiple id="id_assignment_objects" name="assignment_objects">
-				{% for id,choice in form.fields.assignment_objects.choices %}
-				<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
-				{% endfor %}
-			</select> 
+		{% load crispy_forms_tags %}
+		{{ form.management_form }}
+		{% crispy form %}
 
-			<a href="/admin/target_object_database/targetobject/add/">Add a new Target</a>
-		</div>
-		<div class="form-group">
-			<label for="id_course">Course for this Assignment:</label> 
-			<select class="form-control selectpicker" data-live-search="true" id="id_course" name="course">
-				{% for id,choice in form.fields.course.choices %}
-				<option value="{{ id }}" {% if id == form.course.value %} selected {% endif %}>{{ choice }}</option>
-				{% endfor %}
-			</select> 
-		</div>
-		<fieldset>
-			<legend>Annotation Database Settings</legend>
-			<div class="form-group">
-				<label for="id_annotation_database_url">Annotation Database URL:</label> 
-				<input id="id_annotation_database_url" maxlength="255" name="annotation_database_url" class="form-control" type="text" value="{{ form.annotation_database_url.value }}">
-			</div>
-			<div class="form-group">
-				<label for="id_annotation_database_apikey">Annotation Database API Key:</label> 
-				<input id="id_annotation_database_apikey" maxlength="255" name="annotation_database_apikey" class="form-control" type="text" value="{{ form.annotation_database_apikey.value }}">
-			</div>
-			<div class="form-group">
-				<label for="id_annotation_database_secret_token">Annotation Secret Token:</label> 
-				<input id="id_annotation_database_secret_token" maxlength="255" name="annotation_database_secret_token" class="form-control" type="text" value="{{ form.annotation_database_secret_token.value }}">
-			</div>
-		</fieldset>
-		<fieldset>
-			<legend>Annotator Settings</legend>
-			<div class="checkbox">
-				<label><input type="checkbox" id="id_allow_highlights" name="allow_highlights" {% if form.allow_highlights.value %} checked {% endif %}>Enable Colored Highlights
-			</div>
-			<div class="form-group hidden">
-				<label for="id_highlights_options">Predetermined Tags and Colors:</label> 
-				<input id="id_highlights_options" maxlength="255" name="highlights_options" class="form-control" type="text" value="{{ form.highlights_options.value }}">
-			</div>
-			<div class="checkbox">
-				<label><input type="checkbox" id="id_allow_touch" name="allow_touch" {% if form.allow_touch.value %} checked {% endif %}>Enable Touch Device Support
-			</div>
-			<div class="checkbox">
-				<label><input type="checkbox" id="id_allow_flags" name="allow_flags" {% if form.allow_flags.value %} checked {% endif %}>Enable Flagging
-			</div>
-		</fieldset>
-		<fieldset>
-			<legend>Annotation Table Settings</legend>
-			<div class="checkbox">
-				<label><input type="checkbox" id="id_include_instructor_tab" name="include_instructor_tab" {% if form.include_instructor_tab.value %} checked {% endif %}>Enable Instructor Tab
-			</div>
-			<div class="form-group">
-			<label for="id_default_tab">Default Tab</label> 
-			<select class="form-control selectpicker" data-live-search="true" id="id_default_tab" name="default_tab">
-				{% for id,choice in form.fields.default_tab.choices %}
-				<option value="{{ id }}" {% if id == form.default_tab.value %} selected {% endif %}>{{ choice }}</option>
-				{% endfor %}
-			</select> 
-		</div>
-			<div class="form-group">
-				<label for="id_pagination_limit">Number of Annotations per Page:</label> 
-				<input id="id_pagination_limit" name="pagination_limit" class="form-control" type="number" value="{{ form.pagination_limit.value }}">
-			</div>
-		</fieldset>
+		<table class="sortable">
+			<thead>
+			<tr>
+				<td>
+				Source Material
+				</td>
+			</tr>
+			</thead>
+			<tbody>
+			{%for f in targets_form.management_form%}
+			    {{f}}
+			{%endfor%}
+			{% if number_of_targets == 0%}
+			<tr id="1" class="ui-state-default assignment-targets-table-row">
+				
+				<td class="field-target_object" >
+					<select id="id_assignmenttargets_set-0-target_object" name="assignmenttargets_set-0-target_object" class="selectpicker form-control" data-live-search="true">
+						{% for id,choice in form.fields.assignment_objects.choices %}
+						<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+				</td>
+				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
+				<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
+				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
+			</tr>
+			{% endif %}
+			{% for item in targets_form %}
+				{% if forloop.counter0 < number_of_targets %}
+					<tr id="{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
+				
+						<td class="field-target_object" >
+							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
+								{% for id,choice in form.fields.assignment_objects.choices %}
+								<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
+						{% endfor %}
+							</select>
+						</td>
+						<td>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+						</td>
+						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+			</tbody>
+			<tfoot>
+			<tr>
+			<td colspan="5">
+			{% buttons %}
+		<a href="#" class="save btn btn-success" style="width:100%" onclick="addNewSourceMaterial(); return false;">
+		{% bootstrap_icon "plus" %} Add Source Materials
+		</a>
+		{% endbuttons %}
+			</td>
+			</tr>
+			</tfoot>
+		</table>
+		
 		{% buttons %}
 		<button type="submit" class="save btn btn-primary">
 		{% bootstrap_icon "star" %} Save
@@ -108,5 +223,6 @@
 		{% bootstrap_icon "remove" %} Cancel
 		</a>
 		{% endbuttons %}
+
 	</form>
 {% endblock %}

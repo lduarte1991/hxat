@@ -2569,7 +2569,7 @@
         },
         options: {
           help: 'Help',
-          fullscreen: 'Full Screen',
+          fullscreen: 'Sidebar',
           codeview: 'Code View'
         },
         paragraph: {
@@ -4604,7 +4604,7 @@
      */
     this.toggle = function (layoutInfo) {
 
-      var $editor = layoutInfo.editor(),
+      var $editor = $('.annotator-widget'),//layoutInfo.editor(),
           $toolbar = layoutInfo.toolbar(),
           $editable = layoutInfo.editable(),
           $codable = layoutInfo.codable(),
@@ -4625,7 +4625,7 @@
 
         $window.on('resize', function () {
           resize({
-            h: $window.height() - $toolbar.outerHeight() - $annotatorcontrols.height()
+            h: $window.height() - $toolbar.outerHeight() - $annotatorcontrols.outerHeight() - 5 // for padding
           });
         }).trigger('resize');
 

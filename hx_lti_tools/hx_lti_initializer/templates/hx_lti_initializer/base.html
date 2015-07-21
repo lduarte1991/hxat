@@ -1,189 +1,25 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/js/bootstrap-select.min.js"></script>
-<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/css/bootstrap-select.min.css">
-{# Load the tag library #}
+<!DOCTYPE html>
+{# Make sure to load static files, jquery, and bootstrap select #}
+{% load staticfiles %}
+<script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
+<script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/bootstrap-select.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}">
+
+{# Load the tag library for bootsrap #}
 {% load bootstrap3 %}
 
-{# Load CSS and JavaScript #}
+{# Load CSS and JavaScript for bootstrap #}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-<style>
-.sidebar {
-    text-align: center;
-    border: 1px solid black;
-    padding-right: 20px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    width:250px;
-}
 
-.sidebar-top {
-    text-align: center;
-    border: 1px solid black;
-    padding: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom: 0px;
-    width:250px;
-}
-
-.sidebar-top #user-label {
-    font-family: "arial", sans-serif;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.sidebar a {
-    color:#66ccff;
-    font-family: "arial", sans-serif;
-    text-decoration:none;
-    font-size: 13px;
-}
-
-.bar {
-    width: 100%;
-    border-bottom: 1px solid black;
-}
-
-.dashed-bar {
-    border-bottom: 1px dashed black;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.sidebar p {
-    text-align: left;
-}
-
-.sidebar .label {
-    color: #bbbbbb;
-    text-transform: uppercase;
-    font-family: "arial", sans-serif;
-    font-size: 10px;
-}
-
-.header {
-    width: 100%;
-    height: 100px;
-    border-bottom: 4px solid #66ccff;
-    margin-bottom: 20px;
-}
-
-.section-header{
-    color: #999999;
-    text-transform: uppercase;
-    font-family: "arial", sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    border-bottom:1px solid #999999;
-    margin-bottom: 10px;
-}
-
-.course-name {
-    color: black;
-    text-transform: uppercase;
-    font-family: "arial", sans-serif;
-    font-size: 22px;
-    margin-bottom: 10px;
-}
-
-td {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-    font-family: "arial", sans-serif;
-}
-
-th {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    font-family: "arial", sans-serif;
-}
-
-.settingslink {
-    font-size: 12px;
-    float: left;
-    margin-top: -15px;
-}
-
-.leftfloat{
-    margin-top: 4px;
-    margin-left: -30px;
-}
-
-ul {
-    text-align: left;
-    font-size: 11px;
-}
-
-li {
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-#assignments > tbody > tr:nth-child(odd) > td {
-    cursor: pointer;
-}
-
-#assignments > tbody > tr:nth-child(odd) > td:hover {
-    background-color: #66ccff;
-}
-
-#assignments > tbody > tr:last-child > td:hover {
-    background-color: inherit;
-}
-
-.expandicon {
-    float: right;
-    height: 20px;
-    width: 20px;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_expand_more_48px-128.png);
-}
-
-.closeicon {
-    float: right;
-    height: 20px;
-    width: 20px;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-image: url(https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_up_48px-32.png);
-    
-}
-
-.copypaste{
-    padding: 20px;
-    text-align: center;
-    border: 1px solid;
-    border-radius: 10px;
-    background-color: rgba(0,5,54,0.1);
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-.copypaste p{
-    text-align: center;
-}
-
-.copypaste pre {
-    text-align: center;
-}
-
-.helptext {
-	font-size: 8pt;
-	display: block;
-	color: #aaaaaa;
-}
-.navigation {
-    font-size: 18pt;
-    padding-bottom: 20px;
-}
-</style>
+<!-- TODO: This should contain logo/name and possibly navigation --> 
 <div class="header"></div>
+
+<!-- Broken off into two sections, information on the left and content on the right -->
 <div class="container">
 	<div class="row">
         <div class="col-md-3">

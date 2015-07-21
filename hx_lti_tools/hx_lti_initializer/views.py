@@ -134,7 +134,7 @@ def launch_lti(request):
         original = {
             'user_id': user_id,
             'username': user_name,
-            'roles': roles,
+            'is_instructor': request.user and request.user.is_authenticated(),
             'collection': collection_id,
             'course': course,
             'object': object_id,
@@ -212,31 +212,12 @@ def launch_lti(request):
             messages.warning(request, message_error)
             course_object = LTICourse.create_course(course, lti_profile)
     
-    # get all the courses the user is a part of
-    #courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
-    
-    # then gets all the files associated with the courses 
-    #files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
-    
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
     return redirect('hx_lti_initializer:course_admin_hub')
 
-    # then renders the page using the template
-    #return render(
-    #    request,
-    #    'hx_lti_initializer/testpage2.html',
-    #    {
-    #        'user': lti_profile.user,
-    #        'email': lti_profile.user.email,
-    #        'user_id': lti_profile.user.get_username(), 
-    #        'roles': lti_profile.roles, 
-    #        'courses': courses_for_user, 
-    #        'files': files_in_courses,
-    #    }
-    #)
 
 @login_required
 def edit_course(request, id):
@@ -271,16 +252,62 @@ def course_admin_hub(request):
     lti_profile = LTIProfile.objects.get(user=request.user)
     courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
-
+    debug = files_in_courses
     return render(
         request,
         'hx_lti_initializer/testpage2.html',
         {
             'user': request.user,
             'email': request.user.email,
-            'user_id': request.user.get_username(),
+            'is_instructor': request.user and request.user.is_authenticated(),
             'roles': lti_profile.roles,
             'courses': courses_for_user,
             'files': files_in_courses,
+            'debug': debug,
         }
     )
+
+def access_annotation_target(request, course_id, assignment_id, object_id, user_id=None, user_name=None, roles=None):
+    """
+    """
+    if user_id is None:
+        user_name = request.user.get_username()
+        user_id = request.user.email
+        lti_profile = LTIProfile.objects.get(anon_id=user_id)
+        roles = lti_profile.roles
+    try:
+        assignment = Assignment.objects.get(assignment_id=assignment_id)
+        targ_obj = TargetObject.objects.get(pk=object_id)
+    except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+        raise PermissionDenied()    
+
+    original = {
+        'user_id': user_id,
+        'username': user_name,
+        'is_instructor': request.user and request.user.is_authenticated(),
+        'collection': assignment_id,
+        'course': course_id,
+        'object': object_id,
+        'target_object': targ_obj,
+        'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
+        'assignment': assignment,
+    }
+    if not assignment.object_before(object_id) is None:
+        original['prev_object'] = assignment.object_before(object_id)
+
+    if not assignment.object_after(object_id) is None:
+        original['next_object'] = assignment.object_after(object_id)
+
+    if (targ_obj.target_type == 'vd'):
+        srcurl = targ_obj.target_content
+        if 'youtu' in srcurl:
+            typeSource = 'video/youtube'
+        else:
+            disassembled = urlparse(srcurl)
+            file_ext = splitext(basename(disassembled.path))[1]
+            typeSource = 'video/' + file_ext.replace('.', '')
+        original.update({'typeSource': typeSource})
+    elif (targ_obj.target_type == 'ig'):
+        original.update({'osd_json': targ_obj.target_content})
+
+    return render(request, '%s/detail.html' % targ_obj.target_type, original)
