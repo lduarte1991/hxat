@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
 <div class="container">
+{% include 'hx_lti_initializer/index_button.html' %}
 <h1>{{ target_object.target_title | safe }}</h1>
 <div id="content">
 </div>
@@ -43,7 +44,6 @@
 </div>
 </div>
 
-
 <script>
 jQuery(function ($) {
     $(function() {
@@ -53,9 +53,11 @@ jQuery(function ($) {
 				context_id: "{{ course }}",
 				collection_id: "{{ collection }}",
 				object_id: {{ object }},
+				//Uhhh....this token is exposed -- TODO!!
 				token: "{{ token }}",
 				username: "{{ username }}",
 				user_id: "{{ user_id }}",
+				instructor_id: '{{ instructor_id }}'
 			},
 			annotationMainOptions: {
 

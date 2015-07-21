@@ -8,7 +8,9 @@
 			showPublicPrivate: true,
 			pagination: 50,
 			flags: false,
-		}
+            // Canvas user_id of instructor of course
+            instructor_id: commonInfo.instructor_id
+		};
 
 		this.TEMPLATENAMES = [
             "annotationList", // Main
@@ -65,7 +67,6 @@
         var store = annotator.plugins.Store;
         var annotations = store.annotations;
         var self = this;
-        
         // goes through all the annotations currently loaded
         jQuery.each(annotations, function(key, value){
             // if the options.userID (i.e. the value we are searching for) is empty signifying
@@ -110,7 +111,6 @@
         var store = annotator.plugins.Store;
         var annotations = store.annotations;
         var self = this;
-        
         // goes through all the annotations currently loaded
         jQuery.each(annotations, function(key, value){
             // if the options.userID (i.e. the value we are searching for) is empty signifying
@@ -123,7 +123,17 @@
                     });
                 }
             }
+
+            // Add class to identify instructor annotations
+            // if (value.user.id === self.initOptions.instructor_id && value.highlights !== undefined ) {
+            //     jQuery.each(value.highlights, function(key, value){
+            //         jQuery(value).addClass('instructor-hl');
+            //     });
+            // }
         });
+        // Change color of instructor annotations to green
+        //jQuery('head').append('<style> .instructor-hl {background: lime !important} </style>');
+
     };
 
     $.DashboardController.prototype.loadAnnotations = function() {
@@ -139,7 +149,7 @@
         
         // Dani had this for some reason. we can't remember. but if something
         // breaks, uncomment next line.
-        // annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
+        //annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         // Make sure to be openned all annotations for this pagination
         loadFromSearch.limit = this.initOptions.pagination+loadedAn;
@@ -171,7 +181,7 @@
                 moreBut.show();
             else
                 moreBut.hide();
-        }
+        };
         
         var obj = loadFromSearch;
         var action = 'search';
@@ -430,8 +440,8 @@
                         self.initOptions.user_id = '';
                         break;
                     case 'instructor':
-                        self.initOptions.user_id = this.initOptions.instructor_email;
-                        break;
+                         self.initOptions.user_id = this.initOptions.instructor_id;
+                         break;
                     default:
                         self.initOptions.user_id = this.annotator.plugins.Permissions.user.id;
                         break;
@@ -608,7 +618,7 @@
                                         var startAPI = function() {
 
                                             ovaInstance.showAnnotation(anFound);
-                                        }
+                                        };
                                         if (ovaInstance.loaded)
                                             startAPI();
                                         else
@@ -682,7 +692,7 @@
                 userId = '';
                 break;
             case 'instructor':
-                userId = this.initOptions.instructor_email;
+                userId = this.initOptions.instructor_id;
                 break;
             default:
                 userId = this.annotator.plugins.Permissions.user.id;

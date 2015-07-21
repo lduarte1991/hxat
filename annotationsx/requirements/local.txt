@@ -1,0 +1,3 @@
+-r aws.txt
+# local environment requirements, including base requirements
+django-debug-toolbar

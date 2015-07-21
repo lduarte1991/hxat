@@ -1,10 +1,53 @@
 Broad TODOs/Issues:
 
--- Restructure for TLT
+√ Restructure for TLT
+√ Get rid of hard-coded stuff in hx_lti_initializer.views
+√ Use auth middleware to allow us to stray from the launch page
+√ Improve Instructor index
+√ Create Student index
+√ Make sure annotations show up at right place on correct assignment
+√ Navigation improvements: add in a 'return to index' type of button
+√ Clicking on assignment objects shouldn't show the collection ID. Make those just plain text.
+
+
+-- Refactor for TLT
+	-- all secure/variable settings should be in secure.py
+
+-- 'Dashboard' feature
+	 √ Mock-up
+	-- List of students who have annotated something
+		-- for grading purposes?
+	-- List of a specific student's annotations
+
+-- The database token appears to be included in the JavaScript, which is completely accessible to anyone
+    with a right click and a 'show page source.' No. Do not want. We need to refactor to get this out before production.
+
+-- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
+
+-- Update Documentation (may want to wait until we're done with everything else)
+
+-- Duplicate student names break the tool, it seems (Test Student). Make that not happen.
+    -- Also, the db max length for the id (name) field is 30. What about long names?
+    -- The ID/name field shows up in the admin view when you want to select course admins,
+        so it should be human-readable.
+
+-- Need <br/> tags in text entry to format text to be annotated (especially brutal for poems)
+    -- Might be nice if instructors could edit the content in the Canvas RTE
+    -- Could oEmbed help us here?
+
+-- Give instructor 'delete' permission on bad comments?
+
 -- Some backend fields don't accept unicode. This may mess up foreign language courses.
     -- May have to restructure DB
     -- I think this is just the primary ID field (the name I believe).
         Everything else I've tried has been chill with Unicode.
--- Need <br/> tags in text entry to format text to be annotated (especially brutal for poems)
-    -- Might be nice if instructors could edit the content in the Canvas RTE
-    -- Could oEmbed help us here?
+
+-- Figure out what highlight options are/how we can use them, and why they are a required field
+
+-- Unit Tests :(
+
+-- Sometimes going back/forward works smoothly,
+    sometimes the document expires. 'Refresh' always takes you back to the index.
+    Not a huge deal but something to keep in mind. iFrames are like that I guess.
+
+-- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab. Eventually we may want to add support for TFs as well.
