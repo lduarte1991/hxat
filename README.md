@@ -52,3 +52,6 @@ Known Issues: Make sure you have libxml2, libxslt and PostgreSQL installed on yo
 ```
 
 **(At this point, you'll have to go to the wiki to set up on canvas)**
+
+## Troubleshooting
+If you run into issues getting into the admin site, try running ```python manage.py migrate auth``` and then ```python manage.py migrate```

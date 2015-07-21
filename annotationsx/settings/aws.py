@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = SECURE_SETTINGS.get('secret_key')
 
+# TODO: find out if this is supposed to be ['*']
 ALLOWED_HOSTS = []
 
 
@@ -56,12 +57,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_auth_lti.middleware.LTIAuthMiddleware',
+    'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'django_auth_lti.backends.LTIAuthBackend',
+    'django_auth_lti.backends.LTIAuthBackend',  
 )
 
 # Add LTI configuration settings (for django-app-lti)
@@ -70,11 +73,9 @@ LTI_SETUP = {
     "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
 
     ##this is where we're getting trouble
-    "LAUNCH_URL": "hx_lti_intializer:launch_lti", #"lti_init/launch_lti"
-
+    "LAUNCH_URL": "hx_lti_initializer:launch_lti", #"lti_init/launch_lti"
     "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
     "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
-
 
     "EXTENSION_PARAMETERS": {
         "canvas.instructure.com": {
@@ -82,7 +83,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (localhost)", 
+                "text": "Annotations (C9)", 
             }
         }
     }
@@ -90,13 +91,12 @@ LTI_SETUP = {
 
 # Add LTI oauth credentials (for django-auth-lti)
 LTI_OAUTH_CREDENTIALS = {
-    "mykey":"mysecret",
-    "myotherkey": "myothersecret",
+    "123key":"secret",
 }
 
-ROOT_URLCONF = 'hx_annotations_lti.urls'
+ROOT_URLCONF = 'annotationsx.urls'
 
-WSGI_APPLICATION = 'hx_annotations_lti.wsgi.application'
+WSGI_APPLICATION = 'annotationsx.wsgi.application'
 
 
 # Database
@@ -131,6 +131,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
+STATICFILES_DIRS = (
+    os.path.normpath(os.path.join(os.path.dirname(BASE_DIR), 'hx_lti_initializer/static/')),
+)
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
@@ -168,6 +171,10 @@ LTI_ROLES = 'roles'
 
 # should be changed depending on platform roles, these are set up for edX
 ADMIN_ROLES = ['urn:lti:instrole:ims/lis/Administrator', 'urn:lti:role:ims/lis/Instructor', 'urn:lti:role:ims/lis/TeachingAssistant']
+
+#TODO: check if this is what we want
+ADMIN_ROLES += ['Administrator', 'Instructor', 'TeachingAssistant']
+
 STUDENT_ROLES = ['Learner']
 
 # settings for Annotation Server

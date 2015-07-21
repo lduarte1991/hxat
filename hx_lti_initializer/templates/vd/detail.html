@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="{% static "vendors/video/rangeslider.css" %}">
 <link rel="stylesheet" href="{% static "vendors/ova.css" %}">
 <div class="container">
+{% include 'hx_lti_initializer/index_button.html' %}
 <h1>{{ target_object.target_title | safe }}</h1>
 <div class="content">
 	<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264">
@@ -60,9 +61,11 @@ jQuery(function ($) {
 				context_id: "{{ course }}",
 				collection_id: "{{ collection }}",
 				object_id: {{ object }},
+				//Uhhh....this token is exposed -- TODO!!
 				token: "{{ token }}",
 				username: "{{ username }}",
 				user_id: "{{ user_id }}",
+				instructor_id: '{{ instructor_id }}'
 			},
 			annotationMainOptions: {
 

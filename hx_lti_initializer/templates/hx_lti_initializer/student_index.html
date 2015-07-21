@@ -1,0 +1,135 @@
+{% load static from staticfiles %}
+<html lang="en">
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+    </script>
+    {# Load the tag library #}
+    {% load bootstrap3 %}
+
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {# Display django.contrib.messages as Bootstrap alerts #}
+    {% bootstrap_messages %}
+    <meta charset="UTF-8">
+    <!-- TODO: Figure out how to get styles in there dynamically -->
+    <link rel="stylesheet" type="text/css" href="{% static 'hx_lti_initializer/instructor_styles.css' %}" />
+    <title></title>
+</head>
+<script>
+    jQuery(document).ready(function(){
+        jQuery('#assignments .clickable').click(function(event){
+            $(event.currentTarget).find('span').toggleClass('closeicon expandicon');
+        });
+    });
+    var printHelp = function(course_id, collection_id, object_id){
+        var el = '#copypaste-' + course_id;
+        jQuery(el).html("\
+            <p>\
+                In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
+            </p>\
+            <pre>\
+            collection_id="+collection_id+"\
+            </pre>\
+            <pre>\
+            object_id="+object_id+"\
+            </pre>\
+        ");
+        jQuery(el).addClass('copypaste');
+    }
+</script>
+<div class="header">
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="sidebar-top">
+                <div id="user-label">{{ user_name }}</div>
+            </div>
+            <div class="sidebar">
+                <!--<div class="dashed-bar"></div>
+                <div class="dashed-bar"></div>
+                <p>
+                    <a class="link" href="./tutorial">View Tutorial</a>
+                </p>-->
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-8">
+            <div class="section-header">
+                Courses
+            </div>
+            {% for course in courses %}
+            <div class="course-name">
+                {{ course.course_name }}
+            </div>
+            {% if 'Administrator' in roles or 'Instructor' in roles %}
+            <a class="settingslink" href="{{ course.get_admin_url }}" target="_blank">Change Course Settings</a>
+            {% endif %}
+            <div id="copypaste-{{course.id}}"></div>
+            <table id="assignments" class="table table-striped">
+                <tbody>
+                {% for assignment in course.assignment_set.all %}
+                <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
+                    <td>
+                        {% if 'Administrator' in roles or 'Instructor' in roles %}
+                        <a class="settingslink leftfloat" href="{{ assignment.get_admin_url }}" target="_blank">Edit</a>
+                        {% endif %}
+                        {{ assignment.assignment_name }}
+                        <span class="expandicon"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="table table-striped collapse" id="target-objects-{{ assignment.id }}">
+                            <thead>
+                            <tr>
+                                <th>
+                                    Title
+                                </th>
+                                <th>
+                                    Author
+                                </th>
+                                <th>
+                                    Date Created
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for file in assignment.assignment_objects.all %}
+                            <tr>
+                                <td>
+                                    {% if 'Administrator' in roles or 'Instructor' in roles %}
+                                    <a class="settingslink leftfloat" href="{{ file.get_admin_url }}" target="_blank">Edit</a>
+                                    {% endif %}
+                                    {{ file.target_title }}
+                                    <!--<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">{{ file.target_title }}</a>-->
+                                </td>
+                                <td>
+                                    {{ file.target_author }}
+                                </td>
+                                <td title="{{ file.target_created }}">
+                                    {{ file.target_created | timesince }} ago
+                                </td>
+                                <td>
+                                    <form action="annotation_view" id="widget_edit_form" method="post">
+                                        <input name="requested_assignment" value="{{assignment.assignment_id}}" type="hidden">
+                                        <input name="requested_object" value={{ file.id }} type="hidden">
+                                        <input name="assignment_submit" value="View Assignment" class="btn btn-default" type="submit">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</div>
