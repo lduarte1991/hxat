@@ -1,0 +1,106 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+</script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+<div class="container">
+<h1>LTI Successfully Initialized</h1>
+
+<p><b>Welcome, {{user_id}}!</b></p>
+
+<p>Information gathered from initialization:
+    <ul>
+        <li>Email: {{ email }}</li>
+        <li>User ID: {{ user_id }} </li>
+    </ul>
+</p>
+
+{% if files %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Created</th>
+            <th>Course</th>
+            {% if 'Administrator' in roles or 'Instructor' in roles %}
+            <th></th>
+            <th></th>
+            {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for file in files %}
+            <tr>
+                <td><a href="annotation/{{ file.id }}">{{ file.target_title }}</a></td>
+                <td>{{ file.target_author }}</td>
+                <td>{{ file.target_created }}</td>
+                <td><ul>
+                {% for course in file.target_courses.all %}
+                    <li>{{ course.course_name }}</li>
+                {% endfor %}
+                </ul></td>
+                {% if 'Administrator' in roles or 'Instructor' in roles %}
+                <td><a href="{{ file.get_admin_url }}" target="_blank">Edit</a></td>
+                <td><a href="">Annotation Setings</a></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if 'Administrator' in roles or 'Instructor' in roles %}
+{# Display a form #}
+<form action="/admin/hx_lti_todapi/targetobject/add/" method="get" target="_blank">
+{{ form.as_p }}
+{% buttons %}
+    
+    <button type="submit" class="btn btn-primary">
+      {% bootstrap_icon "star" %} Add New File
+    </button>
+  {% endbuttons %}
+</form>
+{% if courses %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Course Name</th>
+            <th>Admin Users</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for course in courses %}
+            <tr>
+                <td>{{ course.course_name }}</td>
+                <td><ul>
+                {% for admin in course.course_admins.all %}
+                    <li>{{ admin.user.username }}</li>
+                {% endfor %}
+                </ul></td>
+                <td><a href="{{ course.get_admin_url }}" target="_blank">Edit</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<form action="/admin/hx_lti_todapi/lticourse/add/" method="get" target="_blank">
+{{ form.as_p }}
+{% buttons %}
+    
+    <button type="submit" class="btn btn-primary">
+      {% bootstrap_icon "star" %} Add Courses
+    </button>
+  {% endbuttons %}
+</form>
+{% endif %}
+</div>

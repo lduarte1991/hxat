@@ -1,0 +1,228 @@
+{% extends 'hx_lti_initializer/base.html' %}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block content %}
+{% load staticfiles %}
+<script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
+<script src="{% static "vendors/development/jquery-ui.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
+
+
+	<script>
+	jQuery(document).ready(function(){
+		if (jQuery('#id_allow_highlights').val()){
+			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
+		}
+		if (jQuery('#id_include_instructor_tab').val()){
+			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+		}
+		jQuery('#id_include_instructor_tab').change(function(event){
+			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+			jQuery('#id_default_tab').selectpicker('refresh');            
+        });
+        jQuery('#id_allow_highlights').change(function(event){
+        	jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
+            if (jQuery('#id_highlights_options').parent().parent().hasClass('hidden')) {
+            	jQuery('#id_highlights_options').val("");	
+            }
+        });
+        var rows = jQuery('.sortable tbody').find('tr');
+    	var total_forms = rows.length;
+		jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", total_forms);
+        var fixHelper = function(e, ui) {
+			ui.children().each(function() {
+				$(this).width($(this).width());
+			});
+			return ui;
+		};
+        jQuery('.sortable tbody').sortable({
+        	helper: fixHelper,
+        	stop: function(event, ui){
+	        	var arr = jQuery('.sortable tbody').sortable('toArray');
+	        	count = 1;
+	        	jQuery(arr).each(function(index){
+	        		var item = '#' + arr[index];
+	        		//jQuery(item).find(".field-order > input").attr("value", count);
+	        		if(arr[index].indexOf("assignmenttargets_set") == -1){
+	        			count++;
+	        		}
+	        	});
+	        	fixOrderNumbers();
+	        }
+        }).disableSelection();
+        jQuery('.post-form').submit( function(e){
+        	var target_object_list = []
+        	items = jQuery('.field-target_object');
+        	should_quit = false;
+        	items.each(function(index){
+        		name = jQuery(items[index]).find('div > button > span:visible').text();
+        		if (jQuery.inArray(name, target_object_list) !== -1) {
+        			jQuery('.sortable').css('outline', 'red 2px solid');
+        			jQuery('.sortable').css('outline-offset', '5px');
+        			jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">You should not repeat source materials in the same assignment!</p>');
+        			should_quit = true;
+        		} else {
+        			target_object_list.push(name);
+        		}
+        	});
+        	if(should_quit){
+        		return false;
+        	}
+        	return true;
+        });
+    });
+	
+	var fixOrderNumbers = function(){
+		var list_of_rows = jQuery('.sortable tbody').find('tr:visible');
+		jQuery(list_of_rows).each(function(index){
+			jQuery(jQuery(list_of_rows[index]).find(".field-order > input")).attr("value", index+1);
+		});
+	}
+
+	var addNewSourceMaterial = function(){
+    	var rows = jQuery('.sortable tbody').find('tr');
+    	var new_item_id = rows.length;
+    	var order = new_item_id + 1;
+    	var html = '<tr id="'+order+'" class="ui-state-default assignment-targets-table-row">\
+			\
+			<td class="field-target_object" >\
+				<select id="id_assignmenttargets_set-'+new_item_id+'-target_object" name="assignmenttargets_set-'+new_item_id+'-target_object" class="selectpicker form-control" data-live-search="true">\
+					{% for id,choice in form.fields.assignment_objects.choices %}\
+					<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>\
+			{% endfor %}\
+				</select>\
+			</td>\
+			<td>\
+				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>\
+			</td>\
+			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
+			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
+			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
+		</tr>';
+		jQuery('.sortable tbody').append(html);
+		jQuery('.selectpicker').selectpicker();
+		jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", order);
+		fixOrderNumbers();
+    };
+    var deleterow = function(link) {
+    	jQuery(jQuery(link).parent().find('input')).prop('checked',true);
+    	jQuery(link).parent().parent().addClass("hidden");
+    	fixOrderNumbers()
+		//jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value")-1);
+
+    };
+    </script>
+    <style>
+    	.sortable{
+    		width: 100%;
+    		margin-bottom: 20px;
+    	}
+
+    	.field-reorder {
+    		text-align: center;
+    		cursor: move;
+    		width: 40px;
+    	}
+
+    	.field-delete {
+    		text-align: center;
+    		width: 50px;
+    	}
+
+    	.sortable > tbody > tr > td {
+    		padding-top: 10px;
+    		padding-bottom: 10px;
+    		padding-left: 10px;
+    	}
+    </style>
+	<h2>Assignment Form</h2>
+	{% if debug %}
+		<pre>{{debug}}</pre>
+	{% endif %}
+	<form method="POST" class="post-form">{% csrf_token %}
+		{% load crispy_forms_tags %}
+		{{ form.management_form }}
+		{% crispy form %}
+
+		<table class="sortable">
+			<thead>
+			<tr>
+				<td>
+				Source Material
+				</td>
+			</tr>
+			</thead>
+			<tbody>
+			{%for f in targets_form.management_form%}
+			    {{f}}
+			{%endfor%}
+			{% if number_of_targets == 0%}
+			<tr id="1" class="ui-state-default assignment-targets-table-row">
+				
+				<td class="field-target_object" >
+					<select id="id_assignmenttargets_set-0-target_object" name="assignmenttargets_set-0-target_object" class="selectpicker form-control" data-live-search="true">
+						{% for id,choice in form.fields.assignment_objects.choices %}
+						<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+				</td>
+				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
+				<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
+				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
+			</tr>
+			{% endif %}
+			{% for item in targets_form %}
+				{% if forloop.counter0 < number_of_targets %}
+					<tr id="{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
+				
+						<td class="field-target_object" >
+							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
+								{% for id,choice in form.fields.assignment_objects.choices %}
+								<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
+						{% endfor %}
+							</select>
+						</td>
+						<td>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+						</td>
+						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+			</tbody>
+			<tfoot>
+			<tr>
+			<td colspan="5">
+			{% buttons %}
+		<a href="#" class="save btn btn-success" style="width:100%" onclick="addNewSourceMaterial(); return false;">
+		{% bootstrap_icon "plus" %} Add Source Materials
+		</a>
+		{% endbuttons %}
+			</td>
+			</tr>
+			</tfoot>
+		</table>
+		
+		{% buttons %}
+		<button type="submit" class="save btn btn-primary">
+		{% bootstrap_icon "star" %} Save
+		</button>
+		<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save btn btn-danger">
+		{% bootstrap_icon "remove" %} Cancel
+		</a>
+		{% endbuttons %}
+
+	</form>
+{% endblock %}
