@@ -27,6 +27,9 @@ from utils import *
 from urlparse import urlparse
 import json
 import sys
+import logging
+
+logging.basicConfig()
 
 def validate_request(req):
     """
@@ -217,6 +220,8 @@ def launch_lti(request):
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
+    print(request.LTI)
+    #return HttpResponse('Hello')
     return redirect('hx_lti_initializer:course_admin_hub')
 
 
