@@ -41,4 +41,6 @@ setconf('LTI_ROLES', 'roles')
 # should be changed depending on platform roles, these are set up for edX
 setconf('ADMIN_ROLES', {'Administrator', 'Instructor'})
 
+setconf('X_FRAME_ALLOWED_SITES', {'tlt.harvard.edu', 'edx.org'})
+
 default_app_config = 'hx_lti_initializer.apps.InitializerConfig'

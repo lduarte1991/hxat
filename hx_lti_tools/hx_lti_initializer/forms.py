@@ -6,5 +6,5 @@ class CourseForm(forms.ModelForm):
 
 	class Meta:
 		model = LTICourse
-		fields = ('course_name', 'course_admins')
+		fields = ('course_name', 'course_admins', 'course_external_css_default')
 

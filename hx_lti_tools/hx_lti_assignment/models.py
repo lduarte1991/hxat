@@ -16,7 +16,11 @@ class AssignmentTargets(models.Model):
 	)
 	order = models.IntegerField(
 		verbose_name = 'Order',
-		max_length = 255
+	)
+	target_external_css = models.CharField(
+		max_length = 255,
+		blank=True,
+		help_text='(Optional) Please only input a URL to an externally hosted CSS file.'
 	)
 
 	class Meta:

@@ -1,0 +1,34 @@
+<div class="annotationItem item-0 side">
+    <div class= "annotatedBy field side">
+        <%= user.name %>
+    </div>
+    
+    <div class="annotatedAt field side" title="07-22-2015T14:27:15-00:00:00">
+        <% var date = new Date(updated); %>
+        last updated <% print(jQuery.timeago(date)); %>
+    </div>
+
+    <div class="quote field side">
+        <div class="quoteText"><%= quote %></div>
+        <span class="idAnnotation"><%= id %></span>
+        <span class="uri" style="display:none"><%= uri %></span>
+
+    </div>
+    
+    <div class="body field side">
+        <%= text %>
+    </div>
+    
+    <div class="totalreplies field side">
+        <% totalComments %> Replies
+    </div>
+    
+    <div class="tagList field side">
+        <% _.each(tags, function(tagItem){ %>
+            <div class="tag side">
+                <%= tagItem %>
+            </div>
+        <% }); %>
+    </div>
+    
+</div>

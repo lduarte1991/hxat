@@ -8,20 +8,22 @@
 			pagintation: 50,
 			flags: false,
 		}
-
+		console.log(options);
 		this.element = options.annotationElement;
 
 		this.initOptions = jQuery.extend({}, defaultOptions, options.initOptions, commonInfo);
 
 		this.current_tab = this.initOptions.default_tab;
+		this.resizing = false;
+		this.lastUp = 150;
 
 		this.TEMPLATENAMES = [
 			"annotationSection",
+			"annotationItem",
 		];
 
 		this.init();
 		
-		this.loadAnnotations();		
 	};
 
 	/* init
@@ -53,9 +55,8 @@
 		var self = this;
 		var annotator = this.annotator;
 
-		annotator.subscribe("annotationsLoaded", function (annotations){
-			console.log(annotator.plugins.Store.annotations);
-			self.setUpSideDisplay();
+		annotator.subscribe("annotationsLoaded", function (annotations) {
+			self.setUpSideDisplay(annotations);
 		})
 	};
 
@@ -75,10 +76,47 @@
     	
     };
 
-	$.DashboardController.prototype.setUpSideDisplay = function() {
+	$.DashboardController.prototype.setUpSideDisplay = function(annotations) {
 		var self = this;
 		var el = self.element;
-		el.html(self.TEMPLATES.annotationSection());
+		var self = this;
+		var annotationItems = [];
+		annotations.forEach(function(annotation) {
+			var item = jQuery.extend(true, {}, annotation);
+			var html = self.TEMPLATES.annotationItem(annotation);
+			annotationItems.push(html);
+		});
+		el.html(self.TEMPLATES.annotationSection({
+			annotationItems: annotationItems,
+		}));
+
+		jQuery('.resize-handle.side').on('mousedown', function(e){
+			self.resizing = true;
+		});
+
+		jQuery(document).on('mousemove', function(e){
+			if (!self.resizing){
+				return;
+			}
+			e.preventDefault();
+			var section = jQuery('.annotationSection');
+			section.css('min-width', '0px');
+			var offset = section.width()-(e.clientX - section.offset().left);
+			section.css('width', offset);
+			section.css('right', 0);
+			self.lastUp = offset;
+		}).on('mouseup', function(e){
+			self.resizing = false;
+			var section = jQuery('.annotationSection');
+			if(self.lastUp < 150){
+				jQuery('#leftCol').attr('class', 'col-xs-11');
+				section.css('width', '0px');
+				section.css('right', -10);
+			} else {
+				jQuery('#leftCol').attr('class', 'col-xs-7');
+				section.css('min-width', '150px');
+			}
+		});
 	};
 
 }(AController));
