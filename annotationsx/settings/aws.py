@@ -47,6 +47,8 @@ INSTALLED_APPS = (
     'hx_lti_initializer',
     'hx_lti_assignment',
     'target_object_database',
+    'django_auth_lti',
+    'django_app_lti',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -57,6 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_auth_lti.middleware.LTIAuthMiddleware',
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
@@ -79,9 +82,8 @@ WSGI_APPLICATION = 'annotationsx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': SECURE_SETTINGS.get('db_default_name', 'dce_course_info'),
-            #'postgres' is in the TLT aws wiki, but won't this give access to all databases?
-        'USER': SECURE_SETTINGS.get('db_default_user', 'postgres'),
+        'NAME': SECURE_SETTINGS.get('db_default_name', 'annotationsx'),
+        'USER': SECURE_SETTINGS.get('db_default_user', 'annotationsx'),
         'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
         'HOST': SECURE_SETTINGS.get('db_default_host', '127.0.0.1'),
         'PORT': SECURE_SETTINGS.get('db_default_port', 5432),
@@ -127,3 +129,34 @@ JENKINS_TASKS = (
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
+
+# Add to authentication backends (for django-auth-lti)
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_lti.backends.LTIAuthBackend',
+)
+
+LTI_SETUP = {
+    "TOOL_TITLE": "AnnotationsX",
+    "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
+
+    ##this is where we're getting trouble - "Resource_link_id=none" keeps showing up in the launch url.
+    "LAUNCH_URL": "hx_lti_initializer:launch_lti", #"lti_init/launch_lti"
+    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
+    "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
+
+    "EXTENSION_PARAMETERS": {
+        "canvas.instructure.com": {
+            "privacy_level": "public",
+            "course_navigation": {
+                "enabled": "true",
+                "default": "enabled",
+                "text": "Annotations (C9 luis)", 
+            }
+        }
+    }
+}
+
+# Add LTI oauth credentials (for django-auth-lti)
+# hard fail (keyerror) if not present
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
