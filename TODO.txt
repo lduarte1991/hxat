@@ -1,0 +1,89 @@
+============================
+BUGS
+-- Deletion of replies doesn't seem to work 
+-- Last updated doesn't work
+-- Sometimes highlighting doesn't show up the first time you view a target object.
+    -- very marginal
+
+============================
+BROAD TODOS/ISSUES (To be done by fall launch)
+
+-- Do we want a default for an empty dashboard? Or a user with no annotations?
+
+-- Link to dashboard from the detail? So you don't have to go back to the index.
+
+-- Hover to annotate? This was working originally I believe.
+
+-- Test Dashboard et. all to make sure thousands of annotations work.
+
+-- The database token appears to be included in the JavaScript, which can be used to get the entire database
+    -- (we tried curl requests with this token from the command line and were able to dump the whole annotations table/db)
+    -- maybe more strictly permission-bound tokens could help us here
+
+-- Get rid of "resource_link_id=None" in configuration url...how does that get in there??
+
+-- Update Documentation (may want to wait until we're done with everything else)
+
+-- Duplicate student names break the tool, it seems (Test Student). Make that not happen.
+    -- Also, the db max length for the id (name) field is 30. What about long names?
+    -- The ID/name field shows up in the admin view when you want to select course admins,
+        so it should be human-readable.
+
+-- Need <br/> tags in text entry to format text to be annotated (especially brutal for poems)
+    -- see what Luis' changes can do for us
+
+-- Unit Tests :(
+
+-- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
+    Eventually we may want to add support for TFs as well.
+
+
+============================
+NOT A PRIORITY/TODO LONG-TERM:
+
+-- Some backend fields don't accept unicode. This may mess up foreign language courses.
+    -- May have to restructure DB
+    -- I think this is just the primary ID field (the name I believe).
+        Everything else I've tried has been chill with Unicode.
+        
+-- Sometimes going back/forward works smoothly,
+    sometimes the document expires. 'Refresh' always takes you back to the index.
+    Not a huge deal but something to keep in mind. iFrames are like that I guess.
+
+-- Give instructor 'delete' permission on bad comments?
+
+
+============================
+´®
+-- Get rid of hard-coded stuff in hx_lti_initializer.views
+-- Use auth middleware to allow us to stray from the launch page
+-- Improve Instructor index
+-- Create Student index
+-- Make sure annotations show up at right place on correct assignment
+-- Navigation improvements: add in a 'return to index' type of button
+-- Clicking on assignment objects shouldn't show the collection ID. Make those just plain text.
+-- Add requests library to requirements.txt
+-- Change "view assignment" to "view object" or something
+-- Figure out what highlight options are/how we can use them, and why they are a required field
+-- Make advised changes from Pull Request #3 (Harry and Christian's first one):
+    https://github.com/Harvard-ATG/annotationsx/pull/3#discussion_r35117072
+        -- ensure people with multiple roles will work
+        -- correct url routing
+-- Refactor for TLT
+	-- all secure/variable settings should be in secure.py
+-- 'Dashboard' feature
+	-- Mock-up
+	-- List of students who have annotated something
+	-- List of a specific student's annotations
+	-- Remove hard-coded data
+	-- Make sure only the annotations for the correct course are coming
+	    in, not all the annotations the user has ever made.
+-- (fixed) All annotations for a student are shown in the dashboard, as opposed to just the ones for that course.
+-- (fixed) Students can only be a member on one course, or else everything breaks.
+-- (fixed) Students with the same name cannot be enrolled in a course
+    -- Just catch LTIError.userexists and add a '2' to the name (for now)
+    
+============================
+COMPLETED
+
+√ Restructure for TLT
