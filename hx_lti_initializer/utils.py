@@ -66,7 +66,7 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-
+'''
 def render(request, template, context):
     x_frame_allowed = False
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
@@ -82,3 +82,4 @@ def render(request, template, context):
     else :
         response['X-Frame-Options'] = "ALLOW FROM " + domain
     return response
+'''
