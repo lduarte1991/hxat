@@ -1,3 +1,27 @@
 <div class="annotationSection side">
-
+    <div class="resize-handle side"><div class="handle-button"></div></div>
+    <div class="annotation-filter-buttons">
+    	<button type="button" class="btn btn-default">My Notes</button>
+    	<button type="button" class="btn btn-default">Instructor</button>
+    	<button type="button" class="btn btn-default">Public</button>
+    </div>
+    <div class="separator-solid side"></div>
+    <div class="search-bar side">
+    	<div class="input-group">
+            <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term">
+            <div class="input-group-btn">
+                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="filter-options side">
+    	<button type="button" class="btn btn-default" id="users-filter">Users</button>
+    	<button type="button" class="btn btn-default" id="annotationtext-filter">Annotation Text</button>
+    	<button type="button" class="btn btn-default" id="tag-filter">Tag</button>
+    </div>
+    <div class="annotationsHolder side">
+		<% _.each(annotationItems, function(item) { %>
+			<%= item %>
+		<% }); %>
+	</div>
 </div>

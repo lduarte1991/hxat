@@ -88,6 +88,12 @@ class LTICourse(models.Model):
         related_name='course_admin_user_profiles',
     )
 
+    course_external_css_default = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='(Optional) Please only input a URL to an externally hosted CSS file.',
+    )
+
     class Meta:
         verbose_name = _("Course")
 

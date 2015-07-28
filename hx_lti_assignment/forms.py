@@ -69,7 +69,8 @@ class AssignmentTargetsForm(forms.ModelForm):
 		self.helper.layout = Layout(
 			Div(
 				'target_object',
-				'order'
+				'order',
+				'target_external_css'
 			),
 		)
 

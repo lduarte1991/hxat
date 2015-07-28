@@ -174,9 +174,14 @@
 	                    return true;
 	                  },
 			    }
+		    } else if (pluginName === "HighlightTags") {
+		    	options = {
+		            tag: this.initOptions.higlightTags_options,
+		    	}
 		    }
+		    
 		    this.annotation_tool.addPlugin(pluginName, options);
-	    }
+	    } 
 	}
 
 }(AController));

@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render_to_response, render, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth import login
 from django.conf import settings
 from django.contrib import messages
@@ -24,6 +24,7 @@ from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *
 from utils import *
+from urlparse import urlparse
 import json
 import sys
 

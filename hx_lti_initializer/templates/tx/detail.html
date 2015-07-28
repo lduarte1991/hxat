@@ -23,9 +23,9 @@
 <script src="{% static "DashboardController.js" %}"></script>
 <script src="{% static "TargetObjectController.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
-<!--<script src="{% static "vendors/jquery-tokeninput/jquery.tokeninput.js" %}"></script>
+<script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
+<!--<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>-->
@@ -36,11 +36,11 @@
 <!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">
-<link rel="stylesheet" href="{% static "vendors/jquery-tokeninput/token-input.css" %}">-->
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
+<link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <div class="container">
 	<div class="row">
-  		<div class="col-md-9" id="leftCol">
+  		<div class="col-xs-7" id="leftCol">
 			<h1>{{ target_object.target_title | safe }}</h1>
 			<h3>by {{ target_object.target_author | safe }}</h3>
 			<div class="content">
@@ -56,7 +56,7 @@
 			<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right">Next</a><br />
 			{% endif %}
 		</div>
-		<div class="col-md-3" id="rightCol">
+		<div class="col-xs-5" id="rightCol">
 			<div id="dashboard" class="annotationListContainer">
 			</div>
 		</div>
@@ -87,7 +87,9 @@ jQuery(function ($) {
 						'Permissions',
 						'Store',
 						'SummernoteRichText',
-						//'HighlightTags',
+						{% if assignment.allow_highlights %}
+						'HighlightTags',
+						{% endif %}
 						//'RichText',
 						//'Reply',
 						//'Touch',
