@@ -8,3 +8,4 @@ include
 *.sh
 htmlcov
 secure.py
+http_static
