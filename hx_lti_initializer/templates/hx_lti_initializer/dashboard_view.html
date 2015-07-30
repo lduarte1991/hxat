@@ -1,0 +1,104 @@
+<!-- TODO: base template? Any common html that can be factored out. -->
+<!-- Load static? -->
+{% load hx_lti_initializer_extras %}
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+        <!-- TODO: is this staticfiles or http_static? -->
+        {% load static from staticfiles %} 
+        {# Load the tag library #} 
+        {% load bootstrap3 %} 
+        {# Load CSS and JavaScript #} 
+        {% bootstrap_css %} 
+        {% bootstrap_javascript %} 
+        {# Display django.contrib.messages as Bootstrap alerts #} 
+        {% bootstrap_messages %}
+        
+        <title>Instructor Dashboard</title>
+    </head>
+
+    <body>
+        <br/>
+        <div class="container">
+        <div class="navigation">
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+        </div>
+            <div class="col-md">
+                <div id="student_list" class="list-group">
+                    <br/>
+                    {% for student in student_objects %}
+                    <div>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div data-toggle="collapse" data-parent="#accordion" href="#{{ student.student_id }}" class="panel-heading list-group-item" style="cursor: pointer;">
+                                    <h4 class="panel-title">
+                                        {{ student.student_name }}
+                                    </h4>
+                                </div>
+                                <div id="{{ student.student_id }}" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        {% if student.annotations %}
+                                            <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <!-- Last updated or Date? -->
+                                                    <!--<th class="col-md-1">Date</th>-->
+                                                    <!--<th class="col-md-1">Assignment</th>-->
+                                                    <!--<th class="col-md-1">Object</th>-->
+                                                    <!--<th class="col-md-3">Line</th>-->
+                                                    <!--<th class="col-md-3">Annotation</th>-->
+                                                    <!--<th class="col-md-1">Tags</th>-->
+                                                    
+                                                    <!-- Only Date isn't of variable length -->
+                                                    <th class="col-md-1">Date</th>
+                                                    <th>Assignment</th>
+                                                    <th>Object</th>
+                                                    <th>Line</th>
+                                                    <th>Annotation</th>
+                                                    <th>Tags</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for annotation in student.annotations %}
+                                                <!--TODO: Get this tag working again-->
+                                                {#{% if assignment_object_exists annotation.uri annotation.collectionId %}#}
+                                                <tr>
+                                                    <!-- TODO: Time formatting ok? -->
+                                                    <!-- Last updated or date created? -->
+                                                    <td> {{ annotation.updated | format_date }} </td> 
+                                                    <!-- TODO: url according to protocol? -->
+                                                    <td>
+                                                        {% get_assignment_name annotation.collectionId %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="adminhub/?uri={{ annotation.uri }}">
+                                                            {% get_target_object_name annotation.uri %}
+                                                        </a>
+                                                    </td>
+                                                    <td>"{{ annotation.quote }}"</td>
+                                                    <td>{{ annotation.text | safe }}</td>
+                                                    <!-- TODO: tags currently not implemented -->
+                                                    <td>{{ annotation.tags }}</td>
+                                                </tr>
+                                                {#{% endif %}#}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        {% else %}
+                                            <span>No annotations to display</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

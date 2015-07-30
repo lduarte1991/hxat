@@ -5,6 +5,8 @@ BUGS
 -- Sometimes highlighting doesn't show up the first time you view a target object.
     -- very marginal
 
+-- Can't add multiple texts to an assignment
+
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
@@ -87,3 +89,10 @@ NOT A PRIORITY/TODO LONG-TERM:
 COMPLETED
 
 √ Restructure for TLT
+
+============================
+DIFFERENCES FROM LUIS
+-- Fetches a single course (named active_course) as opposed to fetching all courses for admin
+-- Routes student to modified admin_hub as opposed to directly to an assignment
+-- Instructor can edit and delete student annotations
+-- Home button on assignment pages

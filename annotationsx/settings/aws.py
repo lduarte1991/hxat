@@ -59,7 +59,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_auth_lti.middleware.LTIAuthMiddleware',
+    #'django_auth_lti.middleware.LTIAuthMiddleware',
+    #'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
@@ -160,3 +161,45 @@ LTI_SETUP = {
 # Add LTI oauth credentials (for django-auth-lti)
 # hard fail (keyerror) if not present
 LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
+
+
+#TODO: TLT SECURE
+"""
+Default settings for the LTI Initializer
+
+Should set up all things needed for the Annotation tool to be set up including
+the url for the tool to be accessed and for any other variables to be stored.
+"""
+
+# once in production, make sure to turn this to false
+LTI_DEBUG = True
+
+# change the url to the proper point to verify they are trying to
+# access the correct location
+CONSUMER_URL = 'http://54.69.120.77:8000/lti_init/launch_lti/'
+
+# note that consumer key will be visible via the request
+CONSUMER_KEY = '123key'
+
+# the secret token will be encoded in the request.
+# Only places visible are here and the secret given to the LTI consumer,
+# in other words, keep it hidden!
+LTI_SECRET = 'secret'
+
+# needs context_id, collection_id, and object_id to open correct item in tool
+LTI_COURSE_ID = 'context_id'
+LTI_COLLECTION_ID = 'custom_collection_id'
+LTI_OBJECT_ID = 'custom_object_id'
+
+# collects roles as user needs to be an admin in order to create a profile
+LTI_ROLES = 'roles'
+
+# should be changed depending on platform roles, these are set up for edX
+ADMIN_ROLES = {'Administrator', 'Instructor'}
+
+X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org'}
+
+default_app_config = 'hx_lti_initializer.apps.InitializerConfig'
+
+ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
+ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")

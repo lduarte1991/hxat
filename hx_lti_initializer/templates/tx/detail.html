@@ -40,6 +40,9 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <div class="container">
 	<div class="row">
+		<div class="navigation">
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+        </div>
   		<div class="col-xs-7" id="leftCol">
 			<h1>{{ target_object.target_title | safe }}</h1>
 			<h3>by {{ target_object.target_author | safe }}</h3>

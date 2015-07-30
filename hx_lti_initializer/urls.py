@@ -30,4 +30,8 @@ urlpatterns = patterns(
         'hx_lti_initializer.views.access_annotation_target',
         name="access_annotation_target"
     ),
+    url(r'^launch_lti/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='instructor_dashboard_view'),
+    
+    # Quick fix to url routing errors
+    url(r'^admin_hub/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='admin_hub/instructor_dashboard_view'),
 )
