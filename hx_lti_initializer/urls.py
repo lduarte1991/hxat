@@ -26,12 +26,11 @@ urlpatterns = patterns(
         name="course_admin_hub",
     ),
     url(
-        r'^admin_hub/(?P<course_id>[0-9a-z]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
+        r'\w/admin_hub/(?P<course_id>[0-9a-z]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
         'hx_lti_initializer.views.access_annotation_target',
         name="access_annotation_target"
     ),
-    url(r'^launch_lti/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='instructor_dashboard_view'),
     
-    # Quick fix to url routing errors
-    url(r'^admin_hub/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='admin_hub/instructor_dashboard_view'),
+    # using a wildcard for the middle of the url, so lti_init/instructor_dashboard and lti_init/admin_hub/instructor_dashboard will both work
+    url(r'\w/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='instructor_dashboard_view'),
 )

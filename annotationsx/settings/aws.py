@@ -195,6 +195,7 @@ LTI_OBJECT_ID = 'custom_object_id'
 LTI_ROLES = 'roles'
 
 # should be changed depending on platform roles, these are set up for edX
+# TODO: Teaching assistant?
 ADMIN_ROLES = {'Administrator', 'Instructor'}
 
 X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org'}

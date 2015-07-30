@@ -118,12 +118,13 @@ def launch_lti(request):
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    request.session['is_instructor'] = False
     
-    # Check whether user is a student
-    if "Student" in roles or "Learner" in roles:
-        # Set flag in session to later direct user to the appropriate version of the index
-        request.session['is_instructor'] = False
-    else:
+    # Check whether user is a admin, instructor or teaching assistant
+    # TODO: What roles do we actually want here?
+    debug_printer("DEBUG - user logging in with roles: " + str(roles))
+    if "Admin" in roles or "Instructor" in roles:# or "Teaching Assistant" in roles:
+    # Set flag in session to later direct user to the appropriate version of the index
         request.session['is_instructor'] = True
 
     # if "Student" in roles or "Learner" in roles:
@@ -270,6 +271,11 @@ def course_admin_hub(request):
     active_course = LTICourse.objects.filter(course_id=request.session['active_course'])
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, list(active_course))
 
+    try:
+        is_instructor = request.session['is_instructor']
+    except:
+        is_instructor = False
+
     debug = files_in_courses
     return render(
         request,
@@ -277,7 +283,7 @@ def course_admin_hub(request):
         {
             'user': request.user,
             'email': request.user.email,
-            'is_instructor': request.user and request.user.is_authenticated() and request.session['is_instructor'],
+            'is_instructor': request.user and request.user.is_authenticated() and is_instructor,
             'roles': lti_profile.roles,
             'courses': list(active_course),
             'files': files_in_courses,
@@ -297,12 +303,17 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
-        raise PermissionDenied()    
+        raise PermissionDenied() 
+        
+    try:
+        is_instructor = request.session['is_instructor']
+    except:
+        is_instructor = False
 
     original = {
         'user_id': user_id,
         'username': user_name,
-        'is_instructor': request.user and request.user.is_authenticated() and request.session['is_instructor'],
+        'is_instructor': request.user and request.user.is_authenticated() and is_instructor,
         'collection': assignment_id,
         'course': course_id,
         'object': object_id,

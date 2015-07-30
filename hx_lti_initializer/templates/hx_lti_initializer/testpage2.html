@@ -187,9 +187,9 @@ li {
 <div class="header">
 </div>
 <div class="container">
-<pre>
-{{debug}}
-</pre>
+<!--<pre>-->
+<!--{{debug}}-->
+<!--</pre>-->
     <div class="row">
         <div class="col-md-3">
             <div class="sidebar-top">
@@ -263,7 +263,7 @@ li {
                                             <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
                                             {% endif %}
                                             <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
-                                            (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
+                                            <!--(<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)-->
                                         </td>
                                         <td>
                                             {{ file.target_author }}

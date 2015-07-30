@@ -54,9 +54,9 @@ NOT A PRIORITY/TODO LONG-TERM:
 
 -- Give instructor 'delete' permission on bad comments?
 
+-- Prettier URL routing
 
 ============================
-´®
 -- Get rid of hard-coded stuff in hx_lti_initializer.views
 -- Use auth middleware to allow us to stray from the launch page
 -- Improve Instructor index
