@@ -187,14 +187,15 @@ li {
 <div class="header">
 </div>
 <div class="container">
-<pre>
-{{debug}}
-</pre>
+<!--<pre>-->
+<!--{{debug}}-->
+<!--</pre>-->
     <div class="row">
         <div class="col-md-3">
             <div class="sidebar-top">
                 <div id="user-label">{{ user.username }}</div>
             </div>
+            {% if is_instructor %}
             <div class="sidebar">
                 <p>
                     <ul>
@@ -208,6 +209,9 @@ li {
                     <a class="link" href="./tutorial">View Tutorial</a>
                 </p>-->
              </div>
+             <br>
+             <a role="button" href="instructor_dashboard_view"><div class="btn btn-default">Instructor Dashboard</div></a>
+            {% endif %}
         </div>
         <div class="col-md-1"></div>
         <div class="col-md-8">
@@ -218,7 +222,7 @@ li {
             <div class="course-name">
                 {{ course.course_name }}
             </div>
-            {% if 'Administrator' in roles or 'Instructor' in roles %}
+            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
             <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}">Change Course Settings</a>
             {% endif %}
             <div id="copypaste-{{course.id}}"></div>
@@ -227,7 +231,7 @@ li {
                     {% for assignment in course.assignment_set.all %}
                     <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
                         <td>
-                            {% if 'Administrator' in roles or 'Instructor' in roles %}
+                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
                             <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
                             {% endif %}
                             {{ assignment.assignment_name }}
@@ -255,11 +259,11 @@ li {
                                     {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                                     <tr>
                                         <td>
-                                            {% if 'Administrator' in roles or 'Instructor' in roles %}
+                                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
                                             <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
                                             {% endif %}
                                             <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
-                                            (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
+                                            <!--(<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)-->
                                         </td>
                                         <td>
                                             {{ file.target_author }}
@@ -269,6 +273,7 @@ li {
                                         </td>
                                     </tr>
                                     {% endfor %}
+                                    {% if is_instructor %}
                                     <tr>
                                         <td style="text-align:center;" colspan="3">
                                                 <a href="{% url 'target_object_database:create_new_source' %}" class="btn btn-success" role="button">
@@ -277,11 +282,13 @@ li {
                                                 </a>
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </td>
                     </tr>
                     {% endfor %}
+                    {% if is_instructor %}
                     <tr>
                         <td style="text-align:center;">
                             <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" class="btn btn-primary" role="button">
@@ -289,6 +296,7 @@ li {
                             </a>
                         </td>
                     </tr>
+                    {% endif %}
                 </tbody>
             </table>
             {% endfor %}

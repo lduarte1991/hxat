@@ -1,6 +1,5 @@
 """
 This will launch the LTI Annotation tool.
-
 This is basically the controller part of the app. It will set up the tool provider, create/retrive the user and pass along any other information that will be rendered to the access/init screen to the user. 
 """
 
@@ -11,9 +10,10 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login
 from django.conf import settings
+from django.contrib import messages
 from django.contrib import messages
 
 from target_object_database.models import TargetObject
@@ -27,6 +27,10 @@ from utils import *
 from urlparse import urlparse
 import json
 import sys
+import requests
+
+import logging
+logging.basicConfig()
 
 def validate_request(req):
     """
@@ -103,7 +107,7 @@ def launch_lti(request):
     
     validate_request(request)
     tool_provider = initialize_lti_tool_provider(request)
-    
+
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
     consumer_key_requested = request.POST['oauth_consumer_key']
@@ -114,49 +118,57 @@ def launch_lti(request):
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    request.session['is_instructor'] = False
+    
+    # Check whether user is a admin, instructor or teaching assistant
+    # TODO: What roles do we actually want here?
+    debug_printer("DEBUG - user logging in with roles: " + str(roles))
+    if set(roles) & set(settings.ADMIN_ROLES):# or "Teaching Assistant" in roles:
+    # Set flag in session to later direct user to the appropriate version of the index
+        request.session['is_instructor'] = True
 
-    if "Student" in roles or "Learner" in roles:
-        collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-        debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
-        debug_printer('DEBUG - Found object being accessed: %s' % object_id)
+    # if "Student" in roles or "Learner" in roles:
+    #     collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+    #     object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+    #     debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
+    #     debug_printer('DEBUG - Found object being accessed: %s' % object_id)
 
-        user_name = get_lti_value('lis_person_name_full', tool_provider)
-        if user_name == None:
-            # gather the necessary data from the LTI initialization request
-            user_name = get_lti_value('lis_person_sourcedid', tool_provider)
+    #     user_name = get_lti_value('lis_person_name_full', tool_provider)
+    #     if user_name == None:
+    #         # gather the necessary data from the LTI initialization request
+    #         user_name = get_lti_value('lis_person_sourcedid', tool_provider)
 
-        try:
-            assignment = Assignment.objects.get(assignment_id=collection_id)
-            targ_obj = TargetObject.objects.get(pk=object_id)
-        except Assignment.DoesNotExist or TargetObject.DoesNotExist:
-            raise PermissionDenied()
+    #     try:
+    #         assignment = Assignment.objects.get(assignment_id=collection_id)
+    #         targ_obj = TargetObject.objects.get(pk=object_id)
+    #     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+    #         raise PermissionDenied()
 
-        original = {
-            'user_id': user_id,
-            'username': user_name,
-            'is_instructor': request.user and request.user.is_authenticated(),
-            'collection': collection_id,
-            'course': course,
-            'object': object_id,
-            'target_object': targ_obj,
-            'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
-            'assignment': assignment,
-        }
+    #     original = {
+    #         'user_id': user_id,
+    #         'username': user_name,
+    #         'is_instructor': request.user and request.user.is_authenticated(),
+    #         'collection': collection_id,
+    #         'course': course,
+    #         'object': object_id,
+    #         'target_object': targ_obj,
+    #         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
+    #         'assignment': assignment,
+    #     }
 
-        if (targ_obj.target_type == 'vd'):
-            srcurl = targ_obj.target_content
-            if 'youtu' in srcurl:
-                typeSource = 'video/youtube'
-            else:
-                disassembled = urlparse(srcurl)
-                file_ext = splitext(basename(disassembled.path))[1]
-                typeSource = 'video/' + file_ext.replace('.', '')
-            original.update({'typeSource': typeSource})
-        elif (targ_obj.target_type == 'ig'):
-            original.update({'osd_json': targ_obj.target_content})
+    #     if (targ_obj.target_type == 'vd'):
+    #         srcurl = targ_obj.target_content
+    #         if 'youtu' in srcurl:
+    #             typeSource = 'video/youtube'
+    #         else:
+    #             disassembled = urlparse(srcurl)
+    #             file_ext = splitext(basename(disassembled.path))[1]
+    #             typeSource = 'video/' + file_ext.replace('.', '')
+    #         original.update({'typeSource': typeSource})
+    #     elif (targ_obj.target_type == 'ig'):
+    #         original.update({'osd_json': targ_obj.target_content})
 
-        return render(request, '%s/detail.html' % targ_obj.target_type, original)
+    #     return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
         # try to get the profile via the anon id
@@ -206,7 +218,7 @@ def launch_lti(request):
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
         message_error = "Sorry, the course you are trying to reach does not exist."
         messages.error(request, message_error)
-        if 'Administrator' in roles or 'Instructor' in roles:
+        if set(roles) & set(settings.ADMIN_ROLES):
             # if the user is an administrator, the missing course is created
             # otherwise, it will just display an error message
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
@@ -217,7 +229,10 @@ def launch_lti(request):
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
-    return redirect('hx_lti_initializer:course_admin_hub')
+    # Save id of current course in the session
+    request.session['active_course'] = course
+    return course_admin_hub(request)
+    #return redirect('hx_lti_initializer:course_admin_hub')
 
 
 @login_required
@@ -250,9 +265,17 @@ def edit_course(request, id):
 def course_admin_hub(request):
     """
     """
+    #print "Course Admin Session: " + str(request.session.session_key)
+
     lti_profile = LTIProfile.objects.get(user=request.user)
-    courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
-    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, courses_for_user)
+    active_course = LTICourse.objects.filter(course_id=request.session['active_course'])
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, list(active_course))
+
+    try:
+        is_instructor = request.session['is_instructor']
+    except:
+        is_instructor = False
+
     debug = files_in_courses
     return render(
         request,
@@ -260,9 +283,9 @@ def course_admin_hub(request):
         {
             'user': request.user,
             'email': request.user.email,
-            'is_instructor': request.user and request.user.is_authenticated(),
+            'is_instructor': request.user and request.user.is_authenticated() and is_instructor,
             'roles': lti_profile.roles,
-            'courses': courses_for_user,
+            'courses': list(active_course),
             'files': files_in_courses,
             'debug': debug,
         }
@@ -280,12 +303,17 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
-        raise PermissionDenied()    
+        raise PermissionDenied() 
+        
+    try:
+        is_instructor = request.session['is_instructor']
+    except:
+        is_instructor = False
 
     original = {
         'user_id': user_id,
         'username': user_name,
-        'is_instructor': request.user and request.user.is_authenticated(),
+        'is_instructor': request.user and request.user.is_authenticated() and is_instructor,
         'collection': assignment_id,
         'course': course_id,
         'object': object_id,
@@ -312,3 +340,74 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         original.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
+
+
+def instructor_dashboard_view(request):
+    '''
+        TODO
+    '''
+    lti_profile = LTIProfile.objects.get(user=request.user)
+    active_course_id = request.session['active_course']
+    active_course_object = LTICourse.objects.filter(course_id=active_course_id)
+    assignments = Assignment.objects.filter(course=active_course_object)
+    user_id = request.user.email #for some reason
+    #user_profiles = active_course.course_users.all()
+    user_profiles = LTIProfile.objects.filter(roles='Learner') 
+    student_objects = []
+    #token = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3MTY1NjUzLCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0xN1QyMDo0MDo1My4yOTEwODgrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.GfgYf0b7r9MfRccgYmhRlHTeAlzPO2MQ0AXJyuTt39Y"
+    token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
+    annotations_for_course = fetch_annotations(active_course_id, token)
+
+    # get only the annotations for a specific user
+    def filter_annotations(annotations, id):
+        user_annotations = []
+        for anno in annotations['rows']:
+            a = anno['user']['id']
+            if id == a:
+                user_annotations.append(anno)
+        return user_annotations
+
+    for profile in user_profiles:
+        student_objects.append({
+            'student_name': profile,  #the model is set up to return the name of the user on a utf call
+            'student_id': profile.get_id(),
+            'annotations': filter_annotations(annotations_for_course, profile.get_id())
+        })
+    
+    context = {
+        'student_objects': student_objects,
+    }
+    
+    return render(request, 'hx_lti_initializer/dashboard_view.html', context)
+
+ 
+def fetch_annotations (course_id, token):
+    '''
+        Fetches the annotations of a given course from the CATCH database
+    '''
+    
+    # token = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3NzY5NTE5LCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0yNFQyMDoyNToxOS44OTIwNzYrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.lvVa1lui9jBZROISfQzadjzIQzZopsRuD9uJoGQ5scM'
+    headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
+    # TODO: secure.py
+    baseurl = "http://ec2-52-26-240-251.us-west-2.compute.amazonaws.com:8080/catch/annotator/"
+    requesturl = baseurl + "search?contextId=" + course_id
+    
+    # Make request
+    r = requests.get(requesturl, headers=headers)
+    debug_printer("DEBUG - Database Response: " + str(r))
+    return r.json()
+   
+def error_view(request, message):
+    '''
+    Implements graceful and user-friendly (also debugger-friendly) error displays
+    If used properly, we can use this to have better bug reproducibility down the line.
+    While we won't dump any sensitive information, we can at least describe what went wrong
+    uniquely and get an indication from the user which part of our code failed.
+    '''
+    
+    context = {
+        'message': message
+    }
+    
+    return HttpResponse(message)
+   # return render(request, 'hx_lti_initializer/error_page.html', context)

@@ -45,6 +45,15 @@ class LTIProfile(models.Model):
     class Meta:
         """ The name of this section within the admin site """
         verbose_name = _("Instructor/Administrator")
+        
+    def get_id(self):
+        """Returns Canvas user_id of LTIProfile"""
+        anon_id = self.anon_id
+    
+        # The user_id is the part of the anon_id after the colon
+        user_id = anon_id.rpartition(':')[2]
+    
+        return anon_id
 
 
 def user_post_save(sender, instance, created, **kwargs):
