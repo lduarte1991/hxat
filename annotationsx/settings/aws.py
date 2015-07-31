@@ -199,7 +199,7 @@ LTI_ROLES = 'roles'
 
 # should be changed depending on platform roles, these are set up for edX
 # TODO: Teaching assistant?
-ADMIN_ROLES = {'Administrator', 'Instructor'}
+ADMIN_ROLES = {'urn:lti:instrole:ims/lis/Administrator', 'Instructor'}
 
 X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org', 'canvas.harvard.edu', 'c9.io'}
 
