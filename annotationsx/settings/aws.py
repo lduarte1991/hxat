@@ -58,9 +58,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'hx_lti_tools.urls'
+ROOT_URLCONF = 'annotationsx.urls'
 
-WSGI_APPLICATION = 'hx_lti_tools.wsgi.application'
+WSGI_APPLICATION = 'annotationsx.wsgi.application'
 
 
 # Database
@@ -70,8 +70,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_db',
-	'USER': 'root',
-	'PASSWORD': 'bu5egkeShy7Gphqf',
+        'USER': 'root',
+        'PASSWORD': 'bu5egkeShy7Gphqf',
     }
 }
 
