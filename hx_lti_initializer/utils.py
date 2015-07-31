@@ -83,5 +83,5 @@ def render(request, template, context):
     if not x_frame_allowed:
         response['X-Frame-Options'] = "DENY"
     else :
-        response['X-Frame-Options'] = "ALLOW FROM " + domain
+        response['X-Frame-Options'] = "ALLOW-FROM " + domain
     return response
