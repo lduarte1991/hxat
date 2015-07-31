@@ -6,7 +6,7 @@ class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
         debug_printer('DEBUG - X-Frame-Options Middleware')
 
-        parsed_uri = urlparse(request.META.get('HTTP_HOST'))
+        parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
         domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
         x_frame_allow = False
 
