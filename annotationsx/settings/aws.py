@@ -155,7 +155,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (C9 luis)", 
+                "text": "Annotations (C9)", 
             }
         }
     }
