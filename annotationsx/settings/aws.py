@@ -202,6 +202,7 @@ LTI_ROLES = 'roles'
 ADMIN_ROLES = {'urn:lti:instrole:ims/lis/Administrator', 'Instructor'}
 
 X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org', 'canvas.harvard.edu', 'c9.io'}
+X_FRAME_ALLOWED_SITES_MAP = {'tlt.harvard.edu': 'canvas.harvard.edu'}
 
 default_app_config = 'hx_lti_initializer.apps.InitializerConfig'
 

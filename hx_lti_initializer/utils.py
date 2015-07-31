@@ -73,15 +73,19 @@ def render(request, template, context):
     x_frame_allowed = True
     # print request.META
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
-    domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
-    debug_printer('DEBUG - Domain: %s \r' % domain)
+    referer = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
+    x_frame_allow = False
+    debug_printer('DEBUG - Domain: %s \r' % referer)
     for item in settings.X_FRAME_ALLOWED_SITES:
-        if domain.endswith(item):
-            x_frame_allowed = True
+        if referer.endswith(item):
+            if item in settings.X_FRAME_ALLOWED_SITES_MAP:
+                x_frame_allow = '{uri.scheme}://{domain}'.format(uri=parsed_uri, domain=settings.X_FRAME_ALLOWED_SITES_MAP[item])
+            else:
+                x_frame_allow = referer
             break
     response = django.shortcuts.render(request, template, context)
-    if not x_frame_allowed:
+    if x_frame_allow is False:
         response['X-Frame-Options'] = "DENY"
     else :
-        response['X-Frame-Options'] = "ALLOW-FROM " + domain
+        response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
     return response
