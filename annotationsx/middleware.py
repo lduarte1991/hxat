@@ -6,16 +6,16 @@ class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
         debug_printer('DEBUG - X-Frame-Options Middleware')
 
-        parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
-        referer = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
+        parsed_uri = urlparse(request.META.get('HTTP_HOST'))
+        domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
         x_frame_allow = False
 
         for item in settings.X_FRAME_ALLOWED_SITES:
-            if referer.endswith(item):
+            if domain.endswith(item):
                 if item in settings.X_FRAME_ALLOWED_SITES_MAP:
                     x_frame_allow = '{uri.scheme}://{domain}'.format(uri=parsed_uri, domain=settings.X_FRAME_ALLOWED_SITES_MAP[item])
                 else:
-                    x_frame_allow = referer
+                    x_frame_allow = domain
                 break
 
 
