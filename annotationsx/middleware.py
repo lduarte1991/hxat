@@ -1,5 +1,6 @@
 from django.conf import settings
 from urlparse import urlparse
+from hx_lti_initializer.utils import debug_printer
 
 class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
