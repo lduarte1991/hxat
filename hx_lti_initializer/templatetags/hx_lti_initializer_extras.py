@@ -10,18 +10,6 @@ from hx_lti_assignment.models import Assignment
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from target_object_database.models import TargetObject
 
-@register.filter
-def get_item(dictionary, key):
-	'''
-		For some reason django doesn't play nice with dictionaries in its template
-		language, so we've got to do this.
-		Gets the value of a certain key in a dictionary.
-	'''
-	if dictionary.get(key) is None:
-		return ''
-	else:
-		return dictionary.get(key)
-
 def convert_tz(datetimeobj):
 	'''
 		Converts a datetimeobj from UTC to the local timezone
