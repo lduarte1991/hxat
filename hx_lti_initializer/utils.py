@@ -67,25 +67,3 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-
-def render(request, template, context):
-    #TODO: set this back to false.
-    x_frame_allowed = True
-    # print request.META
-    parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
-    referer = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
-    x_frame_allow = False
-    debug_printer('DEBUG - Domain: %s \r' % referer)
-    for item in settings.X_FRAME_ALLOWED_SITES:
-        if referer.endswith(item):
-            if item in settings.X_FRAME_ALLOWED_SITES_MAP:
-                x_frame_allow = '{uri.scheme}://{domain}'.format(uri=parsed_uri, domain=settings.X_FRAME_ALLOWED_SITES_MAP[item])
-            else:
-                x_frame_allow = referer
-            break
-    response = django.shortcuts.render(request, template, context)
-    if x_frame_allow is False:
-        response['X-Frame-Options'] = "DENY"
-    else :
-        response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
-    return response

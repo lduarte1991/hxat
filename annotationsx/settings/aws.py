@@ -59,6 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'annotationsx.middleware.XFrameOptionsMiddleware',
     #'django_auth_lti.middleware.LTIAuthMiddleware',
     #'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
