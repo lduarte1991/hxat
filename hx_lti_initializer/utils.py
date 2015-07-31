@@ -11,6 +11,7 @@ from models import *
 import base64
 import sys
 import datetime
+from django.conf import settings
 
 # import Sample Target Object Model
 from target_object_database.models import TargetObject
@@ -66,9 +67,11 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-'''
+
 def render(request, template, context):
-    x_frame_allowed = False
+    #TODO: set this back to false.
+    x_frame_allowed = True
+    print request.META
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
     domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
     debug_printer('DEBUG - Domain: %s \r' % domain)
@@ -82,4 +85,3 @@ def render(request, template, context):
     else :
         response['X-Frame-Options'] = "ALLOW FROM " + domain
     return response
-'''

@@ -201,7 +201,7 @@ LTI_ROLES = 'roles'
 # TODO: Teaching assistant?
 ADMIN_ROLES = {'Administrator', 'Instructor'}
 
-X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org'}
+X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org', 'canvas.harvard.edu', 'c9.io'}
 
 default_app_config = 'hx_lti_initializer.apps.InitializerConfig'
 
