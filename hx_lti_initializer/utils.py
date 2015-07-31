@@ -71,7 +71,7 @@ def retrieve_token(userid, apikey, secret):
 def render(request, template, context):
     #TODO: set this back to false.
     x_frame_allowed = True
-    print request.META
+    # print request.META
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
     domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
     debug_printer('DEBUG - Domain: %s \r' % domain)
