@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from django.contrib import messages
 from secure import SECURE_SETTINGS
-#BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -109,7 +109,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 #STATIC_URL = '/static/'
 #STATIC_ROOT = '/var/wwwhtml'
