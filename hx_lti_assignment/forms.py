@@ -20,7 +20,7 @@ class AssignmentForm(forms.ModelForm):
 					Field('course', css_class="selectpicker", data_live_search="true"),
 				),
 				Tab(
-					'Annotation Database Settings',
+					'Database Settings',
 					'annotation_database_url',
 					'annotation_database_apikey',
 					'annotation_database_secret_token',
@@ -59,6 +59,20 @@ class AssignmentForm(forms.ModelForm):
 
 	class Meta:
 		model = Assignment
+		fields = [
+			'assignment_name', 
+			'course', 
+			'annotation_database_url', 
+			'annotation_database_apikey',
+			'annotation_database_secret_token',
+			'include_instructor_tab',
+			'default_tab',
+			'pagination_limit',
+			'allow_highlights',
+			'highlights_options',
+			'allow_touch',
+			'allow_flags',
+		]
 
 
 class AssignmentTargetsForm(forms.ModelForm):
@@ -76,6 +90,11 @@ class AssignmentTargetsForm(forms.ModelForm):
 
 	class Meta:
 		model = AssignmentTargets
+		fields= [
+			'target_object', 
+			'order', 
+			'target_external_css',
+		]
 
 AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True)
 
