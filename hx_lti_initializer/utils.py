@@ -2,12 +2,12 @@
 These functions will be used for the initializer module, but may also be helpful
 elsewhere. 
 """
-from django.conf import settings
 import django.shortcuts
 from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
 from firebase_token_generator import create_token
 from models import *
+from annotationsx.settings.secure import SECURE_SETTINGS
 import base64
 import sys
 import datetime
@@ -38,7 +38,7 @@ def debug_printer(debug_text):
     """
     Prints text passed in to stderr (Terminal on Mac) for debugging purposes.
     """
-    if settings.LTI_DEBUG:
+    if SECURE_SETTINGS.get('LTI_DEBUG', False):
         print >> sys.stderr, str(debug_text) + '\r'
 
 def retrieve_token(userid, apikey, secret):
@@ -72,7 +72,7 @@ def render(request, template, context):
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
     domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
     debug_printer('DEBUG - Domain: %s \r' % domain)
-    for item in settings.X_FRAME_ALLOWED_SITES:
+    for item in SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', []):
         if domain.endswith(item):
             x_frame_allowed = True
             break
@@ -80,5 +80,5 @@ def render(request, template, context):
     if not x_frame_allowed:
         response['X-Frame-Options'] = "DENY"
     else :
-        response['X-Frame-Options'] = "ALLOW FROM " + domain
+        response['X-Frame-Options'] = "ALLOW-FROM " + domain
     return response

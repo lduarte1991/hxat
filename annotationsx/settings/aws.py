@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.contrib import messages
+from secure import SECURE_SETTINGS
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -18,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'eyc+bftd*fskn^_vt4+pr)0-ih+7sc%8i40*c=cji6*#+&2paj'
+SECRET_KEY = SECURE_SETTINGS['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -66,13 +67,24 @@ WSGI_APPLICATION = 'annotationsx.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'django_db',
+#         'USER': 'root',
+#         'PASSWORD': 'bu5egkeShy7Gphqf',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_db',
-        'USER': 'root',
-        'PASSWORD': 'bu5egkeShy7Gphqf',
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'annotationsx',
+        'USER': 'annotationsx',
+        'PASSWORD': 'fake',
+        'HOST': 'localhost',
+        'PORT': '',
+    } 
 }
 
 # Internationalization
@@ -93,7 +105,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/html'
+STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
