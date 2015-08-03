@@ -67,7 +67,7 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-
+'''TODO
 def render(request, template, context):
     #TODO: set this back to false.
     x_frame_allowed = True
@@ -85,3 +85,4 @@ def render(request, template, context):
     else :
         response['X-Frame-Options'] = "ALLOW FROM " + domain
     return response
+'''

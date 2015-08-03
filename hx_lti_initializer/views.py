@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect#, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login
 from django.conf import settings
 from django.contrib import messages
@@ -76,6 +76,7 @@ def initialize_lti_tool_provider(req):
 
 def create_new_user(username, user_id, roles):
     # now create the user and LTIProfile with the above information
+    # Max 30 length for person's name, do we want to change this? It's valid for HX but not ATG/FAS
     user = User.objects.create_user(username, user_id)
     user.set_unusable_password()
     user.is_superuser = False
