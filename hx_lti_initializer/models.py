@@ -97,6 +97,11 @@ class LTICourse(models.Model):
         related_name='course_admin_user_profiles',
     )
 
+    course_users = models.ManyToManyField(
+        LTIProfile,
+        related_name = 'course_user_profiles',
+    )
+
     course_external_css_default = models.CharField(
         max_length=255,
         blank=True,

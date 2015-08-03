@@ -1,9 +1,9 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer
+from hx_lti_initializer.utils import debug_printer, render
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
-from django.shortcuts import get_object_or_404, render_to_response, render, redirect
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
