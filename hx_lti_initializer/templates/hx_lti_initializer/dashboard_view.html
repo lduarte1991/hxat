@@ -65,8 +65,9 @@
                                             </thead>
                                             <tbody>
                                                 {% for annotation in student.annotations %}
-                                                <!-- TODO: Uncomment and test with assignment deletion -->
-                                                {#{% if assignment_object_exists annotation.uri annotation.collectionId %}#}
+                                                <!-- TODO: Test with assignment deletion -->
+                                                {% assignment_object_exists annotation.uri annotation.collectionId as exists %}
+                                                {% if exists %}
                                                 <tr>
                                                     <!-- TODO: Time formatting ok? -->
                                                     <!-- Last updated or date created? -->
@@ -85,7 +86,7 @@
                                                     <!-- TODO: tags currently not implemented -->
                                                     <td>{{ annotation.tags }}</td>
                                                 </tr>
-                                                {#{% endif %}#}
+                                                {% endif %}
                                                 {% endfor %}
                                             </tbody>
                                         </table>
