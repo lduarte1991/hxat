@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from django.contrib import messages
 from secure import SECURE_SETTINGS
-#BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -59,6 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'annotationsx.middleware.XFrameOptionsMiddleware',
     #'django_auth_lti.middleware.LTIAuthMiddleware',
     #'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
@@ -108,7 +109,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 #STATIC_URL = '/static/'
 #STATIC_ROOT = '/var/wwwhtml'
@@ -199,9 +199,10 @@ LTI_ROLES = 'roles'
 
 # should be changed depending on platform roles, these are set up for edX
 # TODO: Teaching assistant?
-ADMIN_ROLES = {'Administrator', 'Instructor'}
+ADMIN_ROLES = {'urn:lti:instrole:ims/lis/Administrator', 'Instructor'}
 
 X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org', 'canvas.harvard.edu', 'c9.io'}
+X_FRAME_ALLOWED_SITES_MAP = {'tlt.harvard.edu': 'canvas.harvard.edu'}
 
 default_app_config = 'hx_lti_initializer.apps.InitializerConfig'
 

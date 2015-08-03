@@ -130,7 +130,7 @@ def launch_lti(request):
     # Check whether user is a admin, instructor or teaching assistant
     # TODO: What roles do we actually want here?
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
-    if "Admin" in roles or "Instructor" in roles:# or "Teaching Assistant" in roles:
+    if set(roles) & set(settings.ADMIN_ROLES):# or "Teaching Assistant" in roles:
     # Set flag in session to later direct user to the appropriate version of the index
         request.session['is_instructor'] = True
 
@@ -225,7 +225,7 @@ def launch_lti(request):
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
         message_error = "Sorry, the course you are trying to reach does not exist."
         messages.error(request, message_error)
-        if 'Administrator' in roles or 'Instructor' in roles:
+        if set(roles) & set(settings.ADMIN_ROLES):
             # if the user is an administrator, the missing course is created
             # otherwise, it will just display an error message
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
