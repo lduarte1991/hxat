@@ -53,6 +53,8 @@ def create_new_assignment(request):
                 'annotation_database_url': getattr(settings, 'ANNOTATION_DB_URL', ""),
 	            'annotation_database_apikey': getattr(settings, 'ANNOTATION_DB_API_KEY', ""),
 	            'annotation_database_secret_token': getattr(settings, 'ANNOTATION_DB_SECRET_TOKEN', ""),
+	            # TODO: Figure out a sensible default
+	            'pagination_limit': 20,
             })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0

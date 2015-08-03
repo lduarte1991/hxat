@@ -28,6 +28,7 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
             <div class="col-md">
+                {% if student_objects %}
                 <div id="student_list" class="list-group">
                     <br/>
                     {% for student in student_objects %}
@@ -98,6 +99,9 @@
                     </div>
                     {% endfor %}
                 </div>
+                {% else %}
+                No annotations to display
+                {% endif %}
             </div>
         </div>
     </body>
