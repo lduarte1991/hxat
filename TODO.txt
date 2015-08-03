@@ -6,8 +6,6 @@ BUGS
     -- very marginal
 -- Can't add multiple texts to an assignment
 -- (revisit & test) Students can only be a member on one course, or else everything breaks.
--- (revisit) Students with the same name cannot be enrolled in a course
-    -- recursive temp solution?
 -- Unicode in annotation object title bricks entire DB for all courses
 -- Edit button next to assignment opens object before linking into the edit. Little UI blip.
 
@@ -33,11 +31,6 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Update Documentation (may want to wait until we're done with everything else)
 
--- Duplicate student names break the tool, it seems (Test Student). Make that not happen.
-    -- Also, the db max length for the id (name) field is 30. What about long names?
-    -- The ID/name field shows up in the admin view when you want to select course admins,
-        so it should be human-readable.
-
 -- Unit Tests :(
 
 -- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
@@ -54,6 +47,8 @@ NOT A PRIORITY/TODO LONG-TERM:
 -- Assignment/annotation deletion from the catch database? Do we even want this?
 
 -- Hover to annotate? This was working at one point, I believe.
+
+-- The db max length for the id (name) field is 30. What about long names?
 
 
 ============================
@@ -86,6 +81,10 @@ COMPLETED
 √ Remove the need for <br/> tags in text entry to format text to be annotated (especially brutal for poems)
 √ Prettier URL routing code
 √ Make sure only the annotations for the correct course are coming in, not all the annotations the user has ever made.
+√ (fixed) Duplicate student names break the tool, it seems (Test Student). Make that not happen.
+    Right now, trailing whitespace is added recursively to make a unique name that still displays well.
+    Ideally the DB would be modified to allow something other than the student's name to be the primary key
+
 
 ============================
 DIFFERENCES FROM LUIS
