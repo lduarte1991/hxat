@@ -48,7 +48,12 @@ def create_new_assignment(request):
             debug_printer(targets_form.errors)
 
     else:
-        form = AssignmentForm()
+        # Initialize with database settings so instructor doesn't have to do this manually
+        form = AssignmentForm(initial={
+                'annotation_database_url': getattr(settings, 'ANNOTATION_DB_URL', ""),
+	            'annotation_database_apikey': getattr(settings, 'ANNOTATION_DB_API_KEY', ""),
+	            'annotation_database_secret_token': getattr(settings, 'ANNOTATION_DB_SECRET_TOKEN', ""),
+            })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0
     return render(

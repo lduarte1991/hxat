@@ -205,5 +205,6 @@ X_FRAME_ALLOWED_SITES = {'tlt.harvard.edu', 'edx.org', 'canvas.harvard.edu', 'c9
 
 default_app_config = 'hx_lti_initializer.apps.InitializerConfig'
 
+ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
 ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
 ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
