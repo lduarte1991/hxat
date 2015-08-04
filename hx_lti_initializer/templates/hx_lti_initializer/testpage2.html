@@ -230,11 +230,19 @@ li {
             <table class="table table-striped" id="assignments">
                 <tbody>
                     {% for assignment in course.assignment_set.all %}
+                    <tr>
+                        <td style="position: absolute; left: -20; cursor: auto; border: none; background-color: transparent">
+                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
+                            <a class="" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
+                            {% endif %}
+                        </td>
+                    <tr>
+                    
                     <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
                         <td>
-                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
-                            <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
-                            {% endif %}
+                            <!--{% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}-->
+                            <!--<a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>-->
+                            <!--{% endif %}-->
                             {{ assignment.assignment_name }}
                             <span class="expandicon glyphicon glyphicon-chevron-down"></span>
                         </td>

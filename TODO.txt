@@ -2,7 +2,6 @@
 BUGS
 -- Deletion of replies doesn't seem to work 
 -- Last updated doesn't work
--- Edit button next to assignment opens objects list below it, before linking into the edit. Little UI blip.
 -- Can't use the same text across multiple assignments
 -- Other instructors' texts (well, all texts really) show up in 'add source material'
 
@@ -89,6 +88,7 @@ COMPLETED
 √ (fixed) Can't add multiple texts to an assignment
 √ (fixed) Students can only be a member on one course, or else everything breaks.
 √ (fixed) Shorter Target Object names make skinny tables, which shrink after being opened. Little UI blip.
+√ (fixed) Edit button next to assignment opens objects list below it, before linking into the edit. Little UI blip.
 
 ============================
 DIFFERENCES FROM LUIS
