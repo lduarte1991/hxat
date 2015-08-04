@@ -1,5 +1,4 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -93,10 +92,12 @@ td {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+    padding-right: 5px;
     font-family: "arial", sans-serif;
 }
 
 th {
+    /*width: 100%;*/
     padding-top: 5px;
     padding-bottom: 5px;
     font-family: "arial", sans-serif;
@@ -240,16 +241,16 @@ li {
                     </tr>
                     <tr>
                         <td>
-                            <table class="table table-striped collapse" id="target-objects-{{ assignment.id }}">
+                            <table style="width: 100%; max-width: 100%" class="table table-hover collapse" id="target-objects-{{ assignment.id }}">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th class="col-md-1">
                                             Title
                                         </th>
-                                        <th>
+                                        <th class="col-md-1">
                                             Author
                                         </th>
-                                        <th>
+                                        <th class="col-md-1">
                                             Date Created
                                         </th>
                                     </tr>
