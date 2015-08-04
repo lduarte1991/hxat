@@ -6,20 +6,15 @@ BUGS
     -- very marginal
 -- Can't add multiple texts to an assignment
 -- (revisit & test) Students can only be a member on one course, or else everything breaks.
--- Unicode in annotation object title bricks entire DB for all courses
 -- Edit button next to assignment opens object before linking into the edit. Little UI blip.
+-- Shorter Target Object names make skinny tables, which shrink after being opened. Little UI blip.
+-- Unicode-titled source material doesn't show up in 'add source material' when creating an assignment
+    (minor, you can still edit it with the edit button right next to it)
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Assignment Deletion
-
--- Refactor for TLT
-	-- all secure/variable settings should be in secure.py
-
--- Make sure only the students for the right course are shown in the dashboard.
-
--- Do we want a default for an empty dashboard? Or a user with no annotations?
 
 -- Link to dashboard from the detail? So you don't have to go back to the index.
 
@@ -33,13 +28,13 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Unit Tests :(
 
--- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
-    Eventually we may want to add support for TFs as well.
-
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
-        
+
+-- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
+    Eventually we may want to add support for TFs as well.
+
 -- Sometimes going back/forward works smoothly,
     sometimes the document expires. 'Refresh' always takes you back to the index.
     Not a huge deal but something to keep in mind. iFrames are like that I guess.
@@ -84,7 +79,12 @@ COMPLETED
 √ (fixed) Duplicate student names break the tool, it seems (Test Student). Make that not happen.
     Right now, trailing whitespace is added recursively to make a unique name that still displays well.
     Ideally the DB would be modified to allow something other than the student's name to be the primary key
-
+√ Create a default for an empty dashboard or a student with no annotations
+√ Refactor for TLT
+	√ all secure/variable settings should be in secure.py
+√ (fixed) Unicode in annotation object title bricks entire DB for all courses
+√ (fixed) Unicode assignment and target object names not showing up in dashboard
+√ Make sure only the students for the right course are shown in the dashboard.
 
 ============================
 DIFFERENCES FROM LUIS

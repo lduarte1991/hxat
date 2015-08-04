@@ -1,6 +1,7 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer, render
+from hx_lti_initializer.utils import debug_printer#, render
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render_to_response, redirect
@@ -78,7 +79,7 @@ def edit_assignment(request, id):
     target_num = len(AssignmentTargets.objects.filter(assignment=assignment))
     debug = 'Debug:\n\nAssignment Objects:\n'
     for obj in assignment.assignment_objects.all():
-        debug += str(obj) + '\n'
+        debug += unicode(obj) + '\n'
     if request.method == "POST":
         targets_form = AssignmentTargetsFormSet(request.POST, instance=assignment)
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id

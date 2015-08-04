@@ -148,3 +148,14 @@ class LTICourse(models.Model):
         course_object.save()
         course_object.course_admins.add(lti_profile)
         return course_object
+        
+    def add_user(self, lti_profile):
+        """
+        Given an lti_profile, adds a user to the course_users of an LTICourse if not already there
+        """
+        # Get current course_users
+        current_profiles = self.course_users.all()
+        if lti_profile not in current_profiles:
+            # Add user to course_users if not found
+            self.course_users.add(lti_profile)
+            self.save()

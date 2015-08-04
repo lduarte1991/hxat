@@ -24,6 +24,7 @@ DEBUG = SECURE_SETTINGS.get('debug', False)
 
 TEMPLATE_DEBUG = SECURE_SETTINGS.get('debug', False)
 
+#ALLOWED_HOSTS = ['*'] ???? (will this help us with xframes)?
 ALLOWED_HOSTS = []
 
 

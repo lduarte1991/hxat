@@ -218,6 +218,8 @@ def launch_lti(request):
     try:
         debug_printer('DEBUG - Course was found %s' % course)
         course_object = LTICourse.get_course_by_id(course)
+        # Add user to course_users if not already there
+        course_object.add_user(lti_profile)
     
     except LTICourse.DoesNotExist:
         # this should only happen if an instructor is trying to access the 
@@ -356,12 +358,12 @@ def instructor_dashboard_view(request):
     lti_profile = LTIProfile.objects.get(user=request.user)
     active_course_id = request.session['active_course']
     active_course_object = LTICourse.objects.filter(course_id=active_course_id)
+    # Gets object as opposed to queryset
+    course = LTICourse.objects.get(course_id=active_course_id)
     assignments = Assignment.objects.filter(course=active_course_object)
     user_id = request.user.email #for some reason
-    #user_profiles = active_course.course_users.all()
-    user_profiles = LTIProfile.objects.filter(roles='Learner') 
+    user_profiles = course.course_users.all()
     student_objects = []
-    #token = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3MTY1NjUzLCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0xN1QyMDo0MDo1My4yOTEwODgrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.GfgYf0b7r9MfRccgYmhRlHTeAlzPO2MQ0AXJyuTt39Y"
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
     annotations_for_course = fetch_annotations(active_course_id, token)
 
