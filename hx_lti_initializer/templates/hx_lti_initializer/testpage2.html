@@ -274,14 +274,14 @@ li {
                                     </tr>
                                     {% endfor %}
                                     {% if is_instructor %}
-                                    <tr>
+                                    <!-- TODO: do we want this in? it's a bit buggy, and is somewhat redundant with the 'edit assignment' button <tr>
                                         <td style="text-align:center;" colspan="3">
                                                 <a href="{% url 'target_object_database:create_new_source' %}" class="btn btn-success" role="button">
 
                                                   {% bootstrap_icon "star" %} Add New Source Material
                                                 </a>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     {% endif %}
                                 </tbody>
                             </table>

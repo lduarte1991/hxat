@@ -44,9 +44,13 @@ def create_new_assignment(request):
                 debug_printer(form.errors)
         else:
             #assignment_targets = targets_form.save(commit=False)
-            # TODO: is this what we want (0)? It was what was breaking earlier.
-            target_num = 0#len(assignment_targets)
-
+            # TODO: is this the error functionality that we want?
+            # with frontend validation it shouldn't fail anymore, but we've got a backup just in case
+            try:
+                target_num = len(assignment_targets)
+            except:
+                target_num = 0
+            
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)

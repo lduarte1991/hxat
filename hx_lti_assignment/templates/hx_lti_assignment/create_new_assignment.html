@@ -64,6 +64,7 @@
         	
         	// TODO: this is a total hack, as it depends on the placeholder text from bootstrap
         	track = ""
+        	
         	items.each(function(index){
         		name = jQuery(items[index]).find('div > button > span:visible').text();
         		track += name
@@ -76,11 +77,11 @@
         			target_object_list.push(name);
         		}
         	});
-        	if (track == "Nothing selected") {
+        	if (track == "Nothing selected" || track == "") {
         		console.log("User failed to select a target object")
         		jQuery('.sortable').css('outline', 'red 2px solid');
         		jQuery('.sortable').css('outline-offset', '5px');
-        		jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">Please select a target object</p>');
+        		jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">Please select source material</p>');
         		should_quit = true
         	}
         	return !should_quit

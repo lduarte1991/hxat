@@ -59,21 +59,24 @@ class AssignmentForm(forms.ModelForm):
 
 	class Meta:
 		model = Assignment
-		fields = [
-			'assignment_name', 
-			'course', 
-			'annotation_database_url', 
-			'annotation_database_apikey',
-			'annotation_database_secret_token',
-			'include_instructor_tab',
-			'default_tab',
-			'pagination_limit',
-			'allow_highlights',
-			'highlights_options',
-			'allow_touch',
-			'allow_flags',
-		]
-
+		# TODO: These fields somehow make the assignment creation form not able to display target objects
+			# unless you add 'assignment_objects', but then you get an extra field (that is taken care of
+			# by AssignmentTargetsForm so for now I'm going to comment it out.
+		# fields = [
+		# 	'assignment_name', 
+		# 	#'assignment_objects',
+		# 	'course', 
+		# 	'annotation_database_url', 
+		# 	'annotation_database_apikey',
+		# 	'annotation_database_secret_token',
+		# 	'include_instructor_tab',
+		# 	'default_tab',
+		# 	'pagination_limit',
+		# 	'allow_highlights',
+		# 	'highlights_options',
+		# 	'allow_touch',
+		# 	'allow_flags',
+		# ]
 
 class AssignmentTargetsForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -95,6 +98,8 @@ class AssignmentTargetsForm(forms.ModelForm):
 			'order', 
 			'target_external_css',
 		]
+
+#Assignment.fields += 'assignment_objects'
 
 AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True)
 
