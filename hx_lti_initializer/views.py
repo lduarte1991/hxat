@@ -19,7 +19,7 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
-from annotationsx.settings.secure import SECURE_SETTINGS
+from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *
@@ -34,7 +34,7 @@ def validate_request(req):
     """
     # print out the request to the terminal window if in debug mode
     # this item is set in the settings, in the __init__.py file
-    if SECURE_SETTINGS.get('LTI_DEBUG', False):
+    if settings.LTI_DEBUG:
         for item in req.POST:
             debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
     
@@ -55,8 +55,8 @@ def initialize_lti_tool_provider(req):
     """
     # get the consumer key and secret from settings (__init__.py file)
     # will be used to compare against request to validate the tool init
-    consumer_key = SECURE_SETTINGS.get('CONSUMER_KEY', '')
-    secret = SECURE_SETTINGS.get('LTI_SECRET', '')
+    consumer_key = settings.CONSUMER_KEY
+    secret = settings.LTI_SECRET
     
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
@@ -77,7 +77,7 @@ def create_new_user(username, user_id, roles):
     user.is_superuser = False
     user.is_staff = False
 
-    for admin_role in SECURE_SETTINGS.get('ADMIN_ROLES', ['Administrator']):
+    for admin_role in settings.ADMIN_ROLES:
         for user_role in roles:
                 if admin_role.lower() == user_role.lower():
                     user.is_superuser = True
@@ -110,14 +110,14 @@ def launch_lti(request):
     user_id = get_lti_value('user_id', tool_provider)
     debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
     
-    course = get_lti_value(SECURE_SETTINGS.get('LTI_COURSE_ID', 'context_id'), tool_provider)
+    course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
-    roles = get_lti_value(SECURE_SETTINGS.get('LTI_ROLES', 'roles'), tool_provider)
+    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
 
     if "Student" in roles or "Learner" in roles:
-        collection_id = get_lti_value(SECURE_SETTINGS.get('LTI_COLLECTION_ID', 'collection_id'), tool_provider)
-        object_id = get_lti_value(SECURE_SETTINGS.get('LTI_OBJECT_ID', 'object_id'), tool_provider)
+        collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
         debug_printer('DEBUG - Found object being accessed: %s' % object_id)
 

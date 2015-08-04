@@ -7,7 +7,7 @@ from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
 from firebase_token_generator import create_token
 from models import *
-from annotationsx.settings.secure import SECURE_SETTINGS
+from django.conf import settings
 import base64
 import sys
 import datetime
@@ -38,7 +38,7 @@ def debug_printer(debug_text):
     """
     Prints text passed in to stderr (Terminal on Mac) for debugging purposes.
     """
-    if SECURE_SETTINGS.get('LTI_DEBUG', False):
+    if settings.LTI_DEBUG:
         print >> sys.stderr, str(debug_text) + '\r'
 
 def retrieve_token(userid, apikey, secret):
@@ -72,7 +72,7 @@ def render(request, template, context):
     parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
     domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
     debug_printer('DEBUG - Domain: %s \r' % domain)
-    for item in SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', []):
+    for item in settings.X_FRAME_ALLOWED_SITES:
         if domain.endswith(item):
             x_frame_allowed = True
             break

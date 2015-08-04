@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECURE_SETTINGS['DJANGO_SECRET_KEY']
+SECRET_KEY = SECURE_SETTINGS.get('DJANGO_SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -79,11 +79,11 @@ WSGI_APPLICATION = 'annotationsx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'annotationsx',
-        'USER': 'annotationsx',
-        'PASSWORD': 'fake',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': SECURE_SETTINGS.get('DJANGO_DB_NAME', 'annotationsx'),
+        'USER': SECURE_SETTINGS.get('DJANGO_DB_USER', 'annotationsx'),
+        'PASSWORD': SECURE_SETTINGS.get('DJANGO_DB_PW', 'test_pw'),
+        'HOST': SECURE_SETTINGS.get('DJANGO_DB_HOST', 'localhost'),
+        'PORT': SECURE_SETTINGS.get('DJANGO_DB_PORT', ''),
     } 
 }
 
@@ -125,3 +125,15 @@ JENKINS_TASKS = (
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
+
+LTI_COURSE_ID = "context_id"
+LTI_COLLECTION_ID = "custom_collection_id"
+LTI_OBJECT_ID = "custom_object_id"
+LTI_ROLES = "roles"
+LTI_DEBUG = SECURE_SETTINGS.get('LTI_DEBUG', False)
+LTI_SECRET = SECURE_SETTINGS.get('LTI_SECRET', '')
+CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '')
+CONSUMER_KEY = SECURE_SETTINGS.get('CONSUMER_KEY', '')
+ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
+X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvardx.harvard.edu'})
+
