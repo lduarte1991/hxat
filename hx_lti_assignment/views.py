@@ -16,7 +16,7 @@ def create_new_assignment(request):
     """
     """
     debug = "Nothing"
-    form = ""
+    form = None
     if request.method == "POST":
         targets_form = AssignmentTargetsFormSet(request.POST)
         if targets_form.is_valid():
@@ -43,7 +43,10 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
                 debug_printer(form.errors)
         else:
-            target_num = len(assignment_targets)
+            #assignment_targets = targets_form.save(commit=False)
+            # TODO: is this what we want (0)? It was what was breaking earlier.
+            target_num = 0#len(assignment_targets)
+
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
@@ -59,6 +62,7 @@ def create_new_assignment(request):
             })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0
+
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',

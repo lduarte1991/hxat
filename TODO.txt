@@ -12,9 +12,13 @@ BUGS
     (minor, you can still edit it with the edit button right next to it)
 
 ============================
+
 BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Assignment Deletion
+
+-- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
+    My current solution is a total hack
 
 -- Link to dashboard from the detail? So you don't have to go back to the index.
 
