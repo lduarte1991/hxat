@@ -395,10 +395,8 @@ def fetch_annotations (course_id, token):
         Fetches the annotations of a given course from the CATCH database
     '''
     
-    # token = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3NzY5NTE5LCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0yNFQyMDoyNToxOS44OTIwNzYrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.lvVa1lui9jBZROISfQzadjzIQzZopsRuD9uJoGQ5scM'
     headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
-    # TODO: secure.py
-    baseurl = "http://ec2-52-26-240-251.us-west-2.compute.amazonaws.com:8080/catch/annotator/"
+    baseurl = settings.ANNOTATION_DB_URL + "/"
     requesturl = baseurl + "search?contextId=" + course_id
     
     # Make request
