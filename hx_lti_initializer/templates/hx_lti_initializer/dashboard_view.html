@@ -27,7 +27,11 @@
         <div class="navigation">
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
+        <br>
             <div class="col-md">
+                <div>
+                    <input type="text" id="studentsearch" class="form-control" placeholder="Search for student">
+                </div>
                 {% if student_objects %}
                 <div id="student_list" class="list-group">
                     <br/>
@@ -64,7 +68,7 @@
                                             </thead>
                                             <tbody>
                                                 {% for annotation in student.annotations %}
-                                                <!--TODO: Test with assignment deletion -->
+                                                <!-- TODO: Test with assignment deletion -->
                                                 {% assignment_object_exists annotation.uri annotation.collectionId as exists %}
                                                 {% if exists %}
                                                 <tr>
