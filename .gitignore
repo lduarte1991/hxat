@@ -7,3 +7,5 @@ include
 *.pyc
 *.sh
 htmlcov
+secure.py
+http_static

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from django.contrib import messages
+from secure import SECURE_SETTINGS
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -18,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'eyc+bftd*fskn^_vt4+pr)0-ih+7sc%8i40*c=cji6*#+&2paj'
+SECRET_KEY = SECURE_SETTINGS.get('DJANGO_SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -56,23 +57,35 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'annotationsx.middleware.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'hx_lti_tools.urls'
+ROOT_URLCONF = 'annotationsx.urls'
 
-WSGI_APPLICATION = 'hx_lti_tools.wsgi.application'
+WSGI_APPLICATION = 'annotationsx.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'django_db',
+#         'USER': 'root',
+#         'PASSWORD': 'bu5egkeShy7Gphqf',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_db',
-	'USER': 'root',
-	'PASSWORD': 'bu5egkeShy7Gphqf',
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': SECURE_SETTINGS.get('DJANGO_DB_NAME', 'annotationsx'),
+        'USER': SECURE_SETTINGS.get('DJANGO_DB_USER', 'annotationsx'),
+        'PASSWORD': SECURE_SETTINGS.get('DJANGO_DB_PW', 'test_pw'),
+        'HOST': SECURE_SETTINGS.get('DJANGO_DB_HOST', 'localhost'),
+        'PORT': SECURE_SETTINGS.get('DJANGO_DB_PORT', ''),
+    } 
 }
 
 # Internationalization
@@ -93,7 +106,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/html'
+STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
@@ -113,3 +126,16 @@ JENKINS_TASKS = (
 )
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
+
+LTI_COURSE_ID = "context_id"
+LTI_COLLECTION_ID = "custom_collection_id"
+LTI_OBJECT_ID = "custom_object_id"
+LTI_ROLES = "roles"
+LTI_DEBUG = SECURE_SETTINGS.get('LTI_DEBUG', False)
+LTI_SECRET = SECURE_SETTINGS.get('LTI_SECRET', '')
+CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '')
+CONSUMER_KEY = SECURE_SETTINGS.get('CONSUMER_KEY', '')
+ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
+X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvard.edu'})
+X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP', {'harvard.edu':'harvardx.harvard.edu'})
+

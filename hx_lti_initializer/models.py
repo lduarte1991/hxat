@@ -41,6 +41,15 @@ class LTIProfile(models.Model):
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
         return self.user.username
+    
+    def get_id(self):
+        """Returns Canvas user_id of LTIProfile"""
+        anon_id = self.anon_id
+    
+        # The user_id is the part of the anon_id after the colon
+        user_id = anon_id.rpartition(':')[2]
+    
+        return anon_id
 
     class Meta:
         """ The name of this section within the admin site """
@@ -88,6 +97,12 @@ class LTICourse(models.Model):
         related_name='course_admin_user_profiles',
     )
 
+    course_users = models.ManyToManyField(
+        LTIProfile,
+        related_name = 'course_user_profiles',
+        blank=True,
+    )
+
     course_external_css_default = models.CharField(
         max_length=255,
         blank=True,
@@ -99,6 +114,9 @@ class LTICourse(models.Model):
 
     def __unicode__(self):
         """ When asked to print itself, this object will print the name of the course """
+        return u"%s" % self.course_name
+
+    def __str__(self):
         return self.course_name
 
     @staticmethod

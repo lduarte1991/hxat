@@ -1,5 +1,5 @@
 """
-hx_annotations/hx_lti_tools/abstract_base_classes/target_object_database_api.py
+hx-annotations-lti/abstract_base_classes/target_object_database_api.py
 
 Documentation URL/Ref#: TODO
 Test Script for the Target Object Database API and its current implementation

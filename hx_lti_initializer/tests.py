@@ -1,5 +1,5 @@
 """
-hx_annotations/hx_lti_tools/hx_lti_initializer/tests.py
+hx-annotations-lti/hx_lti_initializer/tests.py
 
 Documentation URL/Ref#: TODO
 Test Script for app hx_lti_initializer
@@ -341,6 +341,6 @@ class LTIInitializerWSGITests(TestCase):
         """
         app = get_internal_wsgi_application()
 
-        from hx_lti_tools.wsgi import application
+        from annotationsx.wsgi import application
 
         self.assertIs(app, application)

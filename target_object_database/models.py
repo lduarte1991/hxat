@@ -31,6 +31,9 @@ class TargetObject(LTI_TodApi):
     
     def __str__(self):
         return "\"" + self.target_title + "\" by " + self.target_author
+
+    def __unicode__(self):
+        return u"\"%s\" by %s" % (self.target_title, self.target_author)
     
     class Meta:
         verbose_name = "Source"

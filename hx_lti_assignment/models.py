@@ -61,6 +61,9 @@ class Assignment(models.Model):
 	def __str__(self):
 		return self.assignment_name
 
+	def __unicode__(self):
+		return u"%s" % self.assignment_name
+
 	def object_before(self, id):
 		if len(self.assignment_objects.all()) > 1:
 			try:
