@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login
 from django.contrib import messages
 

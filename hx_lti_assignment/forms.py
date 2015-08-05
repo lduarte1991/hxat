@@ -2,7 +2,7 @@ from django import forms
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from crispy_forms.helper import FormHelper
 from django.forms.models import modelformset_factory, inlineformset_factory
-from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML
+from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML, Hidden
 from crispy_forms.bootstrap import TabHolder, Tab
 import re
 
@@ -59,20 +59,6 @@ class AssignmentForm(forms.ModelForm):
 
 	class Meta:
 		model = Assignment
-		fields = [
-			'assignment_name', 
-			'course', 
-			'annotation_database_url', 
-			'annotation_database_apikey',
-			'annotation_database_secret_token',
-			'include_instructor_tab',
-			'default_tab',
-			'pagination_limit',
-			'allow_highlights',
-			'highlights_options',
-			'allow_touch',
-			'allow_flags',
-		]
 
 
 class AssignmentTargetsForm(forms.ModelForm):

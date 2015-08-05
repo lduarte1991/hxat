@@ -13,7 +13,7 @@ class LTIProfileAdmin(admin.ModelAdmin):
     pass
 
 class LTICourseAdmin(admin.ModelAdmin):
-	fields = ['course_id', 'course_name', 'course_admins', 'course_external_css_default']
+	fields = ['course_id', 'course_name', 'course_admins', 'course_external_css_default', 'course_users']
 	readonly_fields = ['course_id']
 	
 	def course_id(self, instance): # pragma: no cover

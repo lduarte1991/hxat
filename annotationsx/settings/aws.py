@@ -57,6 +57,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'annotationsx.middleware.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
@@ -135,5 +136,6 @@ LTI_SECRET = SECURE_SETTINGS.get('LTI_SECRET', '')
 CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '')
 CONSUMER_KEY = SECURE_SETTINGS.get('CONSUMER_KEY', '')
 ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
-X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvardx.harvard.edu'})
+X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvard.edu'})
+X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP', {'harvard.edu':'harvardx.harvard.edu'})
 

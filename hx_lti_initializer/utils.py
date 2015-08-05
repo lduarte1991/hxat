@@ -66,19 +66,3 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-
-def render(request, template, context):
-    x_frame_allowed = False
-    parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
-    domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
-    debug_printer('DEBUG - Domain: %s \r' % domain)
-    for item in settings.X_FRAME_ALLOWED_SITES:
-        if domain.endswith(item):
-            x_frame_allowed = True
-            break
-    response = django.shortcuts.render(request, template, context)
-    if not x_frame_allowed:
-        response['X-Frame-Options'] = "DENY"
-    else :
-        response['X-Frame-Options'] = "ALLOW-FROM " + domain
-    return response

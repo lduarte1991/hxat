@@ -100,6 +100,7 @@ class LTICourse(models.Model):
     course_users = models.ManyToManyField(
         LTIProfile,
         related_name = 'course_user_profiles',
+        blank=True,
     )
 
     course_external_css_default = models.CharField(
@@ -113,6 +114,9 @@ class LTICourse(models.Model):
 
     def __unicode__(self):
         """ When asked to print itself, this object will print the name of the course """
+        return u"%s" % self.course_name
+
+    def __str__(self):
         return self.course_name
 
     @staticmethod
