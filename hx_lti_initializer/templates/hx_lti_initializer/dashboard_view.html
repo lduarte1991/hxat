@@ -30,7 +30,7 @@
         <br>
             <div class="col-md">
                 <div>
-                    <input type="text" id="studentsearch" class="form-control" placeholder="Search for student">
+                    <input type="text" id="studentsearch" class="form-control" placeholder="Search for user...">
                 </div>
                 {% if student_objects %}
                 <div id="student_list" class="list-group">
@@ -107,3 +107,24 @@
         </div>
     </body>
 </html>
+
+<script>
+// Filter for the panel of a particular student
+$(document).ready(function(){
+    
+    // Get all panels 
+    var $panels = $('.panel');
+    
+    // Search on key press
+    $('#studentsearch').on('keyup', function(){
+    var val = this.value.toLowerCase();
+    
+    // Show panels that match search value
+    $panels.show().filter(function(){
+        var title = $(this).find('.panel-title').text().toLowerCase();
+        return title.indexOf(val) < 0;
+    }).hide();
+    
+    });
+});
+</script>
