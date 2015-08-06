@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECURE_SETTINGS.get('DJANGO_SECRET_KEY', '')
+SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -58,6 +58,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
+    #'django_auth_lti.middleware.LTIAuthMiddleware',
+    #'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
@@ -68,23 +70,14 @@ WSGI_APPLICATION = 'annotationsx.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'django_db',
-#         'USER': 'root',
-#         'PASSWORD': 'bu5egkeShy7Gphqf',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': SECURE_SETTINGS.get('DJANGO_DB_NAME', 'annotationsx'),
-        'USER': SECURE_SETTINGS.get('DJANGO_DB_USER', 'annotationsx'),
-        'PASSWORD': SECURE_SETTINGS.get('DJANGO_DB_PW', 'test_pw'),
-        'HOST': SECURE_SETTINGS.get('DJANGO_DB_HOST', 'localhost'),
-        'PORT': SECURE_SETTINGS.get('DJANGO_DB_PORT', ''),
+        'NAME': SECURE_SETTINGS.get('db_default_name', 'annotationsx'),
+        'USER': SECURE_SETTINGS.get('db_default_user', 'annotationsx'),
+        'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
+        'HOST': SECURE_SETTINGS.get('db_default_host', 'localhost'),
+        'PORT': SECURE_SETTINGS.get('db_default_port', '5432'),
     } 
 }
 
@@ -139,3 +132,32 @@ ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
 X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvard.edu'})
 X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP', {'harvard.edu':'harvardx.harvard.edu'})
 
+# Add to authentication backends (for django-auth-lti)
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_lti.backends.LTIAuthBackend',
+)
+
+LTI_SETUP = {
+    "TOOL_TITLE": "AnnotationsX",
+    "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
+
+    "LAUNCH_URL": "hx_lti_initializer:launch_lti", #"lti_init/launch_lti"
+    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
+    "INITIALIZE_MODELS": False, # Options: False|resource_only|resource_and_course|resource_and_course_users
+
+    "EXTENSION_PARAMETERS": {
+        "canvas.instructure.com": {
+            "privacy_level": "public",
+            "course_navigation": {
+                "enabled": "true",
+                "default": "enabled",
+                "text": "Annotations (C9)", 
+            }
+        }
+    }
+}
+
+# Add LTI oauth credentials (for django-auth-lti)
+# hard fail (keyerror) if not present
+LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
