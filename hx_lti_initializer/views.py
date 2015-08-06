@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login
-from django.conf import settings
 from django.contrib import messages
 from django.contrib import messages
 from django.db import IntegrityError
@@ -21,6 +20,7 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
+from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *

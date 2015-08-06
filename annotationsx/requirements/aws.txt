@@ -51,3 +51,4 @@ git+https://github.com/Harvard-University-iCommons/django-auth-lti@master#egg=dj
 
 #Took out mySQL
 #MySQL-python==1.2.5
+

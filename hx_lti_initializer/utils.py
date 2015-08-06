@@ -2,9 +2,12 @@
 These functions will be used for the initializer module, but may also be helpful
 elsewhere. 
 """
+import django.shortcuts
+from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
 from firebase_token_generator import create_token
 from models import *
+from django.conf import settings
 import base64
 import sys
 import datetime
@@ -64,23 +67,3 @@ def retrieve_token(userid, apikey, secret):
     custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
     newtoken = create_token(secret, custom_data)
     return newtoken
-
-'''TODO
-def render(request, template, context):
-    #TODO: set this back to false.
-    x_frame_allowed = True
-    # print request.META
-    parsed_uri = urlparse(request.META.get('HTTP_REFERER'))
-    domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
-    debug_printer('DEBUG - Domain: %s \r' % domain)
-    for item in settings.X_FRAME_ALLOWED_SITES:
-        if domain.endswith(item):
-            x_frame_allowed = True
-            break
-    response = django.shortcuts.render(request, template, context)
-    if not x_frame_allowed:
-        response['X-Frame-Options'] = "DENY"
-    else :
-        response['X-Frame-Options'] = "ALLOW FROM " + domain
-    return response
-'''

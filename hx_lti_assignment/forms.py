@@ -2,7 +2,7 @@ from django import forms
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from crispy_forms.helper import FormHelper
 from django.forms.models import modelformset_factory, inlineformset_factory
-from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML
+from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML, Hidden
 from crispy_forms.bootstrap import TabHolder, Tab
 import re
 
@@ -98,8 +98,6 @@ class AssignmentTargetsForm(forms.ModelForm):
 			'order', 
 			'target_external_css',
 		]
-
-#Assignment.fields += 'assignment_objects'
 
 AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True)
 

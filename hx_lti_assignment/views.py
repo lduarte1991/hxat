@@ -4,7 +4,7 @@ from hx_lti_initializer.utils import debug_printer#, render
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
-from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render_to_response, redirect, render
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -85,25 +85,19 @@ def edit_assignment(request, id):
     """
     assignment = get_object_or_404(Assignment, pk=id)
     target_num = len(AssignmentTargets.objects.filter(assignment=assignment))
-    debug = 'Debug:\n\nAssignment Objects:\n'
-    for obj in assignment.assignment_objects.all():
-        debug += unicode(obj) + '\n'
+    debug = u"TEST"
     if request.method == "POST":
         targets_form = AssignmentTargetsFormSet(request.POST, instance=assignment)
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
             assignment_targets = targets_form.save(commit=False)
             changed=False
-            debug += str(request.POST)
-            debug += str(assignment_targets)
             if len(targets_form.deleted_objects) > 0:
                 debug += "Trying to delete a bunch of assignments\n"
                 for del_obj in targets_form.deleted_objects:
                     del_obj.delete()
                 changed=True
-            debug += "\nLength of Targets to be added/edited: " + str(len(assignment_targets)) + "\n"
             if len(assignment_targets) > 0:
-                debug += "Trying to add a bunch of assignments\n"
                 for at in assignment_targets:
                     at.save()
                 changed=True
@@ -113,7 +107,6 @@ def edit_assignment(request, id):
             targets += '&assignment_objects=' + str(targs.id)
         post_values = QueryDict(targets, mutable=True)
         post_values.update(request.POST)
-        debug += str(targets)
         form = AssignmentForm(post_values, instance=assignment)
         if form.is_valid():
             assign1 = form.save(commit=False)
