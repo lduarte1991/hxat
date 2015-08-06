@@ -29,8 +29,19 @@
         </div>
         <br>
             <div>
-                <div>
-                    <input type="text" id="studentsearch" class="form-control" placeholder="Search for user...">
+                <div class="input-group">
+                    <div class="input-group-btn search-panel">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    	<span id="search_concept">Users</span> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#users">Users</a></li>
+                      <li><a href="#content">Content</a></li>
+                    </ul>
+                </div>
+                    <input type="hidden" name="search_param" value="users" id="search_param">
+                    <input type="text" id="studentsearch" class="form-control" placeholder="Search...">
+                    
                 </div>
                 {% if student_objects %}
                 <div id="student_list" class="list-group">
@@ -111,6 +122,19 @@
 <script>
 // Filter for the panel of a particular student
 $(document).ready(function(){
+    // Search type (users by default)
+    var type = 'users';
+    
+    // Toggler for search bar dropdown
+    $('.search-panel .dropdown-menu').find('a').click(function(e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.search-panel span#search_concept').text(concept);
+        $('.input-group #search_param').val(param);
+        // Update search type
+        type = param;
+    });
     
     // Get all panels 
     var $panels = $('.panel');
@@ -118,13 +142,25 @@ $(document).ready(function(){
     // Search on key press
     $('#studentsearch').on('keyup', function(){
         var val = this.value.toLowerCase();
-    
-        // Show panels that match search value
-        $panels.show().filter(function(){
-            $('.panel-collapse').collapse('show');
-            var title = $(this).find('.panel-title').text().toLowerCase();
-            return title.indexOf(val) < 0;
-        }).hide();
+        
+        if (type == 'users') {
+            // Show panels that match search value
+            $panels.show().filter(function(){
+                $('.panel-collapse').collapse('show');
+                var title = $(this).find('.panel-title').text().toLowerCase();
+                return title.indexOf(val) < 0;
+            }).hide();
+        }
+        
+        else {
+            // Show panels that match search value
+            $panels.show().filter(function(){
+                $('.panel-collapse').collapse('show');
+                var title = $(this).find('.panel-body').text().toLowerCase();
+                return title.indexOf(val) < 0;
+            }).hide();
+            
+        }
         
         // Collapse panels if the search bar is empty
         if (val.length == 0) {

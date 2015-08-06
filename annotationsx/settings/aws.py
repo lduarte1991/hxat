@@ -161,3 +161,7 @@ LTI_SETUP = {
 # Add LTI oauth credentials (for django-auth-lti)
 # hard fail (keyerror) if not present
 LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
+
+ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
+ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
+ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
