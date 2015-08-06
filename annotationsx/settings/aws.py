@@ -152,7 +152,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (C9)", 
+                "text": "Annotations (C9 Merge)", 
             }
         }
     }
