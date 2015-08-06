@@ -117,14 +117,20 @@ $(document).ready(function(){
     
     // Search on key press
     $('#studentsearch').on('keyup', function(){
-    var val = this.value.toLowerCase();
+        var val = this.value.toLowerCase();
     
-    // Show panels that match search value
-    $panels.show().filter(function(){
-        var title = $(this).find('.panel-title').text().toLowerCase();
-        return title.indexOf(val) < 0;
-    }).hide();
-    
+        // Show panels that match search value
+        $panels.show().filter(function(){
+            $('.panel-collapse').collapse('show');
+            var title = $(this).find('.panel-title').text().toLowerCase();
+            return title.indexOf(val) < 0;
+        }).hide();
+        
+        // Collapse panels if the search bar is empty
+        if (val.length == 0) {
+            $('.panel-collapse').collapse('hide');
+            console.log($('#studentsearch').value);
+        }
     });
 });
 </script>
