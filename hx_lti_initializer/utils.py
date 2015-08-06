@@ -2,9 +2,12 @@
 These functions will be used for the initializer module, but may also be helpful
 elsewhere. 
 """
+import django.shortcuts
+from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
 from firebase_token_generator import create_token
 from models import *
+from django.conf import settings
 import base64
 import sys
 import datetime

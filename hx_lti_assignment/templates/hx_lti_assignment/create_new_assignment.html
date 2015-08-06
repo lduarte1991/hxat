@@ -61,8 +61,13 @@
         	var target_object_list = []
         	items = jQuery('.field-target_object');
         	should_quit = false;
+        	
+        	// TODO: this is a total hack, as it depends on the placeholder text from bootstrap
+        	track = ""
+        	
         	items.each(function(index){
         		name = jQuery(items[index]).find('div > button > span:visible').text();
+        		track += name
         		if (jQuery.inArray(name, target_object_list) !== -1) {
         			jQuery('.sortable').css('outline', 'red 2px solid');
         			jQuery('.sortable').css('outline-offset', '5px');
@@ -72,10 +77,14 @@
         			target_object_list.push(name);
         		}
         	});
-        	if(should_quit){
-        		return false;
+        	if (track == "Nothing selected" || track == "") {
+        		console.log("User failed to select a target object")
+        		jQuery('.sortable').css('outline', 'red 2px solid');
+        		jQuery('.sortable').css('outline-offset', '5px');
+        		jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">Please select source material</p>');
+        		should_quit = true
         	}
-        	return true;
+        	return !should_quit
         });
     });
 	
@@ -163,7 +172,7 @@
 			{%for f in targets_form.management_form%}
 			    {{f}}
 			{%endfor%}
-			{% if number_of_targets == 0%}
+			{% if number_of_targets == 0 %}
 			<tr id="1" class="ui-state-default assignment-targets-table-row">
 				
 				<td class="field-target_object" >

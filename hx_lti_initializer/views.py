@@ -12,14 +12,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login
-from django.conf import settings
 from django.contrib import messages
 from django.contrib import messages
+from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
+from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
 from models import *
@@ -76,7 +77,13 @@ def initialize_lti_tool_provider(req):
 
 def create_new_user(username, user_id, roles):
     # now create the user and LTIProfile with the above information
-    user = User.objects.create_user(username, user_id)
+    # Max 30 length for person's name, do we want to change this? It's valid for HX but not ATG/FAS
+    try:
+        user = User.objects.create_user(username, user_id)
+    except IntegrityError:
+        # TODO: modify db to make student name not the primary key
+        # a temporary workaround for key integrity errors, until we can make the username not the primary key.
+        return create_new_user(username + " ", user_id, roles)
     user.set_unusable_password()
     user.is_superuser = False
     user.is_staff = False
@@ -211,6 +218,8 @@ def launch_lti(request):
     try:
         debug_printer('DEBUG - Course was found %s' % course)
         course_object = LTICourse.get_course_by_id(course)
+        # Add user to course_users if not already there
+        course_object.add_user(lti_profile)
     
     except LTICourse.DoesNotExist:
         # this should only happen if an instructor is trying to access the 
@@ -349,12 +358,12 @@ def instructor_dashboard_view(request):
     lti_profile = LTIProfile.objects.get(user=request.user)
     active_course_id = request.session['active_course']
     active_course_object = LTICourse.objects.filter(course_id=active_course_id)
+    # Gets object as opposed to queryset
+    course = LTICourse.objects.get(course_id=active_course_id)
     assignments = Assignment.objects.filter(course=active_course_object)
     user_id = request.user.email #for some reason
-    #user_profiles = active_course.course_users.all()
-    user_profiles = LTIProfile.objects.filter(roles='Learner') 
+    user_profiles = course.course_users.all()
     student_objects = []
-    #token = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3MTY1NjUzLCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0xN1QyMDo0MDo1My4yOTEwODgrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.GfgYf0b7r9MfRccgYmhRlHTeAlzPO2MQ0AXJyuTt39Y"
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
     annotations_for_course = fetch_annotations(active_course_id, token)
 
@@ -386,10 +395,8 @@ def fetch_annotations (course_id, token):
         Fetches the annotations of a given course from the CATCH database
     '''
     
-    # token = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpYXQiOiAxNDM3NzY5NTE5LCAiZCI6IHsiaXNzdWVkQXQiOiAiMjAxNS0wNy0yNFQyMDoyNToxOS44OTIwNzYrMDowMCIsICJjb25zdW1lcktleSI6ICI1YWFhNjBmNi1iYTNhLTRjNjAtOTUzYi1hYjk2YzJkMjA2MjQiLCAidWlkIjogIjNlOWZkMjAwNjY1YmY0ZDBiNGJhOWJkZDE3MDg0NWUyZmRmMWFiMjAiLCAidHRsIjogMTcyODAwfSwgInYiOiAwfQ.lvVa1lui9jBZROISfQzadjzIQzZopsRuD9uJoGQ5scM'
     headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
-    # TODO: secure.py
-    baseurl = "http://ec2-52-26-240-251.us-west-2.compute.amazonaws.com:8080/catch/annotator/"
+    baseurl = settings.ANNOTATION_DB_URL + "/"
     requesturl = baseurl + "search?contextId=" + course_id
     
     # Make request

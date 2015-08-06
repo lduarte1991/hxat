@@ -2,7 +2,7 @@ from django import forms
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from crispy_forms.helper import FormHelper
 from django.forms.models import modelformset_factory, inlineformset_factory
-from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML
+from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML, Hidden
 from crispy_forms.bootstrap import TabHolder, Tab
 import re
 
@@ -20,7 +20,7 @@ class AssignmentForm(forms.ModelForm):
 					Field('course', css_class="selectpicker", data_live_search="true"),
 				),
 				Tab(
-					'Annotation Database Settings',
+					'Database Settings',
 					'annotation_database_url',
 					'annotation_database_apikey',
 					'annotation_database_secret_token',
@@ -59,7 +59,24 @@ class AssignmentForm(forms.ModelForm):
 
 	class Meta:
 		model = Assignment
-
+		# TODO: These fields somehow make the assignment creation form not able to display target objects
+			# unless you add 'assignment_objects', but then you get an extra field (that is taken care of
+			# by AssignmentTargetsForm so for now I'm going to comment it out.
+		# fields = [
+		# 	'assignment_name', 
+		# 	#'assignment_objects',
+		# 	'course', 
+		# 	'annotation_database_url', 
+		# 	'annotation_database_apikey',
+		# 	'annotation_database_secret_token',
+		# 	'include_instructor_tab',
+		# 	'default_tab',
+		# 	'pagination_limit',
+		# 	'allow_highlights',
+		# 	'highlights_options',
+		# 	'allow_touch',
+		# 	'allow_flags',
+		# ]
 
 class AssignmentTargetsForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -76,6 +93,11 @@ class AssignmentTargetsForm(forms.ModelForm):
 
 	class Meta:
 		model = AssignmentTargets
+		fields= [
+			'target_object', 
+			'order', 
+			'target_external_css',
+		]
 
 AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True)
 

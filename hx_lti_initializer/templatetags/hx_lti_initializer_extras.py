@@ -60,7 +60,7 @@ def get_assignment_name(collection_id):
 	# Filter for the assignment with assignment_id matching collection_id
 	try:
 		assignment = Assignment.objects.get(assignment_id=collection_id);
-		return str(assignment)
+		return unicode(assignment)
 	# TODO: Currently fails silently. Eventually we will want to improve the model design so this doesn't happen.
 	except:
 		return ''
@@ -69,20 +69,19 @@ def get_assignment_name(collection_id):
 def get_target_object_name(object_id):
 	try:
 		targ_obj = TargetObject.objects.get(pk=object_id)
-		return str(targ_obj)
+		return unicode(targ_obj)
 	# TODO: Currently fails silently. Eventually we will want to improve the model design so this doesn't happen.
 	except:
 		return ''
 
-@register.simple_tag
-
+@register.assignment_tag
 def assignment_object_exists(object_id, collection_id):
 	'''
 		Checks to make sure that both the assignment and the target object exist
 	'''
 	try:
 		targ_obj = TargetObject.objects.get(pk=object_id)
-		#assignment = Assignment.objects.get(assignment_id=collection_id);
+		assignment = Assignment.objects.get(assignment_id=collection_id);
 		return True
 	except:
 		return False
