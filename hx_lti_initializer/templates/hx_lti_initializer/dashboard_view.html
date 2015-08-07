@@ -28,22 +28,21 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
         <br>
+        {% if student_objects %}
             <div>
                 <div class="input-group">
                     <div class="input-group-btn search-panel">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    	<span id="search_concept">Users</span> <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                      <li><a href="#users">Users</a></li>
-                      <li><a href="#content">Content</a></li>
-                    </ul>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        	<span id="search_concept">Name</span> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#name">Name</a></li>
+                            <li><a href="#content">Content</a></li>
+                        </ul>
+                    </div>
+                    <input type="text" id="studentsearch" class="form-control" placeholder="Filter users by...">
+                    <input type="hidden" name="search_param" value="name" id="search_param">
                 </div>
-                    <input type="hidden" name="search_param" value="users" id="search_param">
-                    <input type="text" id="studentsearch" class="form-control" placeholder="Search...">
-                    
-                </div>
-                {% if student_objects %}
                 <div id="student_list" class="list-group">
                     <br/>
                     {% for student in student_objects %}
@@ -113,19 +112,20 @@
                 </div>
                 {% else %}
                 No annotations to display
-                {% endif %}
             </div>
+        {% endif %}
         </div>
     </body>
 </html>
 
 <script>
-// Filter for the panel of a particular student
 $(document).ready(function(){
-    // Search type (users by default)
-    var type = 'users';
+    // Search type (name by default)
+    var type = 'name';
+    // Get all panels 
+    var $panels = $('.panel');
     
-    // Toggler for search bar dropdown
+    // Handles toggling for search bar dropdown
     $('.search-panel .dropdown-menu').find('a').click(function(e) {
         e.preventDefault();
         var param = $(this).attr("href").replace("#", "");
@@ -134,39 +134,47 @@ $(document).ready(function(){
         $('.input-group #search_param').val(param);
         // Update search type
         type = param;
+        // Update view
+        update($('#studentsearch').val().toLowerCase());
+        
     });
     
-    // Get all panels 
-    var $panels = $('.panel');
-    
     // Search on key press
-    $('#studentsearch').on('keyup', function(){
+    $('#studentsearch').on('keyup', function(e){
         var val = this.value.toLowerCase();
         
-        if (type == 'users') {
-            // Show panels that match search value
+        // Only trigger if alphanumeric character is entered
+        if ((e.which <= 90 && e.which >= 48)) {
+            update(val);
+        }
+        
+        // Collapse and show all panels
+        else if (val == '') {
+            $panels.show();
+            $('.panel-collapse').collapse('hide');
+        }
+    });
+    
+    // Updates view
+    function update(value) {
+        if (type == 'name' && value != '') {
+            // Show panels that match user
             $panels.show().filter(function(){
                 $('.panel-collapse').collapse('show');
                 var title = $(this).find('.panel-title').text().toLowerCase();
-                return title.indexOf(val) < 0;
+                return title.indexOf(value) < 0;
             }).hide();
         }
         
-        else {
-            // Show panels that match search value
+        if (type == 'content' && value != '') {
+            // Show panels that match content
             $panels.show().filter(function(){
                 $('.panel-collapse').collapse('show');
                 var title = $(this).find('.panel-body').text().toLowerCase();
-                return title.indexOf(val) < 0;
+                return title.indexOf(value) < 0;
             }).hide();
             
         }
-        
-        // Collapse panels if the search bar is empty
-        if (val.length == 0) {
-            $('.panel-collapse').collapse('hide');
-            console.log($('#studentsearch').value);
-        }
-    });
+    }
 });
 </script>

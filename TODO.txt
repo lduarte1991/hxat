@@ -42,6 +42,7 @@ NOT A PRIORITY/TODO LONG-TERM:
 -- Hover to annotate? This was working at one point, I believe.
 
 -- The db max length for the id (name) field is 30. What about long names?
+    (Note: this is a django requirement
 
 
 ============================
