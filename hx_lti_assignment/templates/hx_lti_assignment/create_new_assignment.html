@@ -234,4 +234,14 @@
 		{% endbuttons %}
 
 	</form>
+	
+	{% if assignment_id %}
+	<form method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
+		{% csrf_token %}
+		<input type="hidden" name="assignment_id" value="{{ assignment_id }}"></input>
+		<button type="submit" class="save btn btn-danger" style="float: left">
+			{% bootstrap_icon "trash" %} Delete Assignment&nbsp
+		</button>
+	</form>
+	{% endif %}
 {% endblock %}

@@ -126,5 +126,6 @@ def edit_assignment(request, id):
             'number_of_targets': target_num,
             'user': request.user,
             'debug': debug,
+            'assignment_id': assignment.assignment_id,
         }
     )

@@ -9,8 +9,6 @@ BUGS
 
 BROAD TODOS/ISSUES (To be done by fall launch)
 
--- Assignment Deletion
-
 -- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
     My current solution is a total hack
 
@@ -90,6 +88,7 @@ COMPLETED
 √ (fixed) Students can only be a member on one course, or else everything breaks.
 √ (fixed) Shorter Target Object names make skinny tables, which shrink after being opened. Little UI blip.
 √ (fixed) Edit button next to assignment opens objects list below it, before linking into the edit. Little UI blip.
+√ Assignment Deletion
 
 ============================
 DIFFERENCES FROM LUIS
