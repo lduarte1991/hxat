@@ -115,6 +115,8 @@ def edit_assignment(request, id):
             return redirect('hx_lti_initializer:course_admin_hub')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
+        #for targs in assignment.assignment_objects.all():
+        #    print targs
         form = AssignmentForm(instance=assignment)
 
     return render(
