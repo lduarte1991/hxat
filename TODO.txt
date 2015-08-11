@@ -9,6 +9,18 @@ BUGS
 
 BROAD TODOS/ISSUES (To be done by fall launch)
 
+-- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
+
+-- Deletion of source material
+
+-- Sidebar functionality (waiting for Luis)
+
+-- Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
+    -- Change user creation
+    -- Change name display code
+
+-- Filter target objects by course in 'add source material' dropdown
+
 -- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
     My current solution is a total hack
 
@@ -38,9 +50,6 @@ NOT A PRIORITY/TODO LONG-TERM:
 -- Assignment/annotation deletion from the catch database? Do we even want this?
 
 -- Hover to annotate? This was working at one point, I believe.
-
--- The db max length for the id (name) field is 30. What about long names?
-    (Note: this is a django requirement
 
 
 ============================
