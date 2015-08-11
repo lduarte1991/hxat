@@ -75,6 +75,7 @@ jQuery(function ($) {
 				username: "{{ username }}",
 				user_id: "{{ user_id }}",
 				is_instructor: "{{ is_instructor }}",
+				pagination: {{ assignment.pagination_limit }},
 			},
 			annotationMainOptions: {
 			},
@@ -109,7 +110,6 @@ jQuery(function ($) {
 					template_urls: '{% static "templates/dashboard/"%}',
 					showPublicPrivateSelectors: true,
 					showMediaSelector: false,
-					pagination: {{ assignment.pagination_limit }},
 					flags: false,
 					imageRootUrl: "{% static "vendors/catch/img"%}",
 					instructor_email: "fake@fake.com",
