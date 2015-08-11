@@ -196,10 +196,7 @@
 						<td class="field-target_object" >
 							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
 								{% for id,choice in form.fields.assignment_objects.choices %}
-								{% target_object_is_in_course user id as exists %}
-                                {% if exists %}
 									<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
-								{% endif %}
 						{% endfor %}
 							</select>
 						</td>
