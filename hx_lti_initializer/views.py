@@ -383,8 +383,9 @@ def instructor_dashboard_view(request):
             'annotations': filter_annotations(annotations_for_course, profile.get_id())
         })
     
+    # Pass alphabetically sorted version of student_objects
     context = {
-        'student_objects': student_objects,
+        'student_objects': sorted(student_objects, lambda x,y:cmp(str(x['student_name']).lower(), str(y['student_name']).lower())),
     }
     
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
@@ -418,3 +419,15 @@ def error_view(request, message):
     
     return HttpResponse(message)
    # return render(request, 'hx_lti_initializer/error_page.html', context)
+
+
+def delete_assignment(request):
+    try:
+        collection_id = request.POST['assignment_id']
+        assignment = Assignment.objects.get(assignment_id=collection_id)
+        assignment.delete()
+        debug_printer("DEBUG - Assignment Deleted: " + unicode(assignment))
+    except:
+        return error_view(request, "Something went wrong with assignment deletion")
+    
+    return redirect('hx_lti_initializer:course_admin_hub')

@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load assignment_extras %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -13,8 +14,6 @@
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
 <script src="{% static "vendors/development/jquery-ui.js" %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
-
-
 	<script>
 	jQuery(document).ready(function(){
 		if (jQuery('#id_allow_highlights').val()){
@@ -197,7 +196,7 @@
 						<td class="field-target_object" >
 							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
 								{% for id,choice in form.fields.assignment_objects.choices %}
-								<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
+									<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
 						{% endfor %}
 							</select>
 						</td>
@@ -234,4 +233,15 @@
 		{% endbuttons %}
 
 	</form>
+	
+	{% if assignment_id %}
+	<!--TODO: Make the deletion confirmation Bootstrap native-->
+	<form onsubmit="return confirm('Are you sure you want to delete this assignment?');" method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
+		{% csrf_token %}
+		<input type="hidden" name="assignment_id" value="{{ assignment_id }}"></input>
+		<button type="submit" id="confirm-delete" class="save btn btn-danger" style="float: left">
+			{% bootstrap_icon "trash" %} Delete Assignment &nbsp
+		</button>
+	</form>
+	{% endif %}
 {% endblock %}
