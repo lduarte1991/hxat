@@ -157,23 +157,22 @@ $(document).ready(function(){
     
     // Updates view
     function update(value) {
-        if (type == 'name' && value != '') {
+        // lookup table for search type
+        var selector_for = {
+          'name': '.panel-title',
+          'content': '.panel-body'
+        };
+        
+        // match search type to selector
+        var selector = selector_for[type];
+        
+        if (selector && value != '') {
             // Show panels that match user
             $panels.show().filter(function(){
                 $('.panel-collapse').collapse('show');
-                var title = $(this).find('.panel-title').text().toLowerCase();
+                var title = $(this).find(selector).text().toLowerCase();
                 return title.indexOf(value) < 0;
             }).hide();
-        }
-        
-        if (type == 'content' && value != '') {
-            // Show panels that match content
-            $panels.show().filter(function(){
-                $('.panel-collapse').collapse('show');
-                var title = $(this).find('.panel-body').text().toLowerCase();
-                return title.indexOf(value) < 0;
-            }).hide();
-            
         }
     }
 });
