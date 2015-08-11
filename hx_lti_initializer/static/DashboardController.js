@@ -82,8 +82,8 @@
 		var self = this;
 		var annotationItems = [];
 		annotations.forEach(function(annotation) {
-			var item = jQuery.extend(true, {}, annotation);
-			var html = self.TEMPLATES.annotationItem(annotation);
+			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var html = self.TEMPLATES.annotationItem(item);
 			annotationItems.push(html);
 		});
 		el.html(self.TEMPLATES.annotationSection({
@@ -117,6 +117,51 @@
 				section.css('min-width', '150px');
 			}
 		});
+	};
+
+	$.DashboardController.prototype.createDateFromISO8601 = function(string) {
+		var d, date, offset, regexp, time, _ref;
+		regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" + "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" 
+		       + "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+		d = string.match(new RegExp(regexp));
+		offset = 0;
+		date = new Date(d[1], 0, 1);
+		if (d[3]) {
+			date.setMonth(d[3] - 1);
+		}
+		if (d[5]) {
+			date.setDate(d[5]);
+		}
+		if (d[7]) {
+			date.setHours(d[7]);
+		}
+		if (d[8]) {
+			date.setMinutes(d[8]);
+		}
+		if (d[10]) {
+			date.setSeconds(d[10]);
+		}
+		if (d[12]) {
+			date.setMilliseconds(Number("0." + d[12]) * 1000);
+		}
+		if (d[14]) {
+			offset = (Number(d[16]) * 60) + Number(d[17]);
+			offset *= (_ref = d[15] === '-') != null ? _ref : {
+				1: -1
+			};
+		}
+		offset -= date.getTimezoneOffset();
+		time = Number(date) + (offset * 60 * 1000);
+		date.setTime(Number(time));
+		return date;
+	};
+
+	$.DashboardController.prototype.formatAnnotation = function(annotation) {
+		var item = annotation;
+		var self = this;
+		if (typeof item.updated !== 'undefined')
+            item.updated = self.createDateFromISO8601(item.updated);
+        return item;
 	};
 
 }(AController));
