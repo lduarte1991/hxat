@@ -10,6 +10,8 @@
 	height: 100%;
 	background-color: #343535;
 	padding: 5px;
+	overflow-x: hidden;
+	overflow-y: scroll;
 }
 .annotationSection.side > .annotationsHolder.side {
 	background-color:white;
@@ -149,4 +151,8 @@
     border: 1px solid #999;
     border-radius: 10px;
     margin-bottom: 3px;
+}
+
+.search-label {
+	color: #ccc;
 }

@@ -118,6 +118,7 @@
 	                    collectionId: this.initOptions.collection_id,
 	                    contextId: this.initOptions.context_id,
 	                    media: this.initOptions.mediaType,
+	                    limit: this.initOptions.pagination,
 	                }
 		    	};
 		    	
