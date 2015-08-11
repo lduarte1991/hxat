@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECURE_SETTINGS.get('django_secret_key', '')
+SECRET_KEY = SECURE_SETTINGS['django_secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -124,10 +124,10 @@ LTI_COURSE_ID = "context_id"
 LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
-LTI_DEBUG = SECURE_SETTINGS.get('LTI_DEBUG', False)
-LTI_SECRET = SECURE_SETTINGS.get('LTI_SECRET', '')
-CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '')
-CONSUMER_KEY = SECURE_SETTINGS.get('CONSUMER_KEY', '')
+LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
+LTI_SECRET = SECURE_SETTINGS['LTI_SECRET']
+CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '') #this doesn't get used...
+CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
 ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
 X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvard.edu'})
 X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP', {'harvard.edu':'harvardx.harvard.edu'})
@@ -152,7 +152,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (C9 Merge)", 
+                "text": "Annotations (C9)", 
             }
         }
     }

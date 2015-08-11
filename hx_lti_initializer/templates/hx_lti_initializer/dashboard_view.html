@@ -96,8 +96,7 @@
                                                     </td>
                                                     <td>"{{ annotation.quote }}"</td>
                                                     <td>{{ annotation.text | safe }}</td>
-                                                    <!-- TODO: tags currently not implemented -->
-                                                    <td>{{ annotation.tags }}</td>
+                                                    <td>{{ annotation.tags | format_tags }}</td>
                                                 </tr>
                                                 {% endif %}
                                                 {% endfor %}
