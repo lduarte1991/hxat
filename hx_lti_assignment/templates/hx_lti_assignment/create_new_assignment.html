@@ -15,9 +15,15 @@
 <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
 	<script>
 	jQuery(document).ready(function(){
-		if (jQuery('#id_allow_highlights').val()){
+		/*if (jQuery('#id_allow_highlights').val()){
 			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
-		}
+		}*/
+		// TODO: until the lack of tags no longer breaks the sidebar functionality,
+		// we cannot allow them to go unused.
+		jQuery('#id_allow_highlights').prop('checked', true);
+		jQuery('#id_allow_highlights').parent().hide();
+		jQuery('#id_highlights_options').attr("placeholder", "(Example) instructor:red")
+		
 		if (jQuery('#id_include_instructor_tab').val()){
 			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
 		}
