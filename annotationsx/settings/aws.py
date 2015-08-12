@@ -125,10 +125,10 @@ LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
 LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
-LTI_SECRET = SECURE_SETTINGS['LTI_SECRET']
-CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '') #this doesn't get used...
-CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
-ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
+LTI_SECRET = SECURE_SETTINGS.get('LTI_SECRET', '') # ignored if using django_auth_lti
+CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL', '') # ignored if using django_auth_lti
+CONSUMER_KEY = SECURE_SETTINGS.get('CONSUMER_KEY', '') # ignored if using django_auth_lti
+ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'}) 
 X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES', {'harvard.edu'})
 X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP', {'harvard.edu':'harvardx.harvard.edu'})
 
@@ -152,7 +152,7 @@ LTI_SETUP = {
             "course_navigation": {
                 "enabled": "true",
                 "default": "enabled",
-                "text": "Annotations (C9)", 
+                "text": "AnnotationsX", 
             }
         }
     }
@@ -170,3 +170,7 @@ ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 CSRF_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
 SESSION_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# AWS SSL settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
