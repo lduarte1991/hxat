@@ -90,6 +90,11 @@
         	}
         	return !should_quit
         });
+        
+        // Set current course as default in course selector
+        $('select[name=course]').val(1);
+		$('.selectpicker').selectpicker('refresh');
+		console.log($('select[name=course]'));
     });
 	
 	var fixOrderNumbers = function(){

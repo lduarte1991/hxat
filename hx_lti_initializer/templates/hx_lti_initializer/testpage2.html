@@ -202,14 +202,17 @@ li {
             <div class="sidebar-top">
                 <div id="user-label">{{ user.username }}</div>
             </div>
+
             {% if is_instructor %}
             <div class="sidebar">
+                <!--
                 <p>
                     <ul>
                         <li>To add a new course, simply initialize LTI tool as an administrator/instructor.</li>
                         <li>Change course settings to edit the name and any people to be considered "admins"</li>
                     </ul>
                 </p>
+                -->
                 <!--<div class="dashed-bar"></div>
                 <div class="dashed-bar"></div>
                 <p>
@@ -218,6 +221,8 @@ li {
              </div>
              <br>
              <a role="button" href="instructor_dashboard_view"><div class="btn btn-default">Instructor Dashboard</div></a>
+            {% else %}
+                <div class="sidebar"></div>
             {% endif %}
         </div>
         <div class="col-md-1"></div>

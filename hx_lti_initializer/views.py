@@ -260,6 +260,7 @@ def edit_course(request, id):
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
+            print("Rolled )))")
             raise PermissionDenied()
     else: 
         form = CourseForm(instance=course)
