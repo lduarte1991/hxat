@@ -144,6 +144,12 @@ li {
     background-size: contain;
 }
 
+#edit_assignment_td {
+    position: absolute;
+    left: -25;
+    border: none;
+}
+
 .copypaste{
     padding: 20px;
     text-align: center;
@@ -231,7 +237,7 @@ li {
                 <tbody>
                     {% for assignment in course.assignment_set.all %}
                     <tr>
-                        <td style="position: absolute; left: -20; cursor: auto; border: none; background-color: transparent">
+                        <td id="edit_assignment_td" style="cursor: auto; background-color: transparent">
                             {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
                             <a class="" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
                             {% endif %}
