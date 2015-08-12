@@ -66,7 +66,7 @@ def create_new_assignment(request):
             })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0
-
+        
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',
@@ -75,7 +75,8 @@ def create_new_assignment(request):
             'targets_form': targets_form,
             'user': request.user,
             'number_of_targets': target_num,
-            'debug': debug
+            'debug': debug,
+            'course_name': request.session['course_name'],
         }
     )
 
@@ -129,5 +130,6 @@ def edit_assignment(request, id):
             'user': request.user,
             'debug': debug,
             'assignment_id': assignment.assignment_id,
+            'course_name': request.session['course_name'],
         }
     )

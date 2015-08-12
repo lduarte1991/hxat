@@ -91,10 +91,13 @@
         	return !should_quit
         });
         
+        // Get name of course
+        var courseName = "{{ course_name | safe }}";
+        // Get value of option matching the current course
+        var value = $('#id_course option').filter(function () { return $(this).html() == courseName;}).val();
         // Set current course as default in course selector
-        $('select[name=course]').val(1);
+        $('select[name=course]').val(value);
 		$('.selectpicker').selectpicker('refresh');
-		console.log($('select[name=course]'));
     });
 	
 	var fixOrderNumbers = function(){
