@@ -7,23 +7,7 @@ BUGS
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
--- Clean up/create sensible frontend instructions
-    √ Don't need 'to add a new course' etc. in the little left-float bubble.
-    -- Probably don't need the little left bubble at all
-
--- Hide irrelevant/unimplemented frontend fields
-    -- Ideally, we won't need target creator or target course options in target object creation
-        -- they should be able to be inferred
-    √ External CSS
-    √ Tags are required right now, they should be hidden and turned on automatically
-
--- Set defaults for frontend fields that can usually be inferred
-    -- In 'Create Source Material'
-        -- Course should default to current course
-        -- Content creator should default to current user
-    √ In 'Create Assignment'
-        √ Annotation DB Key, URL, and Secret should have defaults pre-populated.
-            -- Consider taking out the annotation DB tab entirely (doesn't need to be on the frontend)
+-- Consider taking out the annotation DB tab from assignment creation (doesn't really need to be on the frontend)
 
 -- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
@@ -117,6 +101,18 @@ COMPLETED
 √ Assignment Deletion
 √ Infer default course title from LTI Launch
 √ Sidebar functionality (basic functionality is there)
+√ Hide irrelevant/unimplemented frontend fields
+    √ target creator or target course options in target object creation should be able to be inferred
+    √ External CSS
+    √ Tags are required right now, they should be hidden and turned on automatically
+√ Don't need 'to add a new course' etc. in the little left-float bubble.
+√ Set defaults for frontend fields that can usually be inferred
+    √ In 'Create Source Material'
+        √ Course should default to current course
+        √ Content creator should default to current user
+    √ In 'Create Assignment'
+        √ Annotation DB Key, URL, and Secret should have defaults pre-populated.
+
 
 ============================
 DIFFERENCES FROM LUIS
