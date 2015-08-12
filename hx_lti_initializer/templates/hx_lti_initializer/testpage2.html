@@ -144,6 +144,12 @@ li {
     background-size: contain;
 }
 
+#edit_assignment_td {
+    position: absolute;
+    left: -25;
+    border: none;
+}
+
 .copypaste{
     padding: 20px;
     text-align: center;
@@ -196,14 +202,17 @@ li {
             <div class="sidebar-top">
                 <div id="user-label">{{ user.username }}</div>
             </div>
+
             {% if is_instructor %}
             <div class="sidebar">
+                <!--
                 <p>
                     <ul>
                         <li>To add a new course, simply initialize LTI tool as an administrator/instructor.</li>
                         <li>Change course settings to edit the name and any people to be considered "admins"</li>
                     </ul>
                 </p>
+                -->
                 <!--<div class="dashed-bar"></div>
                 <div class="dashed-bar"></div>
                 <p>
@@ -212,6 +221,8 @@ li {
              </div>
              <br>
              <a role="button" href="instructor_dashboard_view"><div class="btn btn-default">Instructor Dashboard</div></a>
+            {% else %}
+                <div class="sidebar"></div>
             {% endif %}
         </div>
         <div class="col-md-1"></div>
@@ -231,7 +242,7 @@ li {
                 <tbody>
                     {% for assignment in course.assignment_set.all %}
                     <tr>
-                        <td style="position: absolute; left: -20; cursor: auto; border: none; background-color: transparent">
+                        <td id="edit_assignment_td" style="cursor: auto; background-color: transparent">
                             {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
                             <a class="" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
                             {% endif %}

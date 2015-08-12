@@ -1,5 +1,4 @@
 {% extends 'hx_lti_initializer/base.html' %}
-{% load assignment_extras %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -16,9 +15,15 @@
 <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
 	<script>
 	jQuery(document).ready(function(){
-		if (jQuery('#id_allow_highlights').val()){
+		/*if (jQuery('#id_allow_highlights').val()){
 			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
-		}
+		}*/
+		// TODO: until the lack of tags no longer breaks the sidebar functionality,
+		// we cannot allow them to go unused.
+		jQuery('#id_allow_highlights').prop('checked', true);
+		jQuery('#id_allow_highlights').parent().hide();
+		jQuery('#id_highlights_options').attr("placeholder", "(Example) instructor:red")
+		
 		if (jQuery('#id_include_instructor_tab').val()){
 			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
 		}
@@ -85,6 +90,14 @@
         	}
         	return !should_quit
         });
+        
+        // Get name of course
+        var courseName = "{{ course_name | safe }}";
+        // Get value of option matching the current course
+        var value = $('#id_course option').filter(function () { return $(this).html() == courseName;}).val();
+        // Set current course as default in course selector
+        $('select[name=course]').val(value);
+		$('.selectpicker').selectpicker('refresh');
     });
 	
 	var fixOrderNumbers = function(){

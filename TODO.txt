@@ -1,30 +1,43 @@
 ============================
 BUGS
--- Deletion of replies doesn't seem to work 
--- Last updated doesn't work
+-- Can't reply to annotations
 -- Can't use the same text across multiple assignments
 -- Other instructors' texts (well, all texts really) show up in 'add source material'
 
 ============================
-
 BROAD TODOS/ISSUES (To be done by fall launch)
+
+-- Clean up/create sensible frontend instructions
+    √ Don't need 'to add a new course' etc. in the little left-float bubble.
+    -- Probably don't need the little left bubble at all
+
+-- Hide irrelevant/unimplemented frontend fields
+    -- Ideally, we won't need target creator or target course options in target object creation
+        -- they should be able to be inferred
+    √ External CSS
+    √ Tags are required right now, they should be hidden and turned on automatically
+
+-- Set defaults for frontend fields that can usually be inferred
+    -- In 'Create Source Material'
+        -- Course should default to current course
+        -- Content creator should default to current user
+    √ In 'Create Assignment'
+        √ Annotation DB Key, URL, and Secret should have defaults pre-populated.
+            -- Consider taking out the annotation DB tab entirely (doesn't need to be on the frontend)
 
 -- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
 -- Deletion of source material
 
--- Sidebar functionality (waiting for Luis)
-
 -- Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
     -- Change user creation
     -- Change name display code
+    -- (demo fix already completed in another repo)
 
 -- Filter target objects by course in 'add source material' dropdown
 
 -- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
     My current solution is a total hack
-
--- Link to dashboard from the detail? So you don't have to go back to the index.
 
 -- Test Dashboard et. all to make sure thousands of annotations work.
 
@@ -33,12 +46,16 @@ BROAD TODOS/ISSUES (To be done by fall launch)
     -- maybe more strictly permission-bound tokens could help us here
 
 -- Update Documentation (may want to wait until we're done with everything else)
+-- Create high-level documentation
 
 -- Unit Tests :(
 
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Link to dashboard from the detail? So you don't have to go back to the index.
+    -- Find out what users want
 
 -- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
     Eventually we may want to add support for TFs as well.
@@ -98,6 +115,8 @@ COMPLETED
 √ (fixed) Shorter Target Object names make skinny tables, which shrink after being opened. Little UI blip.
 √ (fixed) Edit button next to assignment opens objects list below it, before linking into the edit. Little UI blip.
 √ Assignment Deletion
+√ Infer default course title from LTI Launch
+√ Sidebar functionality (basic functionality is there)
 
 ============================
 DIFFERENCES FROM LUIS

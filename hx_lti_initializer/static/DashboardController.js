@@ -1,26 +1,51 @@
+/**
+ *  DashboardController.js
+ *	
+ * This file contains all logic for the sidebar or bottombar in order to show
+ * annotations in a table/list view instead of, or alongside, the mouseovers
+ * in the target object. 
+ **/
 (function($) {
+
 	$.DashboardController = function(options, commonInfo) {
+		
+		// sets up the default options
 		var defaultOptions = {
+
+			// media can be "text", "video", or "image"
 			media: commonInfo.mediaType,
 			userId: commonInfo.user_id,
-			showMediaSelector: true,
+
+			// if true, this will allow users to change between annotations for video, text,
+			// or images that exist in the same page
+			showMediaSelector: false,
+
+			// if true this will allow users to switch between public/private
 			showPublicPrivate: true,
-			pagintation: 50,
+			pagination: 50,
 			flags: false,
 		}
-		console.log(options);
+
 		this.element = options.annotationElement;
 
 		this.initOptions = jQuery.extend({}, defaultOptions, options.initOptions, commonInfo);
-
 		this.current_tab = this.initOptions.default_tab;
+		
+		// variables used when resizing dashboards
 		this.resizing = false;
 		this.lastUp = 150;
 
+		// set up template names that will be pulled
 		this.TEMPLATENAMES = [
 			"annotationSection",
 			"annotationItem",
 		];
+
+		this.queryDefault = {
+			user_id: undefined,
+		};
+
+		this.addingAnnotations = false;
 
 		this.init();
 		
@@ -30,24 +55,107 @@
 	 * 
 	 */
 	$.DashboardController.prototype.init = function() {
+		// gets the current instance of the wrapper around the target object and annotator
 		var wrapper = jQuery('.annotator-wrapper').parent()[0];
 		var annotator = jQuery.data(wrapper, 'annotator');
+		var self = this;
 		this.annotator = annotator;
+		
+		// sets up all event listeners and their actions
 		this._subscribeAnnotator();
+		
+		// actually compile templates
+		// TODO: Allow instructor (or maybe even user) to switch between different dashboards
 		this.TEMPLATES = {};
 		this._compileTemplates("side");
+		this.setUpSideDisplay([]);
+		this.setUpButtons();
 	};
 
-	$.DashboardController.prototype.loadAnnotations = function() {
+	$.DashboardController.prototype.setUpButtons = function() {
+		var self = this;
+		jQuery('#public').click(function (e){
+			self.changeTab(e.target.innerHTML);
+		});
+		jQuery('#mynotes').click(function (e){
+			self.changeTab(e.target.innerHTML);
+		});
+		jQuery('#instructor').click(function (e){
+			self.changeTab(e.target.innerHTML);
+		});
+		jQuery('#users-filter').addClass('disabled');
+		jQuery('#users-filter').click(function (e){
+			jQuery('#users-filter').addClass('disabled');
+			jQuery('#annotationtext-filter').removeClass('disabled');
+			jQuery('#tag-filter').removeClass('disabled');
+		});
+		jQuery('#annotationtext-filter').click(function (e){
+			jQuery('#users-filter').removeClass('disabled');
+			jQuery('#annotationtext-filter').addClass('disabled');
+			jQuery('#tag-filter').removeClass('disabled');
+		});
+		jQuery('#tag-filter').click(function (e){
+			jQuery('#users-filter').removeClass('disabled');
+			jQuery('#annotationtext-filter').removeClass('disabled');
+			jQuery('#tag-filter').addClass('disabled');
+		});
+		jQuery('button#search-submit').click(function (e) {
+			var text = jQuery('#srch-term').val();
+			var search_filter = jQuery("button.query-filter.disabled").attr("id");
+			if (search_filter === "users-filter"){
+				self.queryDatabase({
+					"username": text,
+				});
+			} else if (search_filter === "annotationtext-filter"){
+				self.queryDatabase({
+					"text": text,
+				});
+			} else if (search_filter === "tag-filter"){
+				self.queryDatabase({
+					"tag": text,
+				})
+			}
+		});
+		jQuery('button#search-clear').click(function (e) {
+			jQuery('#srch-term').val("");
+			self.changeTab(jQuery("button.user-filter.disabled").html());
+		});
+	};
+
+	$.DashboardController.prototype.changeTab = function(def){
+		if (def === "Public"){
+			this.queryDatabase({
+				"user_id": undefined,
+			});
+			jQuery('#public').addClass('disabled');
+			jQuery('#mynotes').removeClass('disabled');
+			jQuery('#instructor').removeClass('disabled');
+		}
+		else if (def === "My Notes"){
+			this.queryDatabase({
+				"user_id": this.initOptions.user_id,
+			});
+			jQuery('#mynotes').addClass('disabled');
+			jQuery('#public').removeClass('disabled');
+			jQuery('#instructor').removeClass('disabled');
+		} else {
+			this.queryDatabase({
+				"user_id": this.initOptions.instructor_email,
+			});
+			jQuery('#instructor').addClass('disabled');
+			jQuery('#public').removeClass('disabled');
+			jQuery('#mynotes').removeClass('disabled');
+		}
+	};
+
+	$.DashboardController.prototype.loadMoreAnnotations = function() {
 		var annotator = this.annotator;
 
 		// TODO: Change below to be a call to the Core Controller
 		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
+		var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
 
-		loadFromSearch.limit = this.initOptions.pagination;
-		loadFromSearch.offset = 0;
-		loadFromSearch.media = this.initOptions.mediaType;
-		loadFromSearch.userid = this.initOptions.user_id;
+		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
 		annotator.plugins.Store.loadAnnotationsFromSearch(loadFromSearch);
 	};
 
@@ -56,8 +164,47 @@
 		var annotator = this.annotator;
 
 		annotator.subscribe("annotationsLoaded", function (annotations) {
-			self.setUpSideDisplay(annotations);
-		})
+			if (self.addingAnnotations){
+				self.addAnnotations(annotations, "after");
+				self.addingAnnotations = false;
+			} else {
+				self.clearDashboard();
+				self.createNewList(annotator.plugins.Store.annotations);
+			}
+		});
+		annotator.subscribe("annotationCreated", function (annotation) {
+			var attempts = 0;
+			var isChanged = function (){
+				if (attempts < 100){
+					setTimeout(function(){
+						if(typeof annotation.id !== 'undefined'){
+							self.addAnnotations([annotation], "before");
+						} else {
+							attempts++;
+							isChanged();
+						}
+					}, 100);
+				}
+			};
+			isChanged();
+		});
+	};
+
+	$.DashboardController.prototype.clearDashboard = function(){
+		var el = this.element;
+		jQuery('.annotationsHolder').html("");
+	};
+
+	$.DashboardController.prototype.createNewList = function(annotations){
+		var self = this;
+		var el = self.element;
+		var self = this;
+		annotations.forEach(function(annotation) {
+			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var html = self.TEMPLATES.annotationItem(item);
+			jQuery('.annotationsHolder').append(html);
+		});
+		
 	};
 
 	$.DashboardController.prototype._compileTemplates = function(templateType){
@@ -79,17 +226,10 @@
 	$.DashboardController.prototype.setUpSideDisplay = function(annotations) {
 		var self = this;
 		var el = self.element;
-		var self = this;
-		var annotationItems = [];
-		annotations.forEach(function(annotation) {
-			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
-			var html = self.TEMPLATES.annotationItem(item);
-			annotationItems.push(html);
-		});
 		el.html(self.TEMPLATES.annotationSection({
-			annotationItems: annotationItems,
+			annotationItems: [],
 		}));
-
+		self.createNewList(annotations);
 		jQuery('.resize-handle.side').on('mousedown', function(e){
 			self.resizing = true;
 		});
@@ -117,6 +257,27 @@
 				section.css('min-width', '150px');
 			}
 		});
+		jQuery('.annotationSection').scroll(function() {
+			if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
+				this.addingAnnotations = true;
+				self.loadMoreAnnotations();
+			}
+		});
+		self.changeTab(this.initOptions.default_tab);
+	};
+
+	$.DashboardController.prototype.addAnnotations = function(annotations, location) {
+		var self = this;
+		annotations.forEach(function(annotation) {
+			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var html = self.TEMPLATES.annotationItem(item);
+			if (location === "before") {
+				jQuery('.annotationsHolder').prepend(html);
+			} else {
+				jQuery('.annotationsHolder').append(html);
+			}
+		});
+		
 	};
 
 	$.DashboardController.prototype.createDateFromISO8601 = function(string) {
@@ -163,5 +324,46 @@
             item.updated = self.createDateFromISO8601(item.updated);
         return item;
 	};
+
+	$.DashboardController.prototype.queryDatabase = function(options) {
+		var setOptions = jQuery.extend({}, this.queryDefault, options);
+		var annotator = this.annotator;
+
+		// TODO: Change below to be a call to the Core Controller
+		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
+		var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
+		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
+		loadFromSearch.offset = 0;
+		loadFromSearch.media = setOptions.mediaType;
+		loadFromSearch.userid = setOptions.user_id;
+		loadFromSearch.username = setOptions.username;
+		loadFromSearch.text = setOptions.text;
+		loadFromSearch.tag = setOptions.tag;
+		this._clearAnnotator();
+		annotator.plugins.Store.loadAnnotationsFromSearch(loadFromSearch);
+	};
+
+	// TODO (Move to Annotator Core)
+	$.DashboardController.prototype._clearAnnotator = function() {
+        var annotator = this.annotator;
+        var store = annotator.plugins.Store;
+        var annotations = store.annotations.slice();
+        
+        annotations.forEach(function(ann){
+            var child, h, _i, _len, _ref;
+            if (ann.highlights !== undefined) {
+                _ref = ann.highlights;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    h = _ref[_i];
+                    if (!(h.parentNode !== undefined)) {
+                        continue;
+                    }
+                    child = h.childNodes[0];
+                    jQuery(h).replaceWith(h.childNodes);
+                }
+            }
+            store.unregisterAnnotation(ann);
+        });
+    };
 
 }(AController));

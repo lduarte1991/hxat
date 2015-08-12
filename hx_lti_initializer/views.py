@@ -220,6 +220,8 @@ def launch_lti(request):
         course_object = LTICourse.get_course_by_id(course)
         # Add user to course_users if not already there
         course_object.add_user(lti_profile)
+        # Store course name in session
+        request.session['course_name'] = course_object.course_name
     
     except LTICourse.DoesNotExist:
         # this should only happen if an instructor is trying to access the 
@@ -233,6 +235,12 @@ def launch_lti(request):
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
             messages.warning(request, message_error)
             course_object = LTICourse.create_course(course, lti_profile)
+            # Set default course name to context title
+            course_object.course_name = get_lti_value('context_title', tool_provider)
+            course_object.save()
+            # Store course name in session
+            request.session['course_name'] = course_object.course_name
+
     
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -252,10 +260,12 @@ def edit_course(request, id):
         if form.is_valid():
             course = form.save()
             course.save()
-
+            
+            request.session['course_name'] = course.course_name
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
+            print("Rolled )))")
             raise PermissionDenied()
     else: 
         form = CourseForm(instance=course)
