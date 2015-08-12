@@ -40,6 +40,8 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
 
+-- Infer default course title from LTI Launch
+
 -- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
     Eventually we may want to add support for TFs as well.
 

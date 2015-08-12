@@ -233,6 +233,10 @@ def launch_lti(request):
             message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
             messages.warning(request, message_error)
             course_object = LTICourse.create_course(course, lti_profile)
+            # Set default course name to context title
+            course_object.course_name = get_lti_value('context_title', tool_provider)
+            course_object.save()
+
     
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
