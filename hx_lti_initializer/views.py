@@ -127,6 +127,9 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     request.session['is_instructor'] = False
     
+    # Set creator name, to be used later as default in addition of source material
+    request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
+    
     # Check whether user is a admin, instructor or teaching assistant
     # TODO: What roles do we actually want here?
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
