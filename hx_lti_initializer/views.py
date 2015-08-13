@@ -60,8 +60,12 @@ def initialize_lti_tool_provider(req):
     """
     # get the consumer key and secret from settings (__init__.py file)
     # will be used to compare against request to validate the tool init
-    consumer_key = settings.CONSUMER_KEY
-    secret = settings.LTI_SECRET
+    #consumer_key = settings.CONSUMER_KEY
+    #secret = settings.LTI_SECRET
+
+    # both of these will give key errors if there is no key or it's the wrong key, respectively.
+    consumer_key = req.POST['oauth_consumer_key']
+    secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
     
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
@@ -126,6 +130,9 @@ def launch_lti(request):
 
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     request.session['is_instructor'] = False
+    
+    # Set creator name, to be used later as default in addition of source material
+    request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
     
     # Check whether user is a admin, instructor or teaching assistant
     # TODO: What roles do we actually want here?
