@@ -13,7 +13,6 @@ import os
 from django.contrib import messages
 from secure import SECURE_SETTINGS
 
-# one above
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
