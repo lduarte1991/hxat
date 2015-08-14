@@ -103,6 +103,7 @@ Below is an overview of the differences between Harvard ATG's [fork](https://git
 		* Under Annotator Settings, the Allow Highlights checkbox is automatically checked and hidden as a temporary fix to a bug which was preventing the display of annotations in the sidebar
 	* The Add New Source Material button is commented out (deprecated), although the addition of new source material can still be accomplished from the Assignment Form
 	* Setup Info dialog commented out (deprecated)
+
 ### Minor Changes
 * Instructors have edit and delete privileges for the annotations of all users.
 * Only displays the data for the course (`active_course`) on which the tool is installed, as opposed to all courses for the user
