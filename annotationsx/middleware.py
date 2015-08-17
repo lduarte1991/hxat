@@ -27,5 +27,4 @@ class XFrameOptionsMiddleware(object):
             response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
 
         debug_printer('DEBUG - X-Frame-Options: %s' % response['X-Frame-Options'])
-
         return response

@@ -27,6 +27,11 @@
     border-radius: 10px;
     overflow: hidden;
     background-color: white;
+    cursor:pointer;
+}
+
+.annotationItem.side:hover {
+	background-color: #ddf;
 }
 
 .annotationSection.side >.resize-handle.side {
@@ -89,20 +94,20 @@
 	margin-top:10px;
 }
 
-.annotatedBy.side {
+.annotationItem .annotatedBy.side {
     font-family: Arial;
     font-size: 12pt;
     font-weight: bold;
     float: left;
 }
 
-.annotatedAt.side {
+.annotationItem .annotatedAt.side {
     font-family: Arial;
     font-size: 8pt;
     float:right;
 }
 
-.quote.side {
+.annotationItem .quote.side {
     border-left: 2px solid #BBB;
     border-radius: 1px;
     padding-left: 10px;
@@ -113,14 +118,14 @@
     font-size: 10pt;
 }
 
-.body.side {
+.annotationItem .body.side {
     font-family: Arial;
     font-size: 11pt;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-.totalreplies.side{
+.annotationItem .totalreplies.side{
     float:left;
     padding:7px;
     margin-left: 20px;
@@ -131,20 +136,20 @@
     font-family: Arial;
 }
 
-.tagList.side {
+.annotationItem .tagList.side {
     float:right;
     width: 50%;
 }
 
-.idAnnotation{
+.annotationItem .idAnnotation{
 	display:none;
 }
 
-.uri {
+.annotationItem .uri {
 	display:none;
 }
 
-.tag.side {
+.annotationItem .tag.side {
     display: inline-block;
     padding: 5px;
     font-size: 10pt;
@@ -155,4 +160,90 @@
 
 .search-label {
 	color: #ccc;
+}
+
+.annotationModal {
+    width: inherit;
+    height: 100%;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+.modal-navigation {
+	background-color: #bbb;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	height: 45px;
+}
+
+button#closeModal {
+	margin: 5px;
+}
+
+.annotationModal .idAnnotation {
+	display: none;
+}
+
+.parentAnnotation {
+	background-color: #333;
+	position: absolute;
+	width: 100%;
+	top: 45px;
+	border-bottom: 2px solid #bbb;
+	padding-bottom: 20px;
+	-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+	box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+}
+
+.parentAnnotation .annotatedBy.side {
+    font-family: Arial;
+    font-size: 12pt;
+    font-weight: bold;
+    float: left;
+    color: #fff;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.parentAnnotation .annotatedAt.side {
+    font-family: Arial;
+    font-size: 8pt;
+    float:right;
+    color: #fff;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.parentAnnotation .quote.side {
+    border-left: 2px solid #BBB;
+    border-radius: 1px;
+    padding-left: 10px;
+    color: #bbb;
+    margin-top: 40px;
+    margin-left: 15px;
+    font-style: italic;
+    font-family: Times New Roman;
+    font-size: 10pt;
+}
+
+.parentAnnotation .body.side {
+    font-family: Arial;
+    font-size: 13pt;
+    margin-top: 20px;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.addReply {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.addReply button.btn.btn-primary.replybutton {
+    width: 100%;
 }

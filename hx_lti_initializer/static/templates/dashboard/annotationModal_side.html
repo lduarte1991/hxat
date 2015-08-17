@@ -1,0 +1,29 @@
+<div class="annotationModal item-modal-<%= id %> side">
+	<span class="idAnnotation"><%= id %></span>
+	<div class="modal-navigation">
+		<button class="btn btn-default" id="closeModal"><i class="glyphicon glyphicon-arrow-left"></i></button>
+		<div class="label"><%= user.name %>&quot;s Annotation</div>
+	</div>
+	<div class="parentAnnotation">
+		<div class= "annotatedBy field side">
+	        <%= user.name %>
+	    </div>
+	    <% var date = new Date(updated); %>
+	    <div class="annotatedAt field side" title="<% print(date) %>">
+	        last updated <% print(jQuery.timeago(date)); %>
+	    </div>
+
+	    <div class="quote field side">
+	        <div class="quoteText"><%= quote %></div>
+	        <span class="uri" style="display:none"><%= uri %></span>
+
+	    </div>
+	    
+	    <div class="body field side">
+	        <%= text %>
+	    </div>
+	</div>
+	<div class="addReply">
+		<button class="btn btn-primary replybutton"><i class="glyphicon glyphicon-pencil"></i>  Reply to Comment</button>
+	</div>
+</div>

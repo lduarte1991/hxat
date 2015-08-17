@@ -34,15 +34,18 @@
 		// variables used when resizing dashboards
 		this.resizing = false;
 		this.lastUp = 150;
+		this.writingReply = false;
 
 		// set up template names that will be pulled
 		this.TEMPLATENAMES = [
 			"annotationSection",
 			"annotationItem",
+			"annotationModal",
 		];
 
 		this.queryDefault = {
 			user_id: undefined,
+			media: this.initOptions.mediaType,
 		};
 
 		this.addingAnnotations = false;
@@ -74,6 +77,7 @@
 
 	$.DashboardController.prototype.setUpButtons = function() {
 		var self = this;
+		var el = self.element;
 		jQuery('#public').click(function (e){
 			self.changeTab(e.target.innerHTML);
 		});
@@ -120,6 +124,7 @@
 			jQuery('#srch-term').val("");
 			self.changeTab(jQuery("button.user-filter.disabled").html());
 		});
+
 	};
 
 	$.DashboardController.prototype.changeTab = function(def){
@@ -171,6 +176,9 @@
 				self.clearDashboard();
 				self.createNewList(annotator.plugins.Store.annotations);
 			}
+			var annotationClicked = self.__bind(self.annotationClicked, self);
+			var el = self.element;
+			el.on("click", ".annotationItem", annotationClicked);
 		});
 		annotator.subscribe("annotationCreated", function (annotation) {
 			var attempts = 0;
@@ -317,6 +325,12 @@
 		return date;
 	};
 
+	$.DashboardController.prototype.__bind = function(fn, me) { 
+	    return function() { 
+	        return fn.apply(me, arguments); 
+    	}
+    }; 
+
 	$.DashboardController.prototype.formatAnnotation = function(annotation) {
 		var item = annotation;
 		var self = this;
@@ -365,5 +379,85 @@
             store.unregisterAnnotation(ann);
         });
     };
+
+    $.DashboardController.prototype.annotationClicked = function(e) {
+    	var self = this;
+    	var target = jQuery(e.target);
+    	var annotation_id = target.find(".idAnnotation").html();
+
+    	// this next part is to double check that idannotation is grabbed from
+    	// within the tags and the quotes section
+    	while (annotation_id === undefined){
+    		target = target.parent();
+    		annotation_id = target.find(".idAnnotation").html();
+    	}
+
+    	var annotationItem = self.getAnnotationById(annotation_id);
+    	var html = self.TEMPLATES.annotationModal(annotationItem);
+    	jQuery('.annotationSection').append(html);
+    	jQuery('.annotationSection').css('y-scroll', 'hidden');
+    	jQuery('.annotationModal #closeModal').click( function (e) {
+    		jQuery('.annotationModal').remove();
+    		jQuery('.annotationSection').css('y-scroll', 'scroll');
+    	});
+    	jQuery('.annotationModal button.replybutton').click( function (e) {
+    		var button = jQuery(e.target);
+    		var positionAdder = {
+    			display: "block",
+    			left: button.offset().left,
+    			top: button.offset().right,
+    		}
+    		self.annotator.adder.css(positionAdder);
+    		self.annotator.onAdderClick();
+    		var parent = jQuery(self.annotator.editor.element).find('.reply-item span.parent-annotation');
+    		console.log(annotation_id);
+    		parent.html(annotation_id);
+    		console.log(parent)
+    	});
+    };
+
+    // TODO Move to AnnotationCore
+    $.DashboardController.prototype.getAnnotationById = function(id){
+    	var annotationId = parseInt(id, 10);
+    	var self = this;
+    	var annotator = self.annotator;
+    	var annotations = annotator.plugins.Store.annotations.slice();
+
+    	for (index in annotations) {
+    		var annotation = annotations[index];
+    		if (annotation.id === annotationId){
+    			return self.formatAnnotation(jQuery.extend(true, {}, annotation));
+    		}
+    	} 
+    	return undefined;
+    };
+
+    $.DashboardController.prototype.getRepliesOfAnnotation = function(annotation_id) {
+    	var anId = parseInt(annotation_id, 10);
+    	var self = this;
+    	var annotator = self.annotator;
+    	var oldLoadFromSearch = annotator.plugins.Store.options.loadFromSearch;
+    	var annotation_obj_id = oldLoadFromSearch.uri;
+    	var context_id = oldLoadFromSearch.contextId;
+    	var collection_id = oldLoadFromSearch.collectionId;
+
+    	var newLoadFromSearch = {
+    		limit: -1,
+    		parentid: anId,
+    		media: "comment",
+    		uri: annotation_obj_id,
+    		contextId: context_id,
+    		collectionId: collection_id,
+    	}
+
+    	var onSuccess = function(data) {
+    		if (data === null) {
+    			data = {};
+    		}
+    		var annotations = data.rows || [];
+
+
+    	}
+    }
 
 }(AController));

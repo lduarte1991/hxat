@@ -1,16 +1,15 @@
-<div class="annotationItem item-0 side">
+<div class="annotationItem item-<%= id %> side">
+    <span class="idAnnotation"><%= id %></span>
     <div class= "annotatedBy field side">
         <%= user.name %>
     </div>
-    
-    <div class="annotatedAt field side" title="07-22-2015T14:27:15-00:00:00">
-        <% var date = new Date(updated); %>
+    <% var date = new Date(updated); %>
+    <div class="annotatedAt field side" title="<% print(date) %>">
         last updated <% print(jQuery.timeago(date)); %>
     </div>
 
     <div class="quote field side">
         <div class="quoteText"><%= quote %></div>
-        <span class="idAnnotation"><%= id %></span>
         <span class="uri" style="display:none"><%= uri %></span>
 
     </div>

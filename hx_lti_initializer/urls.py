@@ -21,6 +21,26 @@ urlpatterns = patterns(
         name="launch_lti",
     ),
     url(
+        r'^annotation_api/search$',
+        'hx_lti_initializer.views.annotation_database_search',
+        name="annotation_database_search",
+    ),
+    url(
+        r'^annotation_api/create$',
+        'hx_lti_initializer.views.annotation_database_create',
+        name="annotation_database_create",
+    ),
+    url(
+        r'^annotation_api/delete/(?P<annotation_id>[0-9]+)$',
+        'hx_lti_initializer.views.annotation_database_delete',
+        name="annotation_database_delete",
+    ),
+    url(
+        r'^annotation_api/update/(?P<annotation_id>[0-9]+)$',
+        'hx_lti_initializer.views.annotation_database_update',
+        name="annotation_database_update",
+    ),
+    url(
         r'^admin_hub/$',
         'hx_lti_initializer.views.course_admin_hub',
         name="course_admin_hub",
