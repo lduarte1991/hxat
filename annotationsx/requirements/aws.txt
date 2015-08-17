@@ -45,7 +45,6 @@ lxml==3.4.1
 
 
 #ATG
-requests==2.2.1
 python-dateutil==1.5
 git+https://github.com/Harvard-ATG/django-app-lti@master#egg=django-app-lti
 git+https://github.com/Harvard-University-iCommons/django-auth-lti@master#egg=django-auth-lti
