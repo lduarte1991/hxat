@@ -3,6 +3,8 @@ BUGS
 -- Can't reply to annotations
 -- Can't use the same text across multiple assignments
 -- Other instructors' texts (well, all texts really) show up in 'add source material'
+-- Sometimes annotation editing gets x-frame denied
+
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
