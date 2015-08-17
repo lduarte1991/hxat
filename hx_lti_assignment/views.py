@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import uuid
-
+from hx_lti_initializer.views import error_view # should we centralize an error view?
 
 @login_required
 def create_new_assignment(request):
@@ -43,18 +43,22 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
                 debug_printer(form.errors)
         else:
-            #assignment_targets = targets_form.save(commit=False)
+            # "The AssignmentTargets could not be created because the data didn't validate."
+            # we will never be able to use assignment_targets
+            # assignment_targets = targets_form.save(commit=False)
             # TODO: is this the error functionality that we want?
-            # with frontend validation it shouldn't fail anymore, but we've got a backup just in case
             try:
                 target_num = len(assignment_targets)
             except:
-                target_num = 0
+                return error_view(request, "Someone else is already using that object")
+            
+            # Old code - fails because there are (somehow) no assignment targets
+            #target_num = len(assignment_targets)
             
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
-
+    # GET
     else:
         # Initialize with database settings so instructor doesn't have to do this manually
         form = AssignmentForm(initial={
@@ -104,6 +108,9 @@ def edit_assignment(request, id):
                 changed=True
             if changed:
                 targets_form = AssignmentTargetsFormSet(instance=assignment)
+        else:
+            return error_view(request, "Someone else is already using that object")
+            
         for targs in assignment.assignment_objects.all():
             targets += '&assignment_objects=' + str(targs.id)
         post_values = QueryDict(targets, mutable=True)
