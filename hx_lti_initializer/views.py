@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib import messages
@@ -26,6 +27,8 @@ from abstract_base_classes.target_object_database_api import TOD_Implementation
 from models import *
 from utils import *
 from urlparse import urlparse
+import urllib2
+import urllib
 import json
 import sys
 import requests
@@ -109,6 +112,18 @@ def create_new_user(username, user_id, roles):
     
     return user, lti_profile
 
+def save_session(request, user_id, collection_id, object_id, context_id, roles):
+    if user_id is not None:
+        request.session["hx_user_id"] = user_id
+    if collection_id is not None:
+        request.session["hx_collection_id"] = collection_id
+    if object_id is not None:
+        request.session["hx_object_id"] = object_id
+    if context_id is not None:
+        request.session["hx_context_id"] = context_id
+    if roles is not None:
+        request.session["hx_roles"] = roles
+
 @csrf_exempt
 def launch_lti(request):
     """
@@ -157,7 +172,6 @@ def launch_lti(request):
     #         targ_obj = TargetObject.objects.get(pk=object_id)
     #     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
     #         raise PermissionDenied()
-
     #     original = {
     #         'user_id': user_id,
     #         'username': user_name,
@@ -181,7 +195,23 @@ def launch_lti(request):
     #         original.update({'typeSource': typeSource})
     #     elif (targ_obj.target_type == 'ig'):
     #         original.update({'osd_json': targ_obj.target_content})
-
+        
+        collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+        save_session(request, user_id, collection_id, object_id, course, roles)
+    '''
+        original = {
+            'user_id': user_id,
+            'username': user_name,
+            'is_instructor': request.user and request.user.is_authenticated(),
+            'collection': collection_id,
+            'course': course,
+            'object': object_id,
+            'target_object': targ_obj,
+            'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
+            'assignment': assignment,
+        }
+    '''
     #     return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
@@ -255,6 +285,7 @@ def launch_lti(request):
     
     # Save id of current course in the session
     request.session['active_course'] = course
+    save_session(request, user_id, "", "", "", roles)
     return course_admin_hub(request)
     #return redirect('hx_lti_initializer:course_admin_hub')
 
@@ -336,6 +367,9 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     except:
         is_instructor = False
 
+    save_session(request, None, assignment_id, object_id, course_id, None)
+    for item in request.session.keys():
+        debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
     original = {
         'user_id': user_id,
         'username': user_name,
@@ -366,7 +400,6 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         original.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
-
 
 def instructor_dashboard_view(request):
     '''
@@ -448,3 +481,137 @@ def delete_assignment(request):
         return error_view(request, "Something went wrong with assignment deletion")
     
     return redirect('hx_lti_initializer:course_admin_hub')
+    
+######################
+##
+##  Annotation Database Methods
+##
+##  Creates a wall between the Annotation tool (mostly JS) and the backend
+##  database, making it harder to spoof a request.
+##
+######################
+
+def annotation_database_search(request):
+    session_collection_id = request.session['hx_collection_id']
+    session_object_id = request.session['hx_object_id']
+    session_context_id = request.session['hx_context_id']
+
+    request_collection_id = request.GET['collectionId']
+    request_object_id = request.GET['uri']
+    request_context_id = request.GET['contextId']
+
+    # verifies the data queried against session so they can't get more than they should
+    if (session_collection_id != request_collection_id
+        or session_object_id != request_object_id
+        or session_context_id != request_context_id):
+        return HttpResponse("You are not authorized to search for annotations")
+
+    collection_id = request.GET['collectionId']
+    assignment = get_object_or_404(Assignment, assignment_id=collection_id)
+
+    data = request.GET
+    url_values = urllib.urlencode(data)
+    database_url = str(assignment.annotation_database_url).strip() + '/search?' + url_values 
+    headers = {'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']}
+
+    response = requests.post(database_url, headers=headers)
+
+    return HttpResponse(response)
+
+@csrf_exempt
+def annotation_database_create(request):
+    session_collection_id = request.session['hx_collection_id']
+    session_object_id = str(request.session['hx_object_id'])
+    session_context_id = request.session['hx_context_id']
+    session_user_id = request.session['hx_user_id']
+
+    json_body = json.loads(request.body)
+
+    request_collection_id = json_body['collectionId']
+    request_object_id = str(json_body['uri'])
+    request_context_id = json_body['contextId']
+    request_user_id = json_body['user']['id']
+
+    debug_printer("%s: %s" % (session_user_id, request_user_id))
+    debug_printer("%s: %s" % (session_collection_id, request_collection_id))
+    debug_printer("%s: %s" % (session_object_id, request_object_id))
+    debug_printer("%s: %s" % (session_context_id, request_context_id))
+
+    # verifies the data queried against session so they can't get more than they should
+    if (session_collection_id != request_collection_id
+        or session_object_id != request_object_id
+        or session_context_id != request_context_id
+        or session_user_id != request_user_id):
+        return HttpResponse("You are not authorized to create an annotation.")
+
+    assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
+
+    database_url = str(assignment.annotation_database_url).strip() + '/create'
+    headers = {
+        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
+        'content-type': 'application/json',
+    }
+    response = requests.post(database_url, data=json.dumps(json_body), headers=headers)
+
+    return HttpResponse(response)
+
+@csrf_exempt
+def annotation_database_delete(request, annotation_id):
+    session_user_id = request.session['hx_user_id']
+    session_collection_id = request.session['hx_collection_id']
+    json_body = json.loads(request.body)
+    request_user_id = json_body['user']['id']
+
+    debug_printer("%s: %s" % (session_user_id, request_user_id))
+
+    # verifies the data queried against session so they can't get more than they should
+    if (session_user_id != request_user_id):
+        return HttpResponse("You are not authorized to create an annotation.")
+
+    assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
+
+    database_url = str(assignment.annotation_database_url).strip() + '/delete/' + str(annotation_id)
+    headers = {
+        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
+        'content-type': 'application/json',
+    }
+    response = requests.delete(database_url, headers=headers)
+
+    return HttpResponse(response)
+
+@csrf_exempt
+def annotation_database_update(request, annotation_id):
+    session_collection_id = request.session['hx_collection_id']
+    session_object_id = str(request.session['hx_object_id'])
+    session_context_id = request.session['hx_context_id']
+    session_user_id = request.session['hx_user_id']
+
+    json_body = json.loads(request.body)
+
+    request_collection_id = json_body['collectionId']
+    request_object_id = str(json_body['uri'])
+    request_context_id = json_body['contextId']
+    request_user_id = json_body['user']['id']
+
+    debug_printer("%s: %s" % (session_user_id, request_user_id))
+    debug_printer("%s: %s" % (session_collection_id, request_collection_id))
+    debug_printer("%s: %s" % (session_object_id, request_object_id))
+    debug_printer("%s: %s" % (session_context_id, request_context_id))
+
+    # verifies the data queried against session so they can't get more than they should
+    if (session_collection_id != request_collection_id
+        or session_object_id != request_object_id
+        or session_context_id != request_context_id
+        or session_user_id != request_user_id):
+        return HttpResponse("You are not authorized to create an annotation.")
+
+    assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
+
+    database_url = str(assignment.annotation_database_url).strip() + '/update/' + str(annotation_id)
+    headers = {
+        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
+        'content-type': 'application/json',
+    }
+    response = requests.put(database_url, data=json.dumps(json_body), headers=headers)
+
+    return HttpResponse(response)

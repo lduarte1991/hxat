@@ -27,8 +27,8 @@
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
 <!--<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>-->
+<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>-->
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
@@ -95,7 +95,7 @@ jQuery(function ($) {
 						'HighlightTags',
 						{% endif %}
 						//'RichText',
-						//'Reply',
+						'Reply',
 						//'Touch',
 					],
 					'database_url': "{{ assignment.annotation_database_url }}",
