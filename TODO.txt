@@ -25,13 +25,6 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Test Dashboard et. all to make sure thousands of annotations work.
 
--- The database token appears to be included in the JavaScript, which can be used to get the entire database
-    -- (we tried curl requests with this token from the command line and were able to dump the whole annotations table/db)
-    -- maybe more strictly permission-bound tokens could help us here
-
--- Update Documentation (may want to wait until we're done with everything else)
--- Create high-level documentation
-
 -- Unit Tests :(
 
 
@@ -112,7 +105,9 @@ COMPLETED
         √ Content creator should default to current user
     √ In 'Create Assignment'
         √ Annotation DB Key, URL, and Secret should have defaults pre-populated.
-
+√ (Fixed by Luis) The database token appears to be included in the JavaScript, which can be used to get the entire database
+√ Update Documentation
+√ Create high-level documentation
 
 ============================
 DIFFERENCES FROM LUIS
