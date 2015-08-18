@@ -46,8 +46,6 @@ urlpatterns = patterns(
         name="course_admin_hub",
     ),
     url(
-        # TODO: Make URL routing more elegant as opposed to having /admin_hub/admin_hub
-        #r'\w/admin_hub/(?P<course_id>[0-9a-z]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
         r'\w/admin_hub/(?P<course_id>[0-9a-z:+-_]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
         'hx_lti_initializer.views.access_annotation_target',
         name="access_annotation_target"

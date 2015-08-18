@@ -1,7 +1,6 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer#, render
-from django.shortcuts import render
+from hx_lti_initializer.utils import debug_printer
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render
@@ -123,8 +122,6 @@ def edit_assignment(request, id):
             return redirect('hx_lti_initializer:course_admin_hub')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
-        #for targs in assignment.assignment_objects.all():
-        #    print targs
         form = AssignmentForm(instance=assignment)
 
     return render(
