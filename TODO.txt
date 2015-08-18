@@ -1,9 +1,7 @@
 ============================
 BUGS
--- Can't reply to annotations
--- Can't use the same text across multiple assignments
--- Other instructors' texts (well, all texts really) show up in 'add source material'
--- Sometimes annotation editing gets x-frame denied
+-- Can't use source material that someone else is already using
+-- Sometimes annotation editing gets x-frame denied (just editing, which is weird)
 
 
 ============================
@@ -13,14 +11,15 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
--- Deletion of source material
+-- Deletion of source material? This is dangerous because it's a shared resource.
 
 -- Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
     -- Change user creation
     -- Change name display code
     -- (demo fix already completed in another repo)
 
--- Filter target objects by course in 'add source material' dropdown
+-- Filter target objects by course in 'add source material' dropdown?
+    (If we're using a collaborative, everyone can use anyone's source material type of thing, then we don't want this)
 
 -- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
     My current solution is a total hack
@@ -110,6 +109,7 @@ COMPLETED
 √ (Fixed by Luis) The database token appears to be included in the JavaScript, which can be used to get the entire database
 √ Update Documentation
 √ Create high-level documentation
+√ (fixed) Can't reply to annotations
 
 ============================
 DIFFERENCES FROM LUIS
