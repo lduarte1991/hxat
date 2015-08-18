@@ -370,6 +370,13 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     save_session(request, None, assignment_id, object_id, course_id, None)
     for item in request.session.keys():
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
+        
+    # Filter for LTIProfile with Instructor role
+    # TODO: Current invariant assumes that we have only one Instructor. 
+    instructor_profile = LTIProfile.objects.filter(roles='Instructor')[:1].get()
+    # Get instructor's user_id
+    instructor_id = instructor_profile.get_id()
+        
     original = {
         'user_id': user_id,
         'username': user_name,
@@ -380,6 +387,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'instructor_id': instructor_id,    
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)

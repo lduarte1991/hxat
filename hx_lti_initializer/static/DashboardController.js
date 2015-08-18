@@ -145,7 +145,7 @@
 			jQuery('#instructor').removeClass('disabled');
 		} else {
 			this.queryDatabase({
-				"user_id": this.initOptions.instructor_email,
+				"user_id": this.initOptions.instructor_id,
 			});
 			jQuery('#instructor').addClass('disabled');
 			jQuery('#public').removeClass('disabled');
