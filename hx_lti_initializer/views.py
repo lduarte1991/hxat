@@ -363,6 +363,7 @@ def annotation_database_search(request):
 
     data = request.GET
     url_values = urllib.urlencode(data)
+    debug_printer("URL Values: %s" % url_values)
     database_url = str(assignment.annotation_database_url).strip() + '/search?' + url_values 
     headers = {'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']}
 
@@ -445,10 +446,10 @@ def annotation_database_update(request, annotation_id):
     request_context_id = json_body['contextId']
     request_user_id = json_body['user']['id']
 
-    debug_printer("%s: %s" % (session_user_id, request_user_id))
-    debug_printer("%s: %s" % (session_collection_id, request_collection_id))
-    debug_printer("%s: %s" % (session_object_id, request_object_id))
-    debug_printer("%s: %s" % (session_context_id, request_context_id))
+    debug_printer("%s %s %s" % (session_user_id, session_user_id != request_user_id, request_user_id))
+    debug_printer("%s %s %s" % (session_collection_id, session_collection_id != request_collection_id,request_collection_id))
+    debug_printer("%s %s %s" % (session_object_id, session_object_id != request_object_id, request_object_id))
+    debug_printer("%s %s %s" % (session_context_id, session_context_id != request_context_id, request_context_id))
 
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
@@ -464,6 +465,6 @@ def annotation_database_update(request, annotation_id):
         'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
         'content-type': 'application/json',
     }
-    response = requests.put(database_url, data=json.dumps(json_body), headers=headers)
+    response = requests.post(database_url, data=json.dumps(json_body), headers=headers)
 
     return HttpResponse(response)

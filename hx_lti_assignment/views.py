@@ -42,7 +42,7 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
                 debug_printer(form.errors)
         else:
-            target_num = len(assignment_targets)
+            target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)

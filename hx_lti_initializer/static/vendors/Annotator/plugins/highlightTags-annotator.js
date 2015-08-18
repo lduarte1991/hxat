@@ -243,7 +243,7 @@ Annotator.Plugin.HighlightTags.prototype.updateField = function(field, annotatio
             var n = annotation.tags[tagnum];
             if (typeof self.annotator.plugins["HighlightTags"] !== 'undefined') {
                 // if there are flags, we must ignore them
-                if (annotation.tags[tagnum].indexOf("flagged-") == -1) {
+                if (annotation.tags[tagnum].indexOf("flagged-") === -1 && annotation.tags[tagnum] !== "") {
                     $('#tag-input').tokenInput('add',{'id':n,'name':n});
                 }
             } else {
@@ -309,7 +309,14 @@ Annotator.Plugin.HighlightTags.prototype.updateViewer = function(field, annotati
 // The following function is run when a person hits submit.
 Annotator.Plugin.HighlightTags.prototype.pluginSubmit = function(field, annotation) {
     arr = $(field).find('input[name=tags]').val().split(',');
-    annotation.tags = arr;
+    console.log(arr.indexOf("") !== -1);
+    console.log(arr.length === 1);
+    if (arr.indexOf("") !== -1 && arr.length === 1) {
+    	annotation.tags = [];
+    } else {
+    	annotation.tags = arr;
+    }
+    console.log(annotation.tags);
 };
 
 // The following will call the colorize function during an external call and then return
