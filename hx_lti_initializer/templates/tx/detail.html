@@ -98,7 +98,7 @@ jQuery(function ($) {
 						'Reply',
 						//'Touch',
 					],
-					'database_url': "{{ assignment.annotation_database_url }}",
+					'database_url': "{{ assignment.annotation_database_url }}", //TODO: set this up: "{{ abstract_db_url }}",
 					'citation': "{{ target_object.target_citation | safe }}",
 					{% if assignment.allow_highlights %}
 					'higlightTags_options': "{{ assignment.highlights_options }}",
@@ -115,7 +115,8 @@ jQuery(function ($) {
 					showMediaSelector: false,
 					flags: false,
 					imageRootUrl: "{% static "vendors/catch/img"%}",
-					instructor_id: "{{ instructor_id }}",
+					// Pass in JSON string, to be converted into JSON
+					instructor_ids: {% autoescape off %} '{{ instructor_ids }}' {% endautoescape %},
 					default_tab: "{{ assignment.default_tab }}",
 				},
 			},

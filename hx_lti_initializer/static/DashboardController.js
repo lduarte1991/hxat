@@ -144,9 +144,17 @@
 			jQuery('#public').removeClass('disabled');
 			jQuery('#instructor').removeClass('disabled');
 		} else {
-			this.queryDatabase({
-				"user_id": this.initOptions.instructor_id,
-			});
+			// Parse string into JSON
+			var ids = JSON.parse(this.initOptions.instructor_ids);
+			
+			// Iterate over instructor ids, querying for their annotations
+			for (var i = 0; i < ids.length; i++) {
+				this.queryDatabase({
+					"user_id": ids[i]
+				});
+				
+			}
+			
 			jQuery('#instructor').addClass('disabled');
 			jQuery('#public').removeClass('disabled');
 			jQuery('#mynotes').removeClass('disabled');

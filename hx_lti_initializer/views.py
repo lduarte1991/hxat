@@ -1,5 +1,6 @@
 """
 This will launch the LTI Annotation tool.
+
 This is basically the controller part of the app. It will set up the tool provider, create/retrive the user and pass along any other information that will be rendered to the access/init screen to the user. 
 """
 
@@ -35,6 +36,8 @@ import requests
 
 import logging
 logging.basicConfig()
+
+from django.core import serializers
 
 def validate_request(req):
     """
@@ -152,6 +155,8 @@ def launch_lti(request):
     # Check whether user is a admin, instructor or teaching assistant
     # TODO: What roles do we actually want here?
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
+    
+    # if intersection
     if set(roles) & set(settings.ADMIN_ROLES):# or "Teaching Assistant" in roles:
     # Set flag in session to later direct user to the appropriate version of the index
         request.session['is_instructor'] = True
@@ -370,12 +375,18 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     save_session(request, None, assignment_id, object_id, course_id, None)
     for item in request.session.keys():
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
+    
+    instructor_profiles = []
+    
+    # Filter for LTIProfiles with an administrative role
+    for role in settings.ADMIN_ROLES:
+        instructor_profiles += list(LTIProfile.objects.filter(roles=role))
         
-    # Filter for LTIProfile with Instructor role
-    # TODO: Current invariant assumes that we have only one Instructor. 
-    instructor_profile = LTIProfile.objects.filter(roles='Instructor')[:1].get()
-    # Get instructor's user_id
-    instructor_id = instructor_profile.get_id()
+    instructor_ids = []
+    
+    # Add to list of instructor_ids
+    for instructor_profile in instructor_profiles:
+        instructor_ids.append(unicode(instructor_profile.get_id()))
         
     original = {
         'user_id': user_id,
@@ -387,7 +398,10 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
-        'instructor_id': instructor_id,    
+        #TODO
+        'abstract_db_url': "http://luis-mirror-condaatje.c9.io/lti_init/annotation_api",
+        # Convert instructor_ids to json
+        'instructor_ids': json.dumps(instructor_ids),    
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
