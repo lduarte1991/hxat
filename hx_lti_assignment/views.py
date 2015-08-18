@@ -47,14 +47,14 @@ def create_new_assignment(request):
             # we will never be able to use assignment_targets
             # assignment_targets = targets_form.save(commit=False)
             # TODO: is this the error functionality that we want?
-            try:
-                target_num = len(assignment_targets)
-            except:
-                return error_view(request, "Someone else is already using that object")
+            # try:
+            #     target_num = len(assignment_targets)
+            # except:
+            #     return error_view(request, "Someone else is already using that object")
             
             # Old code - fails because there are (somehow) no assignment targets
             #target_num = len(assignment_targets)
-            
+            target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)

@@ -173,6 +173,7 @@
 				self.addAnnotations(annotations, "after");
 				self.addingAnnotations = false;
 			} else {
+				console.log("Creating a new list");
 				self.clearDashboard();
 				self.createNewList(annotator.plugins.Store.annotations);
 			}
@@ -342,13 +343,14 @@
 	$.DashboardController.prototype.queryDatabase = function(options) {
 		var setOptions = jQuery.extend({}, this.queryDefault, options);
 		var annotator = this.annotator;
+		console.log(setOptions);
 
 		// TODO: Change below to be a call to the Core Controller
 		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
 		var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
 		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
 		loadFromSearch.offset = 0;
-		loadFromSearch.media = setOptions.mediaType;
+		loadFromSearch.media = setOptions.media;
 		loadFromSearch.userid = setOptions.user_id;
 		loadFromSearch.username = setOptions.username;
 		loadFromSearch.text = setOptions.text;
@@ -414,6 +416,7 @@
     		parent.html(annotation_id);
     		console.log(parent)
     	});
+    	self.getRepliesOfAnnotation(annotation_id);
     };
 
     // TODO Move to AnnotationCore
@@ -436,6 +439,7 @@
     	var anId = parseInt(annotation_id, 10);
     	var self = this;
     	var annotator = self.annotator;
+    	var store = annotator.plugins.Store;
     	var oldLoadFromSearch = annotator.plugins.Store.options.loadFromSearch;
     	var annotation_obj_id = oldLoadFromSearch.uri;
     	var context_id = oldLoadFromSearch.contextId;
@@ -456,8 +460,13 @@
     		}
     		var annotations = data.rows || [];
 
-
+    		console.log(annotations);
     	}
+
+    	search_url = store._urlFor("search", annotation_id);
+        var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
+        var request = jQuery.ajax(search_url, options);
+
     }
 
 }(AController));
