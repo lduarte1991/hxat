@@ -472,13 +472,13 @@
     		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
     		jQuery('.repliesList').css('margin-top', replies_offset);
     		jQuery('.repliesList').css('height', replies_height);
-    		final_html = ''
+    		var final_html = '';
     		annotations.forEach(function(annotation) {
 				var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
 				var html = self.TEMPLATES.replyItem(item);
 				final_html += html;				
 			});
-			jQuery('.repliesList').html(final_html)
+			jQuery('.repliesList').html(final_html);
 			console.log(annotations);
 			console.log("Definitely reached here");
     	}
