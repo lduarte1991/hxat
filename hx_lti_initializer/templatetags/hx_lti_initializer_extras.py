@@ -99,5 +99,6 @@ def get_annotation_by_id(id, students):
 		for annotation in student['annotations']:
 			if annotation['id'] == int(id):
 				return annotation["text"]
-
-	return "None"
+	
+	# If annotation not found, note that it has been deleted
+	return "<i>Deleted Annotation</i>"
