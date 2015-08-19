@@ -315,13 +315,9 @@ def launch_lti(request):
         # Keeping the HX functionality whereby students are routed to specific assignment objects
         # This is motivated by the Poetry in America Course
     
-        # If 
+        # If there are variables passed into the launch indicating a desired target object, render that object
         assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-    
-        print assignment_id
-        print object_id
-    
         course_id = str(course)
         return access_annotation_target(request, course_id, assignment_id, object_id) #roles=roles)#, user_id=None, user_name=None, roles=None):
     except:
