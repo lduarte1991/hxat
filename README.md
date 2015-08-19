@@ -90,7 +90,7 @@ SECURE_SETTINGS = {
 #Differences from hx-annotations-lti
 Below is an overview of the differences between Harvard ATG's [fork](https://github.com/Harvard-ATG/annotationsx) and [hx-annotations-lti](https://github.com/lduarte1991/hx-annotations-lti):
 ### Major Changes
-* Installation: The tool is now integrated with [django-app-lti](https://github.com/Harvard-ATG/django-app-lti), so setup is now via XML configuration. As a result, the tool is launched from the left hand nav of Canvas as opposed to a module.
+* Installation: The tool is now integrated with [django-app-lti](https://github.com/Harvard-ATG/django-app-lti), so setup is now via XML configuration. As a result, the tool is launched from the left hand nav of Canvas as opposed to a module. Note that the functionality of adding the tool as a module is still available if needed.
 * Authentication: Students are routed to a modified version of `admin_hub` with restricted privileges as opposed to an assignment page upon application launch
 * An instructor dashboard which enables instructors to view annotations by student 
 * Ability to delete assignments
@@ -106,6 +106,7 @@ Below is an overview of the differences between Harvard ATG's [fork](https://git
 
 ### Minor Changes
 * Instructors have edit and delete privileges for the annotations of all users.
+* The Instructor tab of the sidebar filters for the annotations of all users with a role defined in `ADMIN_ROLES`(`secure.py`)
 * Only displays the data for the course (`active_course`) on which the tool is installed, as opposed to all courses for the user
 * Default course name: On creation, the course name is set to the `context_title` LTI launch parameter by default
 * Default population of forms:
