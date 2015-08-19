@@ -41,6 +41,7 @@
 			"annotationSection",
 			"annotationItem",
 			"annotationModal",
+			"replyItem",
 		];
 
 		this.queryDefault = {
@@ -467,7 +468,19 @@
     			data = {};
     		}
     		var annotations = data.rows || [];
-    		console.log(annotations);
+    		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+    		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+    		jQuery('.repliesList').css('margin-top', replies_offset);
+    		jQuery('.repliesList').css('height', replies_height);
+    		final_html = ''
+    		annotations.forEach(function(annotation) {
+				var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+				var html = self.TEMPLATES.replyItem(item);
+				final_html += html;				
+			});
+			jQuery('.repliesList').html(final_html)
+			console.log(annotations);
+			console.log("Definitely reached here");
     	}
 
     	search_url = store._urlFor("search", annotation_id);

@@ -247,3 +247,40 @@ button#closeModal {
 .addReply button.btn.btn-primary.replybutton {
     width: 100%;
 }
+
+.repliesList {
+    text-align: center;
+    padding-top: 25px;
+    padding-bottom: 45px;
+    height: inherit;
+}
+
+.replyItem {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    padding: 10px;
+}
+
+.replyItem:nth-child(odd) {
+    background-color: #eee;
+}
+
+.replyItem:nth-child(even) {
+    background-color: #bbb;
+}
+
+.replytext {
+    text-align: left;
+    font-size: 11pt;
+}
+
+.repliedat {
+    font-size: 8pt;
+    text-align: right;
+    font-style: italic;
+    color: #555;
+}
+
+.repliedby{
+    font-weight:bold;
+}
