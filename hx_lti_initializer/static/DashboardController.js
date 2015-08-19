@@ -467,7 +467,6 @@
     			data = {};
     		}
     		var annotations = data.rows || [];
-
     		console.log(annotations);
     	}
 

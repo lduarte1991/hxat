@@ -24,6 +24,7 @@ from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
+from django.contrib.sites.models import get_current_site
 
 from models import *
 from utils import *
@@ -37,7 +38,8 @@ import requests
 import logging
 logging.basicConfig()
 
-from django.core import serializers
+
+
 
 def validate_request(req):
     """
@@ -133,7 +135,7 @@ def launch_lti(request):
     Gets a request from an LTI consumer.
     Passes along information to render a welcome screen to the user.
     """
-    
+
     validate_request(request)
     tool_provider = initialize_lti_tool_provider(request)
 
@@ -187,6 +189,7 @@ def launch_lti(request):
     #         'target_object': targ_obj,
     #         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
     #         'assignment': assignment,
+    #         'abstract_db_url': 'http://annotationsx-condaatje.c9.io:80/lti_init/annotation_api'
     #     }
 
     #     if (targ_obj.target_type == 'vd'):
@@ -201,23 +204,28 @@ def launch_lti(request):
     #     elif (targ_obj.target_type == 'ig'):
     #         original.update({'osd_json': targ_obj.target_content})
         
+        # For HX, students only access one object or collection, and don't have an index
+        # For ATG, students have the index  to choose where to go, so collection_id
+        # and object_id are probably blank for their session right now.
+        # Regardless, the HX session functionality should work as long as we've got
+        # the basic info in there - user_id, course, and roles.
         collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         save_session(request, user_id, collection_id, object_id, course, roles)
-    '''
-        original = {
-            'user_id': user_id,
-            'username': user_name,
-            'is_instructor': request.user and request.user.is_authenticated(),
-            'collection': collection_id,
-            'course': course,
-            'object': object_id,
-            'target_object': targ_obj,
-            'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
-            'assignment': assignment,
-        }
-    '''
-    #     return render(request, '%s/detail.html' % targ_obj.target_type, original)
+    
+        # original = {
+        #     'user_id': user_id,
+        #     'username': user_name,
+        #     'is_instructor': request.user and request.user.is_authenticated(),
+        #     'collection': collection_id,
+        #     'course': course,
+        #     'object': object_id,
+        #     'target_object': targ_obj,
+        #     'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
+        #     'assignment': assignment,
+        #     'abstract_db_url': 'http://annotationsx-condaatje.c9.io:80/lti_init/annotation_api'
+        # }
+        # return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
         # try to get the profile via the anon id
@@ -291,6 +299,34 @@ def launch_lti(request):
     # Save id of current course in the session
     request.session['active_course'] = course
     save_session(request, user_id, "", "", "", roles)
+    
+    # For the use case where the user wants to link to an assignment instead
+    # of the admin_hub upon launch (i.e. for use in modules), this allows the user
+    # to be routed directly to an assignment given the correct GET parameters
+    # lti_init/launch_lti/?collection_id=12up498&object_id=1iu48adsfi
+    try:
+        '''
+            assignment_id = request.POST['collection_id']
+            debug_printer("DEBUG - GET request for assignment/collection_id: " + assignment_id)
+            object_id = request.POST['object_id']
+            debug_printer("DEBUG - GET request for object_id: " + object_id)
+        '''
+    
+        # Keeping the HX functionality whereby students are routed to specific assignment objects
+        # This is motivated by the Poetry in America Course
+    
+        # If 
+        assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+    
+        print assignment_id
+        print object_id
+    
+        course_id = str(course)
+        return access_annotation_target(request, course_id, assignment_id, object_id) #roles=roles)#, user_id=None, user_name=None, roles=None):
+    except:
+        debug_printer("DEBUG - User wants the index")
+    
     return course_admin_hub(request)
     #return redirect('hx_lti_initializer:course_admin_hub')
 
@@ -365,6 +401,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+        debug_printer("DEBUG - User attempted to access a non-existant Assignment or Target Object")
         raise PermissionDenied() 
         
     try:
@@ -386,8 +423,16 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     
     # Add to list of instructor_ids
     for instructor_profile in instructor_profiles:
-        instructor_ids.append(unicode(instructor_profile.get_id()))
-        
+        instructor_ids.append(instructor_profile.get_id())
+    
+    
+    # Dynamically pass in the address that the detail view will use to fetch annotations.
+    # there's definitely a more elegant way to do this.
+    # also, we may want to consider denying if theres no ssl
+    protocol = 'https://' if request.is_secure() else 'http://'
+    abstract_db_url = protocol + get_current_site(request).domain + "/lti_init/annotation_api"
+    debug_printer("DEBUG - Abstract Database URL:" + abstract_db_url)
+
     original = {
         'user_id': user_id,
         'username': user_name,
@@ -398,8 +443,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
-        #TODO
-        'abstract_db_url': "http://luis-mirror-condaatje.c9.io/lti_init/annotation_api",
+        'abstract_db_url': abstract_db_url,
         # Convert instructor_ids to json
         'instructor_ids': json.dumps(instructor_ids),    
     }
@@ -427,6 +471,7 @@ def instructor_dashboard_view(request):
     '''
         TODO
     '''
+    
     lti_profile = LTIProfile.objects.get(user=request.user)
     active_course_id = request.session['active_course']
     active_course_object = LTICourse.objects.filter(course_id=active_course_id)

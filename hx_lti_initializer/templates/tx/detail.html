@@ -98,7 +98,7 @@ jQuery(function ($) {
 						'Reply',
 						//'Touch',
 					],
-					'database_url': "{{ assignment.annotation_database_url }}", //TODO: set this up: "{{ abstract_db_url }}",
+					'database_url': "{{ abstract_db_url }}", //"{{ assignment.annotation_database_url }}",
 					'citation': "{{ target_object.target_citation | safe }}",
 					{% if assignment.allow_highlights %}
 					'higlightTags_options': "{{ assignment.highlights_options }}",

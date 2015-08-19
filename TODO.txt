@@ -35,9 +35,6 @@ NOT A PRIORITY/TODO LONG-TERM:
 -- Link to dashboard from the detail? So you don't have to go back to the index.
     -- Find out what users want
 
--- Currently, we assume that there is only one instructor when it comes to loading in annotations for the instructor tab.
-    Eventually we may want to add support for TFs as well.
-
 -- Sometimes going back/forward works smoothly,
     sometimes the document expires. 'Refresh' always takes you back to the index.
     Not a huge deal but something to keep in mind. iFrames are like that I guess.
@@ -110,7 +107,9 @@ COMPLETED
 √ Update Documentation
 √ Create high-level documentation
 √ (fixed) Can't reply to annotations
-
+√ (single-instructor invariant eliminated)
+    Can now have multiple instructors/TFs show up in the 'instructor' tab.
+    
 ============================
 DIFFERENCES FROM LUIS
 -- Fetches a single course (named active_course) as opposed to fetching all courses for admin
