@@ -51,8 +51,8 @@ def format_tags(tagslist):
 	'''
 		Pretty-prints list of tags
 	'''
-	if tagslist == ['']:
-		return "None"
+	if tagslist == []:
+		return ""
 	return ', '.join(tagslist)
 	
 @register.simple_tag
