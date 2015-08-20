@@ -169,18 +169,17 @@
 		var self = this;
 		var annotator = this.annotator;
 
+		var annotationClicked = self.__bind(self.annotationClicked, self);
+		var el = self.element;
+		el.on("click", ".annotationItem", annotationClicked);
 		annotator.subscribe("annotationsLoaded", function (annotations) {
 			if (self.addingAnnotations){
 				self.addAnnotations(annotations, "after");
 				self.addingAnnotations = false;
 			} else {
-				console.log("Creating a new list");
 				self.clearDashboard();
 				self.createNewList(annotator.plugins.Store.annotations);
 			}
-			var annotationClicked = self.__bind(self.annotationClicked, self);
-			var el = self.element;
-			el.on("click", ".annotationItem", annotationClicked);
 		});
 		annotator.subscribe("annotationCreated", function (annotation) {
 			var attempts = 0;
@@ -338,13 +337,18 @@
 		var self = this;
 		if (typeof item.updated !== 'undefined')
             item.updated = self.createDateFromISO8601(item.updated);
+        var permissions = self.annotator.plugins.Permissions;
+        var authorized = permissions.options.userAuthorize('delete', annotation, permissions.user);
+        var updateAuthorized = permissions.options.userAuthorize('update', annotation, permissions.user);
+        item.authToDeleteButton = authorized;
+        item.authToEditButton = updateAuthorized;
+        item.authorized = authorized || updateAuthorized;
         return item;
 	};
 
 	$.DashboardController.prototype.queryDatabase = function(options) {
 		var setOptions = jQuery.extend({}, this.queryDefault, options);
 		var annotator = this.annotator;
-		console.log(setOptions);
 
 		// TODO: Change below to be a call to the Core Controller
 		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
@@ -357,7 +361,6 @@
 		loadFromSearch.text = setOptions.text;
 		loadFromSearch.tag = setOptions.tag;
 		this._clearAnnotator();
-		console.log(loadFromSearch);
 		annotator.plugins.Store.loadAnnotationsFromSearch(loadFromSearch);
 	};
 
@@ -396,7 +399,7 @@
     		annotation_id = target.find(".idAnnotation").html();
     	}
 
-    	var annotationItem = self.getAnnotationById(annotation_id);
+    	var annotationItem = self.getAnnotationById(annotation_id, true);
     	var html = self.TEMPLATES.annotationModal(annotationItem);
     	jQuery('.annotationSection').append(html);
     	jQuery('.annotationSection').css('y-scroll', 'hidden');
@@ -409,20 +412,68 @@
     		var positionAdder = {
     			display: "block",
     			left: button.offset().left,
-    			top: button.offset().right,
+    			top: button.offset().top,
     		}
     		self.annotator.adder.css(positionAdder);
     		self.annotator.onAdderClick();
     		var parent = jQuery(self.annotator.editor.element).find('.reply-item span.parent-annotation');
-    		console.log(annotation_id);
     		parent.html(annotation_id);
-    		console.log(parent)
     	});
     	self.getRepliesOfAnnotation(annotation_id);
+    	jQuery('.parentAnnotation .quoteText').click( function(e){
+    		var annotations = self.annotator.plugins.Store.annotations;
+    		for(var item in annotations){
+    			var annotation = annotations[item]; 
+    			if (annotation.id.toString() === annotation_id) {
+    				jQuery('html, body').animate({
+    					scrollTop: jQuery(annotation.highlights[0]).offset().top },
+    					'slow'
+    				);
+    			};
+    		}
+    	});
+    	jQuery('.parentAnnotation #edit').click(function (e){
+    		if (annotationItem.authToEditButton) {
+    			var button = jQuery(e.target);
+
+    			var positionAdder = {
+	    			display: "block",
+	    			left: button.offset().left,
+	    			top: button.scrollTop(),
+	    		}
+	    		var annotation_to_update = self.getAnnotationById(annotation_id, false);
+	    		var update_parent = function() {
+	    			console.log("hit update");
+                  cleanup_parent();
+                  var response = self.annotator.updateAnnotation(annotation_to_update);
+                  console.log(self.annotator);
+                  return response;
+                };
+                var cleanup_parent = function() {
+                	console.log("hit cancel");
+                  self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
+                  return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
+                };
+                self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
+                self.annotator.subscribe('annotationEditorSubmit', update_parent);
+	    		self.annotator.showEditor(annotation_to_update, positionAdder);
+	    		jQuery('.annotator-widget').addClass('fullscreen');
+    		}
+    	});
+		jQuery('[data-toggle="confirmation"]').confirmation({
+			title: "Would you like to delete your annotation?",
+			onConfirm: function (){
+				console.log("test");
+				if(annotationItem.authToDeleteButton){
+					var annotation_to_delete = self.getAnnotationById(annotation_id, false);
+					self.annotator.deleteAnnotation(annotation_to_delete);
+				}
+			},
+		});
     };
 
     // TODO Move to AnnotationCore
-    $.DashboardController.prototype.getAnnotationById = function(id){
+    $.DashboardController.prototype.getAnnotationById = function(id, formatted){
     	var annotationId = parseInt(id, 10);
     	var self = this;
     	var annotator = self.annotator;
@@ -431,7 +482,11 @@
     	for (index in annotations) {
     		var annotation = annotations[index];
     		if (annotation.id === annotationId){
-    			return self.formatAnnotation(jQuery.extend(true, {}, annotation));
+    			if (formatted){
+    				return self.formatAnnotation(jQuery.extend(true, {}, annotation));
+    			} else {
+    				return annotation
+    			}
     		}
     	} 
     	return undefined;
@@ -472,14 +527,12 @@
 				final_html += html;				
 			});
 			jQuery('.repliesList').html(final_html)
-			console.log(annotations);
-			console.log("Definitely reached here");
     	}
 
     	search_url = store._urlFor("search", annotation_id);
         var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
         var request = jQuery.ajax(search_url, options);
 
-    }
+    };
 
 }(AController));

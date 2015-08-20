@@ -153,7 +153,7 @@ def launch_lti(request):
         original = {
             'user_id': user_id,
             'username': user_name,
-            'is_instructor': request.user and request.user.is_authenticated(),
+            'is_instructor': request.user and request.user.is_authenticated() and "Learner" not in roles,
             'collection': collection_id,
             'course': course,
             'object': object_id,
@@ -306,7 +306,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     original = {
         'user_id': user_id,
         'username': user_name,
-        'is_instructor': request.user and request.user.is_authenticated(),
+        'is_instructor': request.user and request.user.is_authenticated() and "Learner" not in roles,
         'collection': assignment_id,
         'course': course_id,
         'object': object_id,
