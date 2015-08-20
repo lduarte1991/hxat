@@ -98,7 +98,8 @@
                                                         {% if annotation.parent == "0" %}
                                                             "{{ annotation.quote }}"
                                                         {% else %}
-                                                            <b>Reply To:</b> "{% get_annotation_by_id annotation.parent student_objects %}"
+                                                            {#<b>Reply To:</b> "{% get_annotation_by_id annotation.parent student_objects %}"#}
+                                                            <b>Reply To:</b> "{% get_annotation_by_id annotation.parent annotation_dict %}"
                                                         {% endif %}
                                                     </td>
                                                     <td>{{ annotation.text | safe }}</td>

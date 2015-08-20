@@ -83,7 +83,7 @@ def assignment_object_exists(object_id, collection_id):
 		return True
 	except:
 		return False
-	
+"""
 @register.simple_tag
 def get_annotation_by_id(id, students):
 	'''
@@ -100,3 +100,18 @@ def get_annotation_by_id(id, students):
 	
 	# If annotation not found, note that it has been deleted
 	return "<i>Deleted Annotation</i>"
+"""
+
+@register.simple_tag
+def get_annotation_by_id(id, annotations):
+	'''
+		Given the id of an annotation and a dictionary of annotations keyed by id,
+		this returns the text of the annotation with that id	
+	'''
+	
+	try:
+		annotation = annotations[id]["text"]
+	except:
+		annotation = "<i>Deleted Annotation</i>"
+	
+	return annotation

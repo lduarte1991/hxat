@@ -38,9 +38,6 @@ import requests
 import logging
 logging.basicConfig()
 
-
-
-
 def validate_request(req):
     """
     Validates the request in order to permit or deny access to the LTI tool.
@@ -467,24 +464,27 @@ def instructor_dashboard_view(request):
     '''
         TODO
     '''
-    
-    lti_profile = LTIProfile.objects.get(user=request.user)
     active_course_id = request.session['active_course']
-    active_course_object = LTICourse.objects.filter(course_id=active_course_id)
     # Gets object as opposed to queryset
     course = LTICourse.objects.get(course_id=active_course_id)
-    assignments = Assignment.objects.filter(course=active_course_object)
     user_id = request.user.email #for some reason
     user_profiles = course.course_users.all()
     student_objects = []
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
     annotations_for_course = fetch_annotations(active_course_id, token)
 
-    # get only the annotations for a specific user
+    # Dictionary of annotations, keyed by id of annotation for O(1) lookup later
+    annotation_dict = {}
+    
+    # get only the annotations for a specific user, while at the same updating annotation_dict
     def filter_annotations(annotations, id):
         user_annotations = []
         for anno in annotations['rows']:
+            # Insert into annotation dictionary
+            annotation_dict[unicode(anno['id'])] = anno
+            # Get id of user who made the annotation
             a = anno['user']['id']
+            # If id matches, append to list of annotations for that user
             if id == a:
                 user_annotations.append(anno)
         return user_annotations
@@ -496,9 +496,11 @@ def instructor_dashboard_view(request):
             'annotations': filter_annotations(annotations_for_course, profile.get_id())
         })
     
-    # Pass alphabetically sorted version of student_objects
     context = {
+        # Pass alphabetically sorted version of student_objects
         'student_objects': sorted(student_objects, lambda x,y:cmp(str(x['student_name']).lower(), str(y['student_name']).lower())),
+        # Dictionary of annotations, keyed by id for easy reply lookup
+        'annotation_dict': annotation_dict,
     }
     
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
