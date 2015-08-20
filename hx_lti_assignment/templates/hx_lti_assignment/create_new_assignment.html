@@ -19,7 +19,7 @@
 			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
 		}*/
 		// TODO: until the lack of tags no longer breaks the sidebar functionality,
-		// we cannot allow them to go unused.
+		// we cannot allow them to go unused. Right now we set them to 'on' and hide from the front end.
 		jQuery('#id_allow_highlights').prop('checked', true);
 		jQuery('#id_allow_highlights').parent().hide();
 		jQuery('#id_highlights_options').attr("placeholder", "(Example) instructor:red")
@@ -252,6 +252,7 @@
 	</form>
 	
 	{% if assignment_id %}
+	<!--Assignment Deletion-->
 	<!--TODO: Make the deletion confirmation Bootstrap native-->
 	<form onsubmit="return confirm('Are you sure you want to delete this assignment?');" method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
 		{% csrf_token %}

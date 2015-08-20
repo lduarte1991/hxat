@@ -1,7 +1,6 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer#, render
-from django.shortcuts import render
+from hx_lti_initializer.utils import debug_printer
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render
@@ -47,14 +46,14 @@ def create_new_assignment(request):
             # we will never be able to use assignment_targets
             # assignment_targets = targets_form.save(commit=False)
             # TODO: is this the error functionality that we want?
-            try:
-                target_num = len(assignment_targets)
-            except:
-                return error_view(request, "Someone else is already using that object")
+            # try:
+            #     target_num = len(assignment_targets)
+            # except:
+            #     return error_view(request, "Someone else is already using that object")
             
             # Old code - fails because there are (somehow) no assignment targets
             #target_num = len(assignment_targets)
-            
+            target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
@@ -123,8 +122,6 @@ def edit_assignment(request, id):
             return redirect('hx_lti_initializer:course_admin_hub')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
-        #for targs in assignment.assignment_objects.all():
-        #    print targs
         form = AssignmentForm(instance=assignment)
 
     return render(

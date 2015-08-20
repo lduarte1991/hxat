@@ -94,8 +94,16 @@
                                                             {% get_target_object_name annotation.uri %}
                                                         </a>
                                                     </td>
-                                                    <td>"{{ annotation.quote }}"</td>
+                                                    <td>
+                                                        {% if annotation.parent == "0" %}
+                                                            "{{ annotation.quote }}"
+                                                        {% else %}
+                                                            {#<b>Reply To:</b> "{% get_annotation_by_id annotation.parent student_objects %}"#}
+                                                            <b>Reply To:</b> "{% get_annotation_by_id annotation.parent annotation_dict %}"
+                                                        {% endif %}
+                                                    </td>
                                                     <td>{{ annotation.text | safe }}</td>
+                                                    
                                                     <td>{{ annotation.tags | format_tags }}</td>
                                                 </tr>
                                                 {% endif %}

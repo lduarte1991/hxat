@@ -41,6 +41,7 @@
 			"annotationSection",
 			"annotationItem",
 			"annotationModal",
+			"replyItem",
 		];
 
 		this.queryDefault = {
@@ -144,9 +145,17 @@
 			jQuery('#public').removeClass('disabled');
 			jQuery('#instructor').removeClass('disabled');
 		} else {
-			this.queryDatabase({
-				"user_id": this.initOptions.instructor_email,
-			});
+			// Parse string into JSON
+			var ids = JSON.parse(this.initOptions.instructor_ids);
+			
+			// Iterate over instructor ids, querying for their annotations
+			for (var i = 0; i < ids.length; i++) {
+				this.queryDatabase({
+					"user_id": ids[i]
+				});
+				
+			}
+			
 			jQuery('#instructor').addClass('disabled');
 			jQuery('#public').removeClass('disabled');
 			jQuery('#mynotes').removeClass('disabled');
@@ -173,6 +182,7 @@
 				self.addAnnotations(annotations, "after");
 				self.addingAnnotations = false;
 			} else {
+				console.log("Creating a new list");
 				self.clearDashboard();
 				self.createNewList(annotator.plugins.Store.annotations);
 			}
@@ -342,13 +352,14 @@
 	$.DashboardController.prototype.queryDatabase = function(options) {
 		var setOptions = jQuery.extend({}, this.queryDefault, options);
 		var annotator = this.annotator;
+		console.log(setOptions);
 
 		// TODO: Change below to be a call to the Core Controller
 		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
 		var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
 		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
 		loadFromSearch.offset = 0;
-		loadFromSearch.media = setOptions.mediaType;
+		loadFromSearch.media = setOptions.media;
 		loadFromSearch.userid = setOptions.user_id;
 		loadFromSearch.username = setOptions.username;
 		loadFromSearch.text = setOptions.text;
@@ -414,6 +425,7 @@
     		parent.html(annotation_id);
     		console.log(parent)
     	});
+    	self.getRepliesOfAnnotation(annotation_id);
     };
 
     // TODO Move to AnnotationCore
@@ -436,6 +448,7 @@
     	var anId = parseInt(annotation_id, 10);
     	var self = this;
     	var annotator = self.annotator;
+    	var store = annotator.plugins.Store;
     	var oldLoadFromSearch = annotator.plugins.Store.options.loadFromSearch;
     	var annotation_obj_id = oldLoadFromSearch.uri;
     	var context_id = oldLoadFromSearch.contextId;
@@ -455,9 +468,25 @@
     			data = {};
     		}
     		var annotations = data.rows || [];
-
-
+    		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+    		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+    		jQuery('.repliesList').css('margin-top', replies_offset);
+    		jQuery('.repliesList').css('height', replies_height);
+    		var final_html = '';
+    		annotations.forEach(function(annotation) {
+				var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+				var html = self.TEMPLATES.replyItem(item);
+				final_html += html;				
+			});
+			jQuery('.repliesList').html(final_html);
+			console.log(annotations);
+			console.log("Definitely reached here");
     	}
+
+    	search_url = store._urlFor("search", annotation_id);
+        var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
+        var request = jQuery.ajax(search_url, options);
+
     }
 
 }(AController));

@@ -11,7 +11,6 @@ from django.conf import settings
 import base64
 import sys
 import datetime
-from django.conf import settings
 
 # import Sample Target Object Model
 from target_object_database.models import TargetObject
