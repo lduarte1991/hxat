@@ -38,7 +38,20 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
-<div class="container">
+<script type = "text/javascript" >
+	// Sends a message to canvas to resize the iframe so we don't have scrolling issues
+    $(document).ready(function() {
+        var receiver = "https://canvas.harvard.edu";
+        var message = {
+            subject: "lti.frameResize",
+            height: $(".fit-to-canvas").height()
+        };
+        console.log("sending message to receiver: ", message, receiver);
+        window.parent.postMessage(JSON.stringify(message), receiver);
+    }, 1000); 
+</script>
+
+<div class="container fit-to-canvas">
 	<div class="row">
 		<div class="navigation">
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
