@@ -335,20 +335,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     save_session(request, None, assignment_id, object_id, course_id, None)
     for item in request.session.keys():
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
-    
-    instructor_profiles = []
-    
-    # Filter for LTIProfiles with an administrative role
-    for role in settings.ADMIN_ROLES:
-        instructor_profiles += list(LTIProfile.objects.filter(roles=role))
-        
-    instructor_ids = []
-    
-    # Add to list of instructor_ids
-    for instructor_profile in instructor_profiles:
-        instructor_ids.append(instructor_profile.get_id())
-    
-    
+
     # Dynamically pass in the address that the detail view will use to fetch annotations.
     # there's definitely a more elegant way to do this.
     # also, we may want to consider denying if theres no ssl
@@ -367,8 +354,6 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
         'abstract_db_url': abstract_db_url,
-        # Convert instructor_ids to json
-        'instructor_ids': json.dumps(instructor_ids),    
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -523,14 +508,11 @@ def annotation_database_search(request):
     collection_id = request.GET['collectionId']
     assignment = get_object_or_404(Assignment, assignment_id=collection_id)
 
-    data = request.GET
-    url_values = urllib.urlencode(data)
-    debug_printer("URL Values: %s" % url_values)
-    database_url = str(assignment.annotation_database_url).strip() + '/search?' + url_values 
+    url_values = request.GET.urlencode()
+    database_url = str(assignment.annotation_database_url).strip() + '/search?'
     headers = {'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']}
 
-    response = requests.post(database_url, headers=headers)
-
+    response = requests.post(database_url, headers=headers, params=url_values)
     return HttpResponse(response)
 
 @csrf_exempt

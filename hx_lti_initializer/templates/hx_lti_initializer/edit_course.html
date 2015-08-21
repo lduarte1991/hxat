@@ -16,20 +16,16 @@
 			<label for="id_course_name">Course name:</label> 
 			<input id="id_course_name" maxlength="255" name="course_name" class="form-control" type="text" value="{{form.course_name.value}}">
 		</div>
-		<!-- TODO: Right now role determines permissions (e.g. TA, Instructor, Admin) -->
-		<!-- Selecting admins is hidden until functionality is there -->
-		<!--<div class="form-group">-->
-		<div class="form-group hidden">
+		<div class="form-group">
 			<label for="id_course_admins">Course admins:</label> 
 			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins">
 				{% for id,choice in form.fields.course_admins.choices %}
-				<option value="{{ id }}" selected="selected">{{ choice }}</option>
+				<option value="{{ id }}" {% if id in form.course_admins.value %} selected {% endif %}>{{ choice }}</option>
 				{% endfor %}
 			</select> 
 		</div>
-		<!-- TODO: hidden until functionality or examples are there -->
-		<!--<div class="form-group">-->
-		<div class="form-group hidden">
+		<!-- TODO: Add example of how to use-->
+		<div class="form-group">
 			<label for="id_course_external_css_default">External CSS Default:</label> 
 			
 			<input id="id_course_external_css_default" maxlength="255" name="course_external_css_default" class="form-control" type="text" value="{{form.course_external_css_default.value}}">
