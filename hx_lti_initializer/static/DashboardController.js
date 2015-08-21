@@ -462,43 +462,48 @@
     		}
     	});
     	jQuery('.parentAnnotation #edit').click(function (e){
-    		if (annotationItem.authToEditButton) {
-    			var button = jQuery(e.target);
-
-    			var positionAdder = {
-	    			display: "block",
-	    			left: button.offset().left,
-	    			top: button.scrollTop(),
-	    		}
-	    		var annotation_to_update = self.getAnnotationById(annotation_id, false);
-	    		var update_parent = function() {
-	    			console.log("hit update");
-                  cleanup_parent();
-                  var response = self.annotator.updateAnnotation(annotation_to_update);
-                  console.log(self.annotator);
-                  return response;
-                };
-                var cleanup_parent = function() {
-                	console.log("hit cancel");
-                  self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
-                  return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
-                };
-                self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
-                self.annotator.subscribe('annotationEditorSubmit', update_parent);
-	    		self.annotator.showEditor(annotation_to_update, positionAdder);
-	    		jQuery('.annotator-widget').addClass('fullscreen');
-    		}
+    		self.editAnnotation(annotation_id, e);
     	});
-		jQuery('[data-toggle="confirmation"]').confirmation({
+		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
 			title: "Would you like to delete your annotation?",
 			onConfirm: function (){
-				console.log("test");
 				if(annotationItem.authToDeleteButton){
 					var annotation_to_delete = self.getAnnotationById(annotation_id, false);
 					self.annotator.deleteAnnotation(annotation_to_delete);
 				}
 			},
 		});
+    };
+
+    $.DashboardController.prototype.editAnnotation = function(annotation_id, event){
+    	var self = this;
+		if (annotationItem.authToEditButton) {
+			var button = jQuery(event.target);
+
+			var positionAdder = {
+    			display: "block",
+    			left: button.offset().left,
+    			top: button.scrollTop(),
+    		}
+
+    		var annotation_to_update = self.getAnnotationById(annotation_id, false);
+    		
+    		var update_parent = function() {
+             	cleanup_parent();
+            	var response = self.annotator.updateAnnotation(annotation_to_update);
+            	return response;
+            };
+            var cleanup_parent = function() {
+            	self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
+            	return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
+            };
+
+            self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
+            self.annotator.subscribe('annotationEditorSubmit', update_parent);
+    		self.annotator.showEditor(annotation_to_update, positionAdder);
+    		
+    		jQuery('.annotator-widget').addClass('fullscreen');
+		}
     };
 
     // TODO Move to AnnotationCore

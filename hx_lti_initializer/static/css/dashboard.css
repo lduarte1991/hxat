@@ -289,3 +289,8 @@ button#closeModal {
     float: right;
     right: 20px;
 }
+
+.replyeditgroup{
+    display: block;
+    margin-top: 10px;
+}
