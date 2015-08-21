@@ -6,8 +6,6 @@ BUGS
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
--- iFrame sizing
-
 -- Consider taking out the annotation DB tab from assignment creation (doesn't really need to be on the frontend)
 
 -- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
@@ -109,6 +107,8 @@ COMPLETED
 √ (single-instructor invariant eliminated)
     Can now have multiple instructors/TFs show up in the 'instructor' tab.
 √ (fixed) Sometimes annotation editing gets x-frame denied (just editing, which is weird)
+√ iFrame sizing
+
 
 ============================
 DIFFERENCES FROM LUIS

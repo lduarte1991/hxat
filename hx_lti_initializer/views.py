@@ -454,7 +454,17 @@ def fetch_annotations (course_id, token):
     # Make request
     r = requests.get(requesturl, headers=headers)
     debug_printer("DEBUG - Database Response: " + str(r))
-    return r.json()
+    
+    try:
+        annotations = r.json()
+    except:
+        # If there are no annotations, the database should return a dictionary with empty rows,
+        # but in the event of another exception such as an authentication error, fail
+        # gracefully by manually passing in that empty response
+        annotations = {'rows':[]}
+        logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
+        
+    return annotations
    
 def error_view(request, message):
     '''
