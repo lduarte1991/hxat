@@ -2,6 +2,14 @@
 BUGS
 -- Can't use source material that someone else is already using
 
+-- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
+My hunch is that this is due to
+				self.queryDatabase({
+					"username": text,
+				});
+from DashboardController.js
+-- Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
+-- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
