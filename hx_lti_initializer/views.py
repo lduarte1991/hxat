@@ -578,9 +578,12 @@ def annotation_database_delete(request, annotation_id):
     request_user_id = json_body['user']['id']
 
     debug_printer("%s: %s" % (session_user_id, request_user_id))
-
+    
+    admin_ids = get_admin_ids()
+    
     # verifies the data queried against session so they can't get more than they should
-    if (session_user_id != request_user_id):
+    # Give admins universal delete privilege
+    if (session_user_id != request_user_id and session_user_id not in admin_ids):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
@@ -613,11 +616,14 @@ def annotation_database_update(request, annotation_id):
     debug_printer("%s %s %s" % (session_object_id, session_object_id != request_object_id, request_object_id))
     debug_printer("%s %s %s" % (session_context_id, session_context_id != request_context_id, request_context_id))
 
+    admin_ids = get_admin_ids()
+    
+    # Give admins universal edit privileges
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
         or session_object_id != request_object_id
         or session_context_id != request_context_id
-        or session_user_id != request_user_id):
+        or (session_user_id != request_user_id and session_user_id not in admin_ids)):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
@@ -630,3 +636,20 @@ def annotation_database_update(request, annotation_id):
     response = requests.post(database_url, data=json.dumps(json_body), headers=headers)
 
     return HttpResponse(response)
+    
+def get_admin_ids():
+    """
+        Returns a set of the user ids of all users with an admin role
+    """
+    admins = []
+    admin_ids = set()
+    
+    # Get users with an admin role
+    for role in settings.ADMIN_ROLES:
+        admins += list(LTIProfile.objects.filter(roles=role))
+    
+    # Add their ids to admin_ids
+    for admin in admins:
+        admin_ids.add(admin.get_id())
+    
+    return admin_ids

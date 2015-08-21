@@ -42,15 +42,6 @@ class LTIProfile(models.Model):
         """ When asked to print itself, this object will print the username """
         return self.user.username
     
-    def get_id(self):
-        """Returns Canvas user_id of LTIProfile"""
-        anon_id = self.anon_id
-    
-        # The user_id is the part of the anon_id after the colon
-        user_id = anon_id.rpartition(':')[2]
-    
-        return anon_id
-
     class Meta:
         """ The name of this section within the admin site """
         verbose_name = _("Instructor/Administrator")
@@ -58,9 +49,6 @@ class LTIProfile(models.Model):
     def get_id(self):
         """Returns Canvas user_id of LTIProfile"""
         anon_id = self.anon_id
-    
-        # The user_id is the part of the anon_id after the colon
-        user_id = anon_id.rpartition(':')[2]
     
         return anon_id
 
@@ -172,3 +160,4 @@ class LTICourse(models.Model):
             # Add user to course_users if not found
             self.course_users.add(lti_profile)
             self.save()
+        
