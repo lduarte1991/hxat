@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load list_of_ids %}
 <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
 <script src="{% static "vendors/development/underscore.js" %}"></script>
 <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
@@ -114,7 +115,7 @@ jQuery(function ($) {
 					showMediaSelector: false,
 					flags: false,
 					imageRootUrl: "{% static "vendors/catch/img"%}",
-					instructor_email: "fake@fake.com",
+					instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
 					default_tab: "{{ assignment.default_tab }}",
 				},
 			},

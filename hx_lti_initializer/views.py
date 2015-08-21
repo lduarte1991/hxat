@@ -361,14 +361,11 @@ def annotation_database_search(request):
     collection_id = request.GET['collectionId']
     assignment = get_object_or_404(Assignment, assignment_id=collection_id)
 
-    data = request.GET
-    url_values = urllib.urlencode(data)
-    debug_printer("URL Values: %s" % url_values)
-    database_url = str(assignment.annotation_database_url).strip() + '/search?' + url_values 
+    url_values = request.GET.urlencode()
+    database_url = str(assignment.annotation_database_url).strip() + '/search?'
     headers = {'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']}
 
-    response = requests.post(database_url, headers=headers)
-
+    response = requests.post(database_url, headers=headers, params=url_values)
     return HttpResponse(response)
 
 @csrf_exempt
