@@ -132,7 +132,7 @@
     border: 1px solid #999;
     border-radius: 5px;
     background-color: #DCE9FE;
-    font-size: 11pt;
+    font-size: 8pt;
     font-family: Arial;
 }
 
@@ -228,6 +228,7 @@ button#closeModal {
     font-style: italic;
     font-family: Times New Roman;
     font-size: 10pt;
+    cursor:pointer;
 }
 
 .parentAnnotation .body.side {
@@ -256,8 +257,7 @@ button#closeModal {
 }
 
 .replyItem {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    border-top: 2px solid black;
     padding: 10px;
 }
 
@@ -283,4 +283,9 @@ button#closeModal {
 
 .repliedby{
     font-weight:bold;
+}
+
+.editgroup{
+    float: right;
+    right: 20px;
 }

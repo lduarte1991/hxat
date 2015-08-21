@@ -22,6 +22,16 @@
 	    <div class="body field side">
 	        <%= text %>
 	    </div>
+	    <% if (authorized) {%>
+		    <div class="btn-group btn-group-xs editgroup" role="group" aria-label="edit">
+		    	<% if(authToEditButton) { %>
+			    <button class="btn btn-primary" id="edit"><i class="glyphicon glyphicon-pencil"></i> Edit </button>
+			    <% } %>
+			    <% if(authToDeleteButton) { %>
+			    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
+			    <% } %>
+		    </div>
+	    <% } %>
 	</div>
 	<div class="repliesList">
 	    Loading Replies...
