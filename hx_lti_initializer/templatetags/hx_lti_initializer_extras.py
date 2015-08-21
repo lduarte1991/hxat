@@ -83,24 +83,6 @@ def assignment_object_exists(object_id, collection_id):
 		return True
 	except:
 		return False
-"""
-@register.simple_tag
-def get_annotation_by_id(id, students):
-	'''
-		Given the id of an annotation and a list of student_objects, this searches through
-		the student_objects and returns the text of the annotation with that id	
-	'''
-	# O(n^2) - maximum of students*student_annotations executions.
-	# TODO: Performance?
-	# alternative is a network request to get annotation by ID.
-	for student in students:
-		for annotation in student['annotations']:
-			if annotation['id'] == int(id):
-				return annotation["text"]
-	
-	# If annotation not found, note that it has been deleted
-	return "<i>Deleted Annotation</i>"
-"""
 
 @register.simple_tag
 def get_annotation_by_id(id, annotations):

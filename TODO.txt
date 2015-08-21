@@ -1,7 +1,6 @@
 ============================
 BUGS
 -- Can't use source material that someone else is already using
--- Sometimes annotation editing gets x-frame denied (just editing, which is weird)
 
 
 ============================
@@ -17,9 +16,6 @@ BROAD TODOS/ISSUES (To be done by fall launch)
     -- Change user creation
     -- Change name display code
     -- (demo fix already completed in another repo)
-
--- Filter target objects by course in 'add source material' dropdown?
-    (If we're using a collaborative, everyone can use anyone's source material type of thing, then we don't want this)
 
 -- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
     My current solution is a total hack
@@ -43,6 +39,7 @@ NOT A PRIORITY/TODO LONG-TERM:
 
 -- Hover to annotate? This was working at one point, I believe.
 
+-- Maybe make a better looking UI in the index view
 
 ============================
 COMPLETED
@@ -109,10 +106,14 @@ COMPLETED
 √ (fixed) Can't reply to annotations
 √ (single-instructor invariant eliminated)
     Can now have multiple instructors/TFs show up in the 'instructor' tab.
-    
+√ (fixed) Sometimes annotation editing gets x-frame denied (just editing, which is weird)
+√ iFrame sizing
+
+
 ============================
 DIFFERENCES FROM LUIS
 -- Fetches a single course (named active_course) as opposed to fetching all courses for admin
--- Routes student to modified admin_hub as opposed to directly to an assignment
+-- Routes student to modified admin_hub by default as opposed to directly to an assignment,
+    though we support that functionality as well
 -- Instructor can edit and delete student annotations
 -- Home button on assignment pages

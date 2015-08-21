@@ -19,7 +19,11 @@
     </div>
     
     <div class="totalreplies field side">
-        <% totalComments %> Replies
+        <% if(totalComments === 0) { %>
+            Make New Reply
+        <% } else { %>
+            View <%= totalComments %> Replies
+        <% } %>
     </div>
     
     <div class="tagList field side">

@@ -63,11 +63,6 @@ def initialize_lti_tool_provider(req):
     """
     Starts the provider given the consumer_key and secret.
     """
-    # get the consumer key and secret from settings (__init__.py file)
-    # will be used to compare against request to validate the tool init
-    #consumer_key = settings.CONSUMER_KEY
-    #secret = settings.LTI_SECRET
-
     # both of these will give key errors if there is no key or it's the wrong key, respectively.
     consumer_key = req.POST['oauth_consumer_key']
     secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
@@ -152,54 +147,12 @@ def launch_lti(request):
     request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
     
     # Check whether user is a admin, instructor or teaching assistant
-    # TODO: What roles do we actually want here?
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
     
     # if intersection
-    if set(roles) & set(settings.ADMIN_ROLES):# or "Teaching Assistant" in roles:
+    if set(roles) & set(settings.ADMIN_ROLES):
     # Set flag in session to later direct user to the appropriate version of the index
         request.session['is_instructor'] = True
-
-    # if "Student" in roles or "Learner" in roles:
-    #     collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-    #     object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-    #     debug_printer('DEBUG - Found assignment being accessed: %s' % collection_id)
-    #     debug_printer('DEBUG - Found object being accessed: %s' % object_id)
-
-    #     user_name = get_lti_value('lis_person_name_full', tool_provider)
-    #     if user_name == None:
-    #         # gather the necessary data from the LTI initialization request
-    #         user_name = get_lti_value('lis_person_sourcedid', tool_provider)
-
-    #     try:
-    #         assignment = Assignment.objects.get(assignment_id=collection_id)
-    #         targ_obj = TargetObject.objects.get(pk=object_id)
-    #     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
-    #         raise PermissionDenied()
-    #     original = {
-    #         'user_id': user_id,
-    #         'username': user_name,
-    #         'is_instructor': request.user and request.user.is_authenticated(),
-    #         'collection': collection_id,
-    #         'course': course,
-    #         'object': object_id,
-    #         'target_object': targ_obj,
-    #         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
-    #         'assignment': assignment,
-    #         'abstract_db_url': 'http://annotationsx-condaatje.c9.io:80/lti_init/annotation_api'
-    #     }
-
-    #     if (targ_obj.target_type == 'vd'):
-    #         srcurl = targ_obj.target_content
-    #         if 'youtu' in srcurl:
-    #             typeSource = 'video/youtube'
-    #         else:
-    #             disassembled = urlparse(srcurl)
-    #             file_ext = splitext(basename(disassembled.path))[1]
-    #             typeSource = 'video/' + file_ext.replace('.', '')
-    #         original.update({'typeSource': typeSource})
-    #     elif (targ_obj.target_type == 'ig'):
-    #         original.update({'osd_json': targ_obj.target_content})
         
         # For HX, students only access one object or collection, and don't have an index
         # For ATG, students have the index  to choose where to go, so collection_id
@@ -209,20 +162,6 @@ def launch_lti(request):
         collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         save_session(request, user_id, collection_id, object_id, course, roles)
-    
-        # original = {
-        #     'user_id': user_id,
-        #     'username': user_name,
-        #     'is_instructor': request.user and request.user.is_authenticated(),
-        #     'collection': collection_id,
-        #     'course': course,
-        #     'object': object_id,
-        #     'target_object': targ_obj,
-        #     'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
-        #     'assignment': assignment,
-        #     'abstract_db_url': 'http://annotationsx-condaatje.c9.io:80/lti_init/annotation_api'
-        # }
-        # return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
     try:
         # try to get the profile via the anon id
@@ -302,13 +241,6 @@ def launch_lti(request):
     # to be routed directly to an assignment given the correct GET parameters
     # lti_init/launch_lti/?collection_id=12up498&object_id=1iu48adsfi
     try:
-        '''
-            assignment_id = request.POST['collection_id']
-            debug_printer("DEBUG - GET request for assignment/collection_id: " + assignment_id)
-            object_id = request.POST['object_id']
-            debug_printer("DEBUG - GET request for object_id: " + object_id)
-        '''
-    
         # Keeping the HX functionality whereby students are routed to specific assignment objects
         # This is motivated by the Poetry in America Course
     
@@ -321,8 +253,6 @@ def launch_lti(request):
         debug_printer("DEBUG - User wants the index")
     
     return course_admin_hub(request)
-    #return redirect('hx_lti_initializer:course_admin_hub')
-
 
 @login_required
 def edit_course(request, id):
@@ -337,7 +267,6 @@ def edit_course(request, id):
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
-            print("Rolled )))")
             raise PermissionDenied()
     else: 
         form = CourseForm(instance=course)
@@ -355,9 +284,9 @@ def edit_course(request, id):
 @login_required
 def course_admin_hub(request):
     """
+    The index view for both students and instructors. Based on the is_instructor flag,
+    students are directed to a version of admin_hub with reduced privileges
     """
-    #print "Course Admin Session: " + str(request.session.session_key)
-
     lti_profile = LTIProfile.objects.get(user=request.user)
     active_course = LTICourse.objects.filter(course_id=request.session['active_course'])
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, list(active_course))
@@ -384,6 +313,7 @@ def course_admin_hub(request):
 
 def access_annotation_target(request, course_id, assignment_id, object_id, user_id=None, user_name=None, roles=None):
     """
+    Renders an assignment page
     """
     if user_id is None:
         user_name = request.user.get_username()
@@ -446,33 +376,37 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     if not assignment.object_after(object_id) is None:
         original['next_object'] = assignment.object_after(object_id)
 
-    if (targ_obj.target_type == 'vd'):
-        srcurl = targ_obj.target_content
-        if 'youtu' in srcurl:
-            typeSource = 'video/youtube'
-        else:
-            disassembled = urlparse(srcurl)
-            file_ext = splitext(basename(disassembled.path))[1]
-            typeSource = 'video/' + file_ext.replace('.', '')
-        original.update({'typeSource': typeSource})
-    elif (targ_obj.target_type == 'ig'):
-        original.update({'osd_json': targ_obj.target_content})
+    # TODO: Currently image and video are not supported
+    
+    # if (targ_obj.target_type == 'vd'):
+    #     srcurl = targ_obj.target_content
+    #     if 'youtu' in srcurl:
+    #         typeSource = 'video/youtube'
+    #     else:
+    #         disassembled = urlparse(srcurl)
+    #         file_ext = splitext(basename(disassembled.path))[1]
+    #         typeSource = 'video/' + file_ext.replace('.', '')
+    #     original.update({'typeSource': typeSource})
+    # elif (targ_obj.target_type == 'ig'):
+    #     original.update({'osd_json': targ_obj.target_content})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
 
 def instructor_dashboard_view(request):
     '''
-        TODO
+        Renders the instructor dashboard
     '''
     active_course_id = request.session['active_course']
     # Gets object as opposed to queryset
     course = LTICourse.objects.get(course_id=active_course_id)
     user_id = request.user.email #for some reason
     user_profiles = course.course_users.all()
-    student_objects = []
+    
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
     annotations_for_course = fetch_annotations(active_course_id, token)
 
+    user_objects = []
+    
     # Dictionary of annotations, keyed by id of annotation for O(1) lookup later
     annotation_dict = {}
     
@@ -489,16 +423,18 @@ def instructor_dashboard_view(request):
                 user_annotations.append(anno)
         return user_annotations
 
+    # Create a user_object for each user
     for profile in user_profiles:
-        student_objects.append({
-            'student_name': profile,  #the model is set up to return the name of the user on a utf call
-            'student_id': profile.get_id(),
+        user_objects.append({
+            # A user_object is a dictionary containing name, id and annotations for a user
+            'name': profile,  #the model is set up to return the name of the user on a utf call
+            'id': profile.get_id(),
             'annotations': filter_annotations(annotations_for_course, profile.get_id())
         })
     
     context = {
-        # Pass alphabetically sorted version of student_objects
-        'student_objects': sorted(student_objects, lambda x,y:cmp(str(x['student_name']).lower(), str(y['student_name']).lower())),
+        # Pass alphabetically sorted version of user_objects
+        'user_objects': sorted(user_objects, lambda x,y:cmp(str(x['name']).lower(), str(y['name']).lower())),
         # Dictionary of annotations, keyed by id for easy reply lookup
         'annotation_dict': annotation_dict,
     }
@@ -518,7 +454,17 @@ def fetch_annotations (course_id, token):
     # Make request
     r = requests.get(requesturl, headers=headers)
     debug_printer("DEBUG - Database Response: " + str(r))
-    return r.json()
+    
+    try:
+        annotations = r.json()
+    except:
+        # If there are no annotations, the database should return a dictionary with empty rows,
+        # but in the event of another exception such as an authentication error, fail
+        # gracefully by manually passing in that empty response
+        annotations = {'rows':[]}
+        logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
+        
+    return annotations
    
 def error_view(request, message):
     '''
@@ -537,6 +483,9 @@ def error_view(request, message):
 
 
 def delete_assignment(request):
+    """
+        Assignment deletion from Postgres databases
+    """
     try:
         collection_id = request.POST['assignment_id']
         assignment = Assignment.objects.get(assignment_id=collection_id)
@@ -629,9 +578,12 @@ def annotation_database_delete(request, annotation_id):
     request_user_id = json_body['user']['id']
 
     debug_printer("%s: %s" % (session_user_id, request_user_id))
-
+    
+    admin_ids = get_admin_ids()
+    
     # verifies the data queried against session so they can't get more than they should
-    if (session_user_id != request_user_id):
+    # Give admins universal delete privilege
+    if (session_user_id != request_user_id and session_user_id not in admin_ids):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
@@ -664,11 +616,14 @@ def annotation_database_update(request, annotation_id):
     debug_printer("%s %s %s" % (session_object_id, session_object_id != request_object_id, request_object_id))
     debug_printer("%s %s %s" % (session_context_id, session_context_id != request_context_id, request_context_id))
 
+    admin_ids = get_admin_ids()
+    
+    # Give admins universal edit privileges
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
         or session_object_id != request_object_id
         or session_context_id != request_context_id
-        or session_user_id != request_user_id):
+        or (session_user_id != request_user_id and session_user_id not in admin_ids)):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
@@ -681,3 +636,20 @@ def annotation_database_update(request, annotation_id):
     response = requests.post(database_url, data=json.dumps(json_body), headers=headers)
 
     return HttpResponse(response)
+    
+def get_admin_ids():
+    """
+        Returns a set of the user ids of all users with an admin role
+    """
+    admins = []
+    admin_ids = set()
+    
+    # Get users with an admin role
+    for role in settings.ADMIN_ROLES:
+        admins += list(LTIProfile.objects.filter(roles=role))
+    
+    # Add their ids to admin_ids
+    for admin in admins:
+        admin_ids.add(admin.get_id())
+    
+    return admin_ids
