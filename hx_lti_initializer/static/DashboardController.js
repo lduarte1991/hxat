@@ -197,6 +197,35 @@
 			};
 			isChanged();
 		});
+		annotator.subscribe("annotationUpdated", function (annotation) {
+			var annotationItem = self.formatAnnotation(annotation);
+			var date = new Date(annotationItem.updated);
+			var dateAgo = jQuery.timeago(date);
+			if( jQuery('.annotationModal').length > 0 ) {
+				jQuery('.parentAnnotation .annotatedAt').html("last updated " + dateAgo);
+				jQuery('.parentAnnotation .annotatedAt').attr("title", date);
+				jQuery('.parentAnnotation .body').html(annotationItem.text);
+			}
+
+			divObject = '.annotationItem.item-'+annotation.id.toString();
+			console.log(divObject);
+			jQuery(divObject + ' .annotatedAt').html("last updated" + dateAgo);
+			jQuery(divObject + ' .annotatedAt').attr("title", date);
+			jQuery(divObject + ' .body').html(annotationItem.text);
+			tagHtml = ""
+			annotationItem.tags.forEach(function(tag){
+				tagHtml += "<div class=\"tag side\">" + tag + "</div>"
+			});
+			jQuery(divObject + ' .tagList').html(tagHtml);
+		});
+		annotator.subscribe("annotationDeleted", function (annotation) {
+			if (jQuery('.annotationModal').length > 0) {
+				jQuery('.annotationModal').remove();
+    			jQuery('.annotationSection').css('y-scroll', 'scroll');
+			}
+			divObject = '.annotationItem.item-'+annotation.id.toString();
+			jQuery(divObject).remove();
+		});
 	};
 
 	$.DashboardController.prototype.clearDashboard = function(){
@@ -209,7 +238,7 @@
 		var el = self.element;
 		var self = this;
 		annotations.forEach(function(annotation) {
-			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var item = self.formatAnnotation(annotation);
 			var html = self.TEMPLATES.annotationItem(item);
 			jQuery('.annotationsHolder').append(html);
 		});
@@ -278,7 +307,7 @@
 	$.DashboardController.prototype.addAnnotations = function(annotations, location) {
 		var self = this;
 		annotations.forEach(function(annotation) {
-			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var item = self.formatAnnotation(annotation);
 			var html = self.TEMPLATES.annotationItem(item);
 			if (location === "before") {
 				jQuery('.annotationsHolder').prepend(html);
@@ -333,7 +362,7 @@
     }; 
 
 	$.DashboardController.prototype.formatAnnotation = function(annotation) {
-		var item = annotation;
+		var item = jQuery.extend(true, {}, annotation);
 		var self = this;
 		if (typeof item.updated !== 'undefined')
             item.updated = self.createDateFromISO8601(item.updated);
@@ -483,7 +512,7 @@
     		var annotation = annotations[index];
     		if (annotation.id === annotationId){
     			if (formatted){
-    				return self.formatAnnotation(jQuery.extend(true, {}, annotation));
+    				return self.formatAnnotation(annotation);
     			} else {
     				return annotation
     			}
@@ -522,7 +551,7 @@
     		jQuery('.repliesList').css('height', replies_height);
     		final_html = ''
     		annotations.forEach(function(annotation) {
-				var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+				var item = self.formatAnnotation(annotation);
 				var html = self.TEMPLATES.replyItem(item);
 				final_html += html;				
 			});
