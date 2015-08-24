@@ -11,10 +11,10 @@ My hunch is that this is due to
 from DashboardController.js
 
 
--- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
+-- Editing replies does not work. Might just not be implemented yet by Luis.
     Note: you can edit and delete a reply from the original sidebar, but not in the sidebar reply view. Only in the
-    flat, all-annotations view. Basically, you can't change it when you're viewing it as a reply, but
-    you can change it when you're viewing it as its own annotation.
+    flat, all-annotations view. Basically, you can't edit it when you're viewing it as a reply, but
+    you can edit it when you're viewing it as its own annotation.
 
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
