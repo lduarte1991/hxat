@@ -31,7 +31,7 @@ urlpatterns = patterns(
         name="annotation_database_create",
     ),
     url(
-        r'^annotation_api/delete/(?P<annotation_id>[0-9]+)$',
+        r'^annotation_api/delete/(?P<annotation_id>[0-9]+|)$',
         'hx_lti_initializer.views.annotation_database_delete',
         name="annotation_database_delete",
     ),

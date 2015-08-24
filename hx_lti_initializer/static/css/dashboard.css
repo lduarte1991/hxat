@@ -192,6 +192,7 @@ button#closeModal {
 	position: absolute;
 	width: 100%;
 	top: 45px;
+    z-index: 1000;
 	border-bottom: 2px solid #bbb;
 	padding-bottom: 20px;
 	-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
@@ -254,6 +255,7 @@ button#closeModal {
     padding-top: 25px;
     padding-bottom: 45px;
     height: inherit;
+    overflow-y: scroll;
 }
 
 .replyItem {

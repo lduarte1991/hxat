@@ -6,9 +6,6 @@
     </div>
     <% if (authorized) {%>
 		<div class="btn-group btn-group-xs replyeditgroup" role="group" aria-label="edit" style="display:block;">
-	    	<% if(authToEditButton) { %>
-		    <button class="btn btn-primary" id="edit"><i class="glyphicon glyphicon-pencil"></i> Edit </button>
-		    <% } %>
 		    <% if(authToDeleteButton) { %>
 		    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
 		    <% } %>
