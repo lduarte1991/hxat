@@ -179,7 +179,7 @@
 		el.on("click", ".annotationItem", annotationClicked);
 		annotator.subscribe("annotationsLoaded", function (annotations) {
 			if (self.addingAnnotations){
-				self.addAnnotations(annotations, "after");
+				self.addAnnotations('.annotationsHolder', annotations, "after");
 				self.addingAnnotations = false;
 			} else {
 				self.clearDashboard();
@@ -192,7 +192,11 @@
 				if (attempts < 100){
 					setTimeout(function(){
 						if(typeof annotation.id !== 'undefined'){
-							self.addAnnotations([annotation], "before");
+							if(annotation.media === "comment") {
+								self.addAnnotations('.repliesList', [annotation], "before");
+							} else {
+								self.addAnnotations('.annotationsHolder', [annotation], "before");
+							}
 						} else {
 							attempts++;
 							isChanged();
@@ -309,18 +313,22 @@
 		self.changeTab(this.initOptions.default_tab);
 	};
 
-	$.DashboardController.prototype.addAnnotations = function(annotations, location) {
+	$.DashboardController.prototype.addAnnotations = function(element, annotations, location) {
 		var self = this;
 		annotations.forEach(function(annotation) {
 			var item = self.formatAnnotation(annotation);
-			var html = self.TEMPLATES.annotationItem(item);
-			if (location === "before") {
-				jQuery('.annotationsHolder').prepend(html);
+			var html = ''
+			if (element.indexOf('replies') === -1){
+				html = self.TEMPLATES.annotationItem(item);
 			} else {
-				jQuery('.annotationsHolder').append(html);
+				html = self.TEMPLATES.replyItem(item);
+			}
+			if (location === "before") {
+				jQuery(element).prepend(html);
+			} else {
+				jQuery(element).append(html);
 			}
 		});
-		
 	};
 
 	$.DashboardController.prototype.createDateFromISO8601 = function(string) {
@@ -483,6 +491,7 @@
     $.DashboardController.prototype.editAnnotation = function(annotation_id, event){
     	var self = this;
     	var annotationItem = self.getAnnotationById(annotation_id, true);
+    	console.log(annotationItem);
 		if (annotationItem.authToEditButton) {
 			var button = jQuery(event.target);
 
@@ -525,7 +534,7 @@
     			if (formatted){
     				return self.formatAnnotation(annotation);
     			} else {
-    				return annotation
+    				return annotation;
     			}
     		}
     	} 
@@ -560,13 +569,22 @@
     		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
     		jQuery('.repliesList').css('margin-top', replies_offset);
     		jQuery('.repliesList').css('height', replies_height);
+<<<<<<< HEAD
     		var final_html = '';
+=======
+    		final_html = ''
+    		self.list_of_replies = {}
+>>>>>>> 44ec640fe6790dd85fd8086d837bd89662d9d7c2
     		annotations.forEach(function(annotation) {
 				var item = self.formatAnnotation(annotation);
 				var html = self.TEMPLATES.replyItem(item);
-				final_html += html;				
+				final_html += html;
+				self.list_of_replies[item.id.toString()] = annotation;
 			});
+<<<<<<< HEAD
 
+=======
+>>>>>>> 44ec640fe6790dd85fd8086d837bd89662d9d7c2
 			jQuery('.repliesList').html(final_html);
     	}
 
@@ -574,6 +592,24 @@
         var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
         var request = jQuery.ajax(search_url, options);
 
+        var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
+		var el = self.element;
+		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
     };
+
+    $.DashboardController.prototype.replyDeleteClicked = function(e) {
+    	var self = this;
+    	var replyItem = jQuery(e.target).parent().parent();
+    	var annotation_id = replyItem.find('.idAnnotation').html();
+    	var annotation = self.list_of_replies[annotation_id];
+    	jQuery(e.target).confirmation({
+			title: "Would you like to delete your reply?",
+			onConfirm: function (){
+				self.annotator.plugins.Store._apiRequest('destroy', annotation, function(){});
+				replyItem.remove();
+			},
+		});
+		jQuery(e.target).confirmation('show');
+};
 
 }(AController));
