@@ -346,7 +346,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     # also, we may want to consider denying if theres no ssl
     protocol = 'https://' if request.is_secure() else 'http://'
     abstract_db_url = protocol + get_current_site(request).domain + "/lti_init/annotation_api"
-    debug_printer("DEBUG - Abstract Database URL:" + abstract_db_url)
+    debug_printer("DEBUG - Abstract Database URL: " + abstract_db_url)
 
     original = {
         'user_id': user_id,

@@ -3,15 +3,19 @@ BUGS
 -- Can't use source material that someone else is already using
 
 -- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
+
 My hunch is that this is due to
 				self.queryDatabase({
 					"username": text,
 				});
 from DashboardController.js
--- Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
--- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
--- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
+
+-- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
+    Note: you can edit and delete a reply from the sidebar, but not in the reply view. Only in the
+    flat, all-annotations view. Basically, you can't change it when you're viewing it as a reply, but
+    you can change it when you're viewing it as its own annotation.
+-- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
@@ -37,6 +41,10 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Setting someone as a course admin only means that that person's annotations will show up
+    in the instructor tab. Actual admin rights are still based on roles. We may want to circle back 
+    to this based on desired functionality from our first users.
 
 -- Link to dashboard from the detail? So you don't have to go back to the index.
     -- Find out what users want
@@ -118,6 +126,7 @@ COMPLETED
     Can now have multiple instructors/TFs show up in the 'instructor' tab.
 √ (fixed) Sometimes annotation editing gets x-frame denied (just editing, which is weird)
 √ iFrame sizing
+√ (fixed) Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
 
 
 ============================

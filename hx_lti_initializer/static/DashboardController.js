@@ -482,6 +482,7 @@
 
     $.DashboardController.prototype.editAnnotation = function(annotation_id, event){
     	var self = this;
+    	var annotationItem = self.getAnnotationById(annotation_id, true);
 		if (annotationItem.authToEditButton) {
 			var button = jQuery(event.target);
 
