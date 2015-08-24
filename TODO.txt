@@ -10,6 +10,8 @@ My hunch is that this is due to
 from DashboardController.js
 -- Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
 -- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
+-- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
+
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
