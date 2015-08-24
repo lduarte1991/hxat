@@ -12,15 +12,14 @@ from DashboardController.js
 
 
 -- Editing and deleting replies does not work. Might just not be implemented yet by Luis.
-    Note: you can edit and delete a reply from the sidebar, but not in the reply view. Only in the
+    Note: you can edit and delete a reply from the original sidebar, but not in the sidebar reply view. Only in the
     flat, all-annotations view. Basically, you can't change it when you're viewing it as a reply, but
     you can change it when you're viewing it as its own annotation.
+
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
-
--- Consider taking out the annotation DB tab from assignment creation (doesn't really need to be on the frontend)
 
 -- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
@@ -31,9 +30,6 @@ BROAD TODOS/ISSUES (To be done by fall launch)
     -- Change name display code
     -- (demo fix already completed in another repo)
 
--- Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
-    My current solution is a total hack
-
 -- Test Dashboard et. all to make sure thousands of annotations work.
 
 -- Unit Tests :(
@@ -41,6 +37,9 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Decide whether we want to hide the annotation DB tab from assignment creation
+    the typical instructor would likely not need it.
 
 -- Setting someone as a course admin only means that that person's annotations will show up
     in the instructor tab. Actual admin rights are still based on roles. We may want to circle back 
@@ -127,7 +126,7 @@ COMPLETED
 √ (fixed) Sometimes annotation editing gets x-frame denied (just editing, which is weird)
 √ iFrame sizing
 √ (fixed) Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
-
+√ Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
 
 ============================
 DIFFERENCES FROM LUIS
