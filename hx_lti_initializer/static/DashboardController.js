@@ -569,22 +569,14 @@
     		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
     		jQuery('.repliesList').css('margin-top', replies_offset);
     		jQuery('.repliesList').css('height', replies_height);
-<<<<<<< HEAD
     		var final_html = '';
-=======
-    		final_html = ''
     		self.list_of_replies = {}
->>>>>>> 44ec640fe6790dd85fd8086d837bd89662d9d7c2
     		annotations.forEach(function(annotation) {
 				var item = self.formatAnnotation(annotation);
 				var html = self.TEMPLATES.replyItem(item);
 				final_html += html;
 				self.list_of_replies[item.id.toString()] = annotation;
 			});
-<<<<<<< HEAD
-
-=======
->>>>>>> 44ec640fe6790dd85fd8086d837bd89662d9d7c2
 			jQuery('.repliesList').html(final_html);
     	}
 
