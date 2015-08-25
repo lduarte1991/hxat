@@ -124,6 +124,11 @@ def edit_assignment(request, id):
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
 
+    try:
+        course_name = request.session['course_name']
+    except:
+        course_name = None
+    
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',
@@ -134,6 +139,6 @@ def edit_assignment(request, id):
             'user': request.user,
             'debug': debug,
             'assignment_id': assignment.assignment_id,
-            'course_name': request.session['course_name'],
+            'course_name': course_name,
         }
     )

@@ -219,9 +219,11 @@ def launch_lti(request):
     try:
         course_object = LTICourse.get_course_by_id(course)
         debug_printer('DEBUG - Course was found %s' % course)
-
         # Add user to course_users if not already there
         course_object.add_user(lti_profile)
+        
+        # save the course name to the session so it auto-populate later.
+        request.session['course_name'] = course_object.course_name 
         
     except LTICourse.DoesNotExist:
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
@@ -241,11 +243,14 @@ def launch_lti(request):
             course_object = LTICourse.create_course(course, lti_profile)
             course_object.course_name = get_lti_value('context_title', tool_provider)
             course_object.save()
-
-        # Right now there's an issue where instructors have to refresh the page after creating
-        # his/her course in order to recieve admin rights.
-        # I Wanted to have a recursive call solve this, but I haven't been able to get it working.
-        #return launch_lti(request)
+            
+            # save the course name to the session so it auto-populate later.
+            request.session['course_name'] = course_object.course_name 
+            
+            # Right now there's an issue where instructors have to refresh the page after creating
+            # his/her course in order to recieve admin rights.
+            # I Wanted to have a recursive call solve this, but I haven't been able to get it working.
+            #return launch_lti(request)
             
     # log the user into the Django backend
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -284,6 +289,9 @@ def edit_course(request, id):
         if form.is_valid():
             course = form.save()
             course.save()
+            
+            # save the course name to the session so it auto-populate later.
+            request.session['course_name'] = course_object.course_name
             
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
