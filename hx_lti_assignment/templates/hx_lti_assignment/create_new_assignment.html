@@ -61,14 +61,18 @@
 	        	fixOrderNumbers();
 	        }
         }).disableSelection();
-        jQuery('.post-form').submit( function(e){
+        jQuery('.post-form').submit(function(e){
+        	
+        	// We don't need validation if we're deleting.
+        	if (e.target.id == "delete_assignment") {
+        		return true
+        	}
+        	
         	var target_object_list = []
         	items = jQuery('.field-target_object');
         	should_quit = false;
         	
-        	// TODO: this is a total hack, as it depends on the placeholder text from bootstrap
-        	track = ""
-        	
+        	// make sure the user didn't repeat the same source material in the same assignment
         	items.each(function(index){
         		name = jQuery(items[index]).find('div > button > span:visible').text();
         		track += name
@@ -81,12 +85,17 @@
         			target_object_list.push(name);
         		}
         	});
-        	if (track == "Nothing selected" || track == "") {
+
+			// Make sure the user selected a target object
+        	if (target_object_list.indexOf("") !== -1) {
         		console.log("User failed to select a target object")
-        		jQuery('.sortable').css('outline', 'red 2px solid');
-        		jQuery('.sortable').css('outline-offset', '5px');
-        		jQuery('.sortable').prepend('<p style="color:red; font-size: 10pt;">Please select source material</p>');
-        		should_quit = true
+        		if (!jQuery('#targetObjectWarningLabel').length) {
+        			jQuery('.sortable').css('outline', 'red 2px solid');
+        			jQuery('.sortable').css('outline-offset', '5px');
+        			jQuery('.sortable').prepend('<p id="targetObjectWarningLabel" style="color:red; font-size: 10pt;">Please select source material</p>');
+        		}
+        		// Form is no bueno
+				return false
         	}
         	return !should_quit
         });
@@ -253,8 +262,7 @@
 	
 	{% if assignment_id %}
 	<!--Assignment Deletion-->
-	<!--TODO: Make the deletion confirmation Bootstrap native-->
-	<form onsubmit="return confirm('Are you sure you want to delete this assignment?');" method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
+	<form id="delete_assignment" onsubmit="return confirm('Are you sure you want to delete this assignment?');" method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
 		{% csrf_token %}
 		<input type="hidden" name="assignment_id" value="{{ assignment_id }}"></input>
 		<button type="submit" id="confirm-delete" class="save btn btn-danger" style="float: left">

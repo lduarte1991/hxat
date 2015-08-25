@@ -106,7 +106,7 @@ Below is an overview of the differences between Harvard ATG's [fork](https://git
 
 ### Minor Changes
 * Instructors have edit and delete privileges for the annotations of all users.
-* The Instructor tab of the sidebar filters for the annotations of all users with a role defined in `ADMIN_ROLES`(`secure.py`)
+* The Instructor tab of the sidebar filters for the annotations of all users who are `course_admins` for an assignment. Note that this is different from `ADMIN_ROLES`(`secure.py`).
 * Only displays the data for the course (`active_course`) on which the tool is installed, as opposed to all courses for the user
 * Default course name: On creation, the course name is set to the `context_title` LTI launch parameter by default
 * Default population of forms:

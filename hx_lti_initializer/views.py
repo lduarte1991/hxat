@@ -22,6 +22,7 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.forms import CourseForm
+from hx_lti_initializer.utils import debug_printer, get_lti_value
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -202,8 +203,9 @@ def launch_lti(request):
     # now it's time to deal with the course_id it does not associate
     # with users as they can flow in and out in a MOOC
     try:
-        debug_printer('DEBUG - Course was found %s' % course)
         course_object = LTICourse.get_course_by_id(course)
+        debug_printer('DEBUG - Course was found %s' % course)
+
         # Add user to course_users if not already there
         course_object.add_user(lti_profile)
         # Store course name in session
@@ -218,7 +220,7 @@ def launch_lti(request):
         if set(roles) & set(settings.ADMIN_ROLES):
             # if the user is an administrator, the missing course is created
             # otherwise, it will just display an error message
-            message_error = "Because you are an instructor, a course has been created for you, edit it below to add a proper name."
+            message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
             messages.warning(request, message_error)
             course_object = LTICourse.create_course(course, lti_profile)
             # Set default course name to context title
@@ -226,8 +228,11 @@ def launch_lti(request):
             course_object.save()
             # Store course name in session
             request.session['course_name'] = course_object.course_name
-
-    
+        
+        # Wanted to have a recursive call solve the problem of no admin rights granted without refreshing,
+        # but it doesn't work for some reason.
+        # return launch_lti(request)
+            
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
@@ -335,26 +340,13 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     save_session(request, None, assignment_id, object_id, course_id, None)
     for item in request.session.keys():
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
-    
-    instructor_profiles = []
-    
-    # Filter for LTIProfiles with an administrative role
-    for role in settings.ADMIN_ROLES:
-        instructor_profiles += list(LTIProfile.objects.filter(roles=role))
-        
-    instructor_ids = []
-    
-    # Add to list of instructor_ids
-    for instructor_profile in instructor_profiles:
-        instructor_ids.append(instructor_profile.get_id())
-    
-    
+
     # Dynamically pass in the address that the detail view will use to fetch annotations.
     # there's definitely a more elegant way to do this.
     # also, we may want to consider denying if theres no ssl
     protocol = 'https://' if request.is_secure() else 'http://'
     abstract_db_url = protocol + get_current_site(request).domain + "/lti_init/annotation_api"
-    debug_printer("DEBUG - Abstract Database URL:" + abstract_db_url)
+    debug_printer("DEBUG - Abstract Database URL: " + abstract_db_url)
 
     original = {
         'user_id': user_id,
@@ -367,8 +359,6 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
         'abstract_db_url': abstract_db_url,
-        # Convert instructor_ids to json
-        'instructor_ids': json.dumps(instructor_ids),    
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -523,14 +513,11 @@ def annotation_database_search(request):
     collection_id = request.GET['collectionId']
     assignment = get_object_or_404(Assignment, assignment_id=collection_id)
 
-    data = request.GET
-    url_values = urllib.urlencode(data)
-    debug_printer("URL Values: %s" % url_values)
-    database_url = str(assignment.annotation_database_url).strip() + '/search?' + url_values 
+    url_values = request.GET.urlencode()
+    database_url = str(assignment.annotation_database_url).strip() + '/search?'
     headers = {'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']}
 
-    response = requests.post(database_url, headers=headers)
-
+    response = requests.post(database_url, headers=headers, params=url_values)
     return HttpResponse(response)
 
 @csrf_exempt

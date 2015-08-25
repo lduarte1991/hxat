@@ -145,17 +145,14 @@
 			jQuery('#public').removeClass('disabled');
 			jQuery('#instructor').removeClass('disabled');
 		} else {
-			// Parse string into JSON
-			var ids = JSON.parse(this.initOptions.instructor_ids);
+			var ids = this.initOptions.instructors;
 			
 			// Iterate over instructor ids, querying for their annotations
 			for (var i = 0; i < ids.length; i++) {
 				this.queryDatabase({
-					"user_id": ids[i]
+					"user_id": ids[i],
 				});
-				
 			}
-			
 			jQuery('#instructor').addClass('disabled');
 			jQuery('#public').removeClass('disabled');
 			jQuery('#mynotes').removeClass('disabled');
@@ -182,7 +179,7 @@
 		el.on("click", ".annotationItem", annotationClicked);
 		annotator.subscribe("annotationsLoaded", function (annotations) {
 			if (self.addingAnnotations){
-				self.addAnnotations(annotations, "after");
+				self.addAnnotations('.annotationsHolder', annotations, "after");
 				self.addingAnnotations = false;
 			} else {
 				self.clearDashboard();
@@ -195,7 +192,11 @@
 				if (attempts < 100){
 					setTimeout(function(){
 						if(typeof annotation.id !== 'undefined'){
-							self.addAnnotations([annotation], "before");
+							if(annotation.media === "comment") {
+								self.addAnnotations('.repliesList', [annotation], "before");
+							} else {
+								self.addAnnotations('.annotationsHolder', [annotation], "before");
+							}
 						} else {
 							attempts++;
 							isChanged();
@@ -204,6 +205,35 @@
 				}
 			};
 			isChanged();
+		});
+		annotator.subscribe("annotationUpdated", function (annotation) {
+			var annotationItem = self.formatAnnotation(annotation);
+			var date = new Date(annotationItem.updated);
+			var dateAgo = jQuery.timeago(date);
+			if( jQuery('.annotationModal').length > 0 ) {
+				jQuery('.parentAnnotation .annotatedAt').html("last updated " + dateAgo);
+				jQuery('.parentAnnotation .annotatedAt').attr("title", date);
+				jQuery('.parentAnnotation .body').html(annotationItem.text);
+			}
+
+			divObject = '.annotationItem.item-'+annotation.id.toString();
+			console.log(divObject);
+			jQuery(divObject + ' .annotatedAt').html("last updated" + dateAgo);
+			jQuery(divObject + ' .annotatedAt').attr("title", date);
+			jQuery(divObject + ' .body').html(annotationItem.text);
+			tagHtml = ""
+			annotationItem.tags.forEach(function(tag){
+				tagHtml += "<div class=\"tag side\">" + tag + "</div>"
+			});
+			jQuery(divObject + ' .tagList').html(tagHtml);
+		});
+		annotator.subscribe("annotationDeleted", function (annotation) {
+			if (jQuery('.annotationModal').length > 0) {
+				jQuery('.annotationModal').remove();
+    			jQuery('.annotationSection').css('y-scroll', 'scroll');
+			}
+			divObject = '.annotationItem.item-'+annotation.id.toString();
+			jQuery(divObject).remove();
 		});
 	};
 
@@ -217,7 +247,7 @@
 		var el = self.element;
 		var self = this;
 		annotations.forEach(function(annotation) {
-			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+			var item = self.formatAnnotation(annotation);
 			var html = self.TEMPLATES.annotationItem(item);
 			jQuery('.annotationsHolder').append(html);
 		});
@@ -283,18 +313,22 @@
 		self.changeTab(this.initOptions.default_tab);
 	};
 
-	$.DashboardController.prototype.addAnnotations = function(annotations, location) {
+	$.DashboardController.prototype.addAnnotations = function(element, annotations, location) {
 		var self = this;
 		annotations.forEach(function(annotation) {
-			var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
-			var html = self.TEMPLATES.annotationItem(item);
-			if (location === "before") {
-				jQuery('.annotationsHolder').prepend(html);
+			var item = self.formatAnnotation(annotation);
+			var html = ''
+			if (element.indexOf('replies') === -1){
+				html = self.TEMPLATES.annotationItem(item);
 			} else {
-				jQuery('.annotationsHolder').append(html);
+				html = self.TEMPLATES.replyItem(item);
+			}
+			if (location === "before") {
+				jQuery(element).prepend(html);
+			} else {
+				jQuery(element).append(html);
 			}
 		});
-		
 	};
 
 	$.DashboardController.prototype.createDateFromISO8601 = function(string) {
@@ -341,7 +375,7 @@
     }; 
 
 	$.DashboardController.prototype.formatAnnotation = function(annotation) {
-		var item = annotation;
+		var item = jQuery.extend(true, {}, annotation);
 		var self = this;
 		if (typeof item.updated !== 'undefined')
             item.updated = self.createDateFromISO8601(item.updated);
@@ -441,43 +475,50 @@
     		}
     	});
     	jQuery('.parentAnnotation #edit').click(function (e){
-    		if (annotationItem.authToEditButton) {
-    			var button = jQuery(e.target);
-
-    			var positionAdder = {
-	    			display: "block",
-	    			left: button.offset().left,
-	    			top: button.scrollTop(),
-	    		}
-	    		var annotation_to_update = self.getAnnotationById(annotation_id, false);
-	    		var update_parent = function() {
-	    			console.log("hit update");
-                  cleanup_parent();
-                  var response = self.annotator.updateAnnotation(annotation_to_update);
-                  console.log(self.annotator);
-                  return response;
-                };
-                var cleanup_parent = function() {
-                	console.log("hit cancel");
-                  self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
-                  return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
-                };
-                self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
-                self.annotator.subscribe('annotationEditorSubmit', update_parent);
-	    		self.annotator.showEditor(annotation_to_update, positionAdder);
-	    		jQuery('.annotator-widget').addClass('fullscreen');
-    		}
+    		self.editAnnotation(annotation_id, e);
     	});
-		jQuery('[data-toggle="confirmation"]').confirmation({
+		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
 			title: "Would you like to delete your annotation?",
 			onConfirm: function (){
-				console.log("test");
 				if(annotationItem.authToDeleteButton){
 					var annotation_to_delete = self.getAnnotationById(annotation_id, false);
 					self.annotator.deleteAnnotation(annotation_to_delete);
 				}
 			},
 		});
+    };
+
+    $.DashboardController.prototype.editAnnotation = function(annotation_id, event){
+    	var self = this;
+    	var annotationItem = self.getAnnotationById(annotation_id, true);
+    	console.log(annotationItem);
+		if (annotationItem.authToEditButton) {
+			var button = jQuery(event.target);
+
+			var positionAdder = {
+    			display: "block",
+    			left: button.offset().left,
+    			top: button.scrollTop(),
+    		}
+
+    		var annotation_to_update = self.getAnnotationById(annotation_id, false);
+    		
+    		var update_parent = function() {
+             	cleanup_parent();
+            	var response = self.annotator.updateAnnotation(annotation_to_update);
+            	return response;
+            };
+            var cleanup_parent = function() {
+            	self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
+            	return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
+            };
+
+            self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
+            self.annotator.subscribe('annotationEditorSubmit', update_parent);
+    		self.annotator.showEditor(annotation_to_update, positionAdder);
+    		
+    		jQuery('.annotator-widget').addClass('fullscreen');
+		}
     };
 
     // TODO Move to AnnotationCore
@@ -491,9 +532,9 @@
     		var annotation = annotations[index];
     		if (annotation.id === annotationId){
     			if (formatted){
-    				return self.formatAnnotation(jQuery.extend(true, {}, annotation));
+    				return self.formatAnnotation(annotation);
     			} else {
-    				return annotation
+    				return annotation;
     			}
     		}
     	} 
@@ -529,12 +570,13 @@
     		jQuery('.repliesList').css('margin-top', replies_offset);
     		jQuery('.repliesList').css('height', replies_height);
     		var final_html = '';
+    		self.list_of_replies = {}
     		annotations.forEach(function(annotation) {
-				var item = self.formatAnnotation(jQuery.extend(true, {}, annotation));
+				var item = self.formatAnnotation(annotation);
 				var html = self.TEMPLATES.replyItem(item);
-				final_html += html;				
+				final_html += html;
+				self.list_of_replies[item.id.toString()] = annotation;
 			});
-
 			jQuery('.repliesList').html(final_html);
     	}
 
@@ -542,6 +584,24 @@
         var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
         var request = jQuery.ajax(search_url, options);
 
+        var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
+		var el = self.element;
+		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
     };
+
+    $.DashboardController.prototype.replyDeleteClicked = function(e) {
+    	var self = this;
+    	var replyItem = jQuery(e.target).parent().parent();
+    	var annotation_id = replyItem.find('.idAnnotation').html();
+    	var annotation = self.list_of_replies[annotation_id];
+    	jQuery(e.target).confirmation({
+			title: "Would you like to delete your reply?",
+			onConfirm: function (){
+				self.annotator.plugins.Store._apiRequest('destroy', annotation, function(){});
+				replyItem.remove();
+			},
+		});
+		jQuery(e.target).confirmation('show');
+};
 
 }(AController));
