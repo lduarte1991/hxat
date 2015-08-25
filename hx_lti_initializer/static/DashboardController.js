@@ -216,12 +216,12 @@
 				jQuery('.parentAnnotation .body').html(annotationItem.text);
 			}
 
-			divObject = '.annotationItem.item-'+annotation.id.toString();
+			var divObject = '.annotationItem.item-'+annotation.id.toString();
 			console.log(divObject);
 			jQuery(divObject + ' .annotatedAt').html("last updated" + dateAgo);
 			jQuery(divObject + ' .annotatedAt').attr("title", date);
 			jQuery(divObject + ' .body').html(annotationItem.text);
-			tagHtml = ""
+			var tagHtml = ""
 			annotationItem.tags.forEach(function(tag){
 				tagHtml += "<div class=\"tag side\">" + tag + "</div>"
 			});
@@ -232,7 +232,7 @@
 				jQuery('.annotationModal').remove();
     			jQuery('.annotationSection').css('y-scroll', 'scroll');
 			}
-			divObject = '.annotationItem.item-'+annotation.id.toString();
+			var divObject = '.annotationItem.item-'+annotation.id.toString();
 			jQuery(divObject).remove();
 		});
 	};
@@ -261,7 +261,7 @@
     		jQuery.ajax({
                 url: template_url, 
                 success: function (data) {
-    		        template = _.template(data);
+    		        var template = _.template(data);
     		        self.TEMPLATES[templateName] = template;
     		    },
                 async: false,
@@ -528,7 +528,7 @@
     	var annotator = self.annotator;
     	var annotations = annotator.plugins.Store.annotations.slice();
 
-    	for (index in annotations) {
+    	for (var index in annotations) {
     		var annotation = annotations[index];
     		if (annotation.id === annotationId){
     			if (formatted){
@@ -580,7 +580,7 @@
 			jQuery('.repliesList').html(final_html);
     	}
 
-    	search_url = store._urlFor("search", annotation_id);
+    	var search_url = store._urlFor("search", annotation_id);
         var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
         var request = jQuery.ajax(search_url, options);
 
