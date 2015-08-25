@@ -3,29 +3,24 @@ BUGS
 -- Can't use source material that someone else is already using
 
 -- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
-
-My hunch is that this is due to
+    My hunch is that this is due to
 				self.queryDatabase({
 					"username": text,
 				});
-from DashboardController.js
+    from DashboardController.js
 
-
--- Editing replies does not work. Might just not be implemented yet by Luis.
-    Note: you can edit and delete a reply from the original sidebar, but not in the sidebar reply view. Only in the
-    flat, all-annotations view. Basically, you can't edit it when you're viewing it as a reply, but
-    you can edit it when you're viewing it as its own annotation.
 
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
--- (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
+-- Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
 
--- Deletion of source material? This is dangerous because it's a shared resource.
 
--- Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
+√? (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
+
+√? Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
     -- Change user creation
     -- Change name display code
     -- (demo fix already completed in another repo)
@@ -37,6 +32,12 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Implement editing functionality for replies? Right now it's just deletion.
+    (this was a bug earlier, but now is a TODO because Luis wisely changed the frontend - now it doesn't show 'edit/delete,' only 'delete')
+
+-- Decide whether we want to support deletion of source material. This is dangerous because it's a shared resource.
+    Perhaps this is something that only admins with access to the django backend should do. (which is how it works right now)
 
 -- Decide whether we want to hide the annotation DB tab from assignment creation
     the typical instructor would likely not need it.
