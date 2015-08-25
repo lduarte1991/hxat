@@ -50,7 +50,7 @@
         	helper: fixHelper,
         	stop: function(event, ui){
 	        	var arr = jQuery('.sortable tbody').sortable('toArray');
-	        	count = 1;
+	        	var count = 1;
 	        	jQuery(arr).each(function(index){
 	        		var item = '#' + arr[index];
 	        		//jQuery(item).find(".field-order > input").attr("value", count);
@@ -69,13 +69,12 @@
         	}
         	
         	var target_object_list = []
-        	items = jQuery('.field-target_object');
-        	should_quit = false;
+        	var items = jQuery('.field-target_object');
+        	var should_quit = false;
         	
         	// make sure the user didn't repeat the same source material in the same assignment
         	items.each(function(index){
-        		name = jQuery(items[index]).find('div > button > span:visible').text();
-        		track += name
+        		var name = jQuery(items[index]).find('div > button > span:visible').text();
         		if (jQuery.inArray(name, target_object_list) !== -1) {
         			jQuery('.sortable').css('outline', 'red 2px solid');
         			jQuery('.sortable').css('outline-offset', '5px');
