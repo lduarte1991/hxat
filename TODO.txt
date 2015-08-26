@@ -13,15 +13,19 @@ BUGS
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
 -- 'include instructor tab' checkbox doesn't seem to have any effect
+    (hidden for now)
 
--- tags don't seem to have any color effects anymore.
+-- choosing a pagination limit doesn't seem to have any effect
+    (This is likely a legacy of the old annotation display at the bottom - hidden for now)
+
+-- tags don't seem to have any color effects anymore (this must've been broken by one of luis' annotation funtionality commits).
+    (Warning text added to tell the user this is an issue)
 
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
     Also when they don't select source material
-
 
 √? (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
@@ -145,3 +149,7 @@ DIFFERENCES FROM LUIS
     though we support that functionality as well
 -- Instructor can edit and delete student annotations
 -- Home button on assignment pages
+-- tagging enabled by default, and hidden from the frontend (the whole thing doesn't work unless tagging is on, so we have to force it to be on)
+-- Default tab to desplay for annotations is hidden, because it doesn't seem to be working.
+-- 'Include instructor tab' checkbox is hidden, because it doesn't seem to have any effect.
+-- Pagination tab is hidden, because it doesn't seem to have any effect
