@@ -1,6 +1,7 @@
 ============================
 BUGS
 -- Can't use source material that someone else is already using
+    (Warning view shows when they try)
 
 -- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
     My hunch is that this is due to
@@ -24,9 +25,6 @@ BUGS
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
--- Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
-    Also when they don't select source material
-
 √? (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
 
 √? Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
@@ -41,6 +39,8 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Examine 'External CSS Default' functionality (in Course Settings)
 
 -- Replies can only go 1 level deep. Do we want to be able to reply to replies?
 
@@ -141,6 +141,8 @@ COMPLETED
 √ iFrame sizing
 √ (fixed) Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
 √ Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
+√ Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
+    √ Also when they don't select source material
 
 ============================
 DIFFERENCES FROM LUIS

@@ -94,6 +94,7 @@ def edit_assignment(request, id):
         targets_form = AssignmentTargetsFormSet(request.POST, instance=assignment)
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
+            print targets_form
             assignment_targets = targets_form.save(commit=False)
             changed=False
             if len(targets_form.deleted_objects) > 0:
@@ -108,7 +109,7 @@ def edit_assignment(request, id):
             if changed:
                 targets_form = AssignmentTargetsFormSet(instance=assignment)
         else:
-            return error_view(request, "Someone else is already using that object")
+            return error_view(request, "Something went wrong. It's likely you have selected source material that is already in use elsewhere.")
             
         for targs in assignment.assignment_objects.all():
             targets += '&assignment_objects=' + str(targs.id)
@@ -120,6 +121,8 @@ def edit_assignment(request, id):
             assign1.save()
             messages.success(request, 'Assignment was successfully created!')
             return redirect('hx_lti_initializer:course_admin_hub')
+        else:
+            return error_view('Something went wrong. ')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
