@@ -39,6 +39,8 @@ import requests
 import logging
 logging.basicConfig()
 
+# If we were to restructure (not recommended because then we can't reconcile with HX),
+# these first 4 functions would be in utils.py
 def validate_request(req):
     """
     Validates the request in order to permit or deny access to the LTI tool.
@@ -64,10 +66,15 @@ def initialize_lti_tool_provider(req):
     """
     Starts the provider given the consumer_key and secret.
     """
-    # both of these will give key errors if there is no key or it's the wrong key, respectively.
-    consumer_key = req.POST['oauth_consumer_key']
-    secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
     
+    try: 
+        # both of these will give key errors if there is no key or it's the wrong key, respectively.
+        consumer_key = req.POST['oauth_consumer_key']
+        secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
+    except:
+        debug_printer("DEBUG - authentication failed")
+        raise PermissionDenied()
+        
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
     
@@ -122,6 +129,9 @@ def save_session(request, user_id, collection_id, object_id, context_id, roles):
     if roles is not None:
         request.session["hx_roles"] = roles
 
+
+
+
 @csrf_exempt
 def launch_lti(request):
     """
@@ -141,35 +151,36 @@ def launch_lti(request):
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
-    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    # default to student
     request.session['is_instructor'] = False
+    
+    # this is where canvas will tell us what level individual is coming into the tool
+    # the 'roles' field usually consists of just 'Instructor' or 'Learner'
+    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    debug_printer("DEBUG - user logging in with roles: " + str(roles))
     
     # Set creator name, to be used later as default in addition of source material
     request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
-    
+
     # Check whether user is a admin, instructor or teaching assistant
-    debug_printer("DEBUG - user logging in with roles: " + str(roles))
-    
-    # if intersection
     if set(roles) & set(settings.ADMIN_ROLES):
-    # Set flag in session to later direct user to the appropriate version of the index
+        # Set flag in session to later direct user to the appropriate version of the index
         request.session['is_instructor'] = True
         
         # For HX, students only access one object or collection, and don't have an index
         # For ATG, students have the index  to choose where to go, so collection_id
         # and object_id are probably blank for their session right now.
-        # Regardless, the HX session functionality should work as long as we've got
-        # the basic info in there - user_id, course, and roles.
         collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         save_session(request, user_id, collection_id, object_id, course, roles)
     
     try:
-        # try to get the profile via the anon id
+        # See if the user already has a profile, and use it if so.
         lti_profile = LTIProfile.objects.get(anon_id=user_id)
         debug_printer('DEBUG - LTI Profile was found via anonymous id.')
     
     except LTIProfile.DoesNotExist:
+        # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
         
         lti_username = get_lti_value('lis_person_name_full', tool_provider)
@@ -183,20 +194,23 @@ def launch_lti(request):
             debug_printer('DEBUG - user_id not found in post.')
             raise PermissionDenied()
         
+        # Wait, this code might be pointless - is it just for printing the roles?
+        # My guess is this was used for something earlier but was then made redundant.
+        '''
         # checks to see if roles were passed in. Defaults to student role.
         all_user_roles = []
-        
         if not roles:
             debug_printer('DEBUG - ALL_ROLES is set but user was not passed in any roles via the request. Defaults to student.')
             all_user_roles += "Student"
-        
         else:
-            # makes sure that roles is a list and not just a string
+            # Make sure we're constructing the proper data type (list of strings)
             if not isinstance(roles, list):
                 roles = [roles]
             all_user_roles += roles
-        
         debug_printer('DEBUG - User had an acceptable role: %s' % all_user_roles)
+        '''
+        
+        debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
         
         user, lti_profile = create_new_user(lti_username, user_id, roles)
     
@@ -205,46 +219,53 @@ def launch_lti(request):
     try:
         course_object = LTICourse.get_course_by_id(course)
         debug_printer('DEBUG - Course was found %s' % course)
-
         # Add user to course_users if not already there
         course_object.add_user(lti_profile)
-        # Store course name in session
-        request.session['course_name'] = course_object.course_name
-    
+        
+        # save the course name to the session so it auto-populate later.
+        request.session['course_name'] = course_object.course_name 
+        
     except LTICourse.DoesNotExist:
-        # this should only happen if an instructor is trying to access the 
-        # tool from a different course
         debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
+        
+        # Put a message on the screen to indicate to the user that the course doesn't exist
         message_error = "Sorry, the course you are trying to reach does not exist."
         messages.error(request, message_error)
+        
         if set(roles) & set(settings.ADMIN_ROLES):
-            # if the user is an administrator, the missing course is created
-            # otherwise, it will just display an error message
+            # This must be the instructor's first time accessing the annotation tool
+            # Make him/her a new course within the tool
+            
             message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
             messages.warning(request, message_error)
+            
+            # create and save a new course for the instructor, with a default name of their canvas course's name
             course_object = LTICourse.create_course(course, lti_profile)
-            # Set default course name to context title
             course_object.course_name = get_lti_value('context_title', tool_provider)
             course_object.save()
-            # Store course name in session
-            request.session['course_name'] = course_object.course_name
-        
-        # Wanted to have a recursive call solve the problem of no admin rights granted without refreshing,
-        # but it doesn't work for some reason.
-        # return launch_lti(request)
             
-    # logs the user in
+            # save the course name to the session so it auto-populate later.
+            request.session['course_name'] = course_object.course_name 
+            
+            # Right now there's an issue where instructors have to refresh the page after creating
+            # his/her course in order to recieve admin rights.
+            # I Wanted to have a recursive call solve this, but I haven't been able to get it working.
+            #return launch_lti(request)
+            
+    # log the user into the Django backend
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
     
-    # Save id of current course in the session
+    # Save id of current course in the session so we know what data to display 
+    # in course_admin_hub and instructor_dashboard_view
     request.session['active_course'] = course
     save_session(request, user_id, "", "", "", roles)
     
-    # For the use case where the user wants to link to an assignment instead
-    # of the admin_hub upon launch (i.e. for use in modules), this allows the user
-    # to be routed directly to an assignment given the correct GET parameters
-    # lti_init/launch_lti/?collection_id=12up498&object_id=1iu48adsfi
+    # For the use case where the course head wants to display an assignment object instead
+    # of the admin_hub upon launch (i.e. for embedded use), this allows the user
+    # to be routed directly to an assignment given the correct POST parameters,
+    # as by Luis' original method of putting collection_id and object_id in the
+    # LTI tool launch params.
     try:
         # Keeping the HX functionality whereby students are routed to specific assignment objects
         # This is motivated by the Poetry in America Course
@@ -253,7 +274,8 @@ def launch_lti(request):
         assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         course_id = str(course)
-        return access_annotation_target(request, course_id, assignment_id, object_id) #roles=roles)#, user_id=None, user_name=None, roles=None):
+        debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
+        return access_annotation_target(request, course_id, assignment_id, object_id)
     except:
         debug_printer("DEBUG - User wants the index")
     
@@ -268,7 +290,9 @@ def edit_course(request, id):
             course = form.save()
             course.save()
             
-            request.session['course_name'] = course.course_name
+            # save the course name to the session so it auto-populate later.
+            request.session['course_name'] = course_object.course_name
+            
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
@@ -289,7 +313,7 @@ def edit_course(request, id):
 @login_required
 def course_admin_hub(request):
     """
-    The index view for both students and instructors. Based on the is_instructor flag,
+    The index view for both students and instructors. Without the 'is_instructor' flag,
     students are directed to a version of admin_hub with reduced privileges
     """
     lti_profile = LTIProfile.objects.get(user=request.user)
@@ -342,7 +366,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
 
     # Dynamically pass in the address that the detail view will use to fetch annotations.
-    # there's definitely a more elegant way to do this.
+    # there's definitely a more elegant way (or a library function) to do this.
     # also, we may want to consider denying if theres no ssl
     protocol = 'https://' if request.is_secure() else 'http://'
     abstract_db_url = protocol + get_current_site(request).domain + "/lti_init/annotation_api"
@@ -386,17 +410,16 @@ def instructor_dashboard_view(request):
     '''
         Renders the instructor dashboard
     '''
+    # Get all the relevant objects we're going to need for the dashboard
     active_course_id = request.session['active_course']
-    # Gets object as opposed to queryset
     course = LTICourse.objects.get(course_id=active_course_id)
     user_id = request.user.email #for some reason
     user_profiles = course.course_users.all()
     
+    # Authenticate and fetch the annotations for this course
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
     annotations_for_course = fetch_annotations(active_course_id, token)
 
-    user_objects = []
-    
     # Dictionary of annotations, keyed by id of annotation for O(1) lookup later
     annotation_dict = {}
     
@@ -413,11 +436,12 @@ def instructor_dashboard_view(request):
                 user_annotations.append(anno)
         return user_annotations
 
-    # Create a user_object for each user
+    # Create an object/dict for each user that contains his/her name, id, and annotations.
+    user_objects = []
     for profile in user_profiles:
         user_objects.append({
             # A user_object is a dictionary containing name, id and annotations for a user
-            'name': profile,  #the model is set up to return the name of the user on a utf call
+            'name': unicode(profile),  #the model is set up to return the name of the user on a unicode call.
             'id': profile.get_id(),
             'annotations': filter_annotations(annotations_for_course, profile.get_id())
         })
@@ -437,15 +461,24 @@ def fetch_annotations (course_id, token):
         Fetches the annotations of a given course from the CATCH database
     '''
     
+    
+    
+    # build request
+    
     headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
     baseurl = settings.ANNOTATION_DB_URL + "/"
-    requesturl = baseurl + "search?contextId=" + course_id
+    limit = 10000 #TODO: How do we want to handle this?
+    requesturl = baseurl + "search?contextId=" + course_id + "&limit=" + str(limit)
     
     # Make request
     r = requests.get(requesturl, headers=headers)
     debug_printer("DEBUG - Database Response: " + str(r))
     
     try:
+        # this gets the whole request, including such things as 'count'
+        # however, that also means that the annotations come in as an object called 'rows,'
+        # where each row represents an annotation object.
+        # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
@@ -455,7 +488,8 @@ def fetch_annotations (course_id, token):
         logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
         
     return annotations
-   
+
+
 def error_view(request, message):
     '''
     Implements graceful and user-friendly (also debugger-friendly) error displays
@@ -468,8 +502,7 @@ def error_view(request, message):
         'message': message
     }
     
-    return HttpResponse(message)
-   # return render(request, 'hx_lti_initializer/error_page.html', context)
+    return render(request, 'hx_lti_initializer/error_page.html', context)
 
 
 def delete_assignment(request):
@@ -482,10 +515,11 @@ def delete_assignment(request):
         assignment.delete()
         debug_printer("DEBUG - Assignment Deleted: " + unicode(assignment))
     except:
-        return error_view(request, "Something went wrong with assignment deletion")
+        return error_view(request, "The assignment deletion may have failed")
     
     return redirect('hx_lti_initializer:course_admin_hub')
-    
+ 
+   
 ######################
 ##
 ##  Annotation Database Methods

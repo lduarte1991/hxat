@@ -41,6 +41,7 @@ def create_new_assignment(request):
                 target_num = len(assignment_targets)
                 debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
                 debug_printer(form.errors)
+                return error_view(request, "Something went wrong with assignment creation.")
         else:
             # "The AssignmentTargets could not be created because the data didn't validate."
             # we will never be able to use assignment_targets
@@ -57,6 +58,8 @@ def create_new_assignment(request):
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
+            return error_view(request, "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.")
+
     # GET
     else:
         # Initialize with database settings so instructor doesn't have to do this manually
@@ -94,6 +97,7 @@ def edit_assignment(request, id):
         targets_form = AssignmentTargetsFormSet(request.POST, instance=assignment)
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
+            print targets_form
             assignment_targets = targets_form.save(commit=False)
             changed=False
             if len(targets_form.deleted_objects) > 0:
@@ -108,7 +112,7 @@ def edit_assignment(request, id):
             if changed:
                 targets_form = AssignmentTargetsFormSet(instance=assignment)
         else:
-            return error_view(request, "Someone else is already using that object")
+            return error_view(request, "Something went wrong. It's likely you have selected source material that is already in use elsewhere.")
             
         for targs in assignment.assignment_objects.all():
             targets += '&assignment_objects=' + str(targs.id)
@@ -120,10 +124,17 @@ def edit_assignment(request, id):
             assign1.save()
             messages.success(request, 'Assignment was successfully created!')
             return redirect('hx_lti_initializer:course_admin_hub')
+        else:
+            return error_view('Something went wrong with assignment editing. ')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
 
+    try:
+        course_name = request.session['course_name']
+    except:
+        course_name = None
+    
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',
@@ -134,6 +145,6 @@ def edit_assignment(request, id):
             'user': request.user,
             'debug': debug,
             'assignment_id': assignment.assignment_id,
-            'course_name': request.session['course_name'],
+            'course_name': course_name,
         }
     )
