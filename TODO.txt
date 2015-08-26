@@ -12,10 +12,15 @@ BUGS
 
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
+-- 'include instructor tab' checkbox doesn't seem to have any effect
+
+-- tags don't seem to have any color effects anymore.
+
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
 -- Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
+    Also when they don't select source material
 
 
 √? (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
@@ -32,6 +37,10 @@ BROAD TODOS/ISSUES (To be done by fall launch)
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Replies can only go 1 level deep. Do we want to be able to reply to replies?
+
+-- <br> tags are added at the end of every annotation, which can make them display strangely in the dashboard
 
 -- Implement editing functionality for replies? Right now it's just deletion.
     (this was a bug earlier, but now is a TODO because Luis wisely changed the frontend - now it doesn't show 'edit/delete,' only 'delete')
