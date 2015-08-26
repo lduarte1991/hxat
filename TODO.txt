@@ -33,12 +33,17 @@ BROAD TODOS/ISSUES (To be done by fall launch)
     -- (demo fix already completed in another repo)
 
 -- Test Dashboard et. all to make sure thousands of annotations work.
+    ( remember the annotations db requires explicit pagination, otherwise it defaults to 10)
 
 -- Unit Tests :(
     -- Uncomment & try to fix old lduarte tests that we commented out earlier
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Revisit pagination in the instructor dashboard's request to the annotation db.
+    ( right now I've just put 10000 to ensure all annotations for the course come in,
+      but ideally there wouldn't be any magic #rs. Maybe a secure setting? )
 
 -- Examine 'External CSS Default' functionality (in Course Settings)
 

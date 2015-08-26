@@ -461,10 +461,14 @@ def fetch_annotations (course_id, token):
         Fetches the annotations of a given course from the CATCH database
     '''
     
+    
+    
     # build request
+    
     headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
     baseurl = settings.ANNOTATION_DB_URL + "/"
-    requesturl = baseurl + "search?contextId=" + course_id
+    limit = 10000 #TODO: How do we want to handle this?
+    requesturl = baseurl + "search?contextId=" + course_id + "&limit=" + str(limit)
     
     # Make request
     r = requests.get(requesturl, headers=headers)
