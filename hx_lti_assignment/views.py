@@ -41,6 +41,7 @@ def create_new_assignment(request):
                 target_num = len(assignment_targets)
                 debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
                 debug_printer(form.errors)
+                return error_view(request, "Something went wrong with assignment creation.")
         else:
             # "The AssignmentTargets could not be created because the data didn't validate."
             # we will never be able to use assignment_targets
@@ -57,6 +58,8 @@ def create_new_assignment(request):
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
+            return error_view(request, "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.")
+
     # GET
     else:
         # Initialize with database settings so instructor doesn't have to do this manually
@@ -122,7 +125,7 @@ def edit_assignment(request, id):
             messages.success(request, 'Assignment was successfully created!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
-            return error_view('Something went wrong. ')
+            return error_view('Something went wrong with assignment editing. ')
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)

@@ -484,7 +484,8 @@ def fetch_annotations (course_id, token):
         logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
         
     return annotations
-   
+
+
 def error_view(request, message):
     '''
     Implements graceful and user-friendly (also debugger-friendly) error displays
@@ -497,8 +498,7 @@ def error_view(request, message):
         'message': message
     }
     
-    return HttpResponse(message)
-   # return render(request, 'hx_lti_initializer/error_page.html', context)
+    return render(request, 'hx_lti_initializer/error_page.html', context)
 
 
 def delete_assignment(request):
@@ -511,10 +511,11 @@ def delete_assignment(request):
         assignment.delete()
         debug_printer("DEBUG - Assignment Deleted: " + unicode(assignment))
     except:
-        return error_view(request, "Something went wrong with assignment deletion")
+        return error_view(request, "The assignment deletion may have failed")
     
     return redirect('hx_lti_initializer:course_admin_hub')
-    
+ 
+   
 ######################
 ##
 ##  Annotation Database Methods

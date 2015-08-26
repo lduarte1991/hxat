@@ -155,3 +155,4 @@ DIFFERENCES FROM LUIS
 -- Default tab to desplay for annotations is hidden, because it doesn't seem to be working.
 -- 'Include instructor tab' checkbox is hidden, because it doesn't seem to have any effect.
 -- Pagination tab is hidden, because it doesn't seem to have any effect
+-- Error view template and functionality for frontend errors
