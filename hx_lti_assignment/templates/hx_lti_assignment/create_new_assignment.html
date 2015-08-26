@@ -86,15 +86,18 @@
         	});
 
 			// Make sure the user selected a target object
-        	if (target_object_list.indexOf("") !== -1) {
-        		console.log("User failed to select a target object")
-        		if (!jQuery('#targetObjectWarningLabel').length) {
-        			jQuery('.sortable').css('outline', 'red 2px solid');
-        			jQuery('.sortable').css('outline-offset', '5px');
-        			jQuery('.sortable').prepend('<p id="targetObjectWarningLabel" style="color:red; font-size: 10pt;">Please select source material</p>');
+        	if (target_object_list.indexOf("") !== -1 || target_object_list.indexOf("Nothing selected") !== -1) {
+        		if (target_object_list.length == 1) {
+	        		console.log("User failed to select a target object")
+	        		if (!jQuery('#targetObjectWarningLabel').length) {
+	        			jQuery('.sortable').css('outline', 'red 2px solid');
+	        			jQuery('.sortable').css('outline-offset', '5px');
+	        			jQuery('.sortable').prepend('<p id="targetObjectWarningLabel" style="color:red; font-size: 10pt;">Please select source material</p>');
+	        		}
+	        		// Form is no bueno
+					return false
+	        			
         		}
-        		// Form is no bueno
-				return false
         	}
         	return !should_quit
         });
