@@ -173,6 +173,7 @@
 		var el = self.element;
 		el.on("click", ".annotationItem", annotationClicked);
 		annotator.subscribe("annotationsLoaded", function (annotations) {
+			console.log(annotations);
 			if (self.addingAnnotations){
 				self.addAnnotations('.annotationsHolder', annotations, "after");
 				self.addingAnnotations = false;
@@ -202,6 +203,7 @@
 			isChanged();
 		});
 		annotator.subscribe("annotationUpdated", function (annotation) {
+			console.log(annotation);
 			var annotationItem = self.formatAnnotation(annotation);
 			var date = new Date(annotationItem.updated);
 			var dateAgo = jQuery.timeago(date);
@@ -310,6 +312,7 @@
 
 	$.DashboardController.prototype.addAnnotations = function(element, annotations, location) {
 		var self = this;
+		console.log(annotations);
 		annotations.forEach(function(annotation) {
 			var item = self.formatAnnotation(annotation);
 			var html = ''
@@ -391,7 +394,7 @@
 		var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
 		var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
 		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
-		loadFromSearch.offset = 0;
+		loadFromSearch.offset = numberOfAnnotations;
 		loadFromSearch.media = setOptions.media;
 		loadFromSearch.userid = setOptions.user_id;
 		loadFromSearch.username = setOptions.username;
@@ -564,7 +567,7 @@
     		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
     		jQuery('.repliesList').css('margin-top', replies_offset);
     		jQuery('.repliesList').css('height', replies_height);
-    		final_html = ''
+    		var final_html = ''
     		self.list_of_replies = {}
     		annotations.forEach(function(annotation) {
 				var item = self.formatAnnotation(annotation);
@@ -576,7 +579,7 @@
     	}
 
     	search_url = store._urlFor("search", annotation_id);
-        var options = store._apiRequestOptions("search", newLoadFromSearch, onSuccess);
+        var options = store._apiRequestOptions("search",                                            	, onSuccess);
         var request = jQuery.ajax(search_url, options);
 
         var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);

@@ -10,8 +10,15 @@
 
 window.AController = window.AController || function(options) {
 	AController.main = new AController.AnnotationMain(options);
-	AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions);
+	console.log(options.targetObjectOptions)
+	if (typeof options.targetObjectOptions !== "undefined") {
+		AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions);
+	}
 	//AController.annotationServer = new AController.AnnotationServer(options.annotationServerOptions);
-	AController.annotationCore = new AController.AnnotationCore(options.annotationCoreOptions, options.commonInfo);
-	AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo);
+	if (typeof options.annotationCoreOptions !== "undefined") {
+		AController.annotationCore = new AController.AnnotationCore(options.annotationCoreOptions, options.commonInfo);
+	}
+	if (typeof options.dashboardControllerOptions !== "undefined") {
+		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo);
+	}
 }

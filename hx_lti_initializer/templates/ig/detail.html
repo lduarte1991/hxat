@@ -1,0 +1,71 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+<script src="{% static "vendors/mirador/mirador.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
+<style type="text/css">
+    body { padding: 0; margin: 0; overflow: hidden; font-size: 70%; }
+    #viewer { background: #333 url(../../../static/vendors/mirador/images/debut_dark.png) left top repeat; width: 100%; height: 100%; position: fixed; }
+  </style>
+  </head>
+  <body>
+<div id="viewer"></div>
+<script>
+$(function() {
+      var mir = Mirador({
+        "id": "viewer",
+        "mainMenuSettings" : {
+           'show' : false
+        },
+        "i18nPath" : "{% static "vendors/mirador/locales/" %}",
+        "layout" : "1x1",
+        "saveSession" : false,
+        "logosLocation" : "{% static "vendors/mirador/images/logos/" %}",
+        "data": [
+        {% for i in target_object.get_target_content_as_list %}
+        { "manifestUri": "{{ i }}", "location": "Harvard University"},
+        {% endfor %}
+        ],
+        "windowObjects": [
+          {
+            "loadedManifest": "{{ objects.0 }}",
+        	  "viewType" : "ImageView",
+            {% if canvas_id %}
+              "canvasID" : "{{ canvas_id }}",
+            {% endif %}
+            "annotationLayer" : true,
+            "annotationCreation" : true,
+        	  "sidePanel" : false,
+            "fullScreen" : false,
+            "layoutOptions" : 
+             {
+             "newObject" : true,
+             "close" : false,
+             "slotRight" : false,
+             "slotLeft" : false,
+             "slotAbove" : false,
+             "slotBelow" : false
+             }
+          },
+        ],
+        "annotationEndpoint": 
+          {
+          "name":"Harvard CATCH Production",
+          "module": "CatchEndpoint",
+          "options": {
+            token: "{{ token }}",
+            // The endpoint of the store on your server.
+            prefix: "https://catch.harvardx.harvard.edu/catch/annotator",
+            userid : "{{ user_id }}",
+            username : "{{ username }}",
+            roles : "{{ roles }}",
+            collection_id : "{{ collection }}",
+            context_id : "{{ course }}",
+          }
+        }
+      });
+    });
+</script>
+</body>
+</html>
