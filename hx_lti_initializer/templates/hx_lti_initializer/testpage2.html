@@ -280,7 +280,7 @@ li {
                                     <tr>
                                         <td>
                                             {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
-                                            <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
+                                            <a onclick="alert('Warning! Editing source material content will mess up any existing annotations. Please proceed with caution.');" class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
                                             {% endif %}
                                             <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
                                             <!--(<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)-->

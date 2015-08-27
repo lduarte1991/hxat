@@ -4,12 +4,12 @@ BUGS
     (Warning view shows when they try)
 
 -- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
-    My hunch is that this is due to
+    My (Harry's) hunch is that this is due to
 				self.queryDatabase({
 					"username": text,
 				});
     from DashboardController.js
-
+    -- Maybe look at Harry's code from instructor dashboard for dynamic search
 
 -- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
 
@@ -22,6 +22,14 @@ BUGS
 -- tags don't seem to have any color effects anymore (this must've been broken by one of luis' annotation funtionality commits).
     (Warning text added to tell the user this is an issue)
 
+-- editing source material will make annotations show up in the wrong place (unless you only append)
+    √ short-term solution: give instructors an informative warning when they're editing.
+    -- mid-term solution: Check to see if there are any annotations on a target object, and if there are, hide the edit button
+    -- long-term, maybe we want to enable editing? Would be quite difficult. It may also be impossible w/ annotator.js
+    
+-- Sometimes triple-clicking the last line of a text will highlight the annotator tool, which makes for some wierd annotations.
+    This also occurs if you somehow manage to highlight the annotation icon by dragging over it.
+
 ============================
 BROAD TODOS/ISSUES (To be done by fall launch)
 
@@ -33,13 +41,15 @@ BROAD TODOS/ISSUES (To be done by fall launch)
     -- (demo fix already completed in another repo)
 
 -- Test Dashboard et. all to make sure thousands of annotations work.
-    ( remember the annotations db requires explicit pagination, otherwise it defaults to 10)
+    (remember the annotations db requires explicit pagination, otherwise it defaults to 10)
 
 -- Unit Tests :(
     -- Uncomment & try to fix old lduarte tests that we commented out earlier
 
 ============================
 NOT A PRIORITY/TODO LONG-TERM:
+
+-- Flagging doesn't seem to be implemented in the new annotator.
 
 -- Revisit pagination in the instructor dashboard's request to the annotation db.
     ( right now I've just put 10000 to ensure all annotations for the course come in,

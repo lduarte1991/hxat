@@ -122,7 +122,7 @@ def edit_assignment(request, id):
         if form.is_valid():
             assign1 = form.save(commit=False)
             assign1.save()
-            messages.success(request, 'Assignment was successfully created!')
+            messages.success(request, 'Assignment was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
             return error_view('Something went wrong with assignment editing. ')
