@@ -114,6 +114,7 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
 	var self = this;
 	annotations.forEach(function(annotation){
+		self.annotator.setupAnnotation(annotation);
 		self.annotator.plugins.Store.registerAnnotation(annotation);
 	});
 };
@@ -226,7 +227,7 @@ AnnotatorEndpointController.prototype.deleteReply = function(reply, callback) {
 	this.annotator.plugins.Store._apiRequest("destroy", reply, callback);
 };
 
-AnnotatorEndpointController.prototype.queryDatabase = function(options, pagination) {
+AnnotatorEndpointController.prototype.queryDatabase = function(options, pagination, mediaType) {
 	var setOptions = jQuery.extend({}, this.queryDefault, options);
 	var annotator = this.annotator;
 
@@ -235,7 +236,7 @@ AnnotatorEndpointController.prototype.queryDatabase = function(options, paginati
 	var numberOfAnnotations = jQuery('.annotationSection .annotationItem').length;
 	loadFromSearch.limit = pagination;
 	loadFromSearch.offset = 0;
-	loadFromSearch.media = "text";
+	loadFromSearch.media = mediaType;
 	loadFromSearch.userid = setOptions.user_id;
 	loadFromSearch.username = setOptions.username;
 	loadFromSearch.text = setOptions.text;

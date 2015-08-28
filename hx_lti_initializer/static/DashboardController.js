@@ -82,17 +82,17 @@
 		jQuery('#public').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": undefined,
-			}, self.initOptions.pagination);
+			}, self.initOptions.pagination, self.initOptions.media);
 		});
 		jQuery('#mynotes').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.user_id,
-			}, self.initOptions.pagination);
+			}, self.initOptions.pagination, self.initOptions.media);
 		});
 		jQuery('#instructor').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.instructors,
-			}, self.initOptions.pagination);
+			}, self.initOptions.pagination, self.initOptions.media);
 		});
 		
 		jQuery('button#search-submit').click(function (e) {
@@ -101,15 +101,15 @@
 			if (search_filter === "users-filter"){
 				self.endpoint.queryDatabase({
 					"username": text,
-				}, self.initOptions.pagination);
+				}, self.initOptions.pagination, self.initOptions.media);
 			} else if (search_filter === "annotationtext-filter"){
 				self.endpoint.queryDatabase({
 					"text": text,
-				}, self.initOptions.pagination);
+				}, self.initOptions.pagination, self.initOptions.media);
 			} else if (search_filter === "tag-filter"){
 				self.endpoint.queryDatabase({
 					"tag": text,
-				}, self.initOptions.pagination)
+				}, self.initOptions.pagination, self.initOptions.media)
 			}
 		});
 
