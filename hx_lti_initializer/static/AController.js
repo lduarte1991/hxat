@@ -10,7 +10,6 @@
 
 window.AController = window.AController || function(options) {
 	AController.main = new AController.AnnotationMain(options);
-	console.log(options.targetObjectOptions)
 	if (typeof options.targetObjectOptions !== "undefined") {
 		AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions);
 	}
@@ -19,6 +18,7 @@ window.AController = window.AController || function(options) {
 		AController.annotationCore = new AController.AnnotationCore(options.annotationCoreOptions, options.commonInfo);
 	}
 	if (typeof options.dashboardControllerOptions !== "undefined") {
-		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo);
+		AController.dashboardView = AController.DashboardView;
+		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo, AController.dashboardView);
 	}
 }
