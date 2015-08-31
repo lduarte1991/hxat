@@ -1,4 +1,4 @@
-var AnnotationStoreController = function(){
+var AnnotationStoreController = function(deferredObject){
 	if (this.constructor === AnnotationStoreController) {
 		throw new Error("Can't instantiate abstract class");
 	}
@@ -65,13 +65,14 @@ AnnotationStoreController.prototype.deleteReply = function(reply, callback) {
  **
  ** Provides a way for the DashboardController.js to interact with the database via Annotator.
  ***/
-var AnnotatorEndpointController = function() {
+var AnnotatorEndpointController = function(deferredObject) {
     AnnotationStoreController.apply(this, arguments);
 
     // gets the current instance of the wrapper around the target object and annotator
 	var wrapper = jQuery('.annotator-wrapper').parent()[0];
 	this.annotator = jQuery.data(wrapper, 'annotator');
 	this.annotationsMasterList = [];
+	deferredObject.resolve();
 };
 
 AnnotatorEndpointController.prototype = Object.create(AnnotationStoreController.prototype);
@@ -84,7 +85,7 @@ AnnotatorEndpointController.prototype.getDatabaseEndPoint = function() {
 
 AnnotatorEndpointController.prototype.getNumOfAnnotationsOnScreen = function (){
 	return this.annotator.plugins.Store.annotations.length;
-}
+};
 
 AnnotatorEndpointController.prototype.setUpListener = function(listener, expected_fun) {
 	var self = this;
@@ -268,38 +269,76 @@ AnnotatorEndpointController.prototype._clearAnnotator = function() {
     });
 };
 
+
 /***
  ** Mirador Endpoint for Dashboard Interaction
  **
  ** Provides a way for the DashboardController.js to interact with the database via Mirador.
  ***/
 
-var MiradorEndpointController = function() {
+var MiradorEndpointController = function(deferredObject) {
     AnnotationStoreController.apply(this, arguments);
-};
+    var self = this;
+    jQuery.subscribe('windowAdded', function (event, windowId, slotAddress) {
+    	console.log("window was added");
+    	// TODO (check id to make sure slot/window match initialized)
+    	self.window = Mirador.viewer.workspace.slots[0].window;
+		self.endpoint = self.window.endpoint;
+		deferredObject.resolve();
+	});
+	self.annotationsMasterList = [];
+};    
 
 MiradorEndpointController.prototype = Object.create(AnnotationStoreController.prototype);
 
 MiradorEndpointController.prototype.constructor = MiradorEndpointController;
 
 MiradorEndpointController.prototype.getDatabaseEndPoint = function() {
-	//TODO
+	return this.endpoint;
+};
+
+MiradorEndpointController.prototype.getNumOfAnnotationsOnScreen = function (){
+	return this.endpoint.annotationsListCatch.length;
 };
 
 MiradorEndpointController.prototype.setUpListener = function(listener, expected_fun) {
-	//TODO
+	var self = this;
+	if (listener === "annotationListLoaded") {
+		jQuery.subscribe(listener + '.' + self.window.id, function(event) {
+			var annotations = self.endpoint.annotationsListCatch;
+			expected_fun(annotations);
+		});
+	} else {
+		jQuery.subscribe(listener + '.' + self.window.id, function(event, oaAnnotation) {
+			expected_fun(annotations);
+		});
+	}
 };
 
 MiradorEndpointController.prototype.updateMasterList = function(){
-	//TODO
+	// make a call to mirador endpoint to call CATCH to get a new instance
+};
+
+MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
+	var self = this;
+	annotations.forEach(function(annotation){
+		// Add annotations to annotationListCatch
+		self.endpoint.annotationsListCatch.push(annotation);
+
+		// trigger drawing here or once they're all loaded below
+	});
+	// trigger only after adding all items to annotationListCatch
 };
 
 MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(annotation){
-	//TODO
+	this.annotationsMasterList.unshift(annotation);
 };
 
 MiradorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation){
-	//TODO
+	var index = this.annotationsMasterList.indexOf(annotation);
+	if (index > -1) {
+		this.annotationsMasterList.splice(index, 1);
+	};
 };
 
 MiradorEndpointController.prototype.getAnnotationById = function(id) {
@@ -315,5 +354,45 @@ MiradorEndpointController.prototype.getAnnotationById = function(id) {
 };
 
 MiradorEndpointController.prototype.authorize = function(action, annotation) {
-	
-}
+	var user = this.endpoint.catchOptions.user;
+	var permissions = this.endpoint.catchOptions.permissions;
+	var tokens = annotation.permissions[action] || [];
+	if (tokens.length === 0) {
+		return true;
+	}
+	for (item in tokens) {
+		var token = tokens[item];
+		if (user.id === token) {
+			return true;
+		}
+	}
+	return false;
+};
+
+MiradorEndpointController.prototype.openEditorForReply = function(location) {
+
+};
+
+MiradorEndpointController.prototype.deleteAnnotation = function(annotation) {
+
+};
+
+MiradorEndpointController.prototype.editAnnotation = function(annotation, button) {
+
+};
+
+MiradorEndpointController.prototype.loadRepliesForParentAnnotation = function(annotation_id, displayFunction) {
+
+};
+
+MiradorEndpointController.prototype.deleteReply = function(reply, callback) {
+
+};
+
+MiradorEndpointController.prototype.queryDatabase = function(options, pagination, mediaType) {
+
+};
+
+MiradorEndpointController.prototype._clearAnnotator = function() {
+
+};

@@ -36,42 +36,47 @@
 		
 		this.writingReply = false;
 
-		
-
+		var endpointLoaded = jQuery.Deferred();
 		if (this.initOptions.mediaType !== "image") {
-			this.endpoint = new AnnotatorEndpointController();
+			this.endpoint = new AnnotatorEndpointController(endpointLoaded);
 		} else {
-			this.endpoint = new MiradorEndpointController();
+			this.endpoint = new MiradorEndpointController(endpointLoaded);
 		}
 
-		this.init();
+		this.init(endpointLoaded);
 	};
 
 	/* init
 	 * 
 	 */
-	$.DashboardController.prototype.init = function() {
+	$.DashboardController.prototype.init = function(deferredObject) {
+		var self = this;
 
-		var annotationsLoaded = self.__bind(this.annotationsLoaded, this);
-		var annotationCreated = self.__bind(this.annotationCreated, this);
-		var annotationUpdated = self.__bind(this.annotationUpdated, this);
-		var annotationDeleted = self.__bind(this.annotationDeleted, this);
+		var annotationsLoaded = self.__bind(self.annotationsLoaded, self);
+		var annotationCreated = self.__bind(self.annotationCreated, self);
+		var annotationUpdated = self.__bind(self.annotationUpdated, self);
+		var annotationDeleted = self.__bind(self.annotationDeleted, self);
 
-		// sets up all event listeners and their actions
-		this.endpoint.setUpListener('annotationsLoaded', annotationsLoaded);
-		this.endpoint.setUpListener('annotationCreated', annotationCreated);
-		this.endpoint.setUpListener('annotationDeleted', annotationDeleted);
-		this.endpoint.setUpListener('annotationUpdated', annotationUpdated);
-		// actually compile templates
-		
-		// TODO: Allow instructor (or maybe even user) to switch between different dashboards
-		this.viewer = new this.dashboardView({
-			suffix: this.initOptions.dashboardVersion,
-			template_urls: this.initOptions.template_urls,
-			element: this.element,
-			endpoint: this.endpoint,
-			pagination: this.initOptions.pagination,
-			controller: this,
+		jQuery.when(deferredObject).done(function() {
+			if (self.initOptions.mediaType === "image") {
+				self.endpoint.setUpListener('annotationListLoaded', annotationsLoaded);
+			} else {
+				// sets up all event listeners and their actions
+				self.endpoint.setUpListener('annotationsLoaded', annotationsLoaded);
+				self.endpoint.setUpListener('annotationCreated', annotationCreated);
+				self.endpoint.setUpListener('annotationDeleted', annotationDeleted);
+				self.endpoint.setUpListener('annotationUpdated', annotationUpdated);
+			}
+			
+			// TODO: Allow instructor (or maybe even user) to switch between different dashboards
+			self.viewer = new self.dashboardView({
+				suffix: self.initOptions.dashboardVersion,
+				template_urls: self.initOptions.template_urls,
+				element: self.element,
+				endpoint: self.endpoint,
+				pagination: self.initOptions.pagination,
+				controller: self,
+			});
 		});
 
 	};
@@ -140,7 +145,7 @@
 	$.DashboardController.prototype.annotationsLoaded = function (annotations) {
 		console.log("AnnotationsLoaded Triggered");
 		console.log(this);
-		this.endpoint.updateMasterList();
+		//this.endpoint.updateMasterList();
 		this.viewer.clearDashboard();
 		this.viewer.updateDashboard(0, this.initOptions.pagination, annotations, false);
 	};
@@ -179,10 +184,6 @@
 	        return fn.apply(me, arguments); 
     	}
     }; 
-
-	
-
-	
 
     $.DashboardController.prototype.annotationClicked = function(e) {
     	var self = this;

@@ -7,12 +7,17 @@
     <div class="annotatedAt field side" title="<% print(date) %>">
         last updated <% print(jQuery.timeago(date)); %>
     </div>
-
-    <div class="quote field side">
-        <div class="quoteText"><%= quote %></div>
-        <span class="uri" style="display:none"><%= uri %></span>
-
-    </div>
+    <% if (media === 'text') {%>
+        <div class="quote field side">
+            <div class="quoteText"><%= quote %></div>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    <% } else if (media === 'image') {%>
+        <div class="zoomToImageBounds">
+            <span class="idAnnotation" style="display:none"><%= id %></span>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    <% } %>
     
     <div class="body field side">
         <%= text %>

@@ -222,7 +222,6 @@
                 var offset = self.initOptions.endpoint.getNumOfAnnotationsOnScreen();
                 var pagination = self.initOptions.pagination;
                 var annotationList = self.initOptions.endpoint.annotationsMasterList;
-                console.log(annotationList);
                 self.updateDashboard(offset, pagination, annotationList, true);
 			}
 		});
