@@ -4,15 +4,7 @@
 <html>
 <head>
 <script src="{% static "vendors/mirador/mirador.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
-<style type="text/css">
-    body { padding: 0; margin: 0; overflow: hidden; font-size: 70%; }
-    #viewer { background: #333 url(../../../static/vendors/mirador/images/debut_dark.png) left top repeat; width: 100%; height: 100%; position: fixed; }
-  </style>
-  <script src="{% static "vendors/development/underscore.js" %}"></script>
-  <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
-  <script src="{% static "vendors/development/jstz.js" %}"></script>
-  {# Load the tag library #}
+{# Load the tag library #}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -21,6 +13,15 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
+<link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
+<style type="text/css">
+    body { padding: 0; margin: 0; overflow: hidden; font-size: 70%; }
+    #viewer { background: #333 url(../../../static/vendors/mirador/images/debut_dark.png) left top repeat; width: 100%; height: 100%; position: fixed; }
+  </style>
+  <script src="{% static "vendors/development/underscore.js" %}"></script>
+  <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
+  <script src="{% static "vendors/development/jstz.js" %}"></script>
+
 <script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
 <script src="{% static "AController.js" %}"></script>
 <script src="{% static "AnnotationMain.js" %}"></script>

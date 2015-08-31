@@ -60,6 +60,8 @@
 		jQuery.when(deferredObject).done(function() {
 			if (self.initOptions.mediaType === "image") {
 				self.endpoint.setUpListener('annotationListLoaded', annotationsLoaded);
+				self.endpoint.setUpListener('catchAnnotationCreated', annotationCreated);
+				self.endpoint.setUpListener('catchAnnotationDeleted', annotationDeleted);
 			} else {
 				// sets up all event listeners and their actions
 				self.endpoint.setUpListener('annotationsLoaded', annotationsLoaded);
@@ -145,7 +147,7 @@
 	$.DashboardController.prototype.annotationsLoaded = function (annotations) {
 		console.log("AnnotationsLoaded Triggered");
 		console.log(this);
-		//this.endpoint.updateMasterList();
+		this.endpoint.updateMasterList();
 		this.viewer.clearDashboard();
 		this.viewer.updateDashboard(0, this.initOptions.pagination, annotations, false);
 	};
@@ -175,6 +177,8 @@
 	};
 
 	$.DashboardController.prototype.annotationDeleted = function(annotation) {
+		console.log("AnnotationDeleted Triggered");
+		console.log(annotation);
 		this.endpoint.removeAnnotationFromMasterList(annotation);
 		this.viewer.deleteAnnotation(annotation);
 	};

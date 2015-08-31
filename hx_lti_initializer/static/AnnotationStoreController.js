@@ -309,14 +309,15 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 			expected_fun(annotations);
 		});
 	} else {
-		jQuery.subscribe(listener + '.' + self.window.id, function(event, oaAnnotation) {
-			expected_fun(annotations);
+		jQuery.subscribe(listener + '.' + self.window.id, function(event, annotation) {
+			expected_fun(annotation);
 		});
 	}
 };
 
 MiradorEndpointController.prototype.updateMasterList = function(){
 	// make a call to mirador endpoint to call CATCH to get a new instance
+	this.annotationsMasterList = this.endpoint.annotationsListCatch.slice();
 };
 
 MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
@@ -335,6 +336,10 @@ MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(anno
 };
 
 MiradorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation){
+	var annotation_checked = annotation;
+	if (typeof annotation_checked !== "object") {
+		annotation_checked = this.getAnnotationById(annotation_checked);
+	};
 	var index = this.annotationsMasterList.indexOf(annotation);
 	if (index > -1) {
 		this.annotationsMasterList.splice(index, 1);
@@ -347,7 +352,7 @@ MiradorEndpointController.prototype.getAnnotationById = function(id) {
 
 	for (index in annotations) {
 		if (annotations[index].id === annotationId)
-			return annotation;
+			return annotations[index];
 	}
 
 	return undefined;
@@ -370,23 +375,25 @@ MiradorEndpointController.prototype.authorize = function(action, annotation) {
 };
 
 MiradorEndpointController.prototype.openEditorForReply = function(location) {
-
+	//given location = {top:, left:}, open an editor to be able to reply here
 };
 
 MiradorEndpointController.prototype.deleteAnnotation = function(annotation) {
-
+	//given an annotation to be deleted, publish call to remove overlay from mirador
+	//and send a signal to catch to delete
 };
 
 MiradorEndpointController.prototype.editAnnotation = function(annotation, button) {
-
+	//given an annotation and the button (which contains location) update the item
+	//in Mirador and send a request to catch to edit
 };
 
 MiradorEndpointController.prototype.loadRepliesForParentAnnotation = function(annotation_id, displayFunction) {
-
+	// make a call to catch via mirador to get replies (should NOT draw them on screen)
 };
 
 MiradorEndpointController.prototype.deleteReply = function(reply, callback) {
-
+	// send a request to CATCH to destroy reply
 };
 
 MiradorEndpointController.prototype.queryDatabase = function(options, pagination, mediaType) {

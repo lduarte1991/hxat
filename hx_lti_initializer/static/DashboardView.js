@@ -181,7 +181,12 @@
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('y-scroll', 'scroll');
         }
-        divObject = '.annotationItem.item-'+annotation.id.toString();
+        var divObject = ""
+        if (typeof annotation !== "object") {
+            divObject = '.annotationItem.item-'+annotation.toString();
+        } else {
+            divObject = '.annotationItem.item-'+annotation.id.toString();
+        }
         jQuery(divObject).remove();
     };
 

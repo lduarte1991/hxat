@@ -4949,7 +4949,8 @@ window.Mirador = window.Mirador || function(config) {
       userid:    "test@mirador.org",
       username:  "mirador-test",
       annotationsList: [],        //OA list for Mirador use
-      annotationsListCatch: null  //internal list for module use
+      annotationsListCatch: null,  //internal list for module use
+      windowID: null
     }, options);
 
     this.init();
@@ -5003,7 +5004,6 @@ window.Mirador = window.Mirador || function(config) {
           jQuery.each(_this.annotationsListCatch, function(index, value) {
             _this.annotationsList.push(_this.getAnnotationInOA(value));
           });
-          jQuery.publish('');
           _this.dfd.resolve(true);
         },
         error: function() {
@@ -5013,7 +5013,8 @@ window.Mirador = window.Mirador || function(config) {
       });
     },
     
-    deleteAnnotation: function(annotationID, returnSuccess, returnError) {          
+    deleteAnnotation: function(annotationID, returnSuccess, returnError) {
+          var _this = this;        
           jQuery.ajax({
              url: this.prefix+"/destroy/"+annotationID,
              type: 'DELETE',
@@ -5024,6 +5025,7 @@ window.Mirador = window.Mirador || function(config) {
              contentType: "application/json; charset=utf-8",
              success: function(data) {
                returnSuccess();
+               jQuery.publish('catchAnnotationDeleted.'+_this.windowID, annotationID);
              },
              error: function() {
                returnError();
@@ -5072,6 +5074,7 @@ window.Mirador = window.Mirador || function(config) {
         contentType: "application/json; charset=utf-8",
         success: function(data) {
           returnSuccess(_this.getAnnotationInOA(data));
+          jQuery.publish('catchAnnotationCreated.'+_this.windowID, data);
         },
         error: function() {
           returnError();
@@ -8775,7 +8778,7 @@ window.Mirador = window.Mirador || function(config) {
       Handlebars.registerHelper('tocLevel', function(id, label, level, children) {
         var caret = '<i class="fa fa-caret-right caret"></i>',
         cert = '<i class="fa fa-certificate star"></i>';
-        return '<h' + (level+1) + '><a class="toc-link" data-rangeID="' + id + '">' + caret + cert + '<span class="label">' + label + '</span></a></h' + (level+1) + '>';
+        return '<h' + (level+1) + '><a class="toc-link" data-rangeID="' + id + '">' + caret + cert + '<span>' + label + '</span></a></h' + (level+1) + '>';
       });
 
       return template(tplData);
