@@ -51,7 +51,7 @@
         };
         console.log("sending message to receiver: ", message, receiver);
         window.parent.postMessage(JSON.stringify(message), receiver);
-    }, 1000); 
+    }, 1000);
 </script>
 
 <div class="container fit-to-canvas">
@@ -115,7 +115,7 @@ jQuery(function ($) {
 						//'Touch',
 					],
 					'database_url': "{{ abstract_db_url }}", //"{{ assignment.annotation_database_url }}",
-					'citation': "{{ target_object.target_citation | safe }}",
+					'citation': "{{ target_object.target_citation | escapejs }}",
 					{% if assignment.allow_highlights %}
 					'higlightTags_options': "{{ assignment.highlights_options }}",
 					{% endif %}
@@ -140,7 +140,7 @@ jQuery(function ($) {
 		if (typeof Annotator.Plugin["Grouping"] === 'function') {
 			options = {
 	    		optionsOVA: {
-		    		posBigNew: 'none', 
+		    		posBigNew: 'none',
 		    		default_tab: 'Public',
 		    		annotation_tool: AController.annotationCore.annotation_tool,
 		    	}
