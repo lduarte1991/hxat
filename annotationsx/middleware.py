@@ -5,9 +5,15 @@ from hx_lti_initializer.utils import debug_printer
 class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
         debug_printer('DEBUG - X-Frame-Options Middleware')
+
+        if request.META.get('HTTP_HOST').startswith('localhost:'):
+            response['X-Frame-Options'] = 'ALLOW-FROM ' + settings.X_FRAME_ALLOWED_SITES_MAP['localhost']
+            return response
+
         referrer = request.META.get('HTTP_REFERER')
         if referrer == None:
             return response
+
         parsed_uri = urlparse(referrer)
         domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
         x_frame_allow = False
