@@ -31,7 +31,10 @@ Harvard ATG's port of the edX Annotation tool to the Canvas LMS platform, forked
 		* Create the annotationsx database and user, prompting for a password and granting DB creation purposes (so executing the test suite doesn't fail).
 			`createdb annotationsx`
 			`createuser --pwprompt --createdb annotationsx`
-
+		* If the above commands didn't work for you, alternativly login to the "psql" interactive terminal and run these commands:
+			`CREATE USER annotationsx WITH PASSWORD 'annotationsx';`
+			`CREATE DATABASE annotationsx;`
+			`GRANT ALL PRIVILEGES ON DATABASE annotationsx to annotationsx;`
 5. Setup the database
 	`./manage.py migrate && ./manage.py syncdb`
 	
