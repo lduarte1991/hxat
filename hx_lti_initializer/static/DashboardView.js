@@ -275,7 +275,7 @@
     	// within the tags and the quotes section
 		while (annotation_id === undefined) {
     		target = target.parent();
-    		annotation_id = this.viewer.findAnnotationId(target);
+    		annotation_id = this.findAnnotationId(target);
     	}
     	if (return_target) {
     		return target;
@@ -302,7 +302,7 @@
     			top: button.offset().top,
     		};
     		
-    		self.endpoint.openEditorForReply(positionAdder, annotation_id);
+    		self.initOptions.endpoint.openEditorForReply(positionAdder, annotation_id);
        	});
 
     	jQuery('.parentAnnotation .quoteText').click( function(e){
@@ -314,15 +314,16 @@
 
     	jQuery('.parentAnnotation #edit').click(function (e){
     		if (annotationItem.authToEditButton) {
-    			self.endpoint.editAnnotation(annotation, jQuery(e.target));
+    			self.initOptions.endpoint.editAnnotation(annotation, jQuery(e.target));
     		};
     	});
-
+        console.log(self);
 		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
 			title: "Would you like to delete your annotation?",
+            placement: 'left',
 			onConfirm: function (){
 				if(annotationItem.authToDeleteButton) {
-					self.endpoint.deleteAnnotation(annotation);
+					self.initOptions.endpoint.deleteAnnotation(annotation);
 				}
 			},
 		});
@@ -335,14 +336,16 @@
 		jQuery('.repliesList').css('margin-top', replies_offset);
 		jQuery('.repliesList').css('height', replies_height);
 		
-		var final_html = ''
-		self.endpoint.list_of_replies = {}
+		var final_html = '';
+		console.log(self);
+        self.initOptions.endpoint.list_of_replies = {};
+
 		
-		annotations.forEach(function(annotation) {
+		replies.forEach(function(annotation) {
 			var item = self.formatAnnotation(annotation);
 			var html = self.initOptions.TEMPLATES.replyItem(item);
 			final_html += html;
-			self.endpoint.list_of_replies[item.id.toString()] = annotation;
+			self.initOptions.endpoint.list_of_replies[item.id.toString()] = annotation;
 		});
 		
 		jQuery('.repliesList').html(final_html);

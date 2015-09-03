@@ -59,9 +59,10 @@
 
 		jQuery.when(deferredObject).done(function() {
 			if (self.initOptions.mediaType === "image") {
-				self.endpoint.setUpListener('annotationListLoaded', annotationsLoaded);
+				self.endpoint.setUpListener('catchAnnotationsLoaded', annotationsLoaded);
 				self.endpoint.setUpListener('catchAnnotationCreated', annotationCreated);
 				self.endpoint.setUpListener('catchAnnotationDeleted', annotationDeleted);
+				self.endpoint.setUpListener('catchAnnotationUpdated', annotationUpdated);
 			} else {
 				// sets up all event listeners and their actions
 				self.endpoint.setUpListener('annotationsLoaded', annotationsLoaded);
@@ -122,7 +123,7 @@
 
 		jQuery('button#search-clear').click(function (e) {
 			jQuery('#srch-term').val("");
-			self.getSelectedTabValue.trigger("click");
+			self.viewer.getSelectedTabValue.trigger("click");
 		});
 
 		var annotationClicked = self.__bind(self.annotationClicked, self);
@@ -148,6 +149,9 @@
 		console.log("AnnotationsLoaded Triggered");
 		console.log(this);
 		this.endpoint.updateMasterList();
+		if (this.endpoint.getNumOfAnnotationsOnScreen() > this.initOptions.pagination) {
+			this.endpoint.updateEndpointList({limit:this.initOptions.pagination});
+		};
 		this.viewer.clearDashboard();
 		this.viewer.updateDashboard(0, this.initOptions.pagination, annotations, false);
 	};
@@ -160,6 +164,7 @@
 			if (attempts < 100){
 				setTimeout( function() {
 					if (typeof annotation.id !== 'undefined') {
+						self.endpoint.addNewAnnotationToMasterList(annotation);
 						self.viewer.addCreatedAnnotation(annotation.media, annotation);
 					} else {
 						attempts++;
@@ -172,7 +177,7 @@
 	};
 
 	$.DashboardController.prototype.annotationUpdated = function (annotation) {
-		this.endpoint.addNewAnnotationToMasterList(annotation);
+		console.log("AnnotationsUpdated Triggered");
 		this.viewer.updateAnnotation(annotation);
 	};
 
@@ -195,8 +200,9 @@
     	var annotation_id = this.viewer.findAnnotationId(target, false);
 
     	var annotationClicked = self.endpoint.getAnnotationById(annotation_id);
-    	this.viewer.displayModalView(annotationClicked);
-    	this.endpoint.loadRepliesForParentAnnotation(annotation_id, this.viewer.displayReplies);
+    	self.viewer.displayModalView(annotationClicked);
+    	var displayReplies = self.__bind(self.viewer.displayReplies, self);
+    	self.endpoint.loadRepliesForParentAnnotation(annotation_id, displayReplies);
     };
 
     $.DashboardController.prototype.replyDeleteClicked = function(e) {

@@ -12,7 +12,7 @@ class AssignmentTargets(models.Model):
 	target_object = models.ForeignKey(
 		TargetObject,
 		verbose_name = 'Source Material',
-		unique = True,
+		unique = False,
 	)
 	order = models.IntegerField(
 		verbose_name = 'Order',

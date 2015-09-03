@@ -287,7 +287,7 @@ button#closeModal {
     font-weight:bold;
 }
 
-.editgroup{
+.editgroup, .savegroup{
     float: right;
     right: 20px;
 }

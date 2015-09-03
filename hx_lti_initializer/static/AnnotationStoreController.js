@@ -20,6 +20,10 @@ AnnotationStoreController.prototype.updateMasterList = function() {
 	throw new Error("Abstract method!");
 };
 
+AnnotationStoreController.prototype.updateEndpointList = function() {
+	throw new Error("Abstract method!");
+};
+
 AnnotationStoreController.prototype.loadMoreAnnotations = function(annotations) {
 	throw new Error("Abstract method!");
 };
@@ -29,6 +33,10 @@ AnnotationStoreController.prototype.addNewAnnotationToMasterList = function(anno
 };
 
 AnnotationStoreController.prototype.removeAnnotationFromMasterList = function(annotation) {
+	throw new Error("Abstract method!");
+};
+
+AnnotationStoreController.prototype.updateAnnotationInMasterList = function(annotation) {
 	throw new Error("Abstract method!");
 };
 
@@ -73,6 +81,11 @@ var AnnotatorEndpointController = function(deferredObject) {
 	this.annotator = jQuery.data(wrapper, 'annotator');
 	this.annotationsMasterList = [];
 	deferredObject.resolve();
+	this.queryDefault = {
+		user_id: undefined,
+		media: "text",
+	};
+
 };
 
 AnnotatorEndpointController.prototype = Object.create(AnnotationStoreController.prototype);
@@ -112,6 +125,10 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 	var request = jQuery.ajax(search_url, options);
 };
 
+AnnotatorEndpointController.prototype.updateEndpointList = function(options) {
+	// will never differ from annotator
+};
+
 AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
 	var self = this;
 	annotations.forEach(function(annotation){
@@ -137,7 +154,7 @@ AnnotatorEndpointController.prototype.getAnnotationById = function(id) {
 
 	for (index in annotations) {
 		if (annotations[index].id === annotationId)
-			return annotation;
+			return annotations[index];
 	}
 
 	return undefined;
@@ -287,6 +304,11 @@ var MiradorEndpointController = function(deferredObject) {
 		deferredObject.resolve();
 	});
 	self.annotationsMasterList = [];
+	self.queryDefault = {
+		user_id: undefined,
+		media: "image",
+	};
+
 };    
 
 MiradorEndpointController.prototype = Object.create(AnnotationStoreController.prototype);
@@ -298,12 +320,12 @@ MiradorEndpointController.prototype.getDatabaseEndPoint = function() {
 };
 
 MiradorEndpointController.prototype.getNumOfAnnotationsOnScreen = function (){
-	return this.endpoint.annotationsListCatch.length;
+	return this.window.annotationsList.length;
 };
 
 MiradorEndpointController.prototype.setUpListener = function(listener, expected_fun) {
 	var self = this;
-	if (listener === "annotationListLoaded") {
+	if (listener === "catchAnnotationsLoaded") {
 		jQuery.subscribe(listener + '.' + self.window.id, function(event) {
 			var annotations = self.endpoint.annotationsListCatch;
 			expected_fun(annotations);
@@ -320,14 +342,25 @@ MiradorEndpointController.prototype.updateMasterList = function(){
 	this.annotationsMasterList = this.endpoint.annotationsListCatch.slice();
 };
 
+MiradorEndpointController.prototype.updateEndpointList = function(options){
+	if (options.limit) {
+		this.window.annotationsList = this.window.annotationsList.slice(0, options.limit);
+		jQuery.publish('annotationListLoaded.' + this.window.id);
+	};
+};
+
 MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
 	var self = this;
+	console.log("Load Annotations");
+	console.log(annotations);
 	annotations.forEach(function(annotation){
 		// Add annotations to annotationListCatch
 		self.endpoint.annotationsListCatch.push(annotation);
-
+		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
 		// trigger drawing here or once they're all loaded below
+		self.window.annotationsList.push(oaAnnotation);
 	});
+	jQuery.publish('annotationListLoaded.' + self.window.id);
 	// trigger only after adding all items to annotationListCatch
 };
 
@@ -337,10 +370,13 @@ MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(anno
 
 MiradorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation){
 	var annotation_checked = annotation;
+
 	if (typeof annotation_checked !== "object") {
 		annotation_checked = this.getAnnotationById(annotation_checked);
 	};
-	var index = this.annotationsMasterList.indexOf(annotation);
+
+	var index = this.annotationsMasterList.indexOf(annotation_checked);
+	
 	if (index > -1) {
 		this.annotationsMasterList.splice(index, 1);
 	};
@@ -379,13 +415,57 @@ MiradorEndpointController.prototype.openEditorForReply = function(location) {
 };
 
 MiradorEndpointController.prototype.deleteAnnotation = function(annotation) {
-	//given an annotation to be deleted, publish call to remove overlay from mirador
-	//and send a signal to catch to delete
+	// given an annotation to be deleted, publish call to remove overlay from mirador
+	// and send a signal to catch to delete
+	jQuery.publish('annotationDeleted.' + this.window.id, annotation.id.toString());
 };
 
 MiradorEndpointController.prototype.editAnnotation = function(annotation, button) {
 	//given an annotation and the button (which contains location) update the item
 	//in Mirador and send a request to catch to edit
+	tinymce.init({ 
+		selector:".parentAnnotation .body", 
+		inline: true, 
+		menubar: false,
+		plugins: "image link media",
+        statusbar: false,
+        toolbar_items_size: 'small',
+        toolbar: "bold italic | bullist numlist | link image media"
+	});
+	jQuery('.parentAnnotation .editgroup').hide();
+	jQuery('.parentAnnotation .savegroup').show();
+
+	var currentBody = jQuery('.parentAnnotation .body').html();
+
+	var self = this;
+	jQuery('.parentAnnotation .savegroup #save').click(function(e) {
+		tinymce.remove();
+		var annotation = self.getAnnotationById(jQuery('.parentAnnotation .idAnnotation').html());
+		annotation.text = jQuery('.parentAnnotation .body').html();
+		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
+		console.log(oaAnnotation);
+		jQuery.publish('annotationUpdated.'+self.window.id, oaAnnotation);
+		console.log(annotation);
+		jQuery('.parentAnnotation .editgroup').show();
+		jQuery('.parentAnnotation .savegroup').hide();
+	});
+
+	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {
+		tinymce.remove();
+		jQuery('.parentAnnotation .body').html(currentBody);
+		jQuery('.parentAnnotation .editgroup').show();
+		jQuery('.parentAnnotation .savegroup').hide();
+	});
+
+};
+
+MiradorEndpointController.prototype.updateAnnotationInMasterList = function(annotation) {
+	
+	for (index in this.annotationsMasterList) {
+		if (this.annotationsMasterList[index].id === annotation.id)
+			this.annotationsMasterList[index] = annotation;
+	}
+
 };
 
 MiradorEndpointController.prototype.loadRepliesForParentAnnotation = function(annotation_id, displayFunction) {
@@ -397,9 +477,47 @@ MiradorEndpointController.prototype.deleteReply = function(reply, callback) {
 };
 
 MiradorEndpointController.prototype.queryDatabase = function(options, pagination, mediaType) {
-
+	console.log("Reached Query");
+	console.log(options);
+	console.log(pagination);
+	console.log(mediaType);
+	var setOptions = jQuery.extend({}, this.queryDefault, options);
+	var self = this;
+	var newOptions = {
+		limit: -1,
+		offset: 0,
+		media: mediaType,
+		userid: setOptions.user_id,
+		username: setOptions.username,
+		text: setOptions.text,
+		tag: setOptions.tag,
+	};
+	console.log(newOptions);
+	var onSuccess = function(data){
+		if (data === null) {
+			data = {};
+		}
+		console.log("Succeeded!");
+		var annotations = data.rows || [];
+		console.log(self.endpoint.annotationsListCatch);
+		console.log(self.window.annotationsList);
+		self.endpoint.annotationsListCatch = annotations;
+		self.updateMasterList();
+		console.log(self.endpoint.annotationsListCatch);
+		self.window.annotationsList = [];
+		annotations.forEach(function(annotation) {
+			var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
+			// trigger drawing here or once they're all loaded below
+			self.window.annotationsList.push(oaAnnotation);
+		});
+		console.log(self.window.annotationsList);
+		jQuery.publish('annotationListLoaded.' + self.window.id);
+		jQuery.publish('catchAnnotationsLoaded', annotations);
+	}
+	console.log(self.endpoint.search);
+	self.endpoint.search(newOptions, onSuccess, function(){});
 };
 
 MiradorEndpointController.prototype._clearAnnotator = function() {
-
+	// Mirador handles clearing when necessary
 };
