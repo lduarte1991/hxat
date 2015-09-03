@@ -1,0 +1,18 @@
+<div class="replyItem item-<%= id%> side">
+	<span class="idAnnotation"><%= id %></span>
+
+	 <div class="replytext field side">
+        <%= text %>
+    </div>
+    <% if (authorized) {%>
+		<div class="btn-group btn-group-xs replyeditgroup" role="group" aria-label="edit" style="display:block;">
+		    <% if(authToDeleteButton) { %>
+		    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
+		    <% } %>
+	    </div>
+    <% } %>
+    <% var date = new Date(updated); %>
+    <div class="repliedat field side" title="<% print(date) %>">
+        reply made <% print(jQuery.timeago(date)); %> by <span class= "repliedby field side"> <%= user.name %> </span>
+    </div>
+</div>

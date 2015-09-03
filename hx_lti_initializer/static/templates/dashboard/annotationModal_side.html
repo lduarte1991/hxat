@@ -1,0 +1,42 @@
+<div class="annotationModal item-modal-<%= id %> side">
+	<span class="idAnnotation"><%= id %></span>
+	<div class="modal-navigation">
+		<button class="btn btn-default" id="closeModal"><i class="glyphicon glyphicon-arrow-left"></i></button>
+		<div class="label"><%= user.name %>&apos;s Annotation</div>
+	</div>
+	<div class="parentAnnotation">
+		<div class= "annotatedBy field side">
+	        <%= user.name %>
+	    </div>
+	    <% var date = new Date(updated); %>
+	    <div class="annotatedAt field side" title="<% print(date) %>">
+	        last updated <% print(jQuery.timeago(date)); %>
+	    </div>
+
+	    <div class="quote field side">
+	        <div class="quoteText"><%= quote %></div>
+	        <span class="uri" style="display:none"><%= uri %></span>
+
+	    </div>
+	    
+	    <div class="body field side">
+	        <%= text %>
+	    </div>
+	    <% if (authorized) {%>
+		    <div class="btn-group btn-group-xs editgroup" role="group" aria-label="edit">
+		    	<% if(authToEditButton) { %>
+			    <button class="btn btn-primary" id="edit"><i class="glyphicon glyphicon-pencil"></i> Edit </button>
+			    <% } %>
+			    <% if(authToDeleteButton) { %>
+			    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
+			    <% } %>
+		    </div>
+	    <% } %>
+	</div>
+	<div class="repliesList">
+	    Loading Replies...
+	</div>
+	<div class="addReply">
+		<button class="btn btn-primary replybutton"><i class="glyphicon glyphicon-pencil"></i>  Reply to Comment</button>
+	</div>
+</div>

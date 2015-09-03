@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{# Make sure to load static files, jquery, and bootstrap select #}
+{% load staticfiles %}
+<script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
+<script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/bootstrap-select.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}">
+
+{# Load the tag library for bootsrap #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript for bootstrap #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+<!-- TODO: This should contain logo/name and possibly navigation --> 
+<div class="header"></div>
+
+<!-- Broken off into two sections, information on the left and content on the right -->
+<div class="container">
+	<div class="row">
+        <div class="col-md-3">
+            <div class="navigation">
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+            </div>
+            <div class="sidebar-top">
+                <div id="user-label">{{ user.username }}</div>
+            </div>
+            <div class="sidebar">
+                <!--
+                <p>
+                    <ul>
+                        <li>To add a new course, simply initialize LTI tool as an administrator/instructor.</li>
+                        <li>Change course settings to edit the name and any people to be considered "admins"</li>
+                    </ul>
+                </p>
+                -->
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-8">
+			<div id="content">
+			    {% block content %}{% endblock %}
+			</div>
+		</div>
+	</div>
+</div>

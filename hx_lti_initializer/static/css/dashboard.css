@@ -1,0 +1,298 @@
+/* Side Dashboard */
+
+.annotationSection.side{
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: auto;
+	width: 300px;
+	min-width: 150px;
+	height: 100%;
+	background-color: #343535;
+	padding: 5px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.annotationSection.side > .annotationsHolder.side {
+	background-color:white;
+	border: 1px solid #999;
+	padding: 3px;
+	margin-top:50px;
+	overflow: scroll;
+}
+
+.annotationItem.side {
+    padding:10px;
+    border: solid 2px #999999;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: white;
+    cursor:pointer;
+}
+
+.annotationItem.side:hover {
+	background-color: #ddf;
+}
+
+.annotationSection.side >.resize-handle.side {
+	width: 8px;
+	position: absolute;
+	left: -4px;
+	top: 0;
+	bottom: 0;
+	cursor:	col-resize;
+	overflow:visible;
+}
+
+.annotationSection.side >.resize-handle.side > .handle-button{
+	width: 30px;
+	height: 100px;
+	margin-left: -26px;
+	background-image:url(images/resize-button.png);
+}
+
+.annotationSection.side > .annotation-filter-buttons {
+	text-align: center;
+	margin-top: 50px;
+	margin-bottom: 20px;
+	min-width: 300px;
+}
+
+.annotationSection.side > .filter-options.side {
+	text-align: center;
+	margin-top: 20px;
+	min-width: 300px;
+}
+
+.annotationSection.side > .search-bar.side {
+	text-align: center;
+	margin-top: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.annotationSection.side > .separator-solid.side {
+	margin: 10px;
+	height: 5px;
+	color: #999;
+	border: 2px solid #999;
+}
+
+.annotationSection.side > .filter-options.side > button#users-filter {
+	border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.annotationSection.side > .filter-options.side > button#annotationtext-filter {
+	border-radius:0px;
+}
+.annotationSection.side > .filter-options.side > button#tag-filter {
+	border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.annotationItem.side:not(:first-child) {
+	margin-top:10px;
+}
+
+.annotationItem .annotatedBy.side {
+    font-family: Arial;
+    font-size: 12pt;
+    font-weight: bold;
+    float: left;
+}
+
+.annotationItem .annotatedAt.side {
+    font-family: Arial;
+    font-size: 8pt;
+    float:right;
+}
+
+.annotationItem .quote.side {
+    border-left: 2px solid #BBB;
+    border-radius: 1px;
+    padding-left: 10px;
+    color: #777;
+    margin-top: 40px;
+    font-style: italic;
+    font-family: Times New Roman;
+    font-size: 10pt;
+}
+
+.annotationItem .body.side {
+    font-family: Arial;
+    font-size: 11pt;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.annotationItem .totalreplies.side{
+    float:left;
+    padding:7px;
+    margin-left: 20px;
+    border: 1px solid #999;
+    border-radius: 5px;
+    background-color: #DCE9FE;
+    font-size: 8pt;
+    font-family: Arial;
+}
+
+.annotationItem .tagList.side {
+    float:right;
+    width: 50%;
+}
+
+.annotationItem .idAnnotation{
+	display:none;
+}
+
+.annotationItem .uri {
+	display:none;
+}
+
+.annotationItem .tag.side {
+    display: inline-block;
+    padding: 5px;
+    font-size: 10pt;
+    border: 1px solid #999;
+    border-radius: 10px;
+    margin-bottom: 3px;
+}
+
+.search-label {
+	color: #ccc;
+}
+
+.annotationModal {
+    width: inherit;
+    height: 100%;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+.modal-navigation {
+	background-color: #bbb;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	height: 45px;
+}
+
+button#closeModal {
+	margin: 5px;
+}
+
+.annotationModal .idAnnotation {
+	display: none;
+}
+
+.parentAnnotation {
+	background-color: #333;
+	position: absolute;
+	width: 100%;
+	top: 45px;
+    z-index: 1000;
+	border-bottom: 2px solid #bbb;
+	padding-bottom: 20px;
+	-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+	box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+}
+
+.parentAnnotation .annotatedBy.side {
+    font-family: Arial;
+    font-size: 12pt;
+    font-weight: bold;
+    float: left;
+    color: #fff;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.parentAnnotation .annotatedAt.side {
+    font-family: Arial;
+    font-size: 8pt;
+    float:right;
+    color: #fff;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.parentAnnotation .quote.side {
+    border-left: 2px solid #BBB;
+    border-radius: 1px;
+    padding-left: 10px;
+    color: #bbb;
+    margin-top: 40px;
+    margin-left: 15px;
+    font-style: italic;
+    font-family: Times New Roman;
+    font-size: 10pt;
+    cursor:pointer;
+}
+
+.parentAnnotation .body.side {
+    font-family: Arial;
+    font-size: 13pt;
+    margin-top: 20px;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.addReply {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.addReply button.btn.btn-primary.replybutton {
+    width: 100%;
+}
+
+.repliesList {
+    text-align: center;
+    padding-top: 25px;
+    padding-bottom: 45px;
+    height: inherit;
+    overflow-y: scroll;
+}
+
+.replyItem {
+    border-top: 2px solid black;
+    padding: 10px;
+}
+
+.replyItem:nth-child(odd) {
+    background-color: #eee;
+}
+
+.replyItem:nth-child(even) {
+    background-color: #bbb;
+}
+
+.replytext {
+    text-align: left;
+    font-size: 11pt;
+}
+
+.repliedat {
+    font-size: 8pt;
+    text-align: right;
+    font-style: italic;
+    color: #555;
+}
+
+.repliedby{
+    font-weight:bold;
+}
+
+.editgroup{
+    float: right;
+    right: 20px;
+}
+
+.replyeditgroup{
+    display: block;
+    margin-top: 10px;
+}

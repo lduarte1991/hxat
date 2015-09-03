@@ -3,7 +3,9 @@ env
 bin
 lib
 include
-.DS_Store
+*.DS_Store
 *.pyc
 *.sh
 htmlcov
+secure.py
+http_static
