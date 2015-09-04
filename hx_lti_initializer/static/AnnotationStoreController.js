@@ -145,7 +145,9 @@ AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(
 	var index = self.annotationsMasterList.indexOf(annotation);
 	if (index > -1) {
 		self.annotationsMasterList.splice(index, 1);
+		return false;
 	};
+	return true;
 };
 
 AnnotatorEndpointController.prototype.getAnnotationById = function(id) {
@@ -166,8 +168,11 @@ AnnotatorEndpointController.prototype.authorize = function(action, annotation) {
 };
 
 AnnotatorEndpointController.prototype.openEditorForReply = function(location) {
-	var position = location;
-	position.display = "block";
+	var position = {
+		display: "block",
+		left: location.left,
+		top: location.top,
+	};
 	this.annotator.adder.css(position);
 	this.annotator.onAdderClick();
 
@@ -365,7 +370,11 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 };
 
 MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(annotation){
-	this.annotationsMasterList.unshift(annotation);
+	if (annotation.media === "comment") {
+		this.list_of_replies[annotation.id] = annotation;
+	} else {
+		this.annotationsMasterList.unshift(annotation);
+	}
 };
 
 MiradorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation){
@@ -379,7 +388,9 @@ MiradorEndpointController.prototype.removeAnnotationFromMasterList = function(an
 	
 	if (index > -1) {
 		this.annotationsMasterList.splice(index, 1);
+		return false;
 	};
+	return true;
 };
 
 MiradorEndpointController.prototype.getAnnotationById = function(id) {
@@ -410,8 +421,47 @@ MiradorEndpointController.prototype.authorize = function(action, annotation) {
 	return false;
 };
 
-MiradorEndpointController.prototype.openEditorForReply = function(location) {
+MiradorEndpointController.prototype.openEditorForReply = function(options) {
 	//given location = {top:, left:}, open an editor to be able to reply here
+	var repliesList = options.repliesList;
+	var template = options.templateReply;
+	var self = this;
+	repliesList.prepend(template);
+	tinymce.init({ 
+		selector:".replyItemEdit .replyText", 
+		inline: true, 
+		menubar: false,
+		plugins: "image link media",
+        statusbar: false,
+        toolbar_items_size: 'small',
+        toolbar: "bold italic | bullist numlist | link image media"
+	});
+	jQuery('.replybutton').hide();
+	jQuery('.newreplygroup #delete').click(function (e) {
+		jQuery('.replybutton').show();
+		jQuery('.replyItemEdit').remove();
+	});
+	jQuery('.newreplygroup #save').click(function (e) {
+		var annotation = {
+			collectionId: self.endpoint.collection_id,
+			contextId: self.endpoint.context_id,
+			uri: self.endpoint.uri,
+			permissions: self.endpoint.catchOptions.permissions,
+			user: self.endpoint.catchOptions.user,
+			archived: false,
+			rangePosition: {},
+			ranges: [],
+			tags: [],
+			text: jQuery('.replyItemEdit .replytext').val(),
+			parent: jQuery('.parentAnnotation .idAnnotation').html(),
+			media: "comment",
+		};
+		
+		self.endpoint.createCatchAnnotation(annotation);
+
+		jQuery('.replybutton').show();
+		jQuery('.replyItemEdit').remove();
+	});
 };
 
 MiradorEndpointController.prototype.deleteAnnotation = function(annotation) {
@@ -443,11 +493,12 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 		var annotation = self.getAnnotationById(jQuery('.parentAnnotation .idAnnotation').html());
 		annotation.text = jQuery('.parentAnnotation .body').html();
 		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
-		console.log(oaAnnotation);
 		jQuery.publish('annotationUpdated.'+self.window.id, oaAnnotation);
-		console.log(annotation);
 		jQuery('.parentAnnotation .editgroup').show();
 		jQuery('.parentAnnotation .savegroup').hide();
+
+		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+		jQuery('.repliesList').css('margin-top', replies_offset);
 	});
 
 	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {
@@ -470,17 +521,32 @@ MiradorEndpointController.prototype.updateAnnotationInMasterList = function(anno
 
 MiradorEndpointController.prototype.loadRepliesForParentAnnotation = function(annotation_id, displayFunction) {
 	// make a call to catch via mirador to get replies (should NOT draw them on screen)
+	var anId = parseInt(annotation_id, 10);
+	var self = this;
+
+	var newLoadFromSearch = {
+		parentid: anId,
+		media: "comment",
+	};
+
+	var onSuccess = function(data) {
+		if (data === null) {
+			data = {};
+		}
+		self.list_of_replies = data.rows || [];
+		displayFunction(self.list_of_replies);
+	};
+
+	self.endpoint.search(newLoadFromSearch, onSuccess, function(){});
 };
 
 MiradorEndpointController.prototype.deleteReply = function(reply, callback) {
 	// send a request to CATCH to destroy reply
+	this.endpoint.deleteAnnotation(reply.id, callback);
 };
 
 MiradorEndpointController.prototype.queryDatabase = function(options, pagination, mediaType) {
-	console.log("Reached Query");
-	console.log(options);
-	console.log(pagination);
-	console.log(mediaType);
+
 	var setOptions = jQuery.extend({}, this.queryDefault, options);
 	var self = this;
 	var newOptions = {
@@ -492,29 +558,27 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		text: setOptions.text,
 		tag: setOptions.tag,
 	};
-	console.log(newOptions);
+
 	var onSuccess = function(data){
 		if (data === null) {
 			data = {};
 		}
-		console.log("Succeeded!");
 		var annotations = data.rows || [];
-		console.log(self.endpoint.annotationsListCatch);
-		console.log(self.window.annotationsList);
+
 		self.endpoint.annotationsListCatch = annotations;
 		self.updateMasterList();
-		console.log(self.endpoint.annotationsListCatch);
 		self.window.annotationsList = [];
+
 		annotations.forEach(function(annotation) {
 			var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
 			// trigger drawing here or once they're all loaded below
 			self.window.annotationsList.push(oaAnnotation);
 		});
-		console.log(self.window.annotationsList);
+
 		jQuery.publish('annotationListLoaded.' + self.window.id);
 		jQuery.publish('catchAnnotationsLoaded', annotations);
 	}
-	console.log(self.endpoint.search);
+
 	self.endpoint.search(newOptions, onSuccess, function(){});
 };
 

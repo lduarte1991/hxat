@@ -12,8 +12,9 @@
             <div class="quoteText"><%= quote %></div>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
-    <% } else if (media === 'image') {%>
+    <% } else if (media === 'image' && thumbnail) {%>
         <div class="zoomToImageBounds">
+            <img class="annotation-thumbnail" src="<%= thumbnail %>" />
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
@@ -24,7 +25,8 @@
     </div>
     
     <div class="totalreplies field side">
-        Make/View Replies
+        <span class="glyphicon glyphicon-comment"></span>
+        <span class="replyNum"> <%= totalComments %> </span>
     </div>
     
     <div class="tagList field side">

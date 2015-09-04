@@ -7,6 +7,7 @@
                 "annotationItem",
                 "annotationModal",
                 "replyItem",
+                "editReplyItem",
             ],
             TEMPLATES: {},
             suffix: "side",
@@ -36,7 +37,7 @@
         };
 
         this.templateTypes = {
-            'replies': 'replyItem',
+            'comment': 'replyItem',
             'text': 'annotationItem',
             'image': 'annotationItem',
             'video': 'annotationItem',
@@ -67,12 +68,13 @@
             return jQuery.ajax(options);
         });
         jQuery.when.apply(jQuery, deferreds).done(function(){
-            console.log('All done');
             self.setUpEmptyDashboard();
-            jQuery(self.filterButtons[0]).addClass('disabled');
             self.setUpButtons(self.tabs);
             self.setUpButtons(self.filterButtons);
             self.initOptions.controller.setUpButtons();
+            jQuery(self.filterButtons[0]).addClass('disabled');
+            var button = '#' + self.initOptions.default_tab.toLowerCase().replace(' ', '');
+            jQuery(button).addClass('disabled');
         });
     };
 
@@ -141,6 +143,10 @@
         item.authToDeleteButton = authorized;
         item.authToEditButton = updateAuthorized;
         item.authorized = authorized || updateAuthorized;
+        item.thumbnail = false;
+        if (item.media === "image" && item.thumb) {
+            item.thumbnail = item.thumb;
+        }
         
         return item;
     };
@@ -150,6 +156,11 @@
         var annotationItem = self.formatAnnotation(annotation);
         var html = self.initOptions.TEMPLATES[self.templateTypes[mediaType]](annotationItem);
         jQuery(self.holders[mediaType]).prepend(html);
+        if (annotationItem.media === "comment") {
+            var parentId = annotationItem.parent;
+            var numReply = parseInt(jQuery('.item-' + parentId).find('.replyNum').html(), 10);
+            jQuery('.item-' + parentId).find('.replyNum').html(numReply+1);
+        };
     };
 
     $.DashboardView.prototype.updateAnnotation = function(annotation) {
@@ -273,17 +284,21 @@
 		annotation_id = target.find('.idAnnotation').html();
 		// this next part is to double check that idannotation is grabbed from
     	// within the tags and the quotes section
-		while (annotation_id === undefined) {
-    		target = target.parent();
-    		annotation_id = this.findAnnotationId(target);
+		if (annotation_id === undefined) {
+            if (return_target) {
+                return this.findAnnotationId(target.parent(), true);
+            } else {
+    		    return this.findAnnotationId(target.parent(), false);
+            }
     	}
+
     	if (return_target) {
     		return target;
     	};
 		return annotation_id;
 	};
 
-	$.DashboardView.prototype.displayModalView = function(annotation) {
+	$.DashboardView.prototype.displayModalView = function(annotation, boundCallback) {
 		var self = this;
 		var annotationItem = self.formatAnnotation(annotation);
 
@@ -297,12 +312,15 @@
 
     	jQuery('.annotationModal button.replybutton').click( function (e) {
     		var button = jQuery(e.target);
-    		var positionAdder = {
+    		var options = {
     			left: button.offset().left,
     			top: button.offset().top,
+                repliesList: jQuery('.repliesList'),
+                templateReply: self.initOptions.TEMPLATES.editReplyItem(),
+                onSuccess: boundCallback,
     		};
     		
-    		self.initOptions.endpoint.openEditorForReply(positionAdder, annotation_id);
+    		self.initOptions.endpoint.openEditorForReply(options);
        	});
 
     	jQuery('.parentAnnotation .quoteText').click( function(e){
@@ -311,6 +329,10 @@
 				'slow'
 			);
     	});
+
+        jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
+            jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.bounds)
+        });
 
     	jQuery('.parentAnnotation #edit').click(function (e){
     		if (annotationItem.authToEditButton) {
@@ -337,7 +359,6 @@
 		jQuery('.repliesList').css('height', replies_height);
 		
 		var final_html = '';
-		console.log(self);
         self.initOptions.endpoint.list_of_replies = {};
 
 		
@@ -349,6 +370,10 @@
 		});
 		
 		jQuery('.repliesList').html(final_html);
+        if (replies.length > 0) {
+            var parentId = replies[0].parent;
+            jQuery('.item-' + parentId).find('.replyNum').html(replies.length);
+        };
 	};
 
 } (AController));

@@ -79,6 +79,7 @@
 				endpoint: self.endpoint,
 				pagination: self.initOptions.pagination,
 				controller: self,
+				default_tab: self.initOptions.default_tab,
 			});
 		});
 
@@ -123,7 +124,7 @@
 
 		jQuery('button#search-clear').click(function (e) {
 			jQuery('#srch-term').val("");
-			self.viewer.getSelectedTabValue.trigger("click");
+			self.viewer.getSelectedTabValue().trigger("click");
 		});
 
 		var annotationClicked = self.__bind(self.annotationClicked, self);
@@ -183,9 +184,11 @@
 
 	$.DashboardController.prototype.annotationDeleted = function(annotation) {
 		console.log("AnnotationDeleted Triggered");
-		console.log(annotation);
-		this.endpoint.removeAnnotationFromMasterList(annotation);
-		this.viewer.deleteAnnotation(annotation);
+		var isReply = this.endpoint.removeAnnotationFromMasterList(annotation);
+		if (!isReply) {
+			this.viewer.deleteAnnotation(annotation);
+		};
+		
 	};
 
 	$.DashboardController.prototype.__bind = function(fn, me) { 
@@ -200,8 +203,9 @@
     	var annotation_id = this.viewer.findAnnotationId(target, false);
 
     	var annotationClicked = self.endpoint.getAnnotationById(annotation_id);
-    	self.viewer.displayModalView(annotationClicked);
-    	var displayReplies = self.__bind(self.viewer.displayReplies, self);
+    	var addCreatedAnnotation = self.__bind(self.viewer.addCreatedAnnotation, self.viewer);
+    	self.viewer.displayModalView(annotationClicked, addCreatedAnnotation);
+    	var displayReplies = self.__bind(self.viewer.displayReplies, self.viewer);
     	self.endpoint.loadRepliesForParentAnnotation(annotation_id, displayReplies);
     };
 
@@ -210,12 +214,19 @@
     	var button = jQuery(e.target);
     	var replyItem = this.viewer.findAnnotationId(button, true);
     	var annotation_id = this.viewer.findAnnotationId(replyItem, false);
-    	var annotation = self.endpoint.list_of_replies[annotation_id];
+    	var annotation = this.endpoint.list_of_replies[annotation_id];
+    	console.log(this.endpoint);
+    	var parentId = annotation.parent;
 
     	button.confirmation({
 			title: "Would you like to delete your reply?",
+			container: "body",
 			onConfirm: function (){
-				self.endpoint.deleteReply(annotation, function(){ replyItem.remove(); });
+				self.endpoint.deleteReply(annotation, function(){ 
+					replyItem.remove(); 
+            		var numReply = parseInt(jQuery('.item-' + parentId).find('.replyNum').html(), 10);
+           		 	jQuery('.item-' + parentId).find('.replyNum').html(numReply-1);
+				});
 			},
 		});
 

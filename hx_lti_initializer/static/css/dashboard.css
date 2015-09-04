@@ -8,10 +8,15 @@
 	width: 300px;
 	min-width: 150px;
 	height: 100%;
-	background-color: #343535;
+	background-image:url(images/debut_dark.png);
 	padding: 5px;
 	overflow-x: hidden;
 	overflow-y: scroll;
+    -moz-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    -webkit-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    /* For IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=270, Color='rgba(0,0,0,0.3)')";
 }
 .annotationSection.side > .annotationsHolder.side {
 	background-color:white;
@@ -23,11 +28,14 @@
 
 .annotationItem.side {
     padding:10px;
-    border: solid 2px #999999;
-    border-radius: 10px;
     overflow: hidden;
     background-color: white;
     cursor:pointer;
+    border-bottom: 1px solid #888;
+}
+
+.annotationItem.side:nth-child(even) {
+    background-color: #eee;
 }
 
 .annotationItem.side:hover {
@@ -51,11 +59,29 @@
 	background-image:url(images/resize-button.png);
 }
 
+.annotationSection.side > .group-wrap {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    min-width: 300px;
+}
+
 .annotationSection.side > .annotation-filter-buttons {
-	text-align: center;
-	margin-top: 50px;
-	margin-bottom: 20px;
-	min-width: 300px;
+	text-align: center;	
+}
+
+.annotationSection.side .btn.user-filter {
+    color: #888;
+    font-weight: bold;
+    background-color: transparent;
+    border: 3px solid #888;
+}
+
+.annotationSection.side .btn.user-filter.disabled {
+    color: #000;
+    font-weight: bold;
+    background-color: #888 !important;
+    border: 3px solid #888;
 }
 
 .annotationSection.side > .filter-options.side {
@@ -91,7 +117,7 @@
 }
 
 .annotationItem.side:not(:first-child) {
-	margin-top:10px;
+	padding-top:10px;
 }
 
 .annotationItem .annotatedBy.side {
@@ -118,6 +144,16 @@
     font-size: 10pt;
 }
 
+.annotationItem .zoomToImageBounds {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.annotationItem .zoomToImageBounds .annotation-thumbnail{
+    max-width: 150px;
+    max-height: 150px;
+}
+
 .annotationItem .body.side {
     font-family: Arial;
     font-size: 11pt;
@@ -126,18 +162,14 @@
 }
 
 .annotationItem .totalreplies.side{
-    float:left;
+    float:right;
     padding:7px;
     margin-left: 20px;
-    border: 1px solid #999;
-    border-radius: 5px;
-    background-color: #DCE9FE;
-    font-size: 8pt;
-    font-family: Arial;
+    font-size: 13pt;
 }
 
 .annotationItem .tagList.side {
-    float:right;
+    float:left;
     width: 50%;
 }
 
@@ -154,7 +186,7 @@
     padding: 5px;
     font-size: 10pt;
     border: 1px solid #999;
-    border-radius: 10px;
+    border-radius: 3px;
     margin-bottom: 3px;
 }
 
@@ -232,6 +264,20 @@ button#closeModal {
     cursor:pointer;
 }
 
+.parentAnnotation .zoomToImageBounds {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 40px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.parentAnnotation .zoomToImageBounds .annotation-thumbnail {
+    max-width: 150px;
+    max-height: 150px;
+}
+
+
 .parentAnnotation .body.side {
     font-family: Arial;
     font-size: 13pt;
@@ -258,7 +304,7 @@ button#closeModal {
     overflow-y: scroll;
 }
 
-.replyItem {
+.replyItem, .replyItemEdit {
     border-top: 2px solid black;
     padding: 10px;
 }
