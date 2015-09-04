@@ -99,7 +99,7 @@ jQuery(function ($) {
 						//'Touch',
 					],
 					'database_url': "https://lti-annotations-dev.harvardx.harvard.edu/lti_init/annotation_api",
-					'citation': "{{ target_object.target_citation | safe }}",
+					'citation': "{{ target_object.target_citation | escapejs }}",
 					{% if assignment.allow_highlights %}
 					'higlightTags_options': "{{ assignment.highlights_options }}",
 					{% endif %}
@@ -124,7 +124,7 @@ jQuery(function ($) {
 		if (typeof Annotator.Plugin["Grouping"] === 'function') {
 			options = {
 	    		optionsOVA: {
-		    		posBigNew: 'none', 
+		    		posBigNew: 'none',
 		    		default_tab: 'Public',
 		    		annotation_tool: AController.annotationCore.annotation_tool,
 		    	}
