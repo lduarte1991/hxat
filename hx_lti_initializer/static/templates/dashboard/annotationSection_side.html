@@ -1,9 +1,11 @@
 <div class="annotationSection side">
     <div class="resize-handle side"><div class="handle-button"></div></div>
-    <div class="annotation-filter-buttons">
-    	<button type="button" class="btn btn-default user-filter" id='mynotes'>My Notes</button>
-    	<button type="button" class="btn btn-default user-filter" id='instructor'>Instructor</button>
-    	<button type="button" class="btn btn-default user-filter" id='public'>Public</button>
+    <div class="group-wrap">
+        <div class="annotation-filter-buttons btn-group">
+        	<button type="button" class="btn user-filter" id='mynotes'>My Notes</button>
+        	<button type="button" class="btn user-filter" id='instructor'>Instructor</button>
+        	<button type="button" class="btn user-filter" id='public'>Public</button>
+        </div>
     </div>
     <div class="separator-solid side"></div>
     <div class="search-bar side">
@@ -17,9 +19,11 @@
     </div>
     <div class="filter-options side">
         <div class="search-label">Search by:</div>
-    	<button type="button" class="btn btn-default query-filter" id="users-filter">Users</button>
-    	<button type="button" class="btn btn-default query-filter" id="annotationtext-filter">Annotation Text</button>
-    	<button type="button" class="btn btn-default query-filter" id="tag-filter">Tag</button>
+    	<div class="btn-group">
+            <button type="button" class="btn btn-default query-filter" id="users-filter">Users</button>
+            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter">Annotation Text</button>
+            <button type="button" class="btn btn-default query-filter" id="tag-filter">Tag</button>
+        </div>
     </div>
     <div class="annotationsHolder side">
 		<% _.each(annotationItems, function(item) { %>

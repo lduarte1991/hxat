@@ -100,10 +100,10 @@
 				</select>\
 			</td>\
 			<td>\
-				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>\
+				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>\
 			</td>\
 			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
-			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
+			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
 			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
 		</tr>';
 		jQuery('.sortable tbody').append(html);
@@ -114,7 +114,7 @@
     var deleterow = function(link) {
     	jQuery(jQuery(link).parent().find('input')).prop('checked',true);
     	jQuery(link).parent().parent().addClass("hidden");
-    	fixOrderNumbers()
+    	fixOrderNumbers();
 		//jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value")-1);
 
     };
@@ -174,10 +174,10 @@
 					</select>
 				</td>
 				<td>
-					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 				</td>
 				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
-				<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
+				<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
 				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
 			</tr>
 			{% endif %}
@@ -193,10 +193,10 @@
 							</select>
 						</td>
 						<td>
-							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 						</td>
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
-						<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
 						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
 					</tr>
 				{% endif %}

@@ -61,5 +61,8 @@ class TargetObject(LTI_TodApi):
     
     def get_target_content_from_id(id_requested):
         return TargetObject.objects.get(pk=id_requested)
+
+    def get_target_content_as_list(self):
+        return self.target_content.split(';')
     
     

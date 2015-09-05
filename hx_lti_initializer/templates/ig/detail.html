@@ -1,0 +1,127 @@
+{% load staticfiles %}
+{% load list_of_ids %}
+<!DOCTYPE html>
+<html>
+<head>
+<script src="{% static "vendors/mirador/mirador.js" %}"></script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
+<style type="text/css">
+    body { padding: 0; margin: 0; overflow: hidden;}
+    #viewer { background: #333 url(../../../static/vendors/mirador/images/debut_dark.png) left top repeat; width: 100%; height: 100%; position: fixed; }
+  </style>
+  <script src="{% static "vendors/development/underscore.js" %}"></script>
+  <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
+  <script src="{% static "vendors/development/jstz.js" %}"></script>
+
+<script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
+<script src="{% static "AController.js" %}"></script>
+<script src="{% static "AnnotationMain.js" %}"></script>
+<script src="{% static "AnnotationStoreController.js" %}"></script>
+<script src="{% static "DashboardController.js" %}"></script>
+<script src="{% static "DashboardView.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+  </head>
+  <body>
+<div id="viewer"></div>
+<div id="dashboard"></div>
+<script>
+$(function() {
+      var mir = Mirador({
+        "id": "viewer",
+        "mainMenuSettings" : {
+           'show' : false
+        },
+        "i18nPath" : "{% static "vendors/mirador/locales/" %}",
+        "layout" : "1x1",
+        "saveSession" : false,
+        "logosLocation" : "{% static "vendors/mirador/images/logos/" %}",
+        "data": [
+        {% for i in target_object.get_target_content_as_list %}
+        { "manifestUri": "{{ i }}", "location": "Harvard University"},
+        {% endfor %}
+        ],
+        "windowObjects": [
+          {
+            "loadedManifest": "{{ objects.0 }}",
+        	  "viewType" : "ImageView",
+            {% if canvas_id %}
+              "canvasID" : "{{ canvas_id }}",
+            {% endif %}
+            "annotationLayer" : true,
+            "annotationCreation" : true,
+        	  "sidePanel" : false,
+            "fullScreen" : true,
+            "layoutOptions" : 
+             {
+             "newObject" : true,
+             "close" : false,
+             "slotRight" : false,
+             "slotLeft" : false,
+             "slotAbove" : false,
+             "slotBelow" : false
+             }
+          },
+        ],
+        "annotationEndpoint": 
+          {
+          "name":"Harvard CATCH Production",
+          "module": "CatchEndpoint",
+          "options": {
+            token: "{{ token }}",
+            // The endpoint of the store on your server.
+            prefix: "https://catch.harvardx.harvard.edu/catch/annotator",
+            userid : "{{ user_id }}",
+            username : "{{ username }}",
+            roles : "{{ roles }}",
+            collection_id : "{{ collection }}",
+            context_id : "{{ course }}",
+          }
+        }
+      });
+      
+      var options = {
+          commonInfo: {
+          mediaType: "image", // {{ media_type }}
+          context_id: "{{ course }}",
+          collection_id: "{{ collection }}",
+          object_id: {{ object }},
+          token: "{{ token }}",
+          username: "{{ username }}",
+          user_id: "{{ user_id }}",
+          is_instructor: "{{ is_instructor }}",
+          pagination: {{ assignment.pagination_limit }},
+        },
+        
+        annotationMainOptions: {
+        },
+        
+        dashboardControllerOptions: {
+          annotationElement: jQuery("#dashboard"),
+          initOptions: {
+            template_urls: '{% static "templates/dashboard/"%}',
+            showPublicPrivateSelectors: true,
+            showMediaSelector: false,
+            flags: false,
+            imageRootUrl: "{% static "vendors/catch/img"%}",
+            instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+            default_tab: "{{ assignment.default_tab }}",
+          },
+        },
+      };
+      AController(options);
+    });
+</script>
+</body>
+</html>
