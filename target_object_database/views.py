@@ -80,7 +80,7 @@ def handlePopAdd(request, addForm, field):
     else:
         form = addForm()
     pageContext = {'form': form, 'field': field, 'user':request.user}
-    return render_to_response("target_object_database/source_form.html", RequestContext(request, pageContext))
+    return render_to_response("target_object_database/test_source_form.html", RequestContext(request, pageContext))
 
 @login_required
 def newSource(request):

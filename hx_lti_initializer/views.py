@@ -274,7 +274,7 @@ def course_admin_hub(request):
     debug = files_in_courses
     return render(
         request,
-        'hx_lti_initializer/testpage2.html',
+        'hx_lti_initializer/admin_hub.html',
         {
             'user': request.user,
             'email': request.user.email,
