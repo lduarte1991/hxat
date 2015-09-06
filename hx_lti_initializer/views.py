@@ -18,7 +18,7 @@ from django.contrib import messages
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
-from hx_lti_assignment.models import Assignment
+from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
@@ -145,7 +145,8 @@ def launch_lti(request):
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
-        except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+            assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
+        except Assignment.DoesNotExist or TargetObject.DoesNotExist or AssignmentTargets.DoesNotExist:
             raise PermissionDenied()
 
         save_session(request, user_id, collection_id, object_id, course, roles)
@@ -173,6 +174,14 @@ def launch_lti(request):
             original.update({'typeSource': typeSource})
         elif (targ_obj.target_type == 'ig'):
             original.update({'osd_json': targ_obj.target_content})
+            viewtype = assignment_target.get_view_type_for_mirador()
+            canvas_id = assignment_target.get_canvas_id_for_mirador()
+
+            if viewtype != None:
+                original.update({'viewType': viewtype})
+            if canvas_id != None:
+                original.update({'canvas_id': canvas_id})
+
 
         return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
@@ -297,6 +306,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     try:
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
+        assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         raise PermissionDenied()    
 
@@ -331,6 +341,13 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         original.update({'typeSource': typeSource})
     elif (targ_obj.target_type == 'ig'):
         original.update({'osd_json': targ_obj.target_content})
+        viewtype = assignment_target.get_view_type_for_mirador()
+        canvas_id = assignment_target.get_canvas_id_for_mirador()
+
+        if viewtype != None:
+            original.update({'viewType': viewtype})
+        if canvas_id != None:
+            original.update({'canvas_id': canvas_id})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
 
