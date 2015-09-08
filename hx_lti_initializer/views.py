@@ -291,7 +291,7 @@ def edit_course(request, id):
             course.save()
             
             # save the course name to the session so it auto-populate later.
-            request.session['course_name'] = course_object.course_name
+            request.session['course_name'] = course.course_name
             
             messages.success(request, 'Course was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
