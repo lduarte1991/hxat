@@ -146,6 +146,7 @@ def launch_lti(request):
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
             assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
+            course_obj = LTICourse.objects.get(course_id=course)
         except Assignment.DoesNotExist or TargetObject.DoesNotExist or AssignmentTargets.DoesNotExist:
             raise PermissionDenied()
 
@@ -161,6 +162,7 @@ def launch_lti(request):
             'target_object': targ_obj,
             'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
             'assignment': assignment,
+            'instructions': assignment_target.target_instructions,
         }
 
         if (targ_obj.target_type == 'vd'):
@@ -182,6 +184,10 @@ def launch_lti(request):
             if canvas_id != None:
                 original.update({'canvas_id': canvas_id})
 
+        if assignment_target.target_external_css:
+            original.update({'custom_css': assignment_target.target_external_css})
+        elif course_obj.course_external_css_default:
+            original.update({'custom_css': course_obj.course_external_css_default})
 
         return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
@@ -307,6 +313,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
         assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
+        course_obj = LTICourse.objects.get(course_id=course_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         raise PermissionDenied()    
 
@@ -323,6 +330,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'instructions': assignment_target.target_instructions,
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -348,6 +356,11 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
             original.update({'viewType': viewtype})
         if canvas_id != None:
             original.update({'canvas_id': canvas_id})
+
+    if assignment_target.target_external_css:
+            original.update({'custom_css': assignment_target.target_external_css})
+    elif course_obj.course_external_css_default:
+        original.update({'custom_css': course_obj.course_external_css_default})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
 

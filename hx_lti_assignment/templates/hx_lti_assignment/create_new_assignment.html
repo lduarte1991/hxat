@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load extra_options %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -13,7 +14,10 @@
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
 <script src="{% static "vendors/development/jquery-ui.js" %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
-
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 
 	<script>
 	jQuery(document).ready(function(){
@@ -59,7 +63,7 @@
 	        		}
 	        	});
 	        	fixOrderNumbers();
-	        }
+	        },
         }).disableSelection();
         jQuery('.post-form').submit( function(e){
         	var target_object_list = []
@@ -87,7 +91,9 @@
         	var viewtype = jQuery('#' + orderNum + '-target_options_view_type').val();
         	var canvas_id = jQuery('#' + orderNum + '-target_options_canvas_id').val();
         	jQuery('#id_assignmenttargets_set-' + orderNum + '-target_external_options').val(viewtype + "," + canvas_id);
-        })
+        });
+
+
     });
 	
 	var fixOrderNumbers = function(){
@@ -109,11 +115,36 @@
 					<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>\
 			{% endfor %}\
 				</select>\
+				<div class="collapse" id="assignment-target-object-settings-'+new_item_id+'">\
+						<label for="id_assignmenttargets_set-'+new_item_id+'-target_instructions">Instructions:</label>\
+	<textarea id="id_assignmenttargets_set-'+new_item_id+'-target_instructions" name="assignmenttargets_set-'+new_item_id+'-target_instructions" class="form-control"></textarea>\
+						<label for="id_assignmenttargets_set-'+new_item_id+'-target_external_css">Assignment CSS:</label>\
+	<input id="id_assignmenttargets_set-'+new_item_id+'-target_external_css" maxlength="255" name="assignmenttargets_set-'+new_item_id+'-target_external_css" class="form-control" type="text" value="">\
+						 		<label>Mirador View Type:</label>\
+						 		<select class="selectpicker form-control mirador_option" data-counter="'+new_item_id+'" id="'+new_item_id+'-target_options_view_type">\
+						 			<option value="ImageView" selected>\
+						 			Single Image View\
+						 			</option>\
+						 			<option value="ThumbnailsView">\
+						 			Thumbnails View\
+						 			</option>\
+						 			<option value="ScrollView">\
+						 			Scroll View\
+						 			</option>\
+						 			<option value="BookView">\
+						 			Book View\
+						 			</option>\
+						 		</select>\
+						 		<label>Open to Page (Canvas ID):</label>\
+						 		<input maxlength="255" id="'+new_item_id+'-target_options_canvas_id" data-counter="'+new_item_id+'" type="text" class="mirador_option form-control" value=""></input>\
+								<textarea id="id_assignmenttargets_set-'+new_item_id+'-target_external_options" name="assignmenttargets_set-'+new_item_id+'-target_external_options" class="form-control hidden"></textarea>\
+					</div>\
 			</td>\
 			<td>\
 				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>\
 			</td>\
 			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
+			<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-'+new_item_id+'">{% bootstrap_icon "cog" %}</td>\
 			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
 			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
 		</tr>';
@@ -166,7 +197,8 @@
 			<thead>
 			<tr>
 				<td>
-				Source Material
+				<h2>Source Material</h2>
+				<p>To add an existing source, hit the green "Add Source Materials" button and use the dropdown menu to select the source you are using. If you would like to create new source material, hit the {% bootstrap_icon "plus" %}" next to the new line instead of choosing from the drop down menu. Use the {% bootstrap_icon "cog" %} to set instructions, custom CSS, and mirador settings for that item. Hit the {% bootstrap_icon "trash" %} to remove the source material from this assignment (it does <b>not</b> delete the source material. Use the {% bootstrap_icon "option-vertical" %} to reorder the source material within this assignment.</p>
 				</td>
 			</tr>
 			</thead>
@@ -183,11 +215,36 @@
 						<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
 						{% endfor %}
 					</select>
+					<div class="collapse" id="assignment-target-object-settings-0">
+						<label for="id_assignmenttargets_set-0-target_instructions">Instructions:</label> 
+	<textarea id="id_assignmenttargets_set-0-target_instructions" name="assignmenttargets_set-0-target_instructions" class="form-control"></textarea>
+						<label for="id_assignmenttargets_set-0-target_external_css">Assignment CSS:</label> 
+	<input id="id_assignmenttargets_set-0-target_external_css" maxlength="255" name="assignmenttargets_set-0-target_external_css" class="form-control" type="text" value="">
+						 		<label>Mirador View Type:</label>
+						 		<select class="selectpicker form-control mirador_option" data-counter="0" id="0-target_options_view_type">
+						 			<option value="ImageView" selected>
+						 			Single Image View
+						 			</option>
+						 			<option value="ThumbnailsView">
+						 			Thumbnails View
+						 			</option>
+						 			<option value="ScrollView">
+						 			Scroll View
+						 			</option>
+						 			<option value="BookView">
+						 			Book View
+						 			</option>
+						 		</select>
+						 		<label>Open to Page (Canvas ID):</label>
+						 		<input maxlength="255" id="0-target_options_canvas_id" data-counter="0" type="text" class="mirador_option form-control" value=""></input>
+								<textarea id="id_assignmenttargets_set-0-target_external_options" name="assignmenttargets_set-0-target_external_options" class="form-control hidden"></textarea>
+					</div>
 				</td>
 				<td>
 					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 				</td>
 				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
+				<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-0">{% bootstrap_icon "cog" %}</td>
 				<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
 				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
 			</tr>
@@ -212,21 +269,22 @@
 								 	{% if choice.target_type == "ig" %}
 								 		<label>Mirador View Type:</label>
 								 		<select class="selectpicker form-control mirador_option" data-counter="{{forloop.parentloop.counter0}}" id="{{forloop.parentloop.counter0}}-target_options_view_type">
-								 			<option value="ImageView">
+								 			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
+								 			<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
 								 			Single Image View
 								 			</option>
-								 			<option value="ThumbnaislView">
+								 			<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
 								 			Thumbnails View
 								 			</option>
-								 			<option value="ScrollView">
+								 			<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
 								 			Scroll View
 								 			</option>
-								 			<option value="BookView">
+								 			<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
 								 			Book View
 								 			</option>
 								 		</select>
-								 		<label>Open to Page (Canvas ID)</label>
-								 		<input maxlength="255" id="{{forloop.parentloop.counter0}}-target_options_canvas_id" data-counter="{{forloop.parentloop.counter0}}" type="text" class="mirador_option form-control"></input>
+								 		<label>Open to Page (Canvas ID):</label>
+								 		<input maxlength="255" id="{{forloop.parentloop.counter0}}-target_options_canvas_id" data-counter="{{forloop.parentloop.counter0}}" type="text" class="mirador_option form-control" value="{{item.target_external_options.value|just_the_canvas_id}}"></input>
 										<textarea id="id_assignmenttargets_set-{{forloop.parentloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.parentloop.counter0}}-target_external_options" class="form-control hidden">{{ item.target_external_options.value }}</textarea>
 								 	{% endif %} 
 								 {% endif %}
