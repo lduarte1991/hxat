@@ -22,6 +22,15 @@ class AssignmentTargets(models.Model):
 		blank=True,
 		help_text='(Optional) Please only input a URL to an externally hosted CSS file.'
 	)
+	target_instructions = models.TextField(
+		blank=True,
+		null=True,
+		help_text='Add instructions for this object within this particular assignment.'
+	)
+	target_external_options = models.TextField(
+		blank=True,
+		null=True,
+	)
 
 	class Meta:
 		verbose_name = "Assignment Target"
@@ -29,6 +38,24 @@ class AssignmentTargets(models.Model):
 		ordering = [
 			'order',
 		]
+
+	def get_view_type_for_mirador(self):
+		"""
+		"""
+		options = self.target_external_options.split(',')
+		if len(options) == 1:
+			return "ImageView"
+		else:
+			return options[0] if options[0] != '' else "ImageView"
+
+	def get_canvas_id_for_mirador(self):
+		"""
+		"""
+		options = self.target_external_options.split(',')
+		if len(options) == 1:
+			return None
+		else:
+			return options[1] if options[1] != '' else None
 
 class Assignment(models.Model):
 	"""

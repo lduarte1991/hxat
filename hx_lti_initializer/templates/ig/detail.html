@@ -54,8 +54,8 @@ $(function() {
         ],
         "windowObjects": [
           {
-            "loadedManifest": "{{ objects.0 }}",
-        	  "viewType" : "ImageView",
+            "loadedManifest": "{{ target_object.get_target_content_as_list.0 }}",
+        	  "viewType" : "{{ viewType }}",
             {% if canvas_id %}
               "canvasID" : "{{ canvas_id }}",
             {% endif %}

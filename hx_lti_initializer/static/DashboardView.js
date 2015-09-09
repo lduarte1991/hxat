@@ -226,8 +226,8 @@
 			var section = jQuery('.annotationSection');
 			if(self.lastUp < 150){
 				jQuery('#leftCol').attr('class', 'col-xs-11');
-				section.css('width', '0px');
-				section.css('right', -10);
+				section.css('width', '10px');
+				section.css('right', 0);
 			} else {
 				jQuery('#leftCol').attr('class', 'col-xs-7');
 				section.css('min-width', '150px');
@@ -241,6 +241,18 @@
                 self.updateDashboard(offset, pagination, annotationList, true);
 			}
 		});
+        jQuery('.handle-button').click( function(e) {
+            var section = jQuery('.annotationSection');
+            if (parseInt(self.lasUp, 10) >= 150) {
+                jQuery('#leftCol').attr('class', 'col-xs-11');
+                section.css('mind-width', '10px');
+                section.css('width', '10px');
+            } else {
+                jQuery('#leftCol').attr('class', 'col-xs-7');
+                section.css('mind-width', '150px');
+                section.css('width', '300px');
+            }
+        });
     };
 
     $.DashboardView.prototype.createDateFromISO8601 = function(string) {
@@ -374,6 +386,11 @@
             var parentId = replies[0].parent;
             jQuery('.item-' + parentId).find('.replyNum').html(replies.length);
         };
+
+        jQuery(window).resize(function(){
+            var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+            jQuery('.repliesList').css('height', replies_height);
+        });
 	};
 
 } (AController));

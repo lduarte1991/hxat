@@ -18,7 +18,7 @@ from django.contrib import messages
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse
-from hx_lti_assignment.models import Assignment
+from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
@@ -145,7 +145,9 @@ def launch_lti(request):
         try:
             assignment = Assignment.objects.get(assignment_id=collection_id)
             targ_obj = TargetObject.objects.get(pk=object_id)
-        except Assignment.DoesNotExist or TargetObject.DoesNotExist:
+            assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
+            course_obj = LTICourse.objects.get(course_id=course)
+        except Assignment.DoesNotExist or TargetObject.DoesNotExist or AssignmentTargets.DoesNotExist:
             raise PermissionDenied()
 
         save_session(request, user_id, collection_id, object_id, course, roles)
@@ -160,6 +162,7 @@ def launch_lti(request):
             'target_object': targ_obj,
             'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
             'assignment': assignment,
+            'instructions': assignment_target.target_instructions,
         }
 
         if (targ_obj.target_type == 'vd'):
@@ -173,6 +176,18 @@ def launch_lti(request):
             original.update({'typeSource': typeSource})
         elif (targ_obj.target_type == 'ig'):
             original.update({'osd_json': targ_obj.target_content})
+            viewtype = assignment_target.get_view_type_for_mirador()
+            canvas_id = assignment_target.get_canvas_id_for_mirador()
+
+            if viewtype != None:
+                original.update({'viewType': viewtype})
+            if canvas_id != None:
+                original.update({'canvas_id': canvas_id})
+
+        if assignment_target.target_external_css:
+            original.update({'custom_css': assignment_target.target_external_css})
+        elif course_obj.course_external_css_default:
+            original.update({'custom_css': course_obj.course_external_css_default})
 
         return render(request, '%s/detail.html' % targ_obj.target_type, original)
     
@@ -297,6 +312,8 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     try:
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
+        assignment_target = AssignmentTargets.objects.get(assignment=assignment, target_object=targ_obj)
+        course_obj = LTICourse.objects.get(course_id=course_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         raise PermissionDenied()    
 
@@ -313,6 +330,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'instructions': assignment_target.target_instructions,
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -331,6 +349,18 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         original.update({'typeSource': typeSource})
     elif (targ_obj.target_type == 'ig'):
         original.update({'osd_json': targ_obj.target_content})
+        viewtype = assignment_target.get_view_type_for_mirador()
+        canvas_id = assignment_target.get_canvas_id_for_mirador()
+
+        if viewtype != None:
+            original.update({'viewType': viewtype})
+        if canvas_id != None:
+            original.update({'canvas_id': canvas_id})
+
+    if assignment_target.target_external_css:
+            original.update({'custom_css': assignment_target.target_external_css})
+    elif course_obj.course_external_css_default:
+        original.update({'custom_css': course_obj.course_external_css_default})
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
 

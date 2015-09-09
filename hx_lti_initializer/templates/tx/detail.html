@@ -38,14 +38,23 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+<link rel="stylesheet" href="{% static "css/instructions.css" %}">
 <!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
+<link rel="stylesheet" href="{{ custom_css }}">
 <div class="container">
 	<div class="row">
   		<div class="col-xs-7" id="leftCol">
+  			<div class="instructions-container">
+  				<div class="instructions-title">
+  					Instructions
+  					<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
+  				</div>
+  				<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
+  			</div>
 			<h1>{{ target_object.target_title | safe }}</h1>
 			<h3>by {{ target_object.target_author | safe }}</h3>
 			<div class="content">
@@ -135,4 +144,13 @@ jQuery(function ($) {
 		}
 	});
 });
+</script>
+<script>
+	jQuery('.toggle-instructions').click(function (){
+		if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+			jQuery('.toggle-instructions').html('Expand Instructions');
+		} else {
+			jQuery('.toggle-instructions').html('Collapse Instructions');
+		}
+	});
 </script>
