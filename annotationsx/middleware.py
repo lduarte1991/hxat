@@ -31,7 +31,7 @@ class XFrameOptionsMiddleware(object):
             response['X-Frame-Options'] = "DENY"
         else :
             response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
-
+        debug_printer('DEBUG - URI: %s' % domain)
         debug_printer('DEBUG - X-Frame-Options: %s' % response['X-Frame-Options'])
 
         return response

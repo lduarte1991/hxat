@@ -27,7 +27,7 @@ def create_new_source(request):
             source.save()
 
             messages.success(request, 'Source was successfully created!')
-            return redirect('hx_lti_initializer:course_admin_hub') 
+            return redirect('hx_lti_initializer:course_admin_hub')
         else:
             debug_printer(form.errors)
     else:
@@ -56,11 +56,11 @@ def edit_source(request, id):
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
             debug_printer(form.errors)
-    else: 
+    else:
         form = SourceForm(instance=source)
     return render(
         request,
-        'target_object_database/source_form.html', 
+        'target_object_database/source_form.html',
         {
             'form': form,
             'user': request.user,
@@ -82,9 +82,9 @@ def handlePopAdd(request, addForm, field):
     else:
         form = addForm()
     pageContext = {
-        'form': form, 
-        'field': field, 
-        'user':request.user, 
+        'form': form,
+        'field': field,
+        'user':request.user,
         'creator' : request.session['creator_default'],
         'course' : request.session['course_name'],
     }

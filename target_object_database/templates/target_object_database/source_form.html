@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 {% extends 'hx_lti_initializer/base.html' %}
 {% load staticfiles %}
 {% load bootstrap3 %}
@@ -15,6 +14,7 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+
 <script>
 	jQuery(document).ready(function(){
 	    var options = {
@@ -34,8 +34,8 @@
         $('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 	});
-
 </script>
+
 <h2>Source Form</h2>
 
 	{% if form.errors %}

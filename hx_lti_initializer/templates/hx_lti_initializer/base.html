@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {# Make sure to load static files, jquery, and bootstrap select #}
+<head>
 {% load staticfiles %}
 <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
 <script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
@@ -15,9 +16,20 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
+</head>
+<body>
+    <!-- TODO: This should contain logo/name -->
+    <div class="header">
+        <div class="site-title">
+            <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">The HarvardX Annotation Tool</a>
+        </div>
+        <div class="user-greeting">Welcome, {{ user.username }}</div>
+    </div>
 
-<!-- TODO: This should contain logo/name and possibly navigation --> 
-<div class="header"></div>
+    <!-- Broken off into two sections, information on the left and content on the right -->
+    <div class="navigation">
+        <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+    </div>
 
 <!-- Broken off into two sections, information on the left and content on the right -->
 <div class="container">

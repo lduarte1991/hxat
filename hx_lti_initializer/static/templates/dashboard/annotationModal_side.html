@@ -12,12 +12,18 @@
 	    <div class="annotatedAt field side" title="<% print(date) %>">
 	        last updated <% print(jQuery.timeago(date)); %>
 	    </div>
-
-	    <div class="quote field side">
-	        <div class="quoteText"><%= quote %></div>
-	        <span class="uri" style="display:none"><%= uri %></span>
-
-	    </div>
+	    <% if (media === 'text') {%>
+        <div class="quote field side">
+            <div class="quoteText"><%= quote %></div>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    	<% } else if (media === 'image' && thumbnail) {%>
+	    <div class="zoomToImageBounds">
+	    	<img class="annotation-thumbnail" src="<%= thumbnail %>" />
+            <span class="idAnnotation" style="display:none"><%= id %></span>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+	    <% } %>
 	    
 	    <div class="body field side">
 	        <%= text %>
@@ -30,6 +36,10 @@
 			    <% if(authToDeleteButton) { %>
 			    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
 			    <% } %>
+		    </div>
+		    <div class="btn-group btn-group-xs savegroup" role="group" aria-label="save-edit" style="display: none;">
+		    <button class="btn btn-primary" id="save"><i class="glyphicon glyphicon-floppy-disk"></i> Save </button>
+		    <button class="btn btn-danger" id="cancel" ><i class="glyphicon glyphicon-remove"></i> Cancel </button>
 		    </div>
 	    <% } %>
 	</div>

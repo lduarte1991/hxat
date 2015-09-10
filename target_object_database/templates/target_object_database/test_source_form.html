@@ -1,0 +1,105 @@
+{% extends 'hx_lti_initializer/base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block content %}
+	<script src="{% static "vendors/development/summernote.js" %}"></script>
+	<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+	<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+	<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+
+	<script>
+		jQuery(document).ready(function() {
+			jQuery('#id_target_type').change(function() {
+				var value = jQuery('#id_target_type').val();
+				var options = {
+					focus: false,
+				};
+				if (value === "vd") {
+					jQuery('.ig').hide();
+					jQuery('.tx').hide();
+					jQuery('.vd').show();
+					jQuery('#id_target_content').destroy();
+				} else if (value === "tx") {
+					jQuery('.ig').hide();
+					jQuery('.vd').hide();
+					jQuery('.tx').show();
+					jQuery('#id_target_content').summernote(options);
+					jQuery('label[for="id_target_content"]').text('Source Content');
+				} else if (value === "ig") {
+					jQuery('.vd').hide();
+					jQuery('.tx').hide();
+					jQuery('.ig').show();
+					jQuery('#id_target_content').destroy();
+					jQuery('label[for="id_target_content"]').text('Mirador Manifests');
+				}
+			});
+		});
+	</script>
+
+	<h2>Annotation Source</h2>
+
+	<form method="POST" class="post-form">{% csrf_token %}
+
+		<div class="form-group">
+			<label for="id_target_type">Annotation Type</label> 
+			<select class="form-control selectpicker" data-live-search="true" id="id_target_type" name="target_type">
+				{% for id,choice in form.fields.target_type.choices %}
+				<option value="{{ id }}" {% if id == form.target_type.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+		</div>
+
+		<div class="form-group">
+			<label for="id_target_title">Source Title:</label> 
+			<input id="id_target_title" maxlength="255" name="target_title" class="form-control" type="text" value="{{ form.target_title.value }}">
+		</div>
+		<div class="form-group tx">
+			<label for="id_target_author">Source Author:</label> 
+			<input id="id_target_author" maxlength="255" name="target_author" class="form-control" type="text" value="{{ form.target_author.value }}">
+		</div>
+		<div class="form-group">
+			<label for="id_target_content">Source Content:</label> 
+			<textarea id="id_target_content" name="target_content" class="form-control">{{ form.target_content.value | safe }}</textarea>
+		</div>
+		<div class="form-group">
+			<label for="id_target_citation">Source Citation:</label> 
+			<textarea id="id_target_citation" name="target_citation" class="form-control">{{ form.target_citation.value | safe }}</textarea>
+		</div>
+
+		<div class="form-group">
+			<label for="id_target_creator">Creator</label> 
+			<select class="form-control selectpicker" data-live-search="true" id="id_target_creator" name="target_creator">
+				{% for id,choice in form.fields.target_creator.choices %}
+				<option value="{{ id }}" {% if id == form.target_creator.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+		</div>
+		<div class="form-group">
+			<label for="id_target_courses">Courses:</label> 
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_target_courses" name="target_courses">
+				{% for id,choice in form.fields.target_courses.choices %}
+				<option value="{{ id }}" {% if id in form.target_courses.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+
+			<div class="help_text">Do not deselect any courses, just make sure yours is selected</div>
+		</div>
+
+		{% buttons %}
+			<button type="submit" class="save btn btn-primary">
+			{% bootstrap_icon "star" %} Save
+			</button>
+			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save btn btn-danger">
+			{% bootstrap_icon "remove" %} Cancel
+			</a>
+		{% endbuttons %}
+	</form>
+{% endblock %}

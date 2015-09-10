@@ -5,12 +5,12 @@ elsewhere.
 import django.shortcuts
 from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
-from firebase_token_generator import create_token
 from models import *
 from django.conf import settings
 import base64
 import sys
 import datetime
+import jwt
 
 # import Sample Target Object Model
 from target_object_database.models import TargetObject
@@ -54,15 +54,20 @@ def retrieve_token(userid, apikey, secret):
     # the following five lines of code allows you to include the defaulttimezone in the iso format
     # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
 
-    dtnow = datetime.datetime.now()
-    dtutcnow = datetime.datetime.utcnow()
-    delta = dtnow - dtutcnow
-    newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
-    newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
+    def _now():
+        return datetime.datetime.utcnow().replace(tzinfo=simple_utc()).replace(microsecond=0).isoformat()
+    
+    token = jwt.encode({
+      'consumerKey': apikey,
+      'userId': userid,
+      'issuedAt': _now(),
+      'ttl': 86400
+    }, secret)
 
-    # uses the issued time (UTC plus timezone), the consumer key and the user's email to maintain a
-    # federated system in the annotation backend server
+    return token
 
-    custom_data = {"issuedAt": newtime, "consumerKey": apikey, "uid": userid, "ttl": 172800}
-    newtoken = create_token(secret, custom_data)
-    return newtoken
+class simple_utc(datetime.tzinfo):
+    def tzname(self):
+        return "UTC"
+    def utcoffset(self, dt):
+        return datetime.timedelta(0)

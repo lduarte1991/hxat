@@ -1,0 +1,111 @@
+{% extends 'hx_lti_initializer/base.html' %}
+
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block content %}
+<script>
+    jQuery(document).ready(function(){
+        jQuery('#assignments .clickable').click(function(event){
+            $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+        });
+    });
+    var printHelp = function(course_id, collection_id, object_id){
+        var el = '#copypaste-' + course_id;
+        jQuery(el).html("\
+            <p>\
+                In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
+            </p>\
+            <input style='width:100%' type=\"text\" value=\"collection_id="+collection_id+"\">\
+            </input><br/>\
+            <input style='width:100%' type=\"text\" value=\"object_id="+object_id+"\">\
+            </input>\
+        ");
+        jQuery(el).addClass('copypaste');
+        jQuery(el).find('input').first().select();
+    
+    }
+</script>
+<div class="section-header">
+    Courses
+</div>
+{% for course in courses %}
+<div class="course-name">
+    {{ course.course_name }}
+</div>
+{% if 'Administrator' in roles or 'Instructor' in roles %}
+<a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}">Change Course Settings</a>
+{% endif %}
+<div id="copypaste-{{course.id}}"></div>
+<table class="table table-striped" id="assignments">
+    <tbody>
+        {% for assignment in course.assignment_set.all %}
+        <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
+            <td>
+                {% if 'Administrator' in roles or 'Instructor' in roles %}
+                <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
+                {% endif %}
+                {{ assignment.assignment_name }}
+                <span class="expandicon glyphicon glyphicon-chevron-down"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            	<div class="assignment-table-row collapse" id="target-objects-{{ assignment.id }}">
+	                <table class="table table-striped" >
+	                    <thead>
+	                        <tr>
+	                            <th>
+	                                Title
+	                            </th>
+	                            <th>
+	                                Author
+	                            </th>
+	                            <th>
+	                                Date Created
+	                            </th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        {% load order_by %}
+	                        {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
+	                        <tr>
+	                            <td>
+	                                {% if 'Administrator' in roles or 'Instructor' in roles %}
+	                                <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
+	                                {% endif %}
+	                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
+	                                (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
+	                            </td>
+	                            <td>
+	                                {{ file.target_author }}
+	                            </td>
+	                            <td title="{{ file.target_created }}">
+	                                {{ file.target_created | timesince }} ago
+	                            </td>
+	                        </tr>
+	                        {% endfor %}
+	                    </tbody>
+	                </table>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td style="text-align:center;">
+                <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" class="btn btn-primary" role="button">
+                {% bootstrap_icon "star" %} Create New Assignment
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endfor %}
+
+{% endblock %}
