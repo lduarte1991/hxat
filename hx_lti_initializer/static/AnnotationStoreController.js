@@ -557,6 +557,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		username: setOptions.username,
 		text: setOptions.text,
 		tag: setOptions.tag,
+		uri: self.endpoint.uri,
 	};
 
 	var onSuccess = function(data){
