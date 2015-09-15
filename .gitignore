@@ -9,3 +9,4 @@ include
 htmlcov
 secure.py
 http_static
+production.py

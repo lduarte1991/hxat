@@ -10,5 +10,6 @@ urlpatterns = patterns('',
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_initializer")),
     url(r'^lti_init/launch_lti/assignment/', include('hx_lti_assignment.urls', namespace="hx_lti_assignment")),
     url(r'^lti_init/launch_lti/', include('target_object_database.urls', namespace="target_object_database")),
-    url(r'^accounts/profile/', TemplateView.as_view(template_name='index.html')) 
+    url(r'^accounts/profile/', TemplateView.as_view(template_name='index.html')),
+    url(r'500/', TemplateView.as_view(template_name="500.html")),
 )
