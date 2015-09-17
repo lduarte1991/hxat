@@ -527,6 +527,7 @@ MiradorEndpointController.prototype.loadRepliesForParentAnnotation = function(an
 	var newLoadFromSearch = {
 		parentid: anId,
 		media: "comment",
+		uri: self.endpoint.uri,
 	};
 
 	var onSuccess = function(data) {

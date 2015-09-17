@@ -232,6 +232,8 @@
 				jQuery('#leftCol').attr('class', 'col-xs-7');
 				section.css('min-width', '150px');
 			}
+            jQuery('.test').css('width', section.offset().left);
+            window.dispatchEvent(new Event('resize'));
 		});
 		jQuery('.annotationSection').scroll(function() {
 			if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
@@ -245,14 +247,37 @@
             var section = jQuery('.annotationSection');
             if (parseInt(self.lasUp, 10) >= 150) {
                 jQuery('#leftCol').attr('class', 'col-xs-11');
-                section.css('mind-width', '10px');
+                section.css('min-width', '10px');
                 section.css('width', '10px');
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
-                section.css('mind-width', '150px');
+                section.css('min-width', '150px');
                 section.css('width', '300px');
             }
+            jQuery('.test').css('width', section.offset().left);
+            window.dispatchEvent(new Event('resize'));
         });
+        jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
+        window.dispatchEvent(new Event('resize'));
+        if (typeof jQuery.subscirbe === 'function') {
+            jQuery.subscribe('windowUpdated', function(){
+                console.log("windowUpdated");
+                var viewType = self.initOptions.endpoint.window.currentFocus;
+                var section = jQuery('.annotationSection');
+
+                if (viewType === "ImageView") {
+                    jQuery('#leftCol').attr('class', 'col-xs-7');
+                    section.css('min-width', '150px');
+                    section.css('width', '300px');
+                } else {
+                    section.css('min-width', '10px');
+                    section.css('width', '10px');
+                }
+                jQuery('.test').css('width', section.offset().left);
+                window.dispatchEvent(new Event('resize'));
+            });
+        };
+        
     };
 
     $.DashboardView.prototype.createDateFromISO8601 = function(string) {

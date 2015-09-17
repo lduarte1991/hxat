@@ -19,19 +19,23 @@
 </head>
 <body>
     <!-- TODO: This should contain logo/name --> 
-    <div class="header">
+    <header class="header" role="banner">
         <div class="site-title">
             <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">The HarvardX Annotation Tool</a>
         </div>
         <div class="user-greeting">Welcome, {{ user.username }}</div>
-    </div>
+    </header>
 
     <!-- Broken off into two sections, information on the left and content on the right -->
-    <div class="navigation">
+    <nav class="navigation" role="navigation" aria-label="Main Menu">
         <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
-    </div>
+    </nav>
 
-    <div class="container">
+    <main class="container" role="main">
 	    {% block content %}{% endblock %}	
-    </div>
+    </main>
+
+    <footer role="contentinfo">
+        <p style="text-align:center;">&copy; 2015 HarvardX</p>
+    </footer>
 </body>
