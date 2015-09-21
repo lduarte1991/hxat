@@ -139,15 +139,14 @@
         
         var authorized = this.initOptions.endpoint.authorize('delete', annotation);
         var updateAuthorized = this.initOptions.endpoint.authorize('update', annotation);
-        
-        item.authToDeleteButton = authorized;
-        item.authToEditButton = updateAuthorized;
-        item.authorized = authorized || updateAuthorized;
+        var is_instructor = this.initOptions.controller.initOptions.is_instructor === "True";
+        item.authToDeleteButton = authorized || is_instructor;
+        item.authToEditButton = updateAuthorized || is_instructor;
+        item.authorized = authorized || updateAuthorized || is_instructor;
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
         }
-        
         return item;
     };
 
@@ -261,7 +260,6 @@
         window.dispatchEvent(new Event('resize'));
         if (typeof jQuery.subscribe === 'function') {
             jQuery.subscribe('windowUpdated', function(){
-                console.log("windowUpdated");
                 var viewType = self.initOptions.endpoint.window.currentFocus;
                 var section = jQuery('.annotationSection');
 
@@ -379,7 +377,6 @@
     			self.initOptions.endpoint.editAnnotation(annotation, jQuery(e.target));
     		};
     	});
-        console.log(self);
 		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
 			title: "Would you like to delete your annotation?",
             placement: 'left',
