@@ -159,6 +159,7 @@ def launch_lti(request):
             'collection': collection_id,
             'course': course,
             'object': object_id,
+            'roles': roles,
             'target_object': targ_obj,
             'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
             'assignment': assignment,
@@ -330,6 +331,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'roles': roles,
         'instructions': assignment_target.target_instructions,
     }
     if not assignment.object_before(object_id) is None:

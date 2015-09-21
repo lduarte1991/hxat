@@ -9,6 +9,8 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
+{% block title %} Admin Hub {% endblock %}
+
 {% block content %}
 <script>
     jQuery(document).ready(function(){
@@ -43,10 +45,10 @@
 <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}">Change Course Settings</a>
 {% endif %}
 <div id="copypaste-{{course.id}}"></div>
-<table class="table table-striped" id="assignments">
+<table class="table table-striped" id="assignments" role="grid">
     <tbody>
         {% for assignment in course.assignment_set.all %}
-        <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
+        <tr role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
             <td>
                 {% if 'Administrator' in roles or 'Instructor' in roles %}
                 <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
@@ -55,9 +57,9 @@
                 <span class="expandicon glyphicon glyphicon-chevron-down"></span>
             </td>
         </tr>
-        <tr>
+        <tr role="row">
             <td>
-            	<div class="assignment-table-row collapse" id="target-objects-{{ assignment.id }}">
+            	<div class="assignment-table-row collapse" id="target-objects-{{ assignment.id }}" role="gridcell">
 	                <table class="table table-striped" >
 	                    <thead>
 	                        <tr>

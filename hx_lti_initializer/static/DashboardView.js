@@ -245,7 +245,7 @@
 		});
         jQuery('.handle-button').click( function(e) {
             var section = jQuery('.annotationSection');
-            if (parseInt(self.lasUp, 10) >= 150) {
+            if (parseInt(section.css, 10) >= 150) {
                 jQuery('#leftCol').attr('class', 'col-xs-11');
                 section.css('min-width', '10px');
                 section.css('width', '10px');
@@ -259,7 +259,7 @@
         });
         jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         window.dispatchEvent(new Event('resize'));
-        if (typeof jQuery.subscirbe === 'function') {
+        if (typeof jQuery.subscribe === 'function') {
             jQuery.subscribe('windowUpdated', function(){
                 console.log("windowUpdated");
                 var viewType = self.initOptions.endpoint.window.currentFocus;
@@ -277,6 +277,9 @@
                 window.dispatchEvent(new Event('resize'));
             });
         };
+        jQuery(window).resize(function() {
+            jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
+        })
         
     };
 
