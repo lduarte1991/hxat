@@ -61,7 +61,6 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
   		<div class="col-xs-7" id="leftCol">
-        <h1>{{ target_object.target_title | escape }}</h1>
         <div class="instructions-container" style="display:{% if instructions %}block{% else %}none{% endif %};">
     			<div class="instructions-title">
     				Instructions
@@ -69,7 +68,7 @@
     			</div>
     			<div class="instructions-body collapse in" aria-expanded="true">{{ instructions | escape | linebreaks }}</div>
     		</div>
-      <h1>{{ target_object.target_title | escape | linebreaks }}</h1>
+        <h1>{{ target_object.target_title | escape }}</h1>
 			<h3>by {{ target_object.target_author | escape | linebreaks }}</h3>
 			<div class="content">
 			{{ target_object.target_content | safe }}
