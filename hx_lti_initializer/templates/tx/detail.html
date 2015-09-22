@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+<link rel="stylesheet" href="{% static "css/instructions.css" %}">
 <!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
@@ -60,8 +61,16 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
   		<div class="col-xs-7" id="leftCol">
-			<h1>{{ target_object.target_title | safe }}</h1>
-			<h3>by {{ target_object.target_author | safe }}</h3>
+        <h1>{{ target_object.target_title | escape }}</h1>
+        <div class="instructions-container" style="display:{% if instructions %}block{% else %}none{% endif %};">
+    			<div class="instructions-title">
+    				Instructions
+    				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
+    			</div>
+    			<div class="instructions-body collapse in" aria-expanded="true">{{ instructions | escape | linebreaks }}</div>
+    		</div>
+      <h1>{{ target_object.target_title | escape | linebreaks }}</h1>
+			<h3>by {{ target_object.target_author | escape | linebreaks }}</h3>
 			<div class="content">
 			{{ target_object.target_content | safe }}
 			</div>
@@ -149,4 +158,13 @@ jQuery(function ($) {
 		}
 	});
 });
+</script>
+<script>
+	jQuery('.toggle-instructions').click(function (){
+		if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+			jQuery('.toggle-instructions').html('Expand Instructions');
+		} else {
+			jQuery('.toggle-instructions').html('Collapse Instructions');
+		}
+	});
 </script>
