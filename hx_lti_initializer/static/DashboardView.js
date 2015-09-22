@@ -127,6 +127,7 @@
         if (updateStore) {
             self.initOptions.endpoint.loadMoreAnnotations(offsetList);
         };
+        jQuery('img').unveil();
     };
 
     $.DashboardView.prototype.formatAnnotation = function(annotation) {
