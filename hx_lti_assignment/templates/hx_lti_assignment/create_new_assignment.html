@@ -93,7 +93,10 @@
         	jQuery('#id_assignmenttargets_set-' + orderNum + '-target_external_options').val(viewtype + "," + canvas_id);
         });
 
-
+				// prevents the jumping to top you get from blank local links
+				$('a[href="#"]').click(function(event){
+					event.preventDefault();
+				});
     });
 
 	var fixOrderNumbers = function(){
@@ -127,9 +130,14 @@
 				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>\
 			</td>\
 			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
-			<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-'+new_item_id+'">{% bootstrap_icon "cog" %}</td>\
-			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
-			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
+			<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}">\
+				<a href="#" class="add-another" title="Open Instructions">{% bootstrap_icon "cog" %}</a>\
+			</td>\
+			<td class="field-delete"><a href="#" onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>\
+			<td class="field-reorder">\
+				<a href="#" class="add-another" title="Reorder">{% bootstrap_icon "option-vertical" %}</a>\
+				<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value="{{item.id.value}}">\
+			</td>\
 		</tr>';
 		jQuery('.sortable tbody').append(html);
 		jQuery('.selectpicker').selectpicker();
@@ -166,6 +174,14 @@
     		padding-bottom: 10px;
     		padding-left: 10px;
     	}
+
+			.normal {
+				/*
+				padding: 0;
+				*/
+				font-weight: normal;
+			}
+
     </style>
 	<h2>Assignment Form</h2>
 	{% if debug %}
@@ -176,7 +192,7 @@
 		{{ form.management_form }}
 		{% crispy form %}
 
-		<table class="sortable">
+		<table class="table table-striped sortable">
 			<thead>
 			<tr>
 				<td>
@@ -210,14 +226,19 @@
 					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 				</td>
 				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
-				<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-0">{% bootstrap_icon "cog" %}</td>
-				<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
-				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
+				<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}">
+					<a href="#" class="add-another" title="Open Instructions">{% bootstrap_icon "cog" %}</a>
+				</td>
+				<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+				<td class="field-reorder">
+					<a href="#" class="add-another" title="Reorder">{% bootstrap_icon "option-vertical" %}</a>
+					<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
+				</td>
 			</tr>
 			{% endif %}
 			{% for item in targets_form %}
 				{% if forloop.counter0 < number_of_targets %}
-					<tr id="{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
+					<tr id="{{forloop.counter}}" class="assignment-targets-table-row">
 
 						<td class="field-target_object" >
 							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
@@ -226,10 +247,14 @@
 								{% endfor %}
 							</select>
 							<div class="collapse" id="assignment-target-object-settings-{{forloop.counter0}}">
-								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions">Instructions:</label>
-			<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions" name="assignmenttargets_set-{{forloop.counter0}}-target_instructions" class="form-control">{{ item.target_instructions.value }}</textarea>
-								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label>
-			<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
+								<div class="form-group">
+									<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions">Instructions:</label>
+									<textarea class="form-control" id="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions" name="assignmenttargets_set-{{forloop.counter0}}-target_instructions" class="form-control">{{ item.target_instructions.value }}</textarea>
+								</div>
+								<div class="form-group">
+									<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label>
+									<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
+								</div>
 								{% for choice in form.fields.assignment_objects.queryset %}
 								 {% if choice.id == item.target_object.value %}
 								 	{% if choice.target_type == "ig" %}
@@ -261,9 +286,14 @@
 							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 						</td>
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
-						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}">{% bootstrap_icon "cog" %}</td>
+						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}">
+							<a href="#" class="add-another" title="Open Instructions">{% bootstrap_icon "cog" %}</a>
+						</td>
 						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
-						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
+						<td class="field-reorder">
+							<a href="#" class="add-another" title="Reorder">{% bootstrap_icon "option-vertical" %}</a>
+							<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
+						</td>
 					</tr>
 				{% endif %}
 			{% endfor %}
