@@ -1,0 +1,28 @@
+.instructions-container {
+	background-color: #EDEDED;
+	position: relative;
+    padding: .5em 1em;
+    border: 1px solid #c8c8c8;
+    border-radius: 0.5em;
+    margin-bottom: 0.5em;
+    margin-top: 1.5em;
+}
+
+.toggle-instructions {
+	font-weight: normal;
+	position: absolute;
+    right: 0;
+    margin: 2px 1em 2px 0;
+    color: darkblue;
+    cursor: pointer;
+}
+
+.instructions-title {
+	font-weight: bold;
+}
+
+.instructions-body {
+	border-top: 1px solid #c8c8c8;
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+}
