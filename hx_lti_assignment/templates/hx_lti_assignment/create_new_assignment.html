@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load extra_options %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -13,40 +14,32 @@
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
 <script src="{% static "vendors/development/jquery-ui.js" %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+
 	<script>
 	jQuery(document).ready(function(){
-		/*if (jQuery('#id_allow_highlights').val()){
-			jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
-		}*/
-		// TODO: until the lack of tags no longer breaks the sidebar functionality,
-		// we cannot allow them to go unused. Right now we set them to 'on' and hide from the front end.
-		jQuery('#id_allow_highlights').prop('checked', true);
-		jQuery('#id_allow_highlights').parent().hide();
-		jQuery('#id_highlights_options').attr("placeholder", "(Example) instructor:red");
-		jQuery('#id_highlights_options').parent().append('<div class="help-block">(Warning - This functionality is still in the works: tagging is operational, but colors aren\'t yet)</div>');
-
-		
-		// TODO: hidden because it doesn't seem to be working
-		jQuery('#id_include_instructor_tab').parent().hide();
-		
-		// TODO: hidden because it doesn't seem to have any effect
-		jQuery('#div_id_default_tab').hide();
-
-		jQuery('#div_id_pagination_limit').hide();
-		jQuery('#annotation-table-settings').append('<div class="help-block">These aren\'t the settings you\'re looking for</div><br/>');
-
-		if (jQuery('#id_include_instructor_tab').val()){
+		if (jQuery('#id_allow_highlights').is(':checked')){
+			jQuery('#id_highlights_options').parent().parent().show();
+		} else {
+			jQuery('#id_highlights_options').parent().parent().hide();
+		}
+		if (jQuery('#id_include_instructor_tab').is(':checked')){
 			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
 		}
 		jQuery('#id_include_instructor_tab').change(function(event){
 			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
-			jQuery('#id_default_tab').selectpicker('refresh');            
+			jQuery('#id_default_tab').selectpicker('refresh');
         });
         jQuery('#id_allow_highlights').change(function(event){
-        	jQuery('#id_highlights_options').parent().parent().toggleClass('hidden');
-            if (jQuery('#id_highlights_options').parent().parent().hasClass('hidden')) {
-            	jQuery('#id_highlights_options').val("");	
-            }
+        	if (jQuery('#id_allow_highlights').is(':checked')){
+				jQuery('#id_highlights_options').parent().parent().show();
+			} else {
+				jQuery('#id_highlights_options').parent().parent().hide();
+				jQuery('#id_highlights_options').val("");
+			}
         });
         var rows = jQuery('.sortable tbody').find('tr');
     	var total_forms = rows.length;
@@ -61,7 +54,7 @@
         	helper: fixHelper,
         	stop: function(event, ui){
 	        	var arr = jQuery('.sortable tbody').sortable('toArray');
-	        	var count = 1;
+	        	count = 1;
 	        	jQuery(arr).each(function(index){
 	        		var item = '#' + arr[index];
 	        		//jQuery(item).find(".field-order > input").attr("value", count);
@@ -70,22 +63,14 @@
 	        		}
 	        	});
 	        	fixOrderNumbers();
-	        }
+	        },
         }).disableSelection();
-        jQuery('.post-form').submit(function(e){
-        	
-        	// We don't need validation if we're deleting.
-        	if (e.target.id == "delete_assignment") {
-        		return true
-        	}
-        	
+        jQuery('.post-form').submit( function(e){
         	var target_object_list = []
-        	var items = jQuery('.field-target_object');
-        	var should_quit = false;
-        	
-        	// make sure the user didn't repeat the same source material in the same assignment
+        	items = jQuery('.field-target_object');
+        	should_quit = false;
         	items.each(function(index){
-        		var name = jQuery(items[index]).find('div > button > span:visible').text();
+        		name = jQuery(items[index]).find('div > button > span:visible').text();
         		if (jQuery.inArray(name, target_object_list) !== -1) {
         			jQuery('.sortable').css('outline', 'red 2px solid');
         			jQuery('.sortable').css('outline-offset', '5px');
@@ -95,33 +80,22 @@
         			target_object_list.push(name);
         		}
         	});
-
-			// Make sure the user selected a target object
-        	if (target_object_list.indexOf("") !== -1 || target_object_list.indexOf("Nothing selected") !== -1) {
-        		if (target_object_list.length == 1) {
-	        		console.log("User failed to select a target object")
-	        		if (!jQuery('#targetObjectWarningLabel').length) {
-	        			jQuery('.sortable').css('outline', 'red 2px solid');
-	        			jQuery('.sortable').css('outline-offset', '5px');
-	        			jQuery('.sortable').prepend('<p id="targetObjectWarningLabel" style="color:red; font-size: 10pt;">Please select source material</p>');
-	        		}
-	        		// Form is no bueno
-					return false
-	        			
-        		}
+        	if(should_quit){
+        		return false;
         	}
-        	return !should_quit
+        	return true;
         });
-        
-        // Get name of course
-        var courseName = "{{ course_name | safe }}";
-        // Get value of option matching the current course
-        var value = $('#id_course option').filter(function () { return $(this).html() == courseName;}).val();
-        // Set current course as default in course selector
-        $('select[name=course]').val(value);
-		$('.selectpicker').selectpicker('refresh');
+
+        jQuery('.mirador_option').change(function (e){
+        	var orderNum = jQuery(e.target).attr('data-counter')
+        	var viewtype = jQuery('#' + orderNum + '-target_options_view_type').val();
+        	var canvas_id = jQuery('#' + orderNum + '-target_options_canvas_id').val();
+        	jQuery('#id_assignmenttargets_set-' + orderNum + '-target_external_options').val(viewtype + "," + canvas_id);
+        });
+
+
     });
-	
+
 	var fixOrderNumbers = function(){
 		var list_of_rows = jQuery('.sortable tbody').find('tr:visible');
 		jQuery(list_of_rows).each(function(index){
@@ -141,12 +115,37 @@
 					<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>\
 			{% endfor %}\
 				</select>\
+				<div class="collapse" id="assignment-target-object-settings-'+new_item_id+'">\
+						<label for="id_assignmenttargets_set-'+new_item_id+'-target_instructions">Instructions:</label>\
+	<textarea id="id_assignmenttargets_set-'+new_item_id+'-target_instructions" name="assignmenttargets_set-'+new_item_id+'-target_instructions" class="form-control"></textarea>\
+						<label for="id_assignmenttargets_set-'+new_item_id+'-target_external_css">Assignment CSS:</label>\
+	<input id="id_assignmenttargets_set-'+new_item_id+'-target_external_css" maxlength="255" name="assignmenttargets_set-'+new_item_id+'-target_external_css" class="form-control" type="text" value="">\
+				 		<label>Mirador View Type:</label>\
+				 		<select class="selectpicker form-control mirador_option" data-counter="'+new_item_id+'" id="'+new_item_id+'-target_options_view_type">\
+				 			<option value="ImageView" selected>\
+				 			Single Image View\
+				 			</option>\
+				 			<option value="ThumbnailsView">\
+				 			Thumbnails View\
+				 			</option>\
+				 			<option value="ScrollView">\
+				 			Scroll View\
+				 			</option>\
+				 			<option value="BookView">\
+				 			Book View\
+				 			</option>\
+				 		</select>\
+				 		<label>Open to Page (Canvas ID):</label>\
+				 		<input maxlength="255" id="'+new_item_id+'-target_options_canvas_id" data-counter="'+new_item_id+'" type="text" class="mirador_option form-control" value=""></input>\
+						<textarea id="id_assignmenttargets_set-'+new_item_id+'-target_external_options" name="assignmenttargets_set-'+new_item_id+'-target_external_options" class="form-control hidden"></textarea>\
+					</div>\
 			</td>\
 			<td>\
-				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>\
+				<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-'+new_item_id+'-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>\
 			</td>\
 			<td class="field-order hidden"><input id="id_assignmenttargets_set-'+new_item_id+'-order" name="assignmenttargets_set-'+new_item_id+'-order" value='+order+'></td>\
-			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
+			<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-'+new_item_id+'">{% bootstrap_icon "cog" %}</td>\
+			<td class="field-delete"><a href=\'#\' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" /></td>\
 			<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>\
 		</tr>';
 		jQuery('.sortable tbody').append(html);
@@ -157,10 +156,10 @@
     var deleterow = function(link) {
     	jQuery(jQuery(link).parent().find('input')).prop('checked',true);
     	jQuery(link).parent().parent().addClass("hidden");
-    	fixOrderNumbers()
-		//jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value", jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr("value")-1);
-
+    	fixOrderNumbers();
     };
+
+
     </script>
     <style>
     	.sortable{
@@ -184,14 +183,10 @@
     		padding-bottom: 10px;
     		padding-left: 10px;
     	}
-		
-		.tab-pane a { 
-    		outline: none;
-		}
     </style>
 	<h2>Assignment Form</h2>
 	{% if debug %}
-		<!--<pre>{{debug}}</pre>-->
+		<pre>{{debug}}</pre>
 	{% endif %}
 	<form method="POST" class="post-form">{% csrf_token %}
 		{% load crispy_forms_tags %}
@@ -202,7 +197,8 @@
 			<thead>
 			<tr>
 				<td>
-				Source Material
+				<h2>Source Material</h2>
+				<p>To add an existing source, hit the green "Add Source Materials" button and use the dropdown menu to select the source you are using. If you would like to create new source material, hit the {% bootstrap_icon "plus" %}" next to the new line instead of choosing from the drop down menu. Use the {% bootstrap_icon "cog" %} to set instructions, custom CSS, and mirador settings for that item. Hit the {% bootstrap_icon "trash" %} to remove the source material from this assignment (it does <b>not</b> delete the source material. Use the {% bootstrap_icon "option-vertical" %} to reorder the source material within this assignment.</p>
 				</td>
 			</tr>
 			</thead>
@@ -212,38 +208,95 @@
 			{%endfor%}
 			{% if number_of_targets == 0 %}
 			<tr id="1" class="ui-state-default assignment-targets-table-row">
-				
+
 				<td class="field-target_object" >
 					<select id="id_assignmenttargets_set-0-target_object" name="assignmenttargets_set-0-target_object" class="selectpicker form-control" data-live-search="true">
 						{% for id,choice in form.fields.assignment_objects.choices %}
 						<option value="{{ id }}" {% if id in form.assignment_objects.value %} selected {% endif %}>{{ choice }}</option>
 						{% endfor %}
 					</select>
+					<div class="collapse" id="assignment-target-object-settings-0">
+						<label for="id_assignmenttargets_set-0-target_instructions">Instructions:</label>
+	<textarea id="id_assignmenttargets_set-0-target_instructions" name="assignmenttargets_set-0-target_instructions" class="form-control"></textarea>
+						<label for="id_assignmenttargets_set-0-target_external_css">Assignment CSS:</label>
+	<input id="id_assignmenttargets_set-0-target_external_css" maxlength="255" name="assignmenttargets_set-0-target_external_css" class="form-control" type="text" value="">
+				 		<label>Mirador View Type:</label>
+				 		<select class="selectpicker form-control mirador_option" data-counter="0" id="0-target_options_view_type">
+				 			<option value="ImageView" selected>
+				 			Single Image View
+				 			</option>
+				 			<option value="ThumbnailsView">
+				 			Thumbnails View
+				 			</option>
+				 			<option value="ScrollView">
+				 			Scroll View
+				 			</option>
+				 			<option value="BookView">
+				 			Book View
+				 			</option>
+				 		</select>
+				 		<label>Open to Page (Canvas ID):</label>
+				 		<input maxlength="255" id="0-target_options_canvas_id" data-counter="0" type="text" class="mirador_option form-control" value=""></input>
+						<textarea id="id_assignmenttargets_set-0-target_external_options" name="assignmenttargets_set-0-target_external_options" class="form-control hidden"></textarea>
+					</div>
 				</td>
 				<td>
-					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+					<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-0-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 				</td>
 				<td class="field-order hidden"><input id="id_assignmenttargets_set-0-order" name="assignmenttargets_set-0-order" value='1'></td>
-				<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
+				<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-0">{% bootstrap_icon "cog" %}</td>
+				<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a><input class="hidden" id="id_assignmenttargets_set-0-DELETE" name="assignmenttargets_set-0-DELETE" type="checkbox" /></td>
 				<td class="field-reorder">{% bootstrap_icon "option-vertical" %}</td>
 			</tr>
 			{% endif %}
 			{% for item in targets_form %}
 				{% if forloop.counter0 < number_of_targets %}
 					<tr id="{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
-				
+
 						<td class="field-target_object" >
 							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
 								{% for id,choice in form.fields.assignment_objects.choices %}
-									<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
-						{% endfor %}
+								<option value="{{ id }}" {% if id == item.target_object.value %} selected {% endif %}>{{ choice }}</option>
+								{% endfor %}
 							</select>
+							<div class="collapse" id="assignment-target-object-settings-{{forloop.counter0}}">
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions">Instructions:</label>
+			<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions" name="assignmenttargets_set-{{forloop.counter0}}-target_instructions" class="form-control">{{ item.target_instructions.value }}</textarea>
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label>
+			<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
+								{% for choice in form.fields.assignment_objects.queryset %}
+								 {% if choice.id == item.target_object.value %}
+								 	{% if choice.target_type == "ig" %}
+								 		<label>Mirador View Type:</label>
+								 		<select class="selectpicker form-control mirador_option" data-counter="{{forloop.parentloop.counter0}}" id="{{forloop.parentloop.counter0}}-target_options_view_type">
+								 			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
+								 			<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
+								 			Single Image View
+								 			</option>
+								 			<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
+								 			Thumbnails View
+								 			</option>
+								 			<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
+								 			Scroll View
+								 			</option>
+								 			<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
+								 			Book View
+								 			</option>
+								 		</select>
+								 		<label>Open to Page (Canvas ID):</label>
+								 		<input maxlength="255" id="{{forloop.parentloop.counter0}}-target_options_canvas_id" data-counter="{{forloop.parentloop.counter0}}" type="text" class="mirador_option form-control" value="{{item.target_external_options.value|just_the_canvas_id}}"></input>
+										<textarea id="id_assignmenttargets_set-{{forloop.parentloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.parentloop.counter0}}-target_external_options" class="form-control hidden">{{ item.target_external_options.value }}</textarea>
+								 	{% endif %}
+								 {% endif %}
+								{% endfor %}
+							</div>
 						</td>
 						<td>
-							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);">{% bootstrap_icon "plus" %}</a>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 						</td>
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
-						<td class="field-delete"><a href='#' onclick="deleterow(this)">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}">{% bootstrap_icon "cog" %}</td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
 						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
 					</tr>
 				{% endif %}
@@ -261,7 +314,7 @@
 			</tr>
 			</tfoot>
 		</table>
-		
+
 		{% buttons %}
 		<button type="submit" class="save btn btn-primary">
 		{% bootstrap_icon "star" %} Save
@@ -272,15 +325,4 @@
 		{% endbuttons %}
 
 	</form>
-	
-	{% if assignment_id %}
-	<!--Assignment Deletion-->
-	<form id="delete_assignment" onsubmit="return confirm('Are you sure you want to delete this assignment?');" method="POST" action="{% url 'hx_lti_initializer:delete_assignment' %}" class="post-form">
-		{% csrf_token %}
-		<input type="hidden" name="assignment_id" value="{{ assignment_id }}"></input>
-		<button type="submit" id="confirm-delete" class="save btn btn-danger" style="float: left">
-			{% bootstrap_icon "trash" %} Delete Assignment &nbsp
-		</button>
-	</form>
-	{% endif %}
 {% endblock %}
