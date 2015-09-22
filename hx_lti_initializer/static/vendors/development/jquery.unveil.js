@@ -43,7 +43,7 @@
     $w.on("scroll.unveil resize.unveil lookup.unveil", unveil);
     $dash.on("scroll.unveil resize.unveil lookup.unveil", unveil);
 
-    unveil();
+    setTimeout(unveil, 500);
 
     return this;
 
