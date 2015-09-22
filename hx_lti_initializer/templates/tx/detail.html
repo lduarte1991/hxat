@@ -61,7 +61,7 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
   		<div class="col-xs-7" id="leftCol">
-        <div class="instructions-container">
+        <div class="instructions-container" style="display:{% if instructions %}block{% else %}none{% endif %};">
     			<div class="instructions-title">
     				Instructions
     				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
