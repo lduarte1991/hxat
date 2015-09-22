@@ -66,12 +66,12 @@
     				Instructions
     				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
     			</div>
-    			<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
+    			<div class="instructions-body collapse in" aria-expanded="true">{{instructions | escape | linebreaks}}</div>
     		</div>
-      <h1>{{ target_object.target_title | safe }}</h1>
-			<h3>by {{ target_object.target_author | safe }}</h3>
+      <h1>{{ target_object.target_title | escape | linebreaks }}</h1>
+			<h3>by {{ target_object.target_author | escape | linebreaks }}</h3>
 			<div class="content">
-			{{ target_object.target_content | safe }}
+			{{ target_object.target_content | escape | linebreaks }}
 			</div>
 			<div class="citation" style="margin-top:20px;">
 			<i>{{ target_object.target_citation }}</i>
