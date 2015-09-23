@@ -14,7 +14,7 @@
         </div>
     <% } else if (media === 'image' && thumbnail) {%>
         <div class="zoomToImageBounds">
-            <img class="annotation-thumbnail" src="<%= thumbnail %>" />
+            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';"/>
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>

@@ -75,7 +75,7 @@
 }
 
 .section-header{
-    color: #999999;
+    color: #767676;
     text-transform: uppercase;
     font-family: "arial", sans-serif;
     font-size: 16px;
@@ -196,4 +196,25 @@ li {
 
 .container table#assignments {
     margin-top: 30px;
+}
+
+td a:not([role="button"]){
+    color: #005d94!important;
+}
+
+footer {
+    position : absolute;
+    bottom : 0;
+    height : 40px;
+    margin-top : 40px;
+    text-align: center;
+    width:100%;
+}
+
+.btn-danger {
+    color: #b31200!important;
+}
+
+.btn-default {
+    color: #005d94!important;
 }

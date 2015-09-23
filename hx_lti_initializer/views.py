@@ -159,6 +159,7 @@ def launch_lti(request):
             'collection': collection_id,
             'course': course,
             'object': object_id,
+            'roles': roles,
             'target_object': targ_obj,
             'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
             'assignment': assignment,
@@ -330,6 +331,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
         'target_object': targ_obj,
         'token': retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token),
         'assignment': assignment,
+        'roles': roles,
         'instructions': assignment_target.target_instructions,
     }
     if not assignment.object_before(object_id) is None:
@@ -384,7 +386,6 @@ def annotation_database_search(request):
 
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
-        or session_object_id != request_object_id
         or session_context_id != request_context_id):
         return HttpResponse("You are not authorized to search for annotations")
 
@@ -419,9 +420,8 @@ def annotation_database_create(request):
 
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
-        or session_object_id != request_object_id
         or session_context_id != request_context_id
-        or session_user_id != request_user_id):
+        or (session_user_id != request_user_id and "@" not in request_user_id)):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
@@ -439,15 +439,17 @@ def annotation_database_create(request):
 def annotation_database_delete(request, annotation_id):
     session_user_id = request.session['hx_user_id']
     session_collection_id = request.session['hx_collection_id']
-    json_body = json.loads(request.body)
-    request_user_id = json_body['user']['id']
+    try: 
+        json_body = json.loads(request.body)
+        request_user_id = json_body['user']['id']
 
-    debug_printer("%s: %s" % (session_user_id, request_user_id))
+        debug_printer("%s: %s" % (session_user_id, request_user_id))
 
-    # verifies the data queried against session so they can't get more than they should
-    if (session_user_id != request_user_id):
-        return HttpResponse("You are not authorized to create an annotation.")
-
+        # verifies the data queried against session so they can't get more than they should
+        if (session_user_id != request_user_id):
+            return HttpResponse("You are not authorized to create an annotation.")
+    except:
+        debug_printer("Probably a Mirador instance")
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
 
     database_url = str(assignment.annotation_database_url).strip() + '/delete/' + str(annotation_id)
@@ -480,7 +482,6 @@ def annotation_database_update(request, annotation_id):
 
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
-        or session_object_id != request_object_id
         or session_context_id != request_context_id
         or session_user_id != request_user_id):
         return HttpResponse("You are not authorized to create an annotation.")

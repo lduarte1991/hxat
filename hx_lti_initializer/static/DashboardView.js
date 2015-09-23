@@ -127,6 +127,7 @@
         if (updateStore) {
             self.initOptions.endpoint.loadMoreAnnotations(offsetList);
         };
+        jQuery('img').unveil();
     };
 
     $.DashboardView.prototype.formatAnnotation = function(annotation) {
@@ -139,15 +140,14 @@
         
         var authorized = this.initOptions.endpoint.authorize('delete', annotation);
         var updateAuthorized = this.initOptions.endpoint.authorize('update', annotation);
-        
-        item.authToDeleteButton = authorized;
-        item.authToEditButton = updateAuthorized;
-        item.authorized = authorized || updateAuthorized;
+        var is_instructor = this.initOptions.controller.initOptions.is_instructor === "True";
+        item.authToDeleteButton = authorized || is_instructor;
+        item.authToEditButton = updateAuthorized || is_instructor;
+        item.authorized = authorized || updateAuthorized || is_instructor;
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
         }
-        
         return item;
     };
 
@@ -232,6 +232,8 @@
 				jQuery('#leftCol').attr('class', 'col-xs-7');
 				section.css('min-width', '150px');
 			}
+            jQuery('.test').css('width', section.offset().left);
+            window.dispatchEvent(new Event('resize'));
 		});
 		jQuery('.annotationSection').scroll(function() {
 			if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
@@ -243,16 +245,41 @@
 		});
         jQuery('.handle-button').click( function(e) {
             var section = jQuery('.annotationSection');
-            if (parseInt(self.lasUp, 10) >= 150) {
+            if (parseInt(section.css, 10) >= 150) {
                 jQuery('#leftCol').attr('class', 'col-xs-11');
-                section.css('mind-width', '10px');
+                section.css('min-width', '10px');
                 section.css('width', '10px');
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
-                section.css('mind-width', '150px');
+                section.css('min-width', '150px');
                 section.css('width', '300px');
             }
+            jQuery('.test').css('width', section.offset().left);
+            window.dispatchEvent(new Event('resize'));
         });
+        jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
+        window.dispatchEvent(new Event('resize'));
+        if (typeof jQuery.subscribe === 'function') {
+            jQuery.subscribe('windowUpdated', function(){
+                var viewType = self.initOptions.endpoint.window.currentFocus;
+                var section = jQuery('.annotationSection');
+
+                if (viewType === "ImageView") {
+                    jQuery('#leftCol').attr('class', 'col-xs-7');
+                    section.css('min-width', '150px');
+                    section.css('width', '300px');
+                } else {
+                    section.css('min-width', '10px');
+                    section.css('width', '10px');
+                }
+                jQuery('.test').css('width', section.offset().left);
+                window.dispatchEvent(new Event('resize'));
+            });
+        };
+        jQuery(window).resize(function() {
+            jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
+        })
+        
     };
 
     $.DashboardView.prototype.createDateFromISO8601 = function(string) {
@@ -351,7 +378,6 @@
     			self.initOptions.endpoint.editAnnotation(annotation, jQuery(e.target));
     		};
     	});
-        console.log(self);
 		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
 			title: "Would you like to delete your annotation?",
             placement: 'left',
