@@ -129,8 +129,10 @@
 
 		var annotationClicked = self.__bind(self.annotationClicked, self);
 		var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
+		var instructionsClicked = self.__bind(self.instructionsClicked, self);
 		var el = self.element;
 		el.on("click", ".annotationItem", annotationClicked);
+		el.on("click", ".annotation-instructions", instructionsClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
 	};
 
@@ -207,6 +209,13 @@
     	self.viewer.displayModalView(annotationClicked, addCreatedAnnotation);
     	var displayReplies = self.__bind(self.viewer.displayReplies, self.viewer);
     	self.endpoint.loadRepliesForParentAnnotation(annotation_id, displayReplies);
+    };
+
+    $.DashboardController.prototype.instructionsClicked = function(e) {
+    	var self = this;
+    	var target = jQuery(e.target);
+
+    	self.viewer.displayInstructions(this.initOptions.instructions);
     };
 
     $.DashboardController.prototype.replyDeleteClicked = function(e) {

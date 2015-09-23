@@ -120,6 +120,7 @@ $(function() {
             imageRootUrl: "{% static "vendors/catch/img"%}",
             instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
             default_tab: "{{ assignment.default_tab }}",
+            instructions: "{{instructions | escapejs }}",
           },
         },
       };

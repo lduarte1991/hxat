@@ -8,6 +8,7 @@
                 "annotationModal",
                 "replyItem",
                 "editReplyItem",
+                'annotationInstructions',
             ],
             TEMPLATES: {},
             suffix: "side",
@@ -418,5 +419,15 @@
             jQuery('.repliesList').css('height', replies_height);
         });
 	};
+
+    $.DashboardView.prototype.displayInstructions = function (instructions) {
+        var self = this;
+        var html = self.initOptions.TEMPLATES.annotationInstructions({'data':instructions});
+        jQuery('.annotationSection').append(html);
+        jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').css('y-scroll', 'scroll');
+        });
+    };
 
 } (AController));
