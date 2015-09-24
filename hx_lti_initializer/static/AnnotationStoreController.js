@@ -105,6 +105,7 @@ AnnotatorEndpointController.prototype.setUpListener = function(listener, expecte
 	var annotator = this.annotator;
 
 	annotator.subscribe(listener, function(annotations) {
+		console.log(listener + "Triggered! ");
 		expected_fun(annotations);
 	});
 };
@@ -125,6 +126,13 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 	var request = jQuery.ajax(search_url, options);
 };
 
+AnnotatorEndpointController.prototype.updateAnnotationInMasterList = function(annotation) {
+	for (index in this.annotationsMasterList) {
+		if (this.annotationsMasterList[index].id === annotation.id)
+			this.annotationsMasterList[index] = annotation;
+	}
+}
+
 AnnotatorEndpointController.prototype.updateEndpointList = function(options) {
 	// will never differ from annotator
 };
@@ -138,13 +146,13 @@ AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations
 };
 
 AnnotatorEndpointController.prototype.addNewAnnotationToMasterList = function(annotation) {
-	self.annotationsMasterList.unshift(annotation);
+	this.annotationsMasterList.unshift(annotation);
 };
 
 AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation) {
-	var index = self.annotationsMasterList.indexOf(annotation);
+	var index = this.annotationsMasterList.indexOf(annotation);
 	if (index > -1) {
-		self.annotationsMasterList.splice(index, 1);
+		this.annotationsMasterList.splice(index, 1);
 		return false;
 	};
 	return true;
@@ -511,7 +519,7 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 };
 
 MiradorEndpointController.prototype.updateAnnotationInMasterList = function(annotation) {
-	
+	annotation.id = parseInt(annotation.id, 10);
 	for (index in this.annotationsMasterList) {
 		if (this.annotationsMasterList[index].id === annotation.id)
 			this.annotationsMasterList[index] = annotation;

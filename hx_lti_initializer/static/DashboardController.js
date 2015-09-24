@@ -33,6 +33,7 @@
 		this.initOptions = jQuery.extend({}, defaultOptions, options.initOptions, commonInfo);
 		this.annotationsMasterList = [];
 		this.current_tab = this.initOptions.default_tab;
+		this.dashboardReady = jQuery.Deferred();
 		
 		this.writingReply = false;
 
@@ -150,13 +151,15 @@
 
 	$.DashboardController.prototype.annotationsLoaded = function (annotations) {
 		console.log("AnnotationsLoaded Triggered");
-		console.log(this);
-		this.endpoint.updateMasterList();
-		if (this.endpoint.getNumOfAnnotationsOnScreen() > this.initOptions.pagination) {
-			this.endpoint.updateEndpointList({limit:this.initOptions.pagination});
-		};
-		this.viewer.clearDashboard();
-		this.viewer.updateDashboard(0, this.initOptions.pagination, annotations, false);
+		var self = this;
+		this.dashboardReady.done(function() {
+			self.endpoint.updateMasterList();
+			if (self.endpoint.getNumOfAnnotationsOnScreen() > self.initOptions.pagination) {
+				self.endpoint.updateEndpointList({limit:self.initOptions.pagination});
+			};
+			self.viewer.clearDashboard();
+			self.viewer.updateDashboard(0, self.initOptions.pagination, annotations, false);
+		});
 	};
 
 	$.DashboardController.prototype.annotationCreated = function (annotation) {
@@ -181,6 +184,7 @@
 
 	$.DashboardController.prototype.annotationUpdated = function (annotation) {
 		console.log("AnnotationsUpdated Triggered");
+		this.endpoint.updateAnnotationInMasterList(annotation);
 		this.viewer.updateAnnotation(annotation);
 	};
 

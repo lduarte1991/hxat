@@ -128,7 +128,10 @@
         if (updateStore) {
             self.initOptions.endpoint.loadMoreAnnotations(offsetList);
         };
-        jQuery('img').unveil();
+        if (typeof jQuery('img').unveil === "function") {
+            jQuery('img').unveil();
+        };
+        
     };
 
     $.DashboardView.prototype.formatAnnotation = function(annotation) {
@@ -280,7 +283,8 @@
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         })
-        
+        console.log("Set up empty");
+        self.initOptions.controller.dashboardReady.resolve();
     };
 
     $.DashboardView.prototype.createDateFromISO8601 = function(string) {
