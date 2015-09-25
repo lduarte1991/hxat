@@ -214,6 +214,12 @@ button#closeModal {
 	margin: 5px;
 }
 
+button#hideParent {
+    margin-top: 5px;
+    margin-right: 15px;
+    float: right;
+}
+
 .annotationModal .idAnnotation {
 	display: none;
 }

@@ -353,6 +353,20 @@
     		jQuery('.annotationModal').remove();
     		jQuery('.annotationSection').css('y-scroll', 'scroll');
     	});
+        jQuery('.annotationModal #hideParent').click( function (e) {
+            jQuery('.parentAnnotation').toggleClass("hidden");
+            if (jQuery('.parentAnnotation').hasClass("hidden")) {
+                var replies_offset = jQuery('.modal-navigation').offset().top -jQuery('.annotationModal').offset().top;
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').height()- jQuery('.modal-navigation').height();
+                jQuery('.repliesList').css('height', replies_height);
+                jQuery('.repliesList').css('margin-top', replies_offset + 20);
+            } else {
+                var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+                jQuery('.repliesList').css('height', replies_height);
+                jQuery('.repliesList').css('margin-top', replies_offset);
+            }
+        });
 
     	jQuery('.annotationModal button.replybutton').click( function (e) {
     		var button = jQuery(e.target);
