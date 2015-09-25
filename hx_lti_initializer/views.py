@@ -98,7 +98,7 @@ def create_new_user(username, user_id, roles):
     
     return user, lti_profile
 
-def save_session(request, user_id, collection_id, object_id, context_id, roles):
+def save_session(request, user_id, collection_id, object_id, context_id, roles, is_staff):
     if user_id is not None:
         request.session["hx_user_id"] = user_id
     if collection_id is not None:
@@ -109,6 +109,8 @@ def save_session(request, user_id, collection_id, object_id, context_id, roles):
         request.session["hx_context_id"] = context_id
     if roles is not None:
         request.session["hx_roles"] = roles
+    if is_staff is not None:
+        request.session["is_staff"] = is_staff
 
 @csrf_exempt
 def launch_lti(request):
@@ -150,7 +152,7 @@ def launch_lti(request):
         except Assignment.DoesNotExist or TargetObject.DoesNotExist or AssignmentTargets.DoesNotExist:
             raise PermissionDenied()
 
-        save_session(request, user_id, collection_id, object_id, course, roles)
+        save_session(request, user_id, collection_id, object_id, course, roles, False)
 
         original = {
             'user_id': user_id,
@@ -250,7 +252,7 @@ def launch_lti(request):
     # logs the user in
     lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, lti_profile.user)
-    save_session(request, user_id, "", "", "", roles)
+    save_session(request, user_id, "", "", "", roles, True)
     return redirect('hx_lti_initializer:course_admin_hub')
 
 
@@ -318,7 +320,7 @@ def access_annotation_target(request, course_id, assignment_id, object_id, user_
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         raise PermissionDenied()    
 
-    save_session(request, None, assignment_id, object_id, course_id, None)
+    save_session(request, None, assignment_id, object_id, course_id, None, None)
     for item in request.session.keys():
         debug_printer('DEBUG SESSION - %s: %s \r' % (item, request.session[item]))
     original = {
@@ -467,6 +469,7 @@ def annotation_database_update(request, annotation_id):
     session_object_id = str(request.session['hx_object_id'])
     session_context_id = request.session['hx_context_id']
     session_user_id = request.session['hx_user_id']
+    session_is_staff = request.session['is_staff']
 
     json_body = json.loads(request.body)
 
@@ -483,7 +486,7 @@ def annotation_database_update(request, annotation_id):
     # verifies the data queried against session so they can't get more than they should
     if (session_collection_id != request_collection_id
         or session_context_id != request_context_id
-        or session_user_id != request_user_id):
+        or (session_user_id != request_user_id and not session_is_staff)):
         return HttpResponse("You are not authorized to create an annotation.")
 
     assignment = get_object_or_404(Assignment, assignment_id=session_collection_id)
