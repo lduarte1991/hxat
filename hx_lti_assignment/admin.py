@@ -3,11 +3,11 @@ from hx_lti_assignment.models import Assignment, AssignmentTargets
 
 
 class AssignmentTargetsInline(admin.TabularInline):
-	model = AssignmentTargets
-	extra = 1
+    model = AssignmentTargets
+    extra = 1
 
 
 class AssignmentAdmin(admin.ModelAdmin):
-	inlines = (AssignmentTargetsInline,)
+    inlines = (AssignmentTargetsInline,)
 
 admin.site.register(Assignment, AssignmentAdmin)

@@ -100,32 +100,36 @@ class LTIInitializerUtilsTests(TestCase):
         Should check to see if the value is being printed out to stderr only if
         the LTI_DEBUG in settings is set to True.
         """
-        settings.LTI_DEBUG = True;
+        settings.LTI_DEBUG = True
         value_found = get_lti_value('roles', self.tp)
         with capture_err(debug_printer, value_found) as output:
             self.assertIn("['Learner', 'Instructor', 'Observer']", output)
 
-        settings.LTI_DEBUG = False;
+        settings.LTI_DEBUG = False
         value_found = get_lti_value('lis_outcome_service_url', self.tp)
         with capture_err(debug_printer, value_found) as output:
             self.assertNotIn("http://localhost/lis_grade_passback", output)
 
     def test_retrieve_token(self):
         """
-        Should pass the test if payload matches the userid and apikey passed in.
+        Should pass the test if payload matches the userid and apikey passed in
         Cannot test the rest due to its usage of time/encrypted oath values.
         """
-        expected = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAyLTI3VDE3OjAwOjQyLjQwNjQ0MSswOjAwIiwgImNvbnN1bWVyS2V5IjogImZha2Vfc2VjcmV0IiwgInVzZXJJZCI6ICJ1c2VybmFtZSIsICJ0dGwiOiA4NjQwMH0.Dx1PoF-7mqBOOSGDMZ9R_s3oaaLRPnn6CJgGGF2A5CQ"
-        response = retrieve_token("username", "fake_apikey")
+        expected = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMD\
+        E0LTAyLTI3VDE3OjAwOjQyLjQwNjQ0MSswOjAwIiwgImNvbnN1bWVyS2V5IjogImZha2Vfc\
+        2VjcmV0IiwgInVzZXJJZCI6ICJ1c2VybmFtZSIsICJ0dGwiOiA4NjQwMH0.Dx1PoF-7mqBO\
+        OSGDMZ9R_s3oaaLRPnn6CJgGGF2A5CQ"
+        response = retrieve_token("username", "fake_apikey", "fake_apikey")
 
-        # because the middle hashes are dependent on time, conly the header and footer are checked for secret key
+        # because the middle hashes are dependent on time, conly the header
+        # and footer are checked for secret key
         self.assertEqual(expected.split('.')[0], response.split('.')[0])
         self.assertNotEqual(expected.split('.')[2], response.split('.')[2])
 
 
 class LTIInitializerModelsTests(TestCase):
     """
-    Focuses on models and static methods found within hx_lti_initializer/models.py
+    Focuses on models and static methods found in hx_lti_initializer/models.py
     """
 
     def createFakeUser(self, username, userid):
@@ -164,11 +168,14 @@ class LTIInitializerModelsTests(TestCase):
         instructor = LTIProfile.objects.get(user=self.user)
         course_object = LTICourse.create_course('test_course_id', instructor)
         self.assertTrue(isinstance(course_object, LTICourse))
-        self.assertEqual(course_object.__unicode__(), course_object.course_name)
+        self.assertEqual(
+            course_object.__unicode__(),
+            course_object.course_name
+        )
 
     def test_LTICourse_get_course_by_id(self):
         """
-        Checks that you can get a course given an id. 
+        Checks that you can get a course given an id.
         """
         instructor = LTIProfile.objects.get(user=self.user)
         course_object = LTICourse.create_course('test_course_id', instructor)
@@ -179,7 +186,7 @@ class LTIInitializerModelsTests(TestCase):
 
     def test_LTICourse_get_courses_of_admin(self):
         """
-        Checks that it returns a list of all the courses that admin is a part of.
+        Checks that it returns a list of all the courses for that admin.
         """
         instructor = LTIProfile.objects.get(user=self.user)
         course_object = LTICourse.create_course('test_course_id', instructor)
@@ -222,7 +229,7 @@ class LTIInitializerViewsTests(TestCase):
 
     def setUp(self):
         rf = RequestFactory()
-        self.good_request = rf.post('/launch_lti/', { 
+        self.good_request = rf.post('/launch_lti/', {
             "lti_message_type": "basic-lti-launch-request",
             "oauth_consumer_key": "123key",
             "lti_version": "LTI-1p0",
@@ -238,7 +245,7 @@ class LTIInitializerViewsTests(TestCase):
             "roles": "Learner,Instructor,Observer",
             "lis_person_sourcedid": "fakeusername",
         })
-        self.bad_request = rf.post('/launch_lti/', { 
+        self.bad_request = rf.post('/launch_lti/', {
             "lti_message_type": "basic-lti-launch-request",
             "lti_version": "LTI-1p0",
             "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
@@ -254,24 +261,26 @@ class LTIInitializerViewsTests(TestCase):
             "lis_person_sourcedid": "fakeusername",
         })
         self.small_request = rf.post('/launch_lti/', {
-            "test" : "one",
+            "test": "one",
             "oauth_consumer_key": "123key",
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
             "lis_person_sourcedid": "fakeusername",
         })
         self.missing_user_id = rf.post('/launch_lti/', {
-            "test" : "one",
+            "test": "one",
             "oauth_consumer_key": "123key",
             "lis_person_sourcedid": "fakeusername",
         })
         self.missing_username = rf.post('/launch_lti/', {
-            "test" : "one",
+            "test": "one",
             "oauth_consumer_key": "123key",
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
         })
         self.tool_consumer = create_test_tc()
-        self.other_request = rf.post('/launch_lti/', self.tool_consumer.generate_launch_data())
-
+        self.other_request = rf.post(
+            '/launch_lti/',
+            self.tool_consumer.generate_launch_data()
+        )
 
     def tearDown(self):
         """
@@ -287,23 +296,34 @@ class LTIInitializerViewsTests(TestCase):
 
     def test_validate_request(self):
         """
-        Simply checks to see if a bad request raises an exception while a 
+        Simply checks to see if a bad request raises an exception while a
         good one does not
         """
         self.assertRaises(PermissionDenied, validate_request, self.bad_request)
         self.assertTrue(validate_request(self.good_request) == None)
-        self.assertRaises(PermissionDenied, validate_request, self.missing_user_id)
-        self.assertRaises(PermissionDenied, validate_request, self.missing_username)
-        settings.LTI_DEBUG = True;
+        self.assertRaises(
+            PermissionDenied,
+            validate_request,
+            self.missing_user_id
+        )
+        self.assertRaises(
+            PermissionDenied,
+            validate_request,
+            self.missing_username
+        )
+        settings.LTI_DEBUG = True
         with capture_err(validate_request, self.small_request) as output:
-            self.assertEqual(output, "DEBUG - test: one \r\r\nDEBUG - oauth_consumer_key: 123key \r\r\nDEBUG - lis_person_sourcedid: fakeusername \r\r\nDEBUG - user_id: 234jfhrwekljrsfw8abcd35cseddda \r\r\n")
+            self.assertEqual(output, "DEBUG - test: one \r\r\nDEBUG - oauth_consumer_key: 123key \r\r\nDEBUG - lis_person_sourcedid: fakeusername \r\r\nDEBUG - user_id: 234jfhrwekljrsfw8abcd35cseddda \r\r\n")  # noqa - testing purposes
 
     def test_initialize_lti_tool_provider(self):
         """
-        Checks to see if initialize_lti_tool_provider actually does check that the
-        request was valid.
+        Checks to see if initialize_lti_tool_provider actually does check
+        that therequest was valid.
         """
-        self.assertIsInstance(initialize_lti_tool_provider(self.other_request), DjangoToolProvider)
+        self.assertIsInstance(
+            initialize_lti_tool_provider(self.other_request),
+            DjangoToolProvider
+        )
 
     def test_create_new_user(self):
         """
@@ -330,6 +350,7 @@ class LTIInitializerUrlsTests(TestCase):
     def test_urls(self):
         url = resolve('/lti_init/launch_lti/')
         self.assertEqual(str(url.view_name), 'hx_lti_initializer:launch_lti')
+
 
 class LTIInitializerWSGITests(TestCase):
     """

@@ -1,6 +1,6 @@
 """
-These functions will be used for the initializer module, but may also be helpful
-elsewhere. 
+These functions will be used for the initializer module, but may also be
+helpful elsewhere.
 """
 import django.shortcuts
 from urlparse import urlparse
@@ -41,6 +41,7 @@ def debug_printer(debug_text):
     if settings.LTI_DEBUG:
         print >> sys.stderr, str(debug_text) + '\r'
 
+
 def retrieve_token(userid, apikey, secret):
     '''
     Return a token for the backend of annotations.
@@ -51,12 +52,13 @@ def retrieve_token(userid, apikey, secret):
     '''
     apikey = apikey
     secret = secret
-    # the following five lines of code allows you to include the defaulttimezone in the iso format
-    # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
+    # the following five lines of code allows you to include the
+    # defaulttimezone in the iso format
+    # noqa for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
 
     def _now():
-        return datetime.datetime.utcnow().replace(tzinfo=simple_utc()).replace(microsecond=0).isoformat()
-    
+        return datetime.datetime.utcnow().replace(tzinfo=simple_utc()).replace(microsecond=0).isoformat()  # noqa
+
     token = jwt.encode({
       'consumerKey': apikey,
       'userId': userid,
@@ -66,8 +68,10 @@ def retrieve_token(userid, apikey, secret):
 
     return token
 
+
 class simple_utc(datetime.tzinfo):
     def tzname(self):
         return "UTC"
+
     def utcoffset(self, dt):
         return datetime.timedelta(0)

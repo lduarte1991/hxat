@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render_to_response, render, redirect
+from django.shortcuts import get_object_or_404, render_to_response, render, redirect  # noqa
 from django.template import RequestContext
 from django.http import Http404, HttpResponse
 from django.utils.html import escape
@@ -9,12 +9,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 
+
 def open_target_object(request, collection_id, target_obj_id):
     try:
         targ_obj = TargetObject.objects.get(pk=target_obj_id)
     except TargetObject.DoesNotExist:
         raise Http404("File you are looking for does not exist.")
-    return render(request, '%s/detail.html' % targ_obj.target_type, {'target_object': targ_obj})
+    return render(
+        request,
+        '%s/detail.html' % targ_obj.target_type,
+        {'target_object': targ_obj}
+    )
+
 
 @login_required
 def create_new_source(request):
@@ -27,7 +33,7 @@ def create_new_source(request):
             source.save()
 
             messages.success(request, 'Source was successfully created!')
-            return redirect('hx_lti_initializer:course_admin_hub') 
+            return redirect('hx_lti_initializer:course_admin_hub')
         else:
             debug_printer(form.errors)
     else:
@@ -40,6 +46,7 @@ def create_new_source(request):
             'user': request.user,
         }
     )
+
 
 @login_required
 def edit_source(request, id):
@@ -56,16 +63,17 @@ def edit_source(request, id):
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
             debug_printer(form.errors)
-    else: 
+    else:
         form = SourceForm(instance=source)
     return render(
         request,
-        'target_object_database/source_form.html', 
+        'target_object_database/source_form.html',
         {
             'form': form,
             'user': request.user,
         }
     )
+
 
 def handlePopAdd(request, addForm, field):
     if request.method == "POST":
@@ -76,15 +84,20 @@ def handlePopAdd(request, addForm, field):
             except forms.ValidationError, error:
                 newObject = None
             if newObject:
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))  # noqa
     else:
         form = addForm()
-    pageContext = {'form': form, 'field': field, 'user':request.user}
-    return render_to_response("target_object_database/source_form.html", RequestContext(request, pageContext))
+    pageContext = {'form': form, 'field': field, 'user': request.user}
+    return render_to_response(
+        "target_object_database/source_form.html",
+        RequestContext(request, pageContext)
+    )
+
 
 @login_required
 def newSource(request):
     return handlePopAdd(request, SourceForm, 'target_object')
+
 
 class SourceView(generics.ListAPIView):
     model = TargetObject

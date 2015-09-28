@@ -1,9 +1,9 @@
-from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet
+from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet  # noqa
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
-from django.shortcuts import get_object_or_404, render_to_response, redirect, render
+from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -20,9 +20,11 @@ def create_new_assignment(request):
         targets_form = AssignmentTargetsFormSet(request.POST)
         if targets_form.is_valid():
             assignment_targets = targets_form.save(commit=False)
-            targets = 'assignment_objects=' + str(assignment_targets[0].target_object.id)
+            targets = 'assignment_objects=' +\
+                str(assignment_targets[0].target_object.id)
             for x in range(len(assignment_targets)-1):
-                targets += '&' + 'assignment_objects=' + str(assignment_targets[x+1].target_object.id)
+                targets += '&' + 'assignment_objects=' +\
+                    str(assignment_targets[x+1].target_object.id)
             post_values = QueryDict(targets, mutable=True)
             post_values.update(request.POST)
             form = AssignmentForm(post_values)
@@ -35,11 +37,12 @@ def create_new_assignment(request):
                     at.assignment = assignment
                     at.save()
                 assignment.save()
-                messages.success(request, 'Assignment was successfully created!')
+                messages.success(request, 'Assignment successfully created!')
                 return redirect('hx_lti_initializer:course_admin_hub')
             else:
                 target_num = len(assignment_targets)
-                debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
+                debug = "Assignment Form is NOT valid" +\
+                    str(request.POST) + "What?"
                 debug_printer(form.errors)
         else:
             target_num = 0
@@ -63,6 +66,7 @@ def create_new_assignment(request):
         }
     )
 
+
 @login_required
 def edit_assignment(request, id):
     """
@@ -71,20 +75,23 @@ def edit_assignment(request, id):
     target_num = len(AssignmentTargets.objects.filter(assignment=assignment))
     debug = u"TEST"
     if request.method == "POST":
-        targets_form = AssignmentTargetsFormSet(request.POST, instance=assignment)
+        targets_form = AssignmentTargetsFormSet(
+            request.POST,
+            instance=assignment
+        )
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
             assignment_targets = targets_form.save(commit=False)
-            changed=False
+            changed = False
             if len(targets_form.deleted_objects) > 0:
                 debug += "Trying to delete a bunch of assignments\n"
                 for del_obj in targets_form.deleted_objects:
                     del_obj.delete()
-                changed=True
+                changed = True
             if len(assignment_targets) > 0:
                 for at in assignment_targets:
                     at.save()
-                changed=True
+                changed = True
             if changed:
                 targets_form = AssignmentTargetsFormSet(instance=assignment)
         for targs in assignment.assignment_objects.all():

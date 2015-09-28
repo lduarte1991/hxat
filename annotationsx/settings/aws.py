@@ -118,6 +118,8 @@ MESSAGE_TAGS = {
 
 PROJECT_APPS = (
     'hx_lti_initializer',
+    'hx_lti_assignment',
+    'target_object_database',
 )
 
 JENKINS_TASKS = (

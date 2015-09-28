@@ -12,12 +12,19 @@ from hx_lti_initializer.models import LTIProfile, LTICourse
 class LTIProfileAdmin(admin.ModelAdmin):
     pass
 
+
 class LTICourseAdmin(admin.ModelAdmin):
-	fields = ['course_id', 'course_name', 'course_admins', 'course_external_css_default', 'course_users']
-	readonly_fields = ['course_id']
-	
-	def course_id(self, instance): # pragma: no cover
-		return str(course_id)
+    fields = [
+        'course_id',
+        'course_name',
+        'course_admins',
+        'course_external_css_default',
+        'course_users',
+    ]
+    readonly_fields = ['course_id']
+
+    def course_id(self, instance):  # pragma: no cover
+        return str(self.course_id)
 
 admin.site.register(LTIProfile, LTIProfileAdmin)
 admin.site.register(LTICourse, LTICourseAdmin)

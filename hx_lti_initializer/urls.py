@@ -51,7 +51,7 @@ urlpatterns = patterns(
         name="course_admin_hub",
     ),
     url(
-        r'^admin_hub/(?P<course_id>[0-9a-z:+-_]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',
+        r'^admin_hub/(?P<course_id>[0-9a-z:+-_]+)/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/preview/$',  # noqa
         'hx_lti_initializer.views.access_annotation_target',
         name="access_annotation_target"
     ),

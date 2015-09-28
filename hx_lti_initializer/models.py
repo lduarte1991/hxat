@@ -41,14 +41,14 @@ class LTIProfile(models.Model):
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
         return self.user.username
-    
+
     def get_id(self):
         """Returns Canvas user_id of LTIProfile"""
         anon_id = self.anon_id
-    
+
         # The user_id is the part of the anon_id after the colon
         user_id = anon_id.rpartition(':')[2]
-    
+
         return anon_id
 
     class Meta:
@@ -75,8 +75,8 @@ post_save.connect(user_post_save, sender=User)
 class LTICourse(models.Model):
     """
     This model will store information about a given "Course" passed in.
-    In other words, whatever is within the context_id of the LTI request will be
-    considered a course and will hold assignments and target objects to annotate.
+    In other words, whatever is within the context_id of the request will be
+    considered a course and hold assignments and target objects to annotate.
     """
 
     # this id will come from the context_id value in the LTI
@@ -99,21 +99,24 @@ class LTICourse(models.Model):
 
     course_users = models.ManyToManyField(
         LTIProfile,
-        related_name = 'course_user_profiles',
+        related_name='course_user_profiles',
         blank=True,
     )
 
     course_external_css_default = models.CharField(
         max_length=255,
         blank=True,
-        help_text='(Optional) Please only input a URL to an externally hosted CSS file.',
+        help_text='Please only add a URL to an externally hosted file.',
     )
 
     class Meta:
         verbose_name = _("Course")
 
     def __unicode__(self):
-        """ When asked to print itself, this object will print the name of the course """
+        """
+        When asked to print itself, this object will print the name
+        of the course.
+        """
         return u"%s" % self.course_name
 
     def __str__(self):
@@ -132,7 +135,9 @@ class LTICourse(models.Model):
         Given an administrator, it will return all LTICourse objects
         in which that user appears within the course_admins attribute.
         """
-        courses_for_user = list(LTICourse.objects.filter(course_admins=user_requested.id))
+        courses_for_user = list(LTICourse.objects.filter(
+            course_admins=user_requested.id
+        ))
         return courses_for_user
 
     @staticmethod
