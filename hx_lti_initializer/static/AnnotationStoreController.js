@@ -488,7 +488,7 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 		plugins: "image link media",
         statusbar: false,
         toolbar_items_size: 'small',
-        toolbar: "bold italic | bullist numlist | link image media"
+        toolbar: "bold italic | bullist numlist | link image media | removeformat"
 	});
 	jQuery('.parentAnnotation .editgroup').hide();
 	jQuery('.parentAnnotation .savegroup').show();
