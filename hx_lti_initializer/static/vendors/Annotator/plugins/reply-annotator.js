@@ -38,7 +38,7 @@ Annotator.Plugin.Reply = (function(_super) {
 	Reply.prototype.input = null;
 
 	Reply.prototype.pluginInit = function() {
-		console.log("Reply-pluginInit");
+		//console.log("Reply-pluginInit");
 		//Check that annotator is working
 		if (!Annotator.supported()) {
 			return;

@@ -150,7 +150,7 @@
 	};
 
 	$.DashboardController.prototype.annotationsLoaded = function (annotations) {
-		console.log("AnnotationsLoaded Triggered");
+		//console.log("AnnotationsLoaded Triggered");
 		var self = this;
 		this.dashboardReady.done(function() {
 			self.endpoint.updateMasterList();
@@ -163,7 +163,7 @@
 	};
 
 	$.DashboardController.prototype.annotationCreated = function (annotation) {
-		console.log("AnnotationsCreated Triggered");
+		//console.log("AnnotationsCreated Triggered");
 		var self = this;
 		var attempts = 0;
 		var isChanged = function (){
@@ -183,13 +183,13 @@
 	};
 
 	$.DashboardController.prototype.annotationUpdated = function (annotation) {
-		console.log("AnnotationsUpdated Triggered");
+		//console.log("AnnotationsUpdated Triggered");
 		this.endpoint.updateAnnotationInMasterList(annotation);
 		this.viewer.updateAnnotation(annotation);
 	};
 
 	$.DashboardController.prototype.annotationDeleted = function(annotation) {
-		console.log("AnnotationDeleted Triggered");
+		//console.log("AnnotationDeleted Triggered");
 		var isReply = this.endpoint.removeAnnotationFromMasterList(annotation);
 		if (!isReply) {
 			this.viewer.deleteAnnotation(annotation);
@@ -228,7 +228,7 @@
     	var replyItem = this.viewer.findAnnotationId(button, true);
     	var annotation_id = this.viewer.findAnnotationId(replyItem, false);
     	var annotation = this.endpoint.list_of_replies[annotation_id];
-    	console.log(this.endpoint);
+    	//console.log(this.endpoint);
     	var parentId = annotation.parent;
 
     	button.confirmation({

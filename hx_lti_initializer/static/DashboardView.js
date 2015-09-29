@@ -283,7 +283,7 @@
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         })
-        console.log("Set up empty");
+        //console.log("Set up empty");
         self.initOptions.controller.dashboardReady.resolve();
     };
 

@@ -105,7 +105,7 @@ AnnotatorEndpointController.prototype.setUpListener = function(listener, expecte
 	var annotator = this.annotator;
 
 	annotator.subscribe(listener, function(annotations) {
-		console.log(listener + "Triggered! ");
+		//console.log(listener + "Triggered! ");
 		expected_fun(annotations);
 	});
 };
@@ -310,7 +310,7 @@ var MiradorEndpointController = function(deferredObject) {
     AnnotationStoreController.apply(this, arguments);
     var self = this;
     jQuery.subscribe('windowAdded', function (event, windowId, slotAddress) {
-    	console.log("window was added");
+    	//console.log("window was added");
     	// TODO (check id to make sure slot/window match initialized)
     	self.window = Mirador.viewer.workspace.slots[0].window;
 		self.endpoint = self.window.endpoint;
@@ -364,8 +364,8 @@ MiradorEndpointController.prototype.updateEndpointList = function(options){
 
 MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) {
 	var self = this;
-	console.log("Load Annotations");
-	console.log(annotations);
+	//console.log("Load Annotations");
+	//console.log(annotations);
 	annotations.forEach(function(annotation){
 		// Add annotations to annotationListCatch
 		self.endpoint.annotationsListCatch.push(annotation);
