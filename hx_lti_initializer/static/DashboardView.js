@@ -46,6 +46,7 @@
 
         // variables used when resizing dashboards
 		this.resizing = false;
+        this.moving = false;
 		this.lastUp = 150;
 
     };
@@ -194,7 +195,7 @@
     $.DashboardView.prototype.deleteAnnotation = function(annotation) {
         if (jQuery('.annotationModal').length > 0) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('y-scroll', 'scroll');
+            jQuery('.annotationSection').css('overflow-y', 'scroll');
         }
         var divObject = ""
         if (typeof annotation !== "object") {
@@ -211,31 +212,63 @@
 		el.html(self.initOptions.TEMPLATES.annotationSection({
 			annotationItems: [],
 		}));
+        
+        jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
 		jQuery('.resize-handle.side').on('mousedown', function(e){
 			self.resizing = true;
+            self.moving = false;
+            console.log("MouseDown");
 		});
-		jQuery(document).on('mousemove', function(e){
+		
+        jQuery(document).on('mousemove', function(e){
 			if (!self.resizing){
+                self.resizing = false;
+                self.moving = false;
 				return;
 			}
 			e.preventDefault();
-			var section = jQuery('.annotationSection');
+            self.moving = true;
+			
+            var section = jQuery('.annotationSection');
+            var handle = jQuery('.resize-handle');
 			section.css('min-width', '0px');
-			var offset = section.width()-(e.clientX - section.offset().left);
+           
+            var offset = section.width() - (e.clientX - section.offset().left);
 			section.css('width', offset);
-			section.css('right', 0);
+			section.css('right', '0px');
+            handle.css('right', offset);
 			self.lastUp = offset;
+
 		}).on('mouseup', function(e){
-			self.resizing = false;
+
+            if (!self.resizing || !self.moving) {
+                self.resizing = false;
+                self.moving = false;
+                return;
+            };
+
+            self.resizing = false;
+
 			var section = jQuery('.annotationSection');
+            var handle = jQuery('.resize-handle');
+
 			if(self.lastUp < 150){
 				jQuery('#leftCol').attr('class', 'col-xs-11');
-				section.css('width', '10px');
-				section.css('right', 0);
+				section.css('width', '0px');
+                handle.css('right', '0px');
+				section.css('right', '-5px');
+                section.css('overflow-y', "hidden");
+                handle.find('i').removeClass('fa-arrow-right');
+                handle.find('i').addClass('fa-arrow-left');
 			} else {
 				jQuery('#leftCol').attr('class', 'col-xs-7');
 				section.css('min-width', '150px');
+                section.css('overflow-y', "scroll");
+                section.css('right', '0px');
+                handle.find('i').addClass('fa-arrow-right');
+                handle.find('i').removeClass('fa-arrow-left');
 			}
+
             jQuery('.test').css('width', section.offset().left);
             window.dispatchEvent(new Event('resize'));
 		});
@@ -247,17 +280,30 @@
                 self.updateDashboard(offset, pagination, annotationList, true);
 			}
 		});
-        jQuery('.handle-button').click( function(e) {
+       jQuery('.handle-button').click( function(e) {
+            if (self.moving) {
+                return;
+            };
+            console.log("MouseClick");
             var section = jQuery('.annotationSection');
-            if (parseInt(section.css, 10) >= 150) {
+            var handle = jQuery('.resize-handle');
+            if (parseInt(section.css('width'), 10) >= 150) {
                 jQuery('#leftCol').attr('class', 'col-xs-11');
-                section.css('min-width', '10px');
-                section.css('width', '10px');
+                section.css('min-width', '0px');
+                section.css('width', '0px');
+                handle.css('right', '0px');
+                section.css('right', '-5px');
+                section.css('overflow-y', "hidden");
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
                 section.css('min-width', '150px');
                 section.css('width', '300px');
+                handle.css('right', '300px');
+                section.css('right', '0px');
+                section.css('overflow-y', "scroll");
             }
+            handle.find('i').toggleClass('fa-arrow-right');
+            handle.find('i').toggleClass('fa-arrow-left');
             jQuery('.test').css('width', section.offset().left);
             window.dispatchEvent(new Event('resize'));
         });
@@ -267,14 +313,25 @@
             jQuery.subscribe('windowUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;
                 var section = jQuery('.annotationSection');
+                var handle = jQuery('.resize-handle');
 
                 if (viewType === "ImageView") {
                     jQuery('#leftCol').attr('class', 'col-xs-7');
                     section.css('min-width', '150px');
                     section.css('width', '300px');
+                    handle.css('right', '300px');
+                    section.css('right', '0px');
+                    section.css('overflow-y', "scroll");
+                    handle.find('i').addClass('fa-arrow-right');
+                    handle.find('i').removeClass('fa-arrow-left');
                 } else {
-                    section.css('min-width', '10px');
-                    section.css('width', '10px');
+                    section.css('min-width', '0px');
+                    section.css('width', '0px');
+                    handle.css('right', '0px');
+                    section.css('right', '-5px');
+                    section.css('overflow-y', "hidden");
+                    handle.find('i').removeClass('fa-arrow-right');
+                    handle.find('i').addClass('fa-arrow-left');
                 }
                 jQuery('.test').css('width', section.offset().left);
                 window.dispatchEvent(new Event('resize'));
@@ -348,10 +405,10 @@
 
 		var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
     	jQuery('.annotationSection').append(html);
-    	jQuery('.annotationSection').css('y-scroll', 'hidden');
+    	jQuery('.annotationSection').css('overflow-y', 'hidden');
     	jQuery('.annotationModal #closeModal').click( function (e) {
     		jQuery('.annotationModal').remove();
-    		jQuery('.annotationSection').css('y-scroll', 'scroll');
+    		jQuery('.annotationSection').css('overflow-y', 'scroll');
     	});
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
@@ -444,7 +501,7 @@
         jQuery('.annotationSection').append(html);
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('y-scroll', 'scroll');
+            jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
     };
 
