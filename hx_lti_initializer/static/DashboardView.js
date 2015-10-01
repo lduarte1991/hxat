@@ -161,6 +161,9 @@
         var annotationItem = self.formatAnnotation(annotation);
         var html = self.initOptions.TEMPLATES[self.templateTypes[mediaType]](annotationItem);
         jQuery(self.holders[mediaType]).prepend(html);
+        if (typeof jQuery('img').unveil === "function") {
+            jQuery('img').unveil('trigger');
+        };
         if (annotationItem.media === "comment") {
             var parentId = annotationItem.parent;
             var numReply = parseInt(jQuery('.item-' + parentId).find('.replyNum').html(), 10);
