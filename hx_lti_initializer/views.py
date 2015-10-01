@@ -243,7 +243,7 @@ def launch_lti(request):
         debug_printer('DEBUG - LTI Profile not found. New User to be created.')
 
         lti_username = get_lti_value('lis_person_name_full', tool_provider)
-        if lti_username is not None:
+        if lti_username is None:
             # gather the necessary data from the LTI initialization request
             lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
 
