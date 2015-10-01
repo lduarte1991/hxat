@@ -19,14 +19,13 @@ from django.contrib.auth import login
 from django.contrib import messages
 
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse
+from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
+from hx_lti_initializer.utils import debug_printer, get_lti_value, retrieve_token  # noqa
 from hx_lti_initializer.forms import CourseForm
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 
-from models import *
-from utils import *
 from urlparse import urlparse
 import urllib2
 import urllib
@@ -89,9 +88,9 @@ def create_new_user(username, user_id, roles):
 
     for admin_role in settings.ADMIN_ROLES:
         for user_role in roles:
-                if admin_role.lower() == user_role.lower():
-                    user.is_superuser = True
-                    user.is_staff = True
+            if admin_role.lower() == user_role.lower():
+                user.is_superuser = True
+                user.is_staff = True
     user.save()
     debug_printer('DEBUG - User was just created')
 
@@ -200,7 +199,7 @@ def launch_lti(request):
             'instructions': assignment_target.target_instructions,
         }
 
-        if (targ_obj.target_type == 'vd'):
+        if targ_obj.target_type == 'vd':
             srcurl = targ_obj.target_content
             if 'youtu' in srcurl:
                 typeSource = 'video/youtube'
@@ -209,7 +208,7 @@ def launch_lti(request):
                 file_ext = splitext(basename(disassembled.path))[1]
                 typeSource = 'video/' + file_ext.replace('.', '')
             original.update({'typeSource': typeSource})
-        elif (targ_obj.target_type == 'ig'):
+        elif targ_obj.target_type == 'ig':
             original.update({'osd_json': targ_obj.target_content})
             viewtype = assignment_target.get_view_type_for_mirador()
             canvas_id = assignment_target.get_canvas_id_for_mirador()
@@ -411,7 +410,7 @@ def access_annotation_target(
     if not assignment.object_after(object_id) is None:
         original['next_object'] = assignment.object_after(object_id)
 
-    if (targ_obj.target_type == 'vd'):
+    if targ_obj.target_type == 'vd':
         srcurl = targ_obj.target_content
         if 'youtu' in srcurl:
             typeSource = 'video/youtube'
@@ -420,7 +419,7 @@ def access_annotation_target(
             file_ext = splitext(basename(disassembled.path))[1]
             typeSource = 'video/' + file_ext.replace('.', '')
         original.update({'typeSource': typeSource})
-    elif (targ_obj.target_type == 'ig'):
+    elif targ_obj.target_type == 'ig':
         original.update({'osd_json': targ_obj.target_content})
         viewtype = assignment_target.get_view_type_for_mirador()
         canvas_id = assignment_target.get_canvas_id_for_mirador()
@@ -431,9 +430,9 @@ def access_annotation_target(
             original.update({'canvas_id': canvas_id})
 
     if assignment_target.target_external_css:
-            original.update({
-                'custom_css': assignment_target.target_external_css
-            })
+        original.update({
+            'custom_css': assignment_target.target_external_css
+        })
     elif course_obj.course_external_css_default:
         original.update({
             'custom_css': course_obj.course_external_css_default
@@ -534,7 +533,7 @@ def annotation_database_delete(request, annotation_id):
         debug_printer("%s: %s" % (session_user_id, request_user_id))
 
         # verifies queries against session so they can't get unauthorized items
-        if (session_user_id != request_user_id):
+        if session_user_id != request_user_id:
             return HttpResponse("You are not allowed to create an annotation.")
     except:
         debug_printer("Probably a Mirador instance")
