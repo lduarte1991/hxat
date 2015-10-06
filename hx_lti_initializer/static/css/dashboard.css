@@ -241,9 +241,11 @@ button#closeModal {
 }
 
 .addReply {
+    width: 100%;
+}
+.addReplyFixedPosition {
     position: absolute;
     bottom: 0;
-    width: 100%;
 }
 
 .addReply button.btn.btn-primary.replybutton {
@@ -253,8 +255,8 @@ button#closeModal {
 .repliesList {
     text-align: center;
     padding-top: 25px;
-    padding-bottom: 45px;
-    height: inherit;
+    /* padding-bottom: 45px; */
+    /* height: inherit; */
     overflow-y: scroll;
 }
 
