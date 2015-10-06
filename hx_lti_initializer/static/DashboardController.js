@@ -586,7 +586,6 @@
     		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
     		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
     		jQuery('.repliesList').css('margin-top', replies_offset);
-    		jQuery('.repliesList').css('height', replies_height);
     		var final_html = '';
     		self.list_of_replies = {}
     		annotations.forEach(function(annotation) {
@@ -596,6 +595,16 @@
 				self.list_of_replies[item.id.toString()] = annotation;
 			});
 			jQuery('.repliesList').html(final_html);
+
+			// when there are too many replies to show on the screen at once,
+			// "fix" the position of the list so the height is constant and it's scrollable
+			// while positioning the reply button at the bottom of the screen so that it's
+			// always visible and available.
+			//		--abarrett 10/6/15
+			if(jQuery('.repliesList').height() > replies_height) {
+				jQuery('.repliesList').css('height', replies_height);
+				jQuery('.addReply').addClass('addReplyFixedPosition');
+			}
     	}
 
     	var search_url = store._urlFor("search", annotation_id);
