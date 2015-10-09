@@ -46,21 +46,27 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <link rel="stylesheet" href="{{ custom_css }}">
 <div id="viewer" class="test" style="padding-left:75px;padding-right:75px;">
-		<div class="instructions-container">
-			<div class="instructions-title">
-				Instructions
-				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
-			</div>
-			<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
+	{% if instructions != "" %}
+	<div class="instructions-container">
+		<div class="instructions-title">
+			Instructions
+			<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
 		</div>
+		<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
+	</div>
+	{% endif %}
 	<h1>{{ target_object.target_title | safe }}</h1>
+	{% if target_object.target_author != "None" %}
 	<h3>by {{ target_object.target_author | safe }}</h3>
+	{% endif %}
 	<div class="content">
 	{{ target_object.target_content | safe }}
 	</div>
+	{% if target_object.target_citation != "None" %}
 	<div class="citation" style="margin-top:20px;">
 	<i>{{ target_object.target_citation }}</i>
 	</div>
+	{% endif %}
 	{% if prev_object %}
 	<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left">Previous</a>
 	{% endif %}
