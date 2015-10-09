@@ -226,6 +226,9 @@ def launch_lti(request):
             original.update({
                 'custom_css': course_obj.course_external_css_default
             })
+        original.update({
+            'dashboard_hidden': assignment_target.get_dashboard_hidden()
+        })
 
         return render(
             request,
@@ -436,6 +439,10 @@ def access_annotation_target(
     elif course_obj.course_external_css_default:
         original.update({
             'custom_css': course_obj.course_external_css_default
+        })
+
+    original.update({
+            'dashboard_hidden': assignment_target.get_dashboard_hidden()
         })
 
     return render(request, '%s/detail.html' % targ_obj.target_type, original)

@@ -377,18 +377,27 @@ button#hideParent {
     text-align: right;
     margin-right: 30px;
     margin-top: -40px;
+    height: 40px;
 }
 
 .annotationSection .annotation-instructions .title {
-    text-align: right;
-    display: inline-block;
-    margin-right: 5px;
-    margin-top: -20px;
-    margin-bottom: 20px;
-    color:#fff;
-    visibility:hidden;
+    float: right;
+    margin-right: 30px;
+    margin-top: 0px;
+    color: #fff;
+    visibility: hidden;
 }
 
 .annotationSection .annotation-instructions:hover .title {
 visibility:visible;
+}
+
+.annotationSection .annotation-instructions .hide_label {
+    text-align: left;
+    margin-left: 5px;
+    float: left;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    color: #fff;
+    visibility: hidden;
 }

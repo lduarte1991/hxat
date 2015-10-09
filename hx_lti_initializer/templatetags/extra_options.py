@@ -7,7 +7,7 @@ register = Library()
 @register.filter_function
 def just_the_view_type(extra_options):
     result = extra_options.split(',')
-    if len(result) == 1:
+    if len(result) < 2:
         return "ImageView"
     else:
         return result[0].strip()
@@ -16,10 +16,22 @@ def just_the_view_type(extra_options):
 @register.filter_function
 def just_the_canvas_id(extra_options):
     result = extra_options.split(',')
-    if len(result) == 1:
+    if len(result) < 2:
         return ""
     else:
         return result[1].strip()
+
+
+@register.filter_function
+def just_dashboard_hidden(extra_options):
+    result = extra_options.split(',')
+    if len(result) < 3:
+        return ""
+    else:
+        if result[2].strip() == "true":
+            return True
+        else:
+            return False
 
 
 @register.tag(name='captureas')

@@ -340,9 +340,28 @@
                 window.dispatchEvent(new Event('resize'));
             });
         };
+
+        if (self.initOptions.controller.initOptions.dashboard_hidden) {
+            var section = jQuery('.annotationSection');
+            var handle = jQuery('.resize-handle');
+            section.css('min-width', '0px');
+            section.css('width', '0px');
+            handle.css('right', '0px');
+            section.css('right', '-5px');
+            section.css('overflow-y', "hidden");
+            handle.find('i').removeClass('fa-arrow-right');
+            handle.find('i').addClass('fa-arrow-left');
+            jQuery('.test').css('width', section.offset().left);
+        };
+
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         })
+        jQuery('.resize-handle').hover(function() {
+            jQuery('.hide_label').css("visibility", "visible");
+        },function() {
+            jQuery('.hide_label').css("visibility", "hidden");
+        });
         //console.log("Set up empty");
         self.initOptions.controller.dashboardReady.resolve();
     };

@@ -57,6 +57,15 @@ class AssignmentTargets(models.Model):
         else:
             return options[1] if options[1] != '' else None
 
+    def get_dashboard_hidden(self):
+        """
+        """
+        options = self.target_external_options.split(',')
+        if len(options) < 3:
+            return "false"
+        else:
+            return options[2] if options[2] != '' else "false"
+
 
 class Assignment(models.Model):
     """
