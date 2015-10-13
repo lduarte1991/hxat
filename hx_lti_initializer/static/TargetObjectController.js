@@ -50,4 +50,31 @@
 		});
 	};
 
+	$.TargetObjectController.prototype.toggleAnnotations = function() {
+		if (this.initOptions.mediaType === "text") {
+			var annotator = window.AController.annotationCore.annotation_tool;
+			var store = annotator.plugins.Store;
+			if (jQuery('.annotations-status').hasClass('on')) {
+				jQuery('.annotations-status .hover-inst').html("Show annotations");
+				jQuery('.annotations-status i').removeClass('fa-close');
+				jQuery('.annotations-status i').addClass('fa-comments');
+				this.annotationsSaved = store.annotations.slice();
+				store.annotations.forEach(function (annotation) {
+					window.AController.dashboardObjectController.endpoint._clearAnnotator();
+				});
+			} else {
+				jQuery('.annotations-status .hover-inst').html("Hide annotations");
+				jQuery('.annotations-status i').addClass('fa-close');
+				jQuery('.annotations-status i').removeClass('fa-comments');
+				this.annotationsSaved.forEach(function (annotation) {
+					annotator.setupAnnotation(annotation);
+					store.registerAnnotation(annotation);
+				});
+				annotator.publish("externalCallToHighlightTags");
+			}
+			console.log(store.annotations);
+			jQuery('.annotations-status').toggleClass("on");
+		};
+	}
+
 }(AController));

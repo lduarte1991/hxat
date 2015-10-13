@@ -171,6 +171,19 @@
             var numReply = parseInt(jQuery('.item-' + parentId).find('.replyNum').html(), 10);
             jQuery('.item-' + parentId).find('.replyNum').html(numReply+1);
         };
+        divObject = '.annotationItem.item-'+annotation.id.toString();
+        
+        tagHtml = ""
+        annotationItem.tags.forEach(function(tag){
+            var style = "";
+            console.log(tag);
+            if (window.AController.main.tags[tag] !== undefined) {
+                var rgbColor = window.AController.main.tags[tag];
+                style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+            };
+            tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
+        });
+        jQuery(divObject + ' .tagList').html(tagHtml);
     };
 
     $.DashboardView.prototype.updateAnnotation = function(annotation) {
