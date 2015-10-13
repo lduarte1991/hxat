@@ -125,7 +125,9 @@
             var html = self.initOptions.TEMPLATES.annotationItem(item);
             jQuery('.annotationsHolder').append(html);
             offsetList.push(annotation);
+            
         };
+
         if (updateStore) {
             self.initOptions.endpoint.loadMoreAnnotations(offsetList);
         };
@@ -190,7 +192,13 @@
 
         tagHtml = ""
         annotationItem.tags.forEach(function(tag){
-            tagHtml += "<div class=\"tag side\">" + tag + "</div>"
+            var style = "";
+            console.log(tag);
+            if (window.AController.main.tags[tag] !== undefined) {
+                var rgbColor = window.AController.main.tags[tag];
+                style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+            };
+            tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
         });
         jQuery(divObject + ' .tagList').html(tagHtml);
     };

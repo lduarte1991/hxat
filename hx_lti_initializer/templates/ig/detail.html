@@ -28,6 +28,7 @@
 <script src="{% static "AnnotationStoreController.js" %}"></script>
 <script src="{% static "DashboardController.js" %}"></script>
 <script src="{% static "DashboardView.js" %}"></script>
+<script src="{% static "TargetObjectController.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
@@ -109,6 +110,9 @@ $(function() {
         },
         
         annotationMainOptions: {
+          {% if assignment.allow_highlights %}
+          'highlightTags_options': "{{ assignment.highlights_options }}",
+          {% endif %}
         },
         
         dashboardControllerOptions: {
@@ -123,6 +127,9 @@ $(function() {
             default_tab: "{{ assignment.default_tab }}",
             instructions: "{{instructions | escapejs }}",
           },
+        },
+
+        targetObjectOptions: {
         },
       };
       AController(options);
