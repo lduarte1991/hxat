@@ -244,6 +244,6 @@
 		});
 
 		button.confirmation('show');
-};
+	};
 
 }(AController));

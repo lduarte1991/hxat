@@ -315,6 +315,28 @@ var MiradorEndpointController = function(deferredObject) {
     	self.window = Mirador.viewer.workspace.slots[0].window;
 		self.endpoint = self.window.endpoint;
 		deferredObject.resolve();
+		jQuery.subscribe('overlaysRendered.' + self.window.id, function() {
+			console.log("AnnotationListLoaded");
+			var annotations = self.window.annotationsList;
+			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
+				window.AController.main.colorizeAnnotations(annotations);
+			};
+		});
+		jQuery.subscribe('tooltipViewerSet.' + self.window.id, function (){
+			window.AController.main.colorizeViewer();
+		});
+		/*jQuery('.mirador-osd-edit-mode').click(function (){
+			var annotations = self.window.annotationsList;
+			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
+				window.AController.main.colorizeAnnotations(annotations);
+			};
+		});
+		jQuery('.mirador-osd-annotations-layer').click(function (){
+			var annotations = self.window.annotationsList;
+			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
+				window.AController.main.colorizeAnnotations(annotations);
+			};
+		});*/
 	});
 	self.annotationsMasterList = [];
 	self.queryDefault = {
@@ -342,6 +364,8 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 		jQuery.subscribe(listener + '.' + self.window.id, function(event) {
 			var annotations = self.endpoint.annotationsListCatch;
 			expected_fun(annotations);
+			
+			console.log("Loaded all again");
 		});
 	} else {
 		jQuery.subscribe(listener + '.' + self.window.id, function(event, annotation) {
@@ -374,6 +398,7 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 		self.window.annotationsList.push(oaAnnotation);
 	});
 	jQuery.publish('annotationListLoaded.' + self.window.id);
+
 	// trigger only after adding all items to annotationListCatch
 };
 

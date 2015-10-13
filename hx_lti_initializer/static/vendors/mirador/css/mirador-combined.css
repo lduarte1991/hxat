@@ -3097,9 +3097,9 @@ li.highlight {
 }
 .mirador-osd-annotations-layer {
   position:absolute;
-  bottom:0;
-  left:0;
-  margin: 1%;
+  top: 10px;
+  left: 10px;
+  transition: none;
 }
 .mirador-osd-toggle-bottom-panel {
   position: absolute;
@@ -3160,9 +3160,9 @@ li.highlight {
 }
 .mirador-osd-context-controls {
   position: absolute;
-  top:0;
-  left:0;
-  margin: 15px;
+  top: 10px;
+  left: 10px;
+  transition: none;
 }
 .mirador-osd-context-controls a {
   float:left;
@@ -3777,6 +3777,9 @@ div.manifest-info a.mirador-btn.mirador-icon-toc {
   padding: 12px;
   padding-bottom:0;
   border-bottom: 1px solid gray;
+}
+.annotation-display:last-child {
+    border: none;
 }
 .annotation-tooltip .button-container {
   text-align: right;

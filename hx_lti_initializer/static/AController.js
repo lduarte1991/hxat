@@ -9,9 +9,8 @@
  */
 
 window.AController = window.AController || function(options) {
-	AController.main = new AController.AnnotationMain(options);
 	if (typeof options.targetObjectOptions !== "undefined") {
-		AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions);
+		AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions, options.commonInfo);
 	}
 	//AController.annotationServer = new AController.AnnotationServer(options.annotationServerOptions);
 	if (typeof options.annotationCoreOptions !== "undefined") {
@@ -21,4 +20,5 @@ window.AController = window.AController || function(options) {
 		AController.dashboardView = AController.DashboardView;
 		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo, AController.dashboardView);
 	}
+	AController.main = new AController.AnnotationMain(options);
 }

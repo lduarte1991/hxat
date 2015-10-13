@@ -92,6 +92,9 @@ jQuery(function ($) {
 				pagination: {{ assignment.pagination_limit }},
 			},
 			annotationMainOptions: {
+				{% if assignment.allow_highlights %}
+				'highlightTags_options': "{{ assignment.highlights_options }}",
+				{% endif %}
 			},
 			annotationCoreOptions: {
 				annotationElement: jQuery(".content"),
@@ -103,7 +106,7 @@ jQuery(function ($) {
 						'Store',
 						'SummernoteRichText',
 						{% if assignment.allow_highlights %}
-						'HighlightTags',
+						//'HighlightTags',
 						{% endif %}
 						//'RichText',
 						'Reply',
@@ -112,11 +115,11 @@ jQuery(function ($) {
 					'database_url': "/lti_init/annotation_api",
 					'citation': "{{ target_object.target_citation | escapejs }}",
 					{% if assignment.allow_highlights %}
-					'higlightTags_options': "{{ assignment.highlights_options }}",
+					'highlightTags_options': "{{ assignment.highlights_options }}",
 					{% endif %}
 				},
 			},
-			targetObjectControllerOptions: {
+			targetObjectOptions: {
 			},
 			dashboardControllerOptions: {
 				annotationElement: jQuery("#dashboard"),
