@@ -299,6 +299,16 @@ AnnotatorEndpointController.prototype._clearAnnotator = function() {
     });
 };
 
+AnnotatorEndpointController.prototype._showAnnotations = function(annotations) {
+    var annotator = this.annotator;
+    var store = annotator.plugins.Store;
+    var annotations = annotations;
+    
+    annotations.forEach(function(ann){
+        annotator.publish('annotationCreated', [ann]);
+    });
+};
+
 
 /***
  ** Mirador Endpoint for Dashboard Interaction

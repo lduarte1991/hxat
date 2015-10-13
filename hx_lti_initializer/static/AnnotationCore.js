@@ -177,7 +177,7 @@
 			    }
 		    } else if (pluginName === "HighlightTags") {
 		    	options = {
-		            tag: this.initOptions.higlightTags_options,
+		            tag: this.initOptions.highlightTags_options,
 		    	}
 		    }
 		    

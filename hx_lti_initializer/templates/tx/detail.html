@@ -46,6 +46,7 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <link rel="stylesheet" href="{{ custom_css }}">
 <div id="viewer" class="test" style="padding-left:75px;padding-right:75px;">
+	<div class="annotations-status on"><i class="fa fa-close"></i> <span class="hover-inst hidden">Hide Annotations</span></div>
 	{% if instructions != "" %}
 	<div class="instructions-container">
 		<div class="instructions-title">
@@ -106,7 +107,7 @@ jQuery(function ($) {
 						'Store',
 						'SummernoteRichText',
 						{% if assignment.allow_highlights %}
-						//'HighlightTags',
+						'HighlightTags',
 						{% endif %}
 						//'RichText',
 						'Reply',
@@ -158,4 +159,10 @@ jQuery(function ($) {
 			jQuery('.toggle-instructions').html('Collapse Instructions');
 		}
 	});
+	jQuery('.annotations-status').hover(function() {
+	    jQuery('.hover-inst').toggleClass("hidden");
+	});
+	jQuery('.annotations-status').click(function() {
+		AController.targetObjectController.toggleAnnotations();
+	})
 </script>

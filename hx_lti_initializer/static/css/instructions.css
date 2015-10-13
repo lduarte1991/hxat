@@ -26,3 +26,11 @@
     margin-top: 0.5em;
     padding-top: 0.5em;
 }
+
+.annotations-status {
+    font-size: 18pt;
+    padding-top: 10px;
+    margin-bottom: -15px;
+    cursor: pointer;
+    display: inline-block;
+}
