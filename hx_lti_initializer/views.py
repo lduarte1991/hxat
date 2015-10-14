@@ -48,7 +48,7 @@ def validate_request(req):
     # print out the request to the terminal window if in debug mode
     # this item is set in the settings, in the __init__.py file
     if settings.LTI_DEBUG:
-        for item in req.POST:
+        for item in sorted(req.POST.dict()):
             debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
 
     # verifies that request contains the information needed
@@ -78,6 +78,17 @@ def initialize_lti_tool_provider(req):
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
 
+    # NOTE: before validating the request, temporarily remove the
+    # QUERY_STRING to work around an issue with how Canvas signs requests
+    # that contain GET parameters. Before Canvas launches the tool, it duplicates the GET
+    # parameters as POST parameters, and signs the POST parameters (*not* the GET parameters).
+    # However, the oauth2 library that validates the request generates
+    # the oauth signature based on the combination of POST+GET parameters together,
+    # resulting in a signature mismatch. By removing the QUERY_STRING before
+    # validating the request, the library will generate the signature based only on
+    # the POST parameters like Canvas.
+    qs = req.META.pop('QUERY_STRING', '')
+
     # now validate the tool via the valid_request function
     # this means that request was well formed but invalid
     if provider.valid_request(req) == False:
@@ -85,6 +96,9 @@ def initialize_lti_tool_provider(req):
         raise PermissionDenied()
     else:
         debug_printer('DEBUG - LTI Tool Provider was valid.')
+
+    req.META['QUERY_STRING'] = qs # restore the query string
+
     return provider
 
 def create_new_user(username, user_id, roles):
