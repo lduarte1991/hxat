@@ -72,7 +72,6 @@
 				});
 				annotator.publish("externalCallToHighlightTags");
 			}
-			console.log(store.annotations);
 			jQuery('.annotations-status').toggleClass("on");
 		};
 	}

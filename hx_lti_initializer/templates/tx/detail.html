@@ -69,10 +69,10 @@
 	</div>
 	{% endif %}
 	{% if prev_object %}
-	<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left">Previous</a>
+	<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
 	{% endif %}
 	{% if next_object %}
-	<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right">Next</a><br />
+	<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;" class="btn btn-primary" role="button">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
 	{% endif %}
 </div>
 	<div id="dashboard" class="annotationListContainer">
