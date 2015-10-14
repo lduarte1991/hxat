@@ -176,7 +176,6 @@
         tagHtml = ""
         annotationItem.tags.forEach(function(tag){
             var style = "";
-            console.log(tag);
             if (window.AController.main.tags[tag] !== undefined) {
                 var rgbColor = window.AController.main.tags[tag];
                 style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
@@ -206,7 +205,6 @@
         tagHtml = ""
         annotationItem.tags.forEach(function(tag){
             var style = "";
-            console.log(tag);
             if (window.AController.main.tags[tag] !== undefined) {
                 var rgbColor = window.AController.main.tags[tag];
                 style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";

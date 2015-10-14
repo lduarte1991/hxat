@@ -50,6 +50,17 @@
 		});
 	};
 
+	$.TargetObjectController.prototype.colorizeEditor = function (){
+		window.tags = jQuery('.token-input-token p');
+		window.tags.each(function (index, item) {
+			var tag = jQuery.trim(jQuery(item).html());
+			var rgbColor = window.AController.main.tags[tag];
+			if (rgbColor !== undefined) {
+				jQuery(item).parent().css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
+			};
+		});
+	};
+
 	$.TargetObjectController.prototype.toggleAnnotations = function() {
 		if (this.initOptions.mediaType === "text") {
 			var annotator = window.AController.annotationCore.annotation_tool;
