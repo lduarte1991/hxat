@@ -409,7 +409,6 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 		self.window.annotationsList.push(oaAnnotation);
 	});
 	jQuery.publish('annotationListLoaded.' + self.window.id);
-	this.annotator.publish('')
 	// trigger only after adding all items to annotationListCatch
 };
 
