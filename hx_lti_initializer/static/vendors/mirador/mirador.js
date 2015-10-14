@@ -3062,8 +3062,7 @@ window.Mirador = window.Mirador || function(config) {
      *  options: 
      *  { 'url': '',
      *    'storeId': 123,
-     *    'APIKey': '23983hf98j3f9283jf2983fj',
-     *    'tagColors' : {'tag1' : '#000000', 'tag2' : '#FF0000', etc}  // for when OSD overlays should be colored differently based on tags
+     *    'APIKey': '23983hf98j3f9283jf2983fj'
      *  }
      *  }
      **/
@@ -4877,7 +4876,8 @@ window.Mirador = window.Mirador || function(config) {
     jQuery.extend(this, {
       element:   null,
       parent:    null,
-      annotations: []
+      annotations: [],
+      windowId:  ""
     }, options);
 
     this.init();
@@ -4894,10 +4894,11 @@ window.Mirador = window.Mirador || function(config) {
     },
     
     getEditor: function(annotation) {
-      var annoText,
+      var annoText = "",
       tags = [],
       _this = this;
 
+      if (!jQuery.isEmptyObject(annotation)) {
         if (jQuery.isArray(annotation.resource)) {
           jQuery.each(annotation.resource, function(index, value) {
             if (value['@type'] === "oa:Tag") {
@@ -4909,10 +4910,13 @@ window.Mirador = window.Mirador || function(config) {
         } else {
           annoText = annotation.resource.chars;
         }
+      }
 
       return this.editorTemplate({content : annoText,
-      tags : tags.join(" "),
-      id : annotation['@id']});
+        tags : tags.join(" "),
+        id : jQuery.isEmptyObject(annotation) ? "" : annotation['@id'],
+        windowId : _this.windowId
+      });
     },
 
     getViewer: function(annotations) {
@@ -4959,16 +4963,17 @@ window.Mirador = window.Mirador || function(config) {
         });
       });
 
-      var template = this.viewerTemplate({annotations : htmlAnnotations});      
+      var template = this.viewerTemplate({annotations : htmlAnnotations,
+        windowId : _this.windowId});
       return template;
       //return combination of all of them
     },
 
     //when this is being used to edit an existing annotation, insert them into the inputs
     editorTemplate: Handlebars.compile([
-                                       '<form class="annotation-editor annotation-tooltip" {{#if id}}data-anno-id="{{id}}"{{/if}}>',
+                                       '<form id="annotation-editor-{{windowId}}" class="annotation-editor annotation-tooltip" {{#if id}}data-anno-id="{{id}}"{{/if}}>',
                                        '<textarea class="text-editor" placeholder="{{t "comments"}}…">{{#if content}}{{content}}{{/if}}</textarea>',
-                                       '<input class="tags-editor" placeholder="{{t "addTagsHere"}}…" {{#if tags}}value="{{tags}}"{{/if}}>',
+                                       '<input id="tags-editor-{{windowId}}" class="tags-editor" placeholder="{{t "addTagsHere"}}…" {{#if tags}}value="{{tags}}"{{/if}}>',
                                        '<div>',
                                        // need to add a delete, if permissions allow
                                        '<div class="button-container">',
@@ -4980,7 +4985,7 @@ window.Mirador = window.Mirador || function(config) {
     ].join('')),
 
     viewerTemplate: Handlebars.compile([
-                                       '<div class="all-annotations">',
+                                       '<div class="all-annotations" id="annotation-viewer-{{windowId}}">',
                                        '{{#each annotations}}',
                                        '<div class="annotation-display annotation-tooltip" data-anno-id="{{id}}">',
                                        '<div class="button-container">',
@@ -4991,7 +4996,7 @@ window.Mirador = window.Mirador || function(config) {
                                        '{{#if username}}<p class="user">{{username}}:</p>{{/if}}',
                                        '<p>{{{annoText}}}</p>',
                                        '</div>',
-                                       '<div class="tags-viewer">',
+                                       '<div id="tags-viewer-{{windowId}}" class="tags-viewer">',
                                        '{{#each tags}}',
                                        '<span class="tag">{{this}}</span>',
                                        '{{/each}}',
@@ -5483,9 +5488,9 @@ window.Mirador = window.Mirador || function(config) {
 
     setTooltipContent: function(event, api) {
       var overlays = this.getOverlaysFromElement(jQuery(event.originalEvent.currentTarget), event.originalEvent),
-      annoTooltip = new $.AnnotationTooltip(), //pass permissions
-      annotations = [],
-      _this = this;
+      _this = this,
+      annoTooltip = new $.AnnotationTooltip({"windowId" : _this.parent.windowId}), //pass permissions
+      annotations = [];
 
       jQuery.each(overlays, function(index, overlay) {
        annotations.push(_this.getAnnoFromRegion(overlay.id)[0]);
@@ -5724,16 +5729,20 @@ window.Mirador = window.Mirador || function(config) {
     },
     
     removeAnnotationEvents: function(tooltipevent, api) {
-      jQuery('.annotation-tooltip a.delete').off("click");
-      jQuery('.annotation-tooltip a.edit').off("click");
-      jQuery('.annotation-tooltip a.save').off("click");
-      jQuery('.annotation-tooltip a.cancel').off("click");
+      var _this = this,
+      editorSelector = '#annotation-editor-'+_this.parent.windowId,
+      viewerSelector = '#annotation-viewer-'+_this.parent.windowId;
+      jQuery(viewerSelector+' a.delete').off("click");
+      jQuery(viewerSelector+' a.edit').off("click");
+      jQuery(editorSelector+' a.save').off("click");
+      jQuery(editorSelector+' a.cancel').off("click");
     },
 
     annotationEvents: function(tooltipevent, api) {
       var _this = this,
-      annoTooltip = new $.AnnotationTooltip();
-      jQuery('.annotation-tooltip a.delete').on("click", function(event) {
+      annoTooltip = new $.AnnotationTooltip({"windowId" : _this.parent.windowId}),
+      selector = '#annotation-viewer-'+_this.parent.windowId;
+      jQuery(selector+' a.delete').on("click", function(event) {
         event.preventDefault();
         
         if (!window.confirm("Do you want to delete this annotation?")) { 
@@ -5750,7 +5759,7 @@ window.Mirador = window.Mirador || function(config) {
         display.remove(); //remove this annotation display from dom
       });
 
-      jQuery('.annotation-tooltip a.edit').on("click", function(event) {
+      jQuery(selector+' a.edit').on("click", function(event) {
         event.preventDefault();
         
         var display = jQuery(this).parents('.annotation-display'),
@@ -5763,14 +5772,15 @@ window.Mirador = window.Mirador || function(config) {
     
     annotationSaveEvent: function(event, api) {
       var _this = this,
-      annoTooltip = new $.AnnotationTooltip();
+      annoTooltip = new $.AnnotationTooltip({"windowId" : _this.parent.windowId}),
+      selector = '#annotation-editor-'+_this.parent.windowId;
       
-      jQuery('.annotation-tooltip').on("submit", function(event) {
+      jQuery(selector).on("submit", function(event) {
         event.preventDefault();
-        jQuery('.annotation-tooltip a.save').click();
+        jQuery(selector+' a.save').click();
       });
 
-      jQuery('.annotation-tooltip a.save').on("click", function(event) {
+      jQuery(selector+' a.save').on("click", function(event) {
         event.preventDefault();
                   
         var display = jQuery(this).parents('.annotation-tooltip'),
@@ -5823,7 +5833,7 @@ window.Mirador = window.Mirador || function(config) {
         _this.unFreezeQtip(api, oaAnno, annoTooltip);
         });
         
-        jQuery('.annotation-tooltip a.cancel').on("click", function(event) {
+        jQuery(selector+' a.cancel').on("click", function(event) {
           event.preventDefault();
           var display = jQuery(this).parents('.annotation-tooltip'),
           id = display.attr('data-anno-id'),
@@ -6060,10 +6070,10 @@ window.Mirador = window.Mirador || function(config) {
     onDrawFinish: function(canvasRect) {
       var _this = this,
       parent = this.parent,
-      annoTooltip = new $.AnnotationTooltip(); //pass permissions
+      annoTooltip = new $.AnnotationTooltip({"windowId" : _this.parent.windowId}); //pass permissions
       var tooltip = jQuery(this.osdOverlay).qtip({
            content: {
-            text : annoTooltip.editorTemplate()
+            text : annoTooltip.getEditor({})
             },
             position : {
               my: 'bottom left',
@@ -6094,7 +6104,6 @@ window.Mirador = window.Mirador || function(config) {
               render: function(event, api) {
               
                 jQuery.publish('annotationEditorAvailable.'+parent.windowId);
-                //jQuery('form.annotation-tooltip input.tags-editor').tokenInput(_this.tags);
 
                 //disable all tooltips for overlays
                 jQuery.publish('disableTooltips.'+parent.windowId);
@@ -6102,8 +6111,10 @@ window.Mirador = window.Mirador || function(config) {
                 _this.osdViewer.zoomPerClick = 1;
                 _this.osdViewer.zoomPerScroll = 1;
 
+                var selector = '#annotation-editor-'+parent.windowId;
+
                 tinymce.init({
-                  selector : 'form.annotation-tooltip textarea',
+                  selector : selector+' textarea',
                   plugins: "image link media",
                   menubar: false,
                   statusbar: false,
@@ -6116,12 +6127,12 @@ window.Mirador = window.Mirador || function(config) {
                   }
                 });
 
-                jQuery('.annotation-tooltip').on("submit", function(event) {
+                jQuery(selector).on("submit", function(event) {
                   event.preventDefault();
-                  jQuery('.annotation-tooltip a.save').click();
+                  jQuery(selector+' a.save').click();
                 });
               
-                jQuery('.annotation-tooltip a.cancel').on("click", function(event) {
+                jQuery(selector+' a.cancel').on("click", function(event) {
                   event.preventDefault();
                   //add check so that dialog box only pops up if there is stuff in the editor
                   var content = tinymce.activeEditor.getContent();
@@ -6139,7 +6150,7 @@ window.Mirador = window.Mirador || function(config) {
                   _this.osdViewer.zoomPerScroll = 1.2;                  
                 });
                 
-                jQuery('.annotation-tooltip a.save').on("click", function(event) {
+                jQuery(selector+' a.save').on("click", function(event) {
                   event.preventDefault();
                   var tagText = jQuery(this).parents('.annotation-editor').find('.tags-editor').val(),
                   resourceText = tinymce.activeEditor.getContent(),

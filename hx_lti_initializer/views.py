@@ -226,6 +226,11 @@ def launch_lti(request):
             original.update({
                 'custom_css': course_obj.course_external_css_default
             })
+        if not assignment.object_before(object_id) is None:
+            original['prev_object'] = assignment.object_before(object_id)
+
+        if not assignment.object_after(object_id) is None:
+            original['next_object'] = assignment.object_after(object_id)
         original.update({
             'dashboard_hidden': assignment_target.get_dashboard_hidden()
         })

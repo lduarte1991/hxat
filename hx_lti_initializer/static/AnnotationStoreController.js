@@ -336,14 +336,14 @@ var MiradorEndpointController = function(deferredObject) {
 			window.AController.main.colorizeViewer();
 		});
 		jQuery.subscribe('annotationEditorAvailable.' + self.window.id, function (){
-			var tagElements = jQuery('.qtip').find('.tags-editor');
+			var tagElements = jQuery('#annotation-editor-'+self.window.id).find('.tags-editor');
 			if (typeof window.AController.main.tags !== "undefined") {
 				tagList = [];
 				Object.keys(window.AController.main.tags).forEach(function(tag){
 					tagList.push({'id': tag, 'name': tag});
 				});
 				tagElements.tokenInput(tagList);
-				jQuery('#token-input-').attr('placeholder', "Add tag...");
+				jQuery('#token-input-tags-editor' + self.window.id).attr('placeholder', "Add tag...");
 			};
 			if (typeof tagElements.attr("value") !== "undefined") {
 				var existingTags = tagElements.attr("value").split(" ");

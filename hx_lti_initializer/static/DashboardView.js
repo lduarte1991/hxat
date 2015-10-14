@@ -184,6 +184,7 @@
         });
         jQuery(divObject + ' .tagList').html(tagHtml);
     };
+    
 
     $.DashboardView.prototype.updateAnnotation = function(annotation) {
         var self = this;

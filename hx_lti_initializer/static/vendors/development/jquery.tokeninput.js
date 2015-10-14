@@ -266,12 +266,15 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.ENTER:
                 case KEY.NUMPAD_ENTER:
                 case KEY.COMMA:
+                case KEY.SPACE:
                   if(selected_dropdown_item) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
                     // this allows for tags to be color-coded based on instructor set-up
                     if (typeof Annotator !== "undefined") {
                         Annotator._instances[0].publish("colorEditorTags");
-                    };
+                    } else {
+                        window.AController.targetObjectController.colorizeEditor();
+                    }
                     hidden_input.change();
                     return false;
                   } else{
