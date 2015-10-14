@@ -327,7 +327,6 @@ var MiradorEndpointController = function(deferredObject) {
 		self.endpoint = self.window.endpoint;
 		deferredObject.resolve();
 		jQuery.subscribe('overlaysRendered.' + self.window.id, function() {
-			console.log("AnnotationListLoaded");
 			var annotations = self.window.annotationsList;
 			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
 				window.AController.main.colorizeAnnotations(annotations);
@@ -336,18 +335,24 @@ var MiradorEndpointController = function(deferredObject) {
 		jQuery.subscribe('tooltipViewerSet.' + self.window.id, function (){
 			window.AController.main.colorizeViewer();
 		});
-		/*jQuery('.mirador-osd-edit-mode').click(function (){
-			var annotations = self.window.annotationsList;
-			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
-				window.AController.main.colorizeAnnotations(annotations);
+		jQuery.subscribe('annotationEditorAvailable.' + self.window.id, function (){
+			var tagElements = jQuery('#annotation-editor-'+self.window.id).find('.tags-editor');
+			if (typeof window.AController.main.tags !== "undefined") {
+				tagList = [];
+				Object.keys(window.AController.main.tags).forEach(function(tag){
+					tagList.push({'id': tag, 'name': tag});
+				});
+				tagElements.tokenInput(tagList);
+				jQuery('#token-input-tags-editor' + self.window.id).attr('placeholder', "Add tag...");
+			};
+			if (typeof tagElements.attr("value") !== "undefined") {
+				var existingTags = tagElements.attr("value").split(" ");
+				existingTags.forEach(function(item) {
+					tagElements.tokenInput("add", {"id": item, "name": item});
+				});
+				window.AController.targetObjectController.colorizeEditor();
 			};
 		});
-		jQuery('.mirador-osd-annotations-layer').click(function (){
-			var annotations = self.window.annotationsList;
-			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
-				window.AController.main.colorizeAnnotations(annotations);
-			};
-		});*/
 	});
 	self.annotationsMasterList = [];
 	self.queryDefault = {
@@ -376,7 +381,6 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 			var annotations = self.endpoint.annotationsListCatch;
 			expected_fun(annotations);
 			
-			console.log("Loaded all again");
 		});
 	} else {
 		jQuery.subscribe(listener + '.' + self.window.id, function(event, annotation) {

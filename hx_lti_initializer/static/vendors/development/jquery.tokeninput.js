@@ -29,7 +29,7 @@ var DEFAULT_SETTINGS = {
 
     // Tokenization settings
     tokenLimit: null,
-    tokenDelimiter: ",",
+    tokenDelimiter: " ",
     preventDuplicates: true,
 
     // Output settings
@@ -266,10 +266,15 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.ENTER:
                 case KEY.NUMPAD_ENTER:
                 case KEY.COMMA:
+                case KEY.SPACE:
                   if(selected_dropdown_item) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
                     // this allows for tags to be color-coded based on instructor set-up
-                    Annotator._instances[0].publish("colorEditorTags")
+                    if (typeof Annotator !== "undefined") {
+                        Annotator._instances[0].publish("colorEditorTags");
+                    } else {
+                        window.AController.targetObjectController.colorizeEditor();
+                    }
                     hidden_input.change();
                     return false;
                   } else{
@@ -467,7 +472,7 @@ $.TokenList = function (input, url_or_data, settings) {
             });
 
         // Store data on the token
-        var token_data = {"id": item.id};
+        var token_data = {"id": item.id, "name": item.id};
         token_data[settings.propertyToSearch] = item[settings.propertyToSearch];
         $.data(this_token.get(0), "tokeninput", item);
 
