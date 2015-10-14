@@ -172,7 +172,7 @@
             jQuery('.item-' + parentId).find('.replyNum').html(numReply+1);
         };
         divObject = '.annotationItem.item-'+annotation.id.toString();
-        
+
         tagHtml = ""
         annotationItem.tags.forEach(function(tag){
             var style = "";

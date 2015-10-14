@@ -143,6 +143,7 @@ AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations
 		self.annotator.setupAnnotation(annotation);
 		self.annotator.plugins.Store.registerAnnotation(annotation);
 	});
+	self.annotator.publish("externalCallToHighlightTags");
 };
 
 AnnotatorEndpointController.prototype.addNewAnnotationToMasterList = function(annotation) {
@@ -408,7 +409,7 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 		self.window.annotationsList.push(oaAnnotation);
 	});
 	jQuery.publish('annotationListLoaded.' + self.window.id);
-
+	this.annotator.publish('')
 	// trigger only after adding all items to annotationListCatch
 };
 
