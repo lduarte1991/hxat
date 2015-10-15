@@ -1,0 +1,5 @@
+input[type=checkbox].mirador_option.form-control {
+    display: inline;
+    width: auto;
+    height: auto;
+}

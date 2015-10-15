@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <title>HxAT Instructor Manual</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="generator" content="Clarify http://www.clarify-it.com">
+  <meta content="" name="description">
+  <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0" />
+  
+  <link href="css/corporate.css" media="screen" rel="stylesheet" type="text/css" /><!-- main CSS for structure and style-->
+  <link href="css/prettyPhoto.css" media="screen" rel="stylesheet" type="text/css" charset="utf-8" />
+  <script src="js/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+      $("a[rel^='prettyPhoto']").prettyPhoto({
+      	theme: 'pp_default',
+        show_title: false,
+        social_tools:false
+      }); 
+    }); 	
+  </script>
+</head>
+
+<body>
+  <div id="wrapper">
+  	<div id="header-row">
+  		<div id="header-left">
+        <div id="header-left-content">
+          <div class="align-bottom">
+            <h1 class="clarify-article-title">HxAT Instructor Manual</h1>
+          </div>
+        </div>
+  		</div>
+  		<div id="header-right">
+  			<span class="align-image-bottom"></span>
+		  	  		</div>
+  	</div>
+    <div id="clarify-article-content">
+            <div class="clarify-article-description">
+        <p>The following manual will guide the instructor through setting up the HxAT in edX. It will also go through the steps of setting up the tool in the Admin Hub. A <a href="../HxAT Instructor Manual.pdf">PDF version of this manual</a> is also available.</p>
+      </div>      <div class="clarify-steps-container">					<div id="clarify-step-1" class="clarify-step-container">						<h2 class="clarify-step-title">1. Adding LTI module to edX</h2>						<div class="clarify-step-instructions"><p>First thing you need to do is head over to the &quot;Advanced Settings&quot; page in Studio.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/adding-lti-module-to-edx.png" width="823" height="166" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					<div class="clarify-sub-steps-container">
+					<div id="clarify-step-2" class="clarify-sub-step-container">						<h3 class="clarify-step-title">1.1 Advanced Settings - Advanced Module List</h3>						<div class="clarify-step-instructions"><p>edX allows you to add advanced modules, which are usually experimental, not commonly used because of the amount of settings involved to turn them on, or at least not necessarily upkept by edX. Here you can add the LTI module which allows you to add any LTI tool you would like as part of the platform. Here you will want to make sure you add &quot;lti&quot; (all lowercase!) to the &quot;Advanced Module List&quot;. Note that the policy definitions are all in alphabetical order. </p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/advanced-settings---advanced-module-list.png" width="768" height="476" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-4" class="clarify-sub-step-container">						<h3 class="clarify-step-title">1.2 Advanced Settings - LTI Passports</h3>						<div class="clarify-step-instructions"><p>Now scroll down to the LTI Passports option. Here you will have to input an ID (could be anything you like, I call it &quot;hxat&quot; or &quot;hx_annotations&quot;) followed by a colon, followed by the key for the LTI tool (ask for this information) and the secret password for the LTI tool (also ask for this) after a second colon.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/advanced-settings---lti-passports.png" width="768" height="244" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-5" class="clarify-sub-step-container">						<h3 class="clarify-step-title">1.3 Ready to Go!</h3>						<div class="clarify-step-instructions"><p>That should be all you need! Please remember the ID code you used in the LTI Passports section as you will need to referenced later. </p></div>					</div>					<div class="clarify-clear"></div>					</div>
+					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-6" class="clarify-step-container">						<h2 class="clarify-step-title">2. Setting Up HxAT in LTI Module</h2>						<div class="clarify-step-instructions"><p>Now head over to the section in the course where you want the annotation tool to appear. Once you've created a new unit, you will see an &quot;Advanced&quot; button as an option to add a new component.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/setting-up-hxat-in-lti-module.png" width="763" height="276" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					<div class="clarify-sub-steps-container">
+					<div id="clarify-step-7" class="clarify-sub-step-container">						<h3 class="clarify-step-title">2.1 Add LTI Module</h3>						<div class="clarify-step-instructions"><p>Now click on the &quot;LTI&quot; module option. <strong>Note:</strong> If you had previously turned on any annotation modules, DO NOT CLICK the option here. &quot;Image Annotation&quot; and &quot;Text Annotation&quot; will take you to the old tool that will be removed very soon and you may be left with errors in your course if you choose them as an option.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/add-lti-module.png" width="995" height="359" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-8" class="clarify-sub-step-container">						<h3 class="clarify-step-title">2.2 Editing the LTI Settings</h3>						<div class="clarify-step-instructions"><p>Now you will see a generic component for LTIs we will go into edit mode to set up the appropriate settings.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/editing-the-lti-settings.png" width="761" height="242" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-9" class="clarify-sub-step-container">						<h3 class="clarify-step-title">2.3 Settings - Part 1</h3>						<div class="clarify-step-instructions"><p>After changing the Display Name for the component (as you would do with any other components), scroll all the way down to LTI ID. Remember the ID you were supposed to remember from Advanced settings? Here's where it comes into play. Change the LTI URL to the one below <a href="[https://hxat.harvardx.harvard.edu/lti_init/launch_lti/].">[</a><strong><a href="[https://hxat.harvardx.harvard.edu/lti_init/launch_lti/].">https://hxat.harvardx.harvard.edu/lti_init/launch_lti/</a></strong><a href="[https://hxat.harvardx.harvard.edu/lti_init/launch_lti/].">].</a> And change the Open in New Page to <strong>False</strong>.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/settings---part-1.png" width="920" height="398" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-10" class="clarify-sub-step-container">						<h3 class="clarify-step-title">2.4 Settings - Part 2</h3>						<div class="clarify-step-instructions"><p>The last option you <strong>must</strong> turn on is to change request user's username to <strong>True</strong>. Then hit Save to finish the set up. <strong>Note:</strong> Because of a current studio issue with edX, you will see a <strong>403 Forbidden</strong> error. Do not freak out, publish and view live or just hit preview and you will see the admin hub.</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/settings---part-2.png" width="1042" height="587" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					</div>
+					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-11" class="clarify-step-container">						<h2 class="clarify-step-title">3. Admin Hub</h2>						<div class="clarify-step-instructions"><p>The firs time you open the annotation tool, you will see the following page. It will take your course ID from edX but edX does not pass in the actual name of the course. So first step after you reach here is to hit the &quot;Change Course Settings&quot; button. </p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/admin-hub.png" width="780" height="260" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					<div class="clarify-sub-steps-container">
+					<div id="clarify-step-12" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.1 Course Settings Page</h3>						<div class="clarify-step-instructions"><p>In this page you will change the name of the course. Everything is done via the course ID so you can feel free to change the name of the course to whatever you'd like. Learners can currently not see this, but always err on the side of it popping up somewhere. </p>
+<p>Here you can add administrators for the course. When one of your TFs/Staff logs on for the first time they will not be able to see the course until you add them to course admins. They will need to log in at least onces via edX to create a profile (happens automatically when they reach this page). Then you will see them from the dropdown list and be able to add them. </p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/course-settings-page.png" width="662" height="364" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-13" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.2 Assignments - Part 1</h3>						<div class="clarify-step-instructions"><p>Let's start out with your first assignment. Once back in the hub main page, hit the &quot;Create New Assignment&quot; button. </p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-1.png" width="662" height="294" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-14" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.3 Assignments - Part 2</h3>						<div class="clarify-step-instructions"><p>The Assignment page is split up into two areas. The first area is the tabular options section on the top half of the page. </p>
+<ol><li>In the first part you will see different Tabs, each with its own set of information that must be filled out. If you forget to fill out one or more of the required fields, you will be brought back to this page and the missing section will be marked in red, so make sure you go through each tab to make sure you've filled out all pertinent information.</li>
+<li>Give a name to the Assignment. They are organized in reverese chronological order on the main page (i.e. the newest assignment at the top) so make sure you name it something that will let you keep track of it.</li>
+<li>Course: make sure you associate it with your course. </li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-2.png" width="662" height="342" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-15" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.4 Assignments - Part 3</h3>						<div class="clarify-step-instructions"><ol><li>Database Settings contains information about where the annotations are stored. Make sure to get the following information from the person in charge. <strong>Do NOT use the same information you may have used in a previous version of the course as those credentials may be removed without notice.</strong></li>
+<li>URL - make sure that this is pointing to the production, i.e. the url should not say &quot;dev&quot; anywhere.</li>
+<li>APIKey is a username to access the database</li>
+<li>Secret token is the password to access the database. DO NOT SHARE THIS WITH ANYONE.</li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-3.png" width="662" height="264" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-16" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.5 Assignments - Part 4</h3>						<div class="clarify-step-instructions"><ol><li>This section sets up the dashboard (in this case sidebar) for the annotations. </li>
+<li>Allows you to include an instructor tab to separate out instructor annotations.</li>
+<li>Sets what the default tab for the dashboard</li>
+<li>How many annotations are loaded initially, default is 50. </li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-4.png" width="662" height="294" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-17" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.6 Assignments - Part 5</h3>						<div class="clarify-step-instructions"><ol><li>These are specific settings for the annotation tool and what you see over the target content.</li>
+<li>Allows you to add predetermined tags and colors</li>
+<li>Input tags and colors in the following manner: <strong>tag1:color1,tag2:color2,tag3:color3</strong></li>
+<li>Purely experimental settings at the moment, will notify when these become available.</li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-5.png" width="662" height="405" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-18" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.7 Assignments - Part 6</h3>						<div class="clarify-step-instructions"><p>The second part to the assignment page lets you organized all of the source material you are including in this one assignment. You should see a table below with at least one row. In each row you will see a source material name (or the words &quot;Nothing selected&quot; if it's your first time here), a plus sign, a gear icon, a trash icon, and three vertical dots.</p>
+<ol><li>The first item you will notice is a big green button that says &quot;Add Source Materials&quot;. Note: This does not create new materials! It only adds existing ones. You can add materials by hitting the plu icon (#3 below) on a new row you have added. Think of this as making a spreadsheet and linking out to the individual pieces of text or the images you want to include in this assignment.</li>
+<li>Here you will see the name of the current selected material. If you click on it, you'll get a dropdown list of all available source materials from all different courses. Once the list gets too long, you might want to use the search functionality to find the source material you are looking for.</li>
+<li>The plus sign on the right allows you to create a new piece of source material (text/image/video). Clicking on this will cause a pop-up window to appear that lets you input your information. Once you hit save there, it should automatically select the new material piece in the dropdown menu to the left (#2).</li>
+<li>The gear allows you to set settings particular to this assignment. Currently you can add instructions to the source material for this assignment, set up any mirador settings for images, and even allow you to link specific css to the page from an external source. </li>
+<li>The trash icon allows you to delete the row. Note: this does not delete the source material, but merely disconnects it from this assignment. If you really need to delete a piece of source material let me know, otherwise feel free to edit.</li>
+<li>I suggest you only do this after saving at least once: you can move the rows up or down to reorganized the source materials to the order you want them. You can always come back and do this if you've saved before.</li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/assignments---part-6.png" width="932" height="263" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-19" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.8 Editing the Hub</h3>						<div class="clarify-step-instructions"><ol><li>Once you hit save above you should be taken back to the main hub page. Here you will find the assignment you just created. Clicking on the row or the arrow on the right will open up the assignment to reveal your source materials in the order they appeared in the previous section.</li>
+<li>Clicking on the edit button to the left of an assignment will take you to the page with the settings you just saw above (Steps 3.2-3.7)</li>
+<li>Clicking on the name of the assignment will take you to what the students will see while clicking on the edit to the left will take you to the page you reached when you first made that source material.</li>
+<li>Hitting Setup Info will make a box appear at the top of the screen with information on how to get the user to be directed to the appropriate page <strong>(extremely important step!!!)</strong></li>
+</ol></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/editing-the-hub.png" width="916" height="350" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-20" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.9 Setup Info Clicked</h3>						<div class="clarify-step-instructions"><p>You will see a box appear with two fields (collection_id) and (object_id) and values associated with that page. <strong>Note:</strong> you only need to do this for the first object in the assignment that the users will see. Open up studio in a separate screen and hit edit on the LTI module to bring up the &quot;custom parameters&quot; setting. </p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/setup-info-clicked.png" width="662" height="226" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					<div id="clarify-step-21" class="clarify-sub-step-container">						<h3 class="clarify-step-title">3.10 Leading Students to the right page</h3>						<div class="clarify-step-instructions"><p>Hit the blue &quot;Add&quot; button on the edit settings section and copy and paste the values into different lines, one for collection_id and one for object_id. Once that is complete, hit save and now when you switch to &quot;Student&quot; in preview or live mode, you should be taken to the page you specified below. Otherwise, you will see an error!!</p></div>
+												<div class="clarify-step-image-wrapper">
+							<div class="clarify-step-image-container">
+								<img src="./images/docs/hxat-instructor-manual/leading-students-to-the-right-page.png" width="662" height="379" class="clarify-step-image" alt="" />
+								
+							</div>
+						</div>					</div>					<div class="clarify-clear"></div>					</div>
+					</div>					<div class="clarify-clear"></div>      </div>    </div>
+    <div class="footer">
+      <div class="align-bottom">
+  			<p></p>
+  		</div>
+		</div>
+  </div>
+</body>
+</html>

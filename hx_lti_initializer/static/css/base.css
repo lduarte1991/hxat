@@ -187,6 +187,8 @@ li {
 
 .navigation a {
     color: #000;
+    margin-left: 10px;
+    margin-right: 30px;
 }
 
 .navigation a:hover {
