@@ -39,10 +39,10 @@
   <body>
 <div id="viewer" class="test">
   {% if prev_object %}
-  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;bottom:0;;position:absolute;margin-left:20px;z-index:999999;opacity:0.3;" class="btn btn-primary" role="button" id="prev_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;bottom:0;;position:absolute;margin-left:20px;z-index:999999;opacity:0.3;transition-duration:0.4s" class="btn btn-primary" role="button" id="prev_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
   {% endif %}
   {% if next_object %}
-  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;bottom:0;right:0;position:absolute;margin-right:120px;z-index:9;opacity:0.3;" class="btn btn-primary" role="button" id="next_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;bottom:0;right:0;position:absolute;margin-right:120px;z-index:9;opacity:0.3;transition-duration:0.4s" class="btn btn-primary" role="button" id="next_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
   {% endif %}
 </div>
 <div id="dashboard"></div>
@@ -143,6 +143,7 @@ $(function() {
       };
       AController(options);
     });
+  
 </script>
 </body>
 </html>

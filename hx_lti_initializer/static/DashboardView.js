@@ -240,7 +240,6 @@
 		jQuery('.resize-handle.side').on('mousedown', function(e){
 			self.resizing = true;
             self.moving = false;
-            console.log("MouseDown");
 		});
 		
         jQuery(document).on('mousemove', function(e){
@@ -307,7 +306,6 @@
             if (self.moving) {
                 return;
             };
-            console.log("MouseClick");
             var section = jQuery('.annotationSection');
             var handle = jQuery('.resize-handle');
             if (parseInt(section.css('width'), 10) >= 150) {

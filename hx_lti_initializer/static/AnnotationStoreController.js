@@ -353,6 +353,15 @@ var MiradorEndpointController = function(deferredObject) {
 				window.AController.targetObjectController.colorizeEditor();
 			};
 		});
+		jQuery.subscribe('bottomPanelSet.' + self.window.id, function(ev, isVisible) {
+			if (isVisible) {
+				jQuery('#prev_target_object').css('bottom', '130px');
+				jQuery('#next_target_object').css('bottom', '130px');
+			} else {
+				jQuery('#prev_target_object').css('bottom', '0px');
+				jQuery('#next_target_object').css('bottom', '0px');
+			}
+		});
 	});
 	self.annotationsMasterList = [];
 	self.queryDefault = {
