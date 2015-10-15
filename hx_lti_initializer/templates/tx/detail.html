@@ -20,11 +20,11 @@
 <script src="{% static "vendors/development/summernote.js" %}"></script>
 <!--<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>-->
 <script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
-<script src="{% static "AController.js" %}"></script>
-<script src="{% static "AnnotationMain.js" %}"></script>
-<script src="{% static "AnnotationCore.js" %}"></script>
-<script src="{% static "DashboardController.js" %}"></script>
-<script src="{% static "TargetObjectController.js" %}"></script>
+<script src="{% static "AController.js" %}?{% now "U" %}"></script>
+<script src="{% static "AnnotationMain.js" %}?{% now "U" %}"></script>
+<script src="{% static "AnnotationCore.js" %}?{% now "U" %}"></script>
+<script src="{% static "DashboardController.js" %}?{% now "U" %}"></script>
+<script src="{% static "TargetObjectController.js" %}?{% now "U" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
 <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
