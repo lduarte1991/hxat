@@ -35,7 +35,7 @@
 						jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
 					};
 				})
-			}, 60);
+			}, 30);
 		};
 	};
 
