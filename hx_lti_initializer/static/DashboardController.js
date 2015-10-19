@@ -385,6 +385,7 @@
         item.authToDeleteButton = authorized;
         item.authToEditButton = updateAuthorized;
         item.authorized = authorized || updateAuthorized;
+        item.tags = item.tags || [];
         return item;
 	};
 
