@@ -370,6 +370,10 @@ class LTIInitializerCourseFormTests(TestCase):
         self.course = course
         self.course_form = CourseForm(instance=course)
     
+    def tearDown(self):
+        User.objects.filter(pk__in=[u.id for u in self.course_admins]).delete()
+        self.course.delete()
+    
     def test_course_form_admins(self):
         course_admins_queryset = self.course_form.get_course_admins().all()
         given_course_admin_names = [(profile.user.first_name, profile.user.last_name) for profile in course_admins_queryset]
