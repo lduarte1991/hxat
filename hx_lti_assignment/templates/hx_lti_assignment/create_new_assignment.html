@@ -27,11 +27,16 @@
 		} else {
 			jQuery('#id_highlights_options').parent().parent().hide();
 		}
-		if (jQuery('#id_include_instructor_tab').is(':checked')){
-			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+		if (!jQuery('#id_include_instructor_tab').is(':checked')){
+			jQuery('#id_default_tab').find('option').first().addClass('hidden');
 		}
 		jQuery('#id_include_instructor_tab').change(function(event){
-			jQuery('#id_default_tab').find('option').first().toggleClass('hidden');
+			if (jQuery('#id_include_instructor_tab').is(':checked')) {
+				jQuery('#id_default_tab').find('option').first().removeClass('hidden');
+			} else {
+				jQuery('#id_default_tab').find('option').first().addClass('hidden');
+			}
+			
 			jQuery('#id_default_tab').selectpicker('refresh');            
         });
         jQuery('#id_allow_highlights').change(function(event){
