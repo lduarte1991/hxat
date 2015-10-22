@@ -20,11 +20,11 @@
 <script src="{% static "vendors/development/summernote.js" %}"></script>
 <!--<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>-->
 <script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
-<script src="{% static "AController.js" %}"></script>
-<script src="{% static "AnnotationMain.js" %}"></script>
-<script src="{% static "AnnotationCore.js" %}"></script>
-<script src="{% static "DashboardController.js" %}"></script>
-<script src="{% static "TargetObjectController.js" %}"></script>
+<script src="{% static "AController.js" %}?{% now "U" %}"></script>
+<script src="{% static "AnnotationMain.js" %}?{% now "U" %}"></script>
+<script src="{% static "AnnotationCore.js" %}?{% now "U" %}"></script>
+<script src="{% static "DashboardController.js" %}?{% now "U" %}"></script>
+<script src="{% static "TargetObjectController.js" %}?{% now "U" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
 <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+<link rel="stylesheet" href="{% static "css/instructions.css" %}">
 <!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
@@ -51,7 +52,7 @@
         };
         console.log("sending message to receiver: ", message, receiver);
         window.parent.postMessage(JSON.stringify(message), receiver);
-    }, 1000); 
+    }, 1000);
 </script>
 
 <div class="container fit-to-canvas">
@@ -60,8 +61,15 @@
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
         </div>
   		<div class="col-xs-7" id="leftCol">
-			<h1>{{ target_object.target_title | safe }}</h1>
-			<h3>by {{ target_object.target_author | safe }}</h3>
+        <div class="instructions-container" style="display:{% if instructions %}block{% else %}none{% endif %};">
+    			<div class="instructions-title">
+    				Instructions
+    				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
+    			</div>
+    			<div class="instructions-body collapse in" aria-expanded="true">{{ instructions | escape | linebreaks }}</div>
+    		</div>
+        <h1>{{ target_object.target_title | escape }}</h1>
+			<h3>by {{ target_object.target_author | escape | linebreaks }}</h3>
 			<div class="content">
 			{{ target_object.target_content | safe }}
 			</div>
@@ -115,7 +123,7 @@ jQuery(function ($) {
 						//'Touch',
 					],
 					'database_url': "{{ abstract_db_url }}", //"{{ assignment.annotation_database_url }}",
-					'citation': "{{ target_object.target_citation | safe }}",
+					'citation': "{{ target_object.target_citation | escapejs }}",
 					{% if assignment.allow_highlights %}
 					'higlightTags_options': "{{ assignment.highlights_options }}",
 					{% endif %}
@@ -140,7 +148,7 @@ jQuery(function ($) {
 		if (typeof Annotator.Plugin["Grouping"] === 'function') {
 			options = {
 	    		optionsOVA: {
-		    		posBigNew: 'none', 
+		    		posBigNew: 'none',
 		    		default_tab: 'Public',
 		    		annotation_tool: AController.annotationCore.annotation_tool,
 		    	}
@@ -149,4 +157,13 @@ jQuery(function ($) {
 		}
 	});
 });
+</script>
+<script>
+	jQuery('.toggle-instructions').click(function (){
+		if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+			jQuery('.toggle-instructions').html('Expand Instructions');
+		} else {
+			jQuery('.toggle-instructions').html('Collapse Instructions');
+		}
+	});
 </script>
