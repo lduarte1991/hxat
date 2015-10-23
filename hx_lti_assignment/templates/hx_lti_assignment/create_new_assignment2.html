@@ -1,0 +1,36 @@
+{% extends 'hx_lti_initializer/base.html' %}
+{% load extra_options %}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block content %}
+{% load staticfiles %}
+<script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
+<script src="{% static "vendors/development/jquery-ui.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<link rel="stylesheet" href="{% static "css/assignments.css" %}">
+
+<h2>Assignment Form</h2>
+	<form method="POST" class="post-form">{% csrf_token %}
+		{% load crispy_forms_tags %}
+		{{ form.management_form }}
+		{% crispy form %}
+	</form>
+
+	<script>
+		jQuery(document).ready(function(){
+			jQuery('#id_course').val({{context_id.id}});
+			jQuery('#id_course').trigger("change");
+		});
+	</script>
+{% endblock %}

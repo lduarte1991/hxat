@@ -1,0 +1,22 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+<div class="container">
+    <br/>
+    <div class="navigation">
+        <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+    </div>
+    <div>
+        <br/>
+        <h1>Oops, an error occurred.</h1>
+        <h3>{{ message }}</h3>
+    </div>
+</div>

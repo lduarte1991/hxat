@@ -71,6 +71,8 @@ def edit_source(request, id):
         {
             'form': form,
             'user': request.user,
+            'creator': request.session['creator_default'],
+            'course': request.session['course_name'],
         }
     )
 
@@ -87,7 +89,13 @@ def handlePopAdd(request, addForm, field):
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))  # noqa
     else:
         form = addForm()
-    pageContext = {'form': form, 'field': field, 'user': request.user}
+    pageContext = {
+        'form': form,
+        'field': field,
+        'user': request.user,
+        'creator': request.session['creator_default'],
+        'course': request.session['course_name'],
+    }
     return render_to_response(
         "target_object_database/source_form.html",
         RequestContext(request, pageContext)

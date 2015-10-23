@@ -137,7 +137,6 @@
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
 	};
 
-
 	$.DashboardController.prototype.loadMoreAnnotations = function() {
 		var annotator = this.annotator;
 

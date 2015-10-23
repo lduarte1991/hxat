@@ -29,7 +29,7 @@
 	 */
 	$.AnnotationCore.prototype.init = function(mediaType){
 		// use this space to mold initOptions into whatever shape you need it to be
-		annotatorOptions = this.initOptions;
+		var annotatorOptions = this.initOptions;
 		
 		// sets up the store for the common settings for the tool, specifically Annotation Database
 		this.setUpCommonAttributes();
@@ -52,7 +52,7 @@
 	 * Init some plugins or options that are common between text, video, and image.
 	 */
 	$.AnnotationCore.prototype.setUpCommonAttributes = function(){
-		annotatorOptions = this.initOptions
+		var annotatorOptions = this.initOptions
 
 		// checks to make sure whether the store attribute exists
 		if (typeof annotatorOptions.store === "undefined"){
@@ -92,8 +92,8 @@
 	};
 
 	$.AnnotationCore.prototype.setUpPlugins = function() {
-	    for (plugin in this.initOptions.plugins){
-	    	pluginName = this.initOptions.plugins[plugin];
+	    for (var plugin in this.initOptions.plugins){
+	    	var pluginName = this.initOptions.plugins[plugin];
 	    	var options = {};
 	    	if (pluginName === "Store") {
 		    	options = {
@@ -158,7 +158,7 @@
 	                      if (tokens.length === 0) {
 	                        return true;
 	                      }
-	                      for (item in tokens) {
+	                      for (var item in tokens) {
 	                        token = tokens[item];
 	                        if (this.userId(user) === token) {
 	                          return true;

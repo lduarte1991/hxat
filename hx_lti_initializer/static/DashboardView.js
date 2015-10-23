@@ -505,7 +505,26 @@
 		});
 	};
 
-	$.DashboardView.prototype.displayReplies = function(replies) {
+    $.DashboardView.prototype.sortAnnotationsByCreated = function(annotations) {
+        var compareCreated = function(a, b) {
+            if (!("created" in a && "created" in b)) {
+                return 0;
+            }
+            // get the ISO8601 time w/o the TZ so it's parseable by Date()
+            // and then compare the millisecond values.
+            // Ex: "2015-09-22T16:30:00 UTC" => Date.parse("2015-09-22T16:30:00") => 1442939400000
+            t1 = Date.parse(a.created.split(' ', 2)[0]);
+            t2 = Date.parse(b.created.split(' ', 2)[0]);
+            return t1 > t2;
+        };
+
+        sorted_annotations = (annotations||[]).slice(); // shallow copy to preserve order of original array
+        sorted_annotations.sort(compareCreated); // sort in place
+        return sorted_annotations;
+    };
+
+	$.DashboardView.prototype.displayReplies = function(replies_unsorted) {
+        var replies = self.sortAnnotationsByCreated(replies_unsorted);
 		var self = this;
         var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
 		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();

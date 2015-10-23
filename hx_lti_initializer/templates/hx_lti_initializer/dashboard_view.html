@@ -1,0 +1,177 @@
+<!-- TODO: base template? Any common html that can be factored out. -->
+<!-- Load static? -->
+{% load hx_lti_initializer_extras %}
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+        <!-- TODO: is this staticfiles or http_static? -->
+        {% load static from staticfiles %} 
+        {# Load the tag library #} 
+        {% load bootstrap3 %} 
+        {# Load CSS and JavaScript #} 
+        {% bootstrap_css %} 
+        {% bootstrap_javascript %} 
+        {# Display django.contrib.messages as Bootstrap alerts #} 
+        {% bootstrap_messages %}
+        
+        <title>Instructor Dashboard</title>
+    </head>
+
+    <body>
+        <br/>
+        <div class="container">
+        <div class="navigation">
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+        </div>
+        <br>
+        {% if user_objects %}
+            <div>
+                <div class="input-group">
+                    <div class="input-group-btn search-panel">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        	<span id="search_concept">By Name</span> <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#name">By Name</a></li>
+                            <li><a href="#content">By Content</a></li>
+                        </ul>
+                    </div>
+                    <input type="text" id="studentsearch" class="form-control" placeholder="Filter users...">
+                    <input type="hidden" name="search_param" value="name" id="search_param">
+                </div>
+                <div id="student_list" class="list-group">
+                    <br/>
+                    {% for user in user_objects %}
+                    <div>
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div data-toggle="collapse" data-parent="#accordion" href="#{{ user.id }}" class="panel-heading list-group-item" style="cursor: pointer;">
+                                    <h4 class="panel-title">
+                                        {{ user.name }}
+                                    </h4>
+                                </div>
+                                <div id="{{ user.id }}" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                            <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <!-- Only Date isn't of variable length -->
+                                                    <th class="col-md-1">Date</th>
+                                                    <th>Assignment</th>
+                                                    <th>Object</th>
+                                                    <th>Line</th>
+                                                    <th>Annotation</th>
+                                                    <th>Tags</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for annotation in user.annotations %}
+                                                <!-- TODO: Test with assignment deletion -->
+                                                {% assignment_object_exists annotation.uri annotation.collectionId as exists %}
+                                                {% if exists %}
+                                                <tr>
+                                                    <!-- TODO: Time formatting ok? -->
+                                                    <!-- Last updated or date created? -->
+                                                    <td> {{ annotation.updated | format_date }} </td> 
+                                                    <!-- TODO: url according to protocol? -->
+                                                    <td>
+                                                        {% get_assignment_name annotation.collectionId %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="admin_hub/{{ annotation.contextId }}/{{ annotation.collectionId }}/{{ annotation.uri }}/preview/">
+                                                            {% get_target_object_name annotation.uri %}
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        {% if annotation.parent == "0" %}
+                                                            "{{ annotation.quote }}"
+                                                        {% else %}
+                                                            <b>Reply To:</b> "{% get_annotation_by_id annotation.parent annotation_dict %}"
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ annotation.text | safe }}</td>
+                                                    
+                                                    <td>{{ annotation.tags | format_tags }}</td>
+                                                </tr>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                No annotations to display
+            </div>
+        {% endif %}
+        </div>
+    </body>
+</html>
+
+<script>
+$(document).ready(function(){
+    // Search type (name by default)
+    var type = 'name';
+    // Get all panels 
+    var $panels = $('.panel');
+    
+    // Handles toggling for search bar dropdown
+    $('.search-panel .dropdown-menu').find('a').click(function(e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.search-panel span#search_concept').text(concept);
+        $('.input-group #search_param').val(param);
+        // Update search type
+        type = param;
+        // Update view
+        update($('#studentsearch').val().toLowerCase());
+        
+    });
+    
+    // Search on key press
+    $('#studentsearch').on('keyup', function(e){
+        var val = this.value.toLowerCase();
+        
+        // Only trigger if alphanumeric character is entered
+        if ((e.which <= 90 && e.which >= 48)) {
+            update(val);
+        }
+        
+        // Collapse and show all panels
+        else if (val == '') {
+            $panels.show();
+            $('.panel-collapse').collapse('hide');
+        }
+    });
+    
+    // Updates view
+    function update(value) {
+        // lookup table for search type
+        var selector_for = {
+          'name': '.panel-title',
+          'content': '.panel-body'
+        };
+        
+        // match search type to selector
+        var selector = selector_for[type];
+        
+        if (selector && value != '') {
+            // Show panels that match user
+            $panels.show().filter(function(){
+                $('.panel-collapse').collapse('show');
+                var title = $(this).find(selector).text().toLowerCase();
+                return title.indexOf(value) < 0;
+            }).hide();
+        }
+    }
+});
+</script>
