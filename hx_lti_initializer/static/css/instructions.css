@@ -18,11 +18,11 @@
 }
 
 .instructions-title {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .instructions-body {
-	border-top: 1px solid #c8c8c8;
+    border-top: 1px solid #c8c8c8;
     margin-top: 0.5em;
     padding-top: 0.5em;
 }

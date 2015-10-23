@@ -161,7 +161,6 @@ def launch_lti(request):
     Gets a request from an LTI consumer.
     Passes along information to render a welcome screen to the user.
     """
-
     validate_request(request)
     tool_provider = initialize_lti_tool_provider(request)
 
@@ -182,112 +181,113 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    if settings.ORGANIZATION == "HARVARDX":
-        if "Student" in roles or "Learner" in roles:
-            collection_id = get_lti_value(
-                settings.LTI_COLLECTION_ID,
-                tool_provider
+    if settings.ORGANIZATION == "HARVARDX" and "Student" in roles or "Learner" in roles:
+        collection_id = get_lti_value(
+            settings.LTI_COLLECTION_ID,
+            tool_provider
+        )
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+        debug_printer('DEBUG - Found assignment: %s' % collection_id)
+        debug_printer('DEBUG - Found object being accessed: %s' % object_id)
+
+        user_name = get_lti_value('lis_person_name_full', tool_provider)
+        if user_name is None:
+            # gather the necessary data from the LTI initialization request
+            user_name = get_lti_value('lis_person_sourcedid', tool_provider)
+
+        try:
+            assignment = Assignment.objects.get(assignment_id=collection_id)
+            targ_obj = TargetObject.objects.get(pk=object_id)
+            assignment_target = AssignmentTargets.objects.get(
+                assignment=assignment,
+                target_object=targ_obj
             )
-            object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-            debug_printer('DEBUG - Found assignment: %s' % collection_id)
-            debug_printer('DEBUG - Found object being accessed: %s' % object_id)
+            course_obj = LTICourse.objects.get(course_id=course)
+        except (Assignment.DoesNotExist or
+                TargetObject.DoesNotExist or
+                AssignmentTargets.DoesNotExist):
+            raise PermissionDenied()
 
-            user_name = get_lti_value('lis_person_name_full', tool_provider)
-            if user_name is None:
-                # gather the necessary data from the LTI initialization request
-                user_name = get_lti_value('lis_person_sourcedid', tool_provider)
+        save_session(
+            request,
+            user_id,
+            collection_id,
+            object_id,
+            course,
+            roles,
+            False
+        )
 
-            try:
-                assignment = Assignment.objects.get(assignment_id=collection_id)
-                targ_obj = TargetObject.objects.get(pk=object_id)
-                assignment_target = AssignmentTargets.objects.get(
-                    assignment=assignment,
-                    target_object=targ_obj
-                )
-                course_obj = LTICourse.objects.get(course_id=course)
-            except (Assignment.DoesNotExist or
-                    TargetObject.DoesNotExist or
-                    AssignmentTargets.DoesNotExist):
-                raise PermissionDenied()
-
-            save_session(
-                request,
+        original = {
+            'user_id': user_id,
+            'username': user_name,
+            'is_instructor': (
+                request.user and
+                request.user.is_authenticated() and
+                "Learner" not in roles
+            ),
+            'collection': collection_id,
+            'course': course,
+            'object': object_id,
+            'roles': roles,
+            'target_object': targ_obj,
+            'token': retrieve_token(
                 user_id,
-                collection_id,
-                object_id,
-                course,
-                roles,
-                False
-            )
+                assignment.annotation_database_apikey,
+                assignment.annotation_database_secret_token
+            ),
+            'assignment': assignment,
+            'instructions': assignment_target.target_instructions,
+            'org': settings.ORGANIZATION,
+        }
 
-            original = {
-                'user_id': user_id,
-                'username': user_name,
-                'is_instructor': (
-                    request.user and
-                    request.user.is_authenticated() and
-                    "Learner" not in roles
-                ),
-                'collection': collection_id,
-                'course': course,
-                'object': object_id,
-                'roles': roles,
-                'target_object': targ_obj,
-                'token': retrieve_token(
-                    user_id,
-                    assignment.annotation_database_apikey,
-                    assignment.annotation_database_secret_token
-                ),
-                'assignment': assignment,
-                'instructions': assignment_target.target_instructions,
-            }
+        if targ_obj.target_type == 'vd':
+            srcurl = targ_obj.target_content
+            if 'youtu' in srcurl:
+                typeSource = 'video/youtube'
+            else:
+                disassembled = urlparse(srcurl)
+                file_ext = splitext(basename(disassembled.path))[1]
+                typeSource = 'video/' + file_ext.replace('.', '')
+            original.update({'typeSource': typeSource})
+        elif targ_obj.target_type == 'ig':
+            original.update({'osd_json': targ_obj.target_content})
+            viewtype = assignment_target.get_view_type_for_mirador()
+            canvas_id = assignment_target.get_canvas_id_for_mirador()
 
-            if targ_obj.target_type == 'vd':
-                srcurl = targ_obj.target_content
-                if 'youtu' in srcurl:
-                    typeSource = 'video/youtube'
-                else:
-                    disassembled = urlparse(srcurl)
-                    file_ext = splitext(basename(disassembled.path))[1]
-                    typeSource = 'video/' + file_ext.replace('.', '')
-                original.update({'typeSource': typeSource})
-            elif targ_obj.target_type == 'ig':
-                original.update({'osd_json': targ_obj.target_content})
-                viewtype = assignment_target.get_view_type_for_mirador()
-                canvas_id = assignment_target.get_canvas_id_for_mirador()
+            if viewtype is not None:
+                original.update({'viewType': viewtype})
+            if canvas_id is not None:
+                original.update({'canvas_id': canvas_id})
 
-                if viewtype is not None:
-                    original.update({'viewType': viewtype})
-                if canvas_id is not None:
-                    original.update({'canvas_id': canvas_id})
-
-            if assignment_target.target_external_css:
-                original.update({
-                    'custom_css': assignment_target.target_external_css
-                })
-            elif course_obj.course_external_css_default:
-                original.update({
-                    'custom_css': course_obj.course_external_css_default
-                })
-            if not assignment.object_before(object_id) is None:
-                original['prev_object'] = assignment.object_before(object_id)
-
-            if not assignment.object_after(object_id) is None:
-                original['next_object'] = assignment.object_after(object_id)
+        if assignment_target.target_external_css:
             original.update({
-                'dashboard_hidden': assignment_target.get_dashboard_hidden()
+                'custom_css': assignment_target.target_external_css
             })
+        elif course_obj.course_external_css_default:
+            original.update({
+                'custom_css': course_obj.course_external_css_default
+            })
+        if not assignment.object_before(object_id) is None:
+            original['prev_object'] = assignment.object_before(object_id)
 
-            return render(
-                request,
-                '%s/detail.html' % targ_obj.target_type,
-                original
-            )
+        if not assignment.object_after(object_id) is None:
+            original['next_object'] = assignment.object_after(object_id)
+        original.update({
+            'dashboard_hidden': assignment_target.get_dashboard_hidden()
+        })
+
+        return render(
+            request,
+            '%s/detail.html' % targ_obj.target_type,
+            original
+        )
     else:
 
         # Set creator name, to be used later as default in addition of source material
-        request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
-
+        if get_lti_value('lis_person_name_full', tool_provider) is not None:
+            request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
+        debug_printer(set(roles))
         # Check whether user is a admin, instructor or teaching assistant
         if set(roles) & set(settings.ADMIN_ROLES):
             # Set flag in session to later direct user to the appropriate version of the index
@@ -298,7 +298,9 @@ def launch_lti(request):
             # and object_id are probably blank for their session right now.
             collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
             object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-            save_session(request, user_id, collection_id, object_id, course, roles)
+            save_session(request, user_id, collection_id, object_id, course, roles, True)
+        else:
+            save_session(request, user_id, None, None, None, None, False)
 
         try:
             # See if the user already has a profile, and use it if so.
@@ -370,7 +372,7 @@ def launch_lti(request):
         # Save id of current course in the session so we know what data to display
         # in course_admin_hub and instructor_dashboard_view
         request.session['active_course'] = course
-        save_session(request, user_id, "", "", "", roles, (set(roles) & set(settings.ADMIN_ROLES)))
+        save_session(request, user_id, "", "", "", roles, request.session['is_staff'])
 
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -498,7 +500,7 @@ def access_annotation_target(
     )
     for item in request.session.keys():
         debug_printer(
-            'DEBUG SESSION - %s: %s \r' % (item, request.session[item])
+            u'DEBUG SESSION - %s: %s \r' % (item, request.session[item])
         )
 
     # Dynamically pass in the address that the detail view will use to fetch annotations.
@@ -529,6 +531,7 @@ def access_annotation_target(
         'roles': roles,
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
+        'org': settings.ORGANIZATION,
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)

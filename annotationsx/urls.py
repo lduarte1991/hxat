@@ -17,5 +17,5 @@ urlpatterns = patterns('',
     url(r'^500/', TemplateView.as_view(template_name="500.html")),
     # TODO: Check to see if this works without enabling django_app_lti
     # Include the lti app's urls
-    url(r'^lti/', include(django_app_lti.urls, namespace="lti")),
+    #url(r'^lti/', include(django_app_lti.urls, namespace="lti")),
 )

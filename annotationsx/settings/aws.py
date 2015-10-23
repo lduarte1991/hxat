@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from django.contrib import messages
 from secure import SECURE_SETTINGS
-from aws
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
@@ -49,6 +48,8 @@ INSTALLED_APPS = (
     'hx_lti_initializer',
     'hx_lti_assignment',
     'target_object_database',
+    'django_auth_lti',
+    'django_app_lti',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -60,8 +61,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
-    #'django_auth_lti.middleware.LTIAuthMiddleware',
-    #'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
+    'django_auth_lti.middleware.LTIAuthMiddleware',
+    # 'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
@@ -80,7 +81,7 @@ DATABASES = {
         'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
         'HOST': SECURE_SETTINGS.get('db_default_host', 'localhost'),
         'PORT': SECURE_SETTINGS.get('db_default_port', '5432'),
-    } 
+    }
 }
 
 # Internationalization
@@ -136,32 +137,32 @@ X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP')
 SERVER_NAME = SECURE_SETTINGS.get('SERVER_NAME')
 ORGANIZATION = SECURE_SETTINGS.get('ORGANIZATION')
 
+LTI_SETUP = {
+    "TOOL_TITLE": "AnnotationsX",
+    "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
+
+    "LAUNCH_URL": "hx_lti_initializer:launch_lti",  #"lti_init/launch_lti"
+    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
+    "INITIALIZE_MODELS": False,  # Options: False|resource_only|resource_and_course|resource_and_course_users
+
+    "EXTENSION_PARAMETERS": {
+        "canvas.instructure.com": {
+            "privacy_level": "public",
+            "course_navigation": {
+                "enabled": "true",
+                "default": "enabled",
+                "text": "AnnotationsX",
+            }
+        }
+    }
+}
+
 if ORGANIZATION == "ATG":
     # Add to authentication backends (for django-auth-lti)
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'django_auth_lti.backends.LTIAuthBackend',
     )
-
-    LTI_SETUP = {
-        "TOOL_TITLE": "AnnotationsX",
-        "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
-
-        "LAUNCH_URL": "hx_lti_initializer:launch_lti",  #"lti_init/launch_lti"
-        "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
-        "INITIALIZE_MODELS": False,  # Options: False|resource_only|resource_and_course|resource_and_course_users
-
-        "EXTENSION_PARAMETERS": {
-            "canvas.instructure.com": {
-                "privacy_level": "public",
-                "course_navigation": {
-                    "enabled": "true",
-                    "default": "enabled",
-                    "text": "AnnotationsX", 
-                }
-            }
-        }
-    }
 
     # Add LTI oauth credentials (for django-auth-lti)
     # hard fail (keyerror) if not present

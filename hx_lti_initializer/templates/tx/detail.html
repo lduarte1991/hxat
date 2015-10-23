@@ -47,20 +47,18 @@
 <link rel="stylesheet" href="{{ custom_css }}">
 <div  id="viewer" class="test" style="padding-left:75px;padding-right:75px;" class="fit-to-canvas">
 	<div class="annotations-status on"><i class="fa fa-close"></i> <span class="hover-inst hidden">Hide Annotations</span></div>
-		<div class="row">
+			{% if org = 'ATG' %}
 			<div class="navigation">
 	                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
 	        </div>
-	  		<div class="col-xs-7" id="leftCol">
-	        <div class="instructions-container" style="display:{% if instructions %}block{% else %}none{% endif %};">
-	    			<div class="instructions-title">
-	    				Instructions
-	    				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
-	    			</div>
+	        {% endif %}
+	        <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
+    			<div class="instructions-title">
+    				Instructions
+    				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
+    			</div>
+				<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
 			</div>
-			<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
-		</div>
-		{% endif %}
 		<h1>{{ target_object.target_title | safe }}</h1>
 		{% if target_object.target_author != "None" %}
 		<h3>by {{ target_object.target_author | safe }}</h3>
