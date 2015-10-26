@@ -24,7 +24,9 @@ httplib2==0.9
 idna==2.0
 ims-lti-py==0.6
 ipaddress==1.0.7
+jwt==0.3.2
 logilab-common==0.63.2
+lxml==3.4.1
 markdown2==2.3.0
 oauth2==1.5.211
 pep8==1.6.2
@@ -32,7 +34,9 @@ psycopg2==2.6.1
 pyOpenSSL==0.15.1
 pyasn1==0.1.7
 pycparser==2.13
+pycrypto==2.6.1
 pylint==1.4.3
+python-dateutil==1.5
 pytz==2015.2
 requests==2.7.0
 six==1.9.0
@@ -40,14 +44,9 @@ snowballstemmer==1.2.0
 sphinx-rtd-theme==0.1.7
 wsgiref==0.1.2
 
-#troublesome installs
-lxml==3.4.1
-
+#Took out MySQL because we're using Postgres now....
+#MySQL-python==1.2.5
 
 #ATG
-python-dateutil==1.5
 git+https://github.com/Harvard-ATG/django-app-lti@master#egg=django-app-lti
 git+https://github.com/Harvard-University-iCommons/django-auth-lti@master#egg=django-auth-lti
-
-#Took out mySQL
-#MySQL-python==1.2.5
