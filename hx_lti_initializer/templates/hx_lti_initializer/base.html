@@ -3,6 +3,7 @@
 <html lang="en">
     <head>
     {% load staticfiles %}
+    {% load hx_lti_initializer_extras %}
     <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
     <script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/bootstrap-select.css" %}">
@@ -33,6 +34,7 @@
             <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
             {% if is_instructor %}
             <a href="{% static "pages/instructor_manual/hxat-instructor-manual.html"%}">Manual</a>
+            <a role="button" href="instructor_dashboard_view">Instructor Dashboard</a>
             {% endif %}
         </nav>
 
