@@ -1,6 +1,7 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet  # noqa
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
+from hx_lti_initializer.models import LTICourse
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
@@ -8,7 +9,8 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import uuid
-from hx_lti_initializer.views import error_view # should we centralize an error view?
+from hx_lti_initializer.views import error_view  # should we centralize an error view?
+
 
 @login_required
 def create_new_assignment(request):
@@ -44,7 +46,18 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
-                return error_view(request, "Something went wrong with assignment creation.")
+                return render(
+                    request,
+                    'hx_lti_assignment/create_new_assignment.html',
+                    {
+                        'form': form,
+                        'targets_form': targets_form,
+                        'user': request.user,
+                        'number_of_targets': target_num,
+                        'debug': debug,
+                        'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+                    }
+                )
         else:
             # "The AssignmentTargets could not be created because the data didn't validate."
             # we will never be able to use assignment_targets
@@ -85,7 +98,7 @@ def create_new_assignment(request):
             'user': request.user,
             'number_of_targets': target_num,
             'debug': debug,
-            'course_name': request.session['course_name'],
+            'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
         }
     )
 
@@ -132,7 +145,18 @@ def edit_assignment(request, id):
             messages.success(request, 'Assignment was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
         else:
-            return error_view('Something went wrong with assignment editing. ')
+            return render(
+                    request,
+                    'hx_lti_assignment/create_new_assignment.html',
+                    {
+                        'form': form,
+                        'targets_form': targets_form,
+                        'user': request.user,
+                        'number_of_targets': target_num,
+                        'debug': debug,
+                        'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+                    }
+                )
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
@@ -152,6 +176,6 @@ def edit_assignment(request, id):
             'user': request.user,
             'debug': debug,
             'assignment_id': assignment.assignment_id,
-            'course_name': course_name,
+            'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
         }
     )

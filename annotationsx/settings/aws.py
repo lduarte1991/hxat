@@ -157,6 +157,10 @@ LTI_SETUP = {
     }
 }
 
+ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
+ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
+ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
+
 if ORGANIZATION == "ATG":
     # Add to authentication backends (for django-auth-lti)
     AUTHENTICATION_BACKENDS = (
@@ -167,10 +171,6 @@ if ORGANIZATION == "ATG":
     # Add LTI oauth credentials (for django-auth-lti)
     # hard fail (keyerror) if not present
     LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
-
-    ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
-    ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
-    ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 
     CSRF_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
     SESSION_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)

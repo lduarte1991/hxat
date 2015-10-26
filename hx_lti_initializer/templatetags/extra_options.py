@@ -6,6 +6,8 @@ register = Library()
 
 @register.filter_function
 def just_the_view_type(extra_options):
+    if extra_options is None:
+        return "ImageView"
     result = extra_options.split(',')
     if len(result) < 2:
         return "ImageView"
@@ -15,6 +17,8 @@ def just_the_view_type(extra_options):
 
 @register.filter_function
 def just_the_canvas_id(extra_options):
+    if extra_options is None:
+        return ""
     result = extra_options.split(',')
     if len(result) < 2:
         return ""
@@ -24,6 +28,8 @@ def just_the_canvas_id(extra_options):
 
 @register.filter_function
 def just_dashboard_hidden(extra_options):
+    if extra_options is None:
+        return False
     result = extra_options.split(',')
     if len(result) < 3:
         return ""
