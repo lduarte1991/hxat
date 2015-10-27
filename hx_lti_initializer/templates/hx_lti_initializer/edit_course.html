@@ -18,9 +18,9 @@
 		</div>
 		<div class="form-group">
 			<label for="id_course_admins">Course admins:</label> 
-			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins">
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins" role="listbox">
 				{% for id,choice in form.fields.course_admins.choices %}
-				<option value="{{ id }}" {% if id in form.course_admins.value %} selected {% endif %}>{{ choice }}</option>
+				<option value="{{ id }}" aria-checked={% if id in form.course_admins.value %}"true" selected {% else %}"false"{% endif %} role="option">{{ choice }}</option>
 				{% endfor %}
 			</select> 
 		</div>

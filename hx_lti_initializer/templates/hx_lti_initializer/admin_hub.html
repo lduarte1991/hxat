@@ -17,6 +17,11 @@
         jQuery('#assignments .clickable').click(function(event){
             $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
         });
+        jQuery('.clickable').keypress(function(e){
+            if (e.which === 13) {
+                jQuery(this).click();
+            };
+        })
     });
     var printHelp = function(course_id, collection_id, object_id){
         var el = '#copypaste-' + course_id;
@@ -48,7 +53,7 @@
 <table class="table table-striped" id="assignments" role="grid">
     <tbody>
         {% for assignment in course.assignment_set.all %}
-        <tr role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
+        <tr tabindex="0" role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
             <td>
                 {% if 'Administrator' in roles or 'Instructor' in roles %}
                 <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
