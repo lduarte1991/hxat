@@ -3333,7 +3333,11 @@ window.Mirador = window.Mirador || function(config) {
 
     loadManifestFromConfig: function(options) {
       // check if there are available slots, otherwise don't process this object from config
-      var slotAddress = options.slotAddress ? options.slotAddress : this.workspace.getAvailableSlot().layoutAddress;
+      //if we have more windowObjects that slots in the layout, return
+      var slotAddress = options.slotAddress ? options.slotAddress : this.workspace.getAvailableSlot() ? this.workspace.getAvailableSlot().layoutAddress : null;
+      if (!slotAddress) {
+        return;
+      }
       var windowConfig = {
         manifest: this.manifests[options.loadedManifest],
         currentFocus : options.viewType,
@@ -5117,6 +5121,14 @@ window.Mirador = window.Mirador || function(config) {
           'admin':  [this.userid]
         }
       };
+    },
+
+    set: function(prop, value, options) {
+      if (options) {
+        this[options.parent][prop] = value;
+      } else {
+        this[prop] = value;
+      }
     },
 
     //Search endpoint for all annotations with a given URI
