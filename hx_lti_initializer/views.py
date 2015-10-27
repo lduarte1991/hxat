@@ -217,6 +217,7 @@ def launch_lti(request):
             roles,
             False
         )
+        request.session['hx_user_name'] = user_name
 
         original = {
             'user_id': user_id,
@@ -302,28 +303,20 @@ def launch_lti(request):
         else:
             save_session(request, user_id, None, None, None, None, False)
 
+        lti_username = get_lti_value('lis_person_name_full', tool_provider)
+        if lti_username is None:
+            lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+            if not lti_username:
+                debug_printer('DEBUG - user_id not found in post.')
+                raise PermissionDenied()
         try:
             # See if the user already has a profile, and use it if so.
             lti_profile = LTIProfile.objects.get(anon_id=user_id)
             debug_printer('DEBUG - LTI Profile was found via anonymous id.')
-
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             debug_printer('DEBUG - LTI Profile not found. New User to be created.')
-
-            lti_username = get_lti_value('lis_person_name_full', tool_provider)
-            if lti_username is None:
-                # gather the necessary data from the LTI initialization request
-                lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-
-            # checks to see if email and username were not passed in
-            # cannot create a user without them
-            if not lti_username:
-                debug_printer('DEBUG - user_id not found in post.')
-                raise PermissionDenied()
-
             debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
-
             user, lti_profile = create_new_user(lti_username, user_id, roles)
 
         # now it's time to deal with the course_id it does not associate
@@ -373,6 +366,7 @@ def launch_lti(request):
         # in course_admin_hub and instructor_dashboard_view
         request.session['active_course'] = course
         save_session(request, user_id, "", "", "", roles, request.session['is_staff'])
+        request.session['hx_user_name'] = lti_username
 
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -469,8 +463,8 @@ def access_annotation_target(
     Renders an assignment page
     """
     if user_id is None:
-        user_name = request.user.get_username()
-        user_id = request.user.email
+        user_name = request.session["hx_user_name"]
+        user_id = request.session["hx_user_id"]
         lti_profile = LTIProfile.objects.get(anon_id=user_id)
         roles = lti_profile.roles
     try:
