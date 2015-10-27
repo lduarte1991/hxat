@@ -3,3 +3,9 @@ input[type=checkbox].mirador_option.form-control {
     width: auto;
     height: auto;
 }
+
+.btn.btn-success {
+	background-color: #006800;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
