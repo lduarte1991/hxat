@@ -61,7 +61,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
-    'django_auth_lti.middleware.LTIAuthMiddleware',
+    #'django_auth_lti.middleware.LTIAuthMiddleware',
     # 'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
@@ -162,15 +162,9 @@ ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
 ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 
 if ORGANIZATION == "ATG":
-    # Add to authentication backends (for django-auth-lti)
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'django_auth_lti.backends.LTIAuthBackend',
-    )
-
-    # Add LTI oauth credentials (for django-auth-lti)
-    # hard fail (keyerror) if not present
     LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
+    CONSUMER_KEY = LTI_OAUTH_CREDENTIALS.items()[0][0]
+    LTI_SECRET = LTI_OAUTH_CREDENTIALS.items()[0][1]
 
     CSRF_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
     SESSION_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)

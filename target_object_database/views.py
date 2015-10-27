@@ -9,6 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 
+def get_course_id(request):
+	return request.session['hx_lti_course_id']
 
 def open_target_object(request, collection_id, target_obj_id):
     try:
@@ -72,7 +74,7 @@ def edit_source(request, id):
             'form': form,
             'user': request.user,
             'creator': request.session['creator_default'],
-            'course': request.session['course_name'],
+            'course': get_course_id(request),
         }
     )
 
@@ -94,7 +96,7 @@ def handlePopAdd(request, addForm, field):
         'field': field,
         'user': request.user,
         'creator': request.session['creator_default'],
-        'course': request.session['course_name'],
+        'course': get_course_id(request),
     }
     return render_to_response(
         "target_object_database/source_form.html",

@@ -11,6 +11,8 @@ from django.core.exceptions import PermissionDenied
 import uuid
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
+def get_course_id(request):
+	return request.session['hx_lti_course_id']
 
 @login_required
 def create_new_assignment(request):
@@ -55,7 +57,7 @@ def create_new_assignment(request):
                         'user': request.user,
                         'number_of_targets': target_num,
                         'debug': debug,
-                        'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+                        'course_id': get_course_id(request),
                     }
                 )
         else:
@@ -98,7 +100,7 @@ def create_new_assignment(request):
             'user': request.user,
             'number_of_targets': target_num,
             'debug': debug,
-            'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+            'course_id': get_course_id(request),
         }
     )
 
@@ -154,7 +156,7 @@ def edit_assignment(request, id):
                         'user': request.user,
                         'number_of_targets': target_num,
                         'debug': debug,
-                        'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+                        'course_id': get_course_id(request),
                     }
                 )
     else:
@@ -176,6 +178,6 @@ def edit_assignment(request, id):
             'user': request.user,
             'debug': debug,
             'assignment_id': assignment.assignment_id,
-            'course_id': LTICourse.objects.get(course_name=request.session['course_name']).id,
+            'course_id': get_course_id(request),
         }
     )

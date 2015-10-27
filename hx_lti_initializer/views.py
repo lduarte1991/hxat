@@ -218,6 +218,7 @@ def launch_lti(request):
             False
         )
         request.session['hx_user_name'] = user_name
+        request.session['hx_lti_course_id'] = course_obj.id
 
         original = {
             'user_id': user_id,
@@ -329,6 +330,7 @@ def launch_lti(request):
 
             # save the course name to the session so it auto-populate later.
             request.session['course_name'] = course_object.course_name
+            request.session['hx_lti_course_id'] = course_object.id
 
         except LTICourse.DoesNotExist:
             debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
@@ -365,7 +367,8 @@ def launch_lti(request):
         # Save id of current course in the session so we know what data to display
         # in course_admin_hub and instructor_dashboard_view
         request.session['active_course'] = course
-        save_session(request, user_id, "", "", "", roles, request.session['is_staff'])
+        request.session['is_staff'] = any([r in settings.ADMIN_ROLES for r in roles])
+        save_session(request, user_id, "", "", course, roles, request.session['is_staff'])
         request.session['hx_user_name'] = lti_username
 
         # For the use case where the course head wants to display an assignment object instead
