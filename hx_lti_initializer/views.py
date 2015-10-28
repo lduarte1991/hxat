@@ -22,9 +22,8 @@ from django.db import IntegrityError
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer, get_lti_value, retrieve_token  # noqa
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import debug_printer, get_lti_value, save_session, create_new_user, initialize_lti_tool_provider, validate_request
+from hx_lti_initializer.utils import debug_printer, get_lti_value, retrieve_token, save_session, create_new_user, initialize_lti_tool_provider, validate_request  # noqa
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -39,6 +38,7 @@ import requests
 import logging
 logging.basicConfig()
 
+
 @csrf_exempt
 def launch_lti(request):
     """
@@ -50,7 +50,6 @@ def launch_lti(request):
 
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
-    consumer_key_requested = request.POST['oauth_consumer_key']
     user_id = get_lti_value('user_id', tool_provider)
     debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
 
@@ -65,7 +64,7 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    if settings.ORGANIZATION == "HARVARDX" and "Student" in roles or "Learner" in roles:
+    if settings.ORGANIZATION == "HARVARDX" and ("Student" in roles or "Learner" in roles):
         collection_id = get_lti_value(
             settings.LTI_COLLECTION_ID,
             tool_provider
@@ -311,16 +310,11 @@ def course_admin_hub(request):
     students are directed to a version of admin_hub with reduced privileges
     """
     lti_profile = LTIProfile.objects.get(user=request.user)
-    if settings.ORGANIZATION == "HARVARDX":
-        courses_for_user = LTICourse.objects.filter(course_admins=lti_profile.id)
-        files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
-            lti_profile,
-            courses_for_user
-        )
-    elif settings.ORGANIZATION == "ATG":
-        active_course = LTICourse.objects.filter(course_id=request.session['active_course'])
-        files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(lti_profile, list(active_course))
-        courses_for_user = list(active_course)
+    courses_for_user = LTICourse.objects.filter(course_id=request.session['hx_context_id'])
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
+        lti_profile,
+        courses_for_user
+    )
 
     try:
         is_instructor = request.session['is_instructor']
