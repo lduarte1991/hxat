@@ -93,12 +93,12 @@ def launch_lti(request):
 
         save_session(
             request,
-            user_id,
-            collection_id,
-            object_id,
-            course,
-            roles,
-            False
+            user_id=user_id,
+            collection_id=collection_id,
+            object_id=object_id,
+            context_id=course,
+            roles=roles,
+            is_staff=False,
         )
         request.session['hx_user_name'] = user_name
         request.session['hx_lti_course_id'] = course_obj.id
@@ -183,9 +183,15 @@ def launch_lti(request):
             # and object_id are probably blank for their session right now.
             collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
             object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-            save_session(request, user_id, collection_id, object_id, course, roles, True)
+            save_session(request,
+                user_id=user_id,
+                collection_id=collection_id,
+                object_id=object_id,
+                context_id=course,
+                roles=roles,
+                is_staff=True)
         else:
-            save_session(request, user_id, None, None, None, None, False)
+            save_session(request, user_id=user_id, is_staff=False)
 
         lti_username = get_lti_value('lis_person_name_full', tool_provider)
         if lti_username is None:
@@ -249,10 +255,12 @@ def launch_lti(request):
 
         # Save id of current course in the session so we know what data to display
         # in course_admin_hub and instructor_dashboard_view
-        request.session['active_course'] = course
-        request.session['is_staff'] = any([r in settings.ADMIN_ROLES for r in roles])
-        save_session(request, user_id, "", "", course, roles, request.session['is_staff'])
-        request.session['hx_user_name'] = lti_username
+        save_session(request,
+            user_id=user_id,
+            user_name=lti_username,
+            context_id=course,
+            roles=roles,
+            is_staff=any([r in settings.ADMIN_ROLES for r in roles]))
 
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -366,12 +374,9 @@ def access_annotation_target(
 
     save_session(
         request,
-        None,
-        assignment_id,
-        object_id,
-        course_id,
-        None,
-        None
+        collection_id=assignment_id,
+        object_id=object_id,
+        context_id=course_id,
     )
     for item in request.session.keys():
         debug_printer(

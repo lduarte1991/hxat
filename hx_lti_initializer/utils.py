@@ -106,20 +106,28 @@ def create_new_user(username, user_id, roles):
     return user, lti_profile
 
 
-def save_session(req, user_id, col_id, object_id, context_id, roles, is_staff):
-    if user_id is not None:
-        req.session["hx_user_id"] = user_id
-    if col_id is not None:
-        req.session["hx_collection_id"] = col_id
-    if object_id is not None:
-        req.session["hx_object_id"] = object_id
-    if context_id is not None:
-        req.session["hx_context_id"] = context_id
-    if roles is not None:
-        req.session["hx_roles"] = roles
-    if is_staff is not None:
-        req.session["is_staff"] = is_staff
+def save_session(request, **kwargs):
+    session_key_for = {
+        "user_id": ["hx_user_id", None],
+        "user_name": ["hx_user_name", None],
+        "context_id": ["hx_context_id", None],
+        "course_id": ["hx_lti_course_id", None],
+        "course_name": ["course_name", None],
+        "collection_id": ["hx_collection_id", None],
+        "object_id": ["hx_object_id", None],
+        "roles": ["hx_roles", []],
+        "is_staff": ["is_staff", False],
+        "is_instructor": ["is_instructor", False],
+    }
+    
+    for k in kwargs:
+        if k not in session_key_for:
+            raise Exception("invalid keyword argument: %s" % k)
 
+    for k, v in session_key_for.iteritems():
+        session_key, session_key_default = v
+        request.session[session_key] = kwargs.get(k, session_key_default)
+        debug_printer("DEBUG - save_session: (%s, %s) => (%s, %s)" % (k, v, session_key, kwargs.get(k, session_key_default)))
 
 def get_lti_value(key, tool_provider):
     """
