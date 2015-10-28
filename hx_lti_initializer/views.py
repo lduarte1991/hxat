@@ -70,17 +70,8 @@ def initialize_lti_tool_provider(req):
     """
     Starts the provider given the consumer_key and secret.
     """
-    try:
-        if settings.ORGANIZATION == "ATG":
-            # both of these will give key errors if there is no key or it's the wrong key, respectively.
-            consumer_key = req.POST['oauth_consumer_key']
-            secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
-        elif settings.ORGANIZATION == "HARVARDX":
-            consumer_key = settings.CONSUMER_KEY
-            secret = settings.LTI_SECRET
-    except:
-        debug_printer("DEBUG - authentication failed")
-        raise PermissionDenied()
+    consumer_key = settings.CONSUMER_KEY
+    secret = settings.LTI_SECRET
 
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
