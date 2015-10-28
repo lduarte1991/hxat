@@ -23,7 +23,10 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import debug_printer, get_lti_value, retrieve_token, save_session, create_new_user, initialize_lti_tool_provider, validate_request  # noqa
+from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token,
+    save_session, create_new_user, initialize_lti_tool_provider, validate_request,
+    fetch_annotations_by_course, get_annotations_keyed_by_user_id, get_annotations_keyed_by_annotation_id,
+    get_distinct_users_from_annotations)
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -345,83 +348,31 @@ def instructor_dashboard_view(request):
         Renders the instructor dashboard
     '''
     # Get all the relevant objects we're going to need for the dashboard
-    active_course_id = request.session['active_course']
-    course = LTICourse.objects.get(course_id=active_course_id)
-    user_id = request.user.email #for some reason
-    user_profiles = course.course_users.all()
-
-    # Authenticate and fetch the annotations for this course
+    user_id = request.session['hx_user_id']
+    context_id = request.session['hx_context_id']
+    course_object = LTICourse.objects.get(course_id=context_id)
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
-    annotations_for_course = fetch_annotations(active_course_id, token)
+    course_annotations = fetch_annotations_by_course(context_id, token)
+    
+    # Transform the data
+    annotations_by_user = get_annotations_keyed_by_user_id(course_annotations)
+    annotations_by_anno = get_annotations_keyed_by_annotation_id(course_annotations)
+    annotation_users    = get_distinct_users_from_annotations(course_annotations)
 
-    # Dictionary of annotations, keyed by id of annotation for O(1) lookup later
-    annotation_dict = {}
+    user_objects = [{
+        'id': user['id'],
+        'name': user['name'],
+        'annotations': annotations_by_user[user['id']],
+    } for user in annotation_users]
 
-    # get only the annotations for a specific user, while at the same updating annotation_dict
-    def filter_annotations(annotations, id):
-        user_annotations = []
-        for anno in annotations['rows']:
-            # Insert into annotation dictionary
-            annotation_dict[unicode(anno['id'])] = anno
-            # Get id of user who made the annotation
-            a = anno['user']['id']
-            # If id matches, append to list of annotations for that user
-            if id == a:
-                user_annotations.append(anno)
-        return user_annotations
-
-    # Create an object/dict for each user that contains his/her name, id, and annotations.
-    user_objects = []
-    for profile in user_profiles:
-        user_objects.append({
-            # A user_object is a dictionary containing name, id and annotations for a user
-            'name': unicode(profile),  #the model is set up to return the name of the user on a unicode call.
-            'id': profile.get_id(),
-            'annotations': filter_annotations(annotations_for_course, profile.get_id())
-        })
+    user_objects = list(sorted(user_objects, key=lambda user: user['name'].lower()))
 
     context = {
-        # Pass alphabetically sorted version of user_objects
-        'user_objects': sorted(user_objects, lambda x,y:cmp(str(x['name']).lower(), str(y['name']).lower())),
-        # Dictionary of annotations, keyed by id for easy reply lookup
-        'annotation_dict': annotation_dict,
+        'user_objects': user_objects, # user objects with their associated annotations
+        'annotation_dict': annotations_by_anno, # annotations keyed by id for easy reply lookup
     }
 
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
-
-
-def fetch_annotations (course_id, token):
-    '''
-        Fetches the annotations of a given course from the CATCH database
-    '''
-
-
-
-    # build request
-
-    headers = {"x-annotator-auth-token": token, "Content-Type":"application/json"}
-    baseurl = settings.ANNOTATION_DB_URL + "/"
-    limit = 10000 #TODO: How do we want to handle this?
-    requesturl = baseurl + "search?contextId=" + course_id + "&limit=" + str(limit)
-
-    # Make request
-    r = requests.get(requesturl, headers=headers)
-    debug_printer("DEBUG - Database Response: " + str(r))
-
-    try:
-        # this gets the whole request, including such things as 'count'
-        # however, that also means that the annotations come in as an object called 'rows,'
-        # where each row represents an annotation object.
-        # if more convenient, we could cut the top level and just return flat annotations.
-        annotations = r.json()
-    except:
-        # If there are no annotations, the database should return a dictionary with empty rows,
-        # but in the event of another exception such as an authentication error, fail
-        # gracefully by manually passing in that empty response
-        annotations = {'rows':[]}
-        logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
-
-    return annotations
 
 
 def error_view(request, message):
