@@ -39,7 +39,7 @@
         </nav>
 
         <main class="container" role="main">
-            {% if org != "HARVARDX" %}
+            {% if org != "HARVARDX" or is_instructor %}
     	    {% block content %}{% endblock %}	
             {% else %}
             <p></p>
