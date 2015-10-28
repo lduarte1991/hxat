@@ -214,10 +214,8 @@ def course_admin_hub(request):
     The index view for both students and instructors. Without the 'is_instructor' flag,
     students are directed to a version of admin_hub with reduced privileges
     """
-    lti_profile = LTIProfile.objects.get(user=request.user)
     courses_for_user = LTICourse.objects.filter(course_id=request.session['hx_context_id'])
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
-        lti_profile,
         courses_for_user
     )
 
@@ -227,9 +225,8 @@ def course_admin_hub(request):
         'hx_lti_initializer/admin_hub.html',
         {
             'user': request.user,
-            'email': request.user.email,
             'is_instructor': request.session["is_staff"],
-            'roles': lti_profile.roles,
+            'roles': request.session["hx_roles"],
             'courses': courses_for_user,
             'files': files_in_courses,
             'debug': debug,
