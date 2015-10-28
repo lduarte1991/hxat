@@ -210,7 +210,7 @@ def fetch_annotations_by_course(context_id, token):
     request_start_time = time.clock()
     r = requests.get(request_url, headers=headers)
     request_end_time = time.clock()
-    request_elapsed_time = request_end_time - request_end_time
+    request_elapsed_time = request_end_time - request_start_time
 
     debug_printer("DEBUG - fetch_annotations_by_course(): annotation database response code: %s" % r.status_code)
     debug_printer("DEBUG - fetch_annotations_by_course(): request time elapsed: %s seconds" % (request_elapsed_time))
