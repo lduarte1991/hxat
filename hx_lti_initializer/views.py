@@ -84,8 +84,8 @@ def launch_lti(request):
             debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
             user, lti_profile = create_new_user(lti_username, user_id, roles)
             # log the user into the Django backend
-            lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, lti_profile.user)
+        lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, lti_profile.user)
         save_session(
             request,
             user_id=user_id,
