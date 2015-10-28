@@ -6,7 +6,6 @@ It will set up the tool provider, create/retrive the user and pass along any
 other information that will be rendered to the access/init screen to the user.
 """
 
-from ims_lti_py.tool_provider import DjangoToolProvider
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 
@@ -25,7 +24,7 @@ from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer, get_lti_value, retrieve_token  # noqa
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import debug_printer, get_lti_value
+from hx_lti_initializer.utils import debug_printer, get_lti_value, save_session, create_new_user, initialize_lti_tool_provider, validate_request
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -39,121 +38,6 @@ import requests
 
 import logging
 logging.basicConfig()
-
-
-# If we were to restructure (not recommended because then we can't reconcile with HX),
-# these first 4 functions would be in utils.py
-def validate_request(req):
-    """
-    Validates the request in order to permit or deny access to the LTI tool.
-    """
-    # print out the request to the terminal window if in debug mode
-    # this item is set in the settings, in the __init__.py file
-    if settings.LTI_DEBUG:
-        for item in sorted(req.POST.dict()):
-            debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
-
-    # verifies that request contains the information needed
-    if 'oauth_consumer_key' not in req.POST:
-        debug_printer('DEBUG - Consumer Key was not present in request.')
-        raise PermissionDenied()
-    if 'user_id' not in req.POST:
-        debug_printer('DEBUG - Anonymous ID was not present in request.')
-        raise PermissionDenied()
-    if ('lis_person_sourcedid' not in req.POST and
-            'lis_person_name_full' not in req.POST):
-        debug_printer('DEBUG - Username or Name was not present in request.')
-        raise PermissionDenied()
-
-
-def initialize_lti_tool_provider(req):
-    """
-    Starts the provider given the consumer_key and secret.
-    """
-    try:
-        if settings.ORGANIZATION == "ATG":
-            # both of these will give key errors if there is no key or it's the wrong key, respectively.
-            consumer_key = req.POST['oauth_consumer_key']
-            secret = settings.LTI_OAUTH_CREDENTIALS[consumer_key]
-        elif settings.ORGANIZATION == "HARVARDX":
-            consumer_key = settings.CONSUMER_KEY
-            secret = settings.LTI_SECRET
-    except:
-        debug_printer("DEBUG - authentication failed")
-        raise PermissionDenied()
-
-    # use the function from ims_lti_py app to verify and initialize tool
-    provider = DjangoToolProvider(consumer_key, secret, req.POST)
-
-    # NOTE: before validating the request, temporarily remove the
-    # QUERY_STRING to work around an issue with how Canvas signs requests
-    # that contain GET parameters. Before Canvas launches the tool, it duplicates the GET
-    # parameters as POST parameters, and signs the POST parameters (*not* the GET parameters).
-    # However, the oauth2 library that validates the request generates
-    # the oauth signature based on the combination of POST+GET parameters together,
-    # resulting in a signature mismatch. By removing the QUERY_STRING before
-    # validating the request, the library will generate the signature based only on
-    # the POST parameters like Canvas.
-    qs = req.META.pop('QUERY_STRING', '')
-
-    # now validate the tool via the valid_request function
-    # this means that request was well formed but invalid
-    if provider.valid_request(req) == False:
-        debug_printer("DEBUG - LTI Exception: Not a valid request.")
-        raise PermissionDenied()
-    else:
-        debug_printer('DEBUG - LTI Tool Provider was valid.')
-
-    req.META['QUERY_STRING'] = qs  # restore the query string
-
-    return provider
-
-
-def create_new_user(username, user_id, roles):
-    # now create the user and LTIProfile with the above information
-    # Max 30 length for person's name, do we want to change this? It's valid for HX but not ATG/FAS
-    try:
-        user = User.objects.create_user(username, user_id)
-    except IntegrityError:
-        # TODO: modify db to make student name not the primary key
-        # a temporary workaround for key integrity errors, until we can make the username not the primary key.
-        return create_new_user(username + " ", user_id, roles)
-    user.set_unusable_password()
-    user.is_superuser = False
-    user.is_staff = False
-
-    for admin_role in settings.ADMIN_ROLES:
-        for user_role in roles:
-            if admin_role.lower() == user_role.lower():
-                user.is_superuser = True
-                user.is_staff = True
-    user.save()
-    debug_printer('DEBUG - User was just created')
-
-    # pull the profile automatically created once the user was above
-    lti_profile = LTIProfile.objects.get(user=user)
-
-    lti_profile.anon_id = user_id
-    lti_profile.roles = (",").join(roles)
-    lti_profile.save()
-
-    return user, lti_profile
-
-
-def save_session(req, user_id, col_id, object_id, context_id, roles, is_staff):
-    if user_id is not None:
-        req.session["hx_user_id"] = user_id
-    if col_id is not None:
-        req.session["hx_collection_id"] = col_id
-    if object_id is not None:
-        req.session["hx_object_id"] = object_id
-    if context_id is not None:
-        req.session["hx_context_id"] = context_id
-    if roles is not None:
-        req.session["hx_roles"] = roles
-    if is_staff is not None:
-        req.session["is_staff"] = is_staff
-
 
 @csrf_exempt
 def launch_lti(request):
@@ -217,6 +101,8 @@ def launch_lti(request):
             roles,
             False
         )
+        request.session['hx_user_name'] = user_name
+        request.session['hx_lti_course_id'] = course_obj.id
 
         original = {
             'user_id': user_id,
@@ -302,28 +188,20 @@ def launch_lti(request):
         else:
             save_session(request, user_id, None, None, None, None, False)
 
+        lti_username = get_lti_value('lis_person_name_full', tool_provider)
+        if lti_username is None:
+            lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+            if not lti_username:
+                debug_printer('DEBUG - user_id not found in post.')
+                raise PermissionDenied()
         try:
             # See if the user already has a profile, and use it if so.
             lti_profile = LTIProfile.objects.get(anon_id=user_id)
             debug_printer('DEBUG - LTI Profile was found via anonymous id.')
-
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             debug_printer('DEBUG - LTI Profile not found. New User to be created.')
-
-            lti_username = get_lti_value('lis_person_name_full', tool_provider)
-            if lti_username is None:
-                # gather the necessary data from the LTI initialization request
-                lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-
-            # checks to see if email and username were not passed in
-            # cannot create a user without them
-            if not lti_username:
-                debug_printer('DEBUG - user_id not found in post.')
-                raise PermissionDenied()
-
             debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
-
             user, lti_profile = create_new_user(lti_username, user_id, roles)
 
         # now it's time to deal with the course_id it does not associate
@@ -336,6 +214,7 @@ def launch_lti(request):
 
             # save the course name to the session so it auto-populate later.
             request.session['course_name'] = course_object.course_name
+            request.session['hx_lti_course_id'] = course_object.id
 
         except LTICourse.DoesNotExist:
             debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
@@ -372,7 +251,9 @@ def launch_lti(request):
         # Save id of current course in the session so we know what data to display
         # in course_admin_hub and instructor_dashboard_view
         request.session['active_course'] = course
-        save_session(request, user_id, "", "", "", roles, request.session['is_staff'])
+        request.session['is_staff'] = any([r in settings.ADMIN_ROLES for r in roles])
+        save_session(request, user_id, "", "", course, roles, request.session['is_staff'])
+        request.session['hx_user_name'] = lti_username
 
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -469,8 +350,8 @@ def access_annotation_target(
     Renders an assignment page
     """
     if user_id is None:
-        user_name = request.user.get_username()
-        user_id = request.user.email
+        user_name = request.session["hx_user_name"]
+        user_id = request.session["hx_user_id"]
         lti_profile = LTIProfile.objects.get(anon_id=user_id)
         roles = lti_profile.roles
     try:

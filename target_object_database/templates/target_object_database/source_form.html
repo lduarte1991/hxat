@@ -24,17 +24,16 @@
 		// Autopopulate creator and course in target form
 		// Get name of creator and course
 		var creatorName = "{{ creator | safe }}";
-        var courseName = "{{ course | safe }}";
+        var courseId = "{{ course | safe }}";
         // Get values of options matching the creator name and course name
-        var creatorValue = $('#id_target_creator option').filter(function () { return $(this).html() == creatorName;}).val();
-        var courseValue = $('#id_target_courses option').filter(function () { return $(this).html() == courseName;}).val();
+        var creatorValue = $('#id_target_creator option').filter(function () { return $(this).text() == creatorName;}).val();
+        var courseValue = $('#id_target_courses option').filter(function () { return $(this).val() == courseId;}).val();
         // Set current creator and current course as defaults in selectors
         $('select[name=target_creator]').val(creatorValue);
         $('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 	});
 
-	<script>
 		jQuery(document).ready(function() {
 			jQuery('#id_target_type').change(function() {
 				var value = jQuery('#id_target_type').val();
