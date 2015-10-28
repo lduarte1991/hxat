@@ -124,8 +124,8 @@ def save_session(request, **kwargs):
         if k not in session_key_for:
             raise Exception("invalid keyword argument: %s" % k)
 
-    for k, v in session_key_for.iteritems():
-        session_key, session_key_default = v
+    for k, v in kwargs.iteritems():
+        session_key, session_key_default = session_key_for[k]
         request.session[session_key] = kwargs.get(k, session_key_default)
         debug_printer("DEBUG - save_session: (%s, %s) => (%s, %s)" % (k, v, session_key, kwargs.get(k, session_key_default)))
 

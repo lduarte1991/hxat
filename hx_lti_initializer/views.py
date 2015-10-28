@@ -59,146 +59,21 @@ def launch_lti(request):
     # default to student
     request.session['is_instructor'] = False
 
-    # this is where canvas will tell us what level individual is coming into the tool
-    # the 'roles' field usually consists of just 'Instructor' or 'Learner'
+    # this is where canvas will tell us what level individual is coming into
+    # the tool the 'roles' field usually consists of just 'Instructor'
+    # or 'Learner'
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    if settings.ORGANIZATION == "HARVARDX" and ("Student" in roles or "Learner" in roles):
-        collection_id = get_lti_value(
-            settings.LTI_COLLECTION_ID,
-            tool_provider
-        )
-        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-        debug_printer('DEBUG - Found assignment: %s' % collection_id)
-        debug_printer('DEBUG - Found object being accessed: %s' % object_id)
-
-        user_name = get_lti_value('lis_person_name_full', tool_provider)
-        if user_name is None:
-            # gather the necessary data from the LTI initialization request
-            user_name = get_lti_value('lis_person_sourcedid', tool_provider)
-
-        try:
-            assignment = Assignment.objects.get(assignment_id=collection_id)
-            targ_obj = TargetObject.objects.get(pk=object_id)
-            assignment_target = AssignmentTargets.objects.get(
-                assignment=assignment,
-                target_object=targ_obj
-            )
-            course_obj = LTICourse.objects.get(course_id=course)
-        except (Assignment.DoesNotExist or
-                TargetObject.DoesNotExist or
-                AssignmentTargets.DoesNotExist):
+    lti_username = get_lti_value('lis_person_name_full', tool_provider)
+    if lti_username is None:
+        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+        if not lti_username:
+            debug_printer('DEBUG - user_id not found in post.')
             raise PermissionDenied()
 
-        save_session(
-            request,
-            user_id=user_id,
-            collection_id=collection_id,
-            object_id=object_id,
-            context_id=course,
-            roles=roles,
-            is_staff=False,
-        )
-        request.session['hx_user_name'] = user_name
-        request.session['hx_lti_course_id'] = course_obj.id
-
-        original = {
-            'user_id': user_id,
-            'username': user_name,
-            'is_instructor': (
-                request.user and
-                request.user.is_authenticated() and
-                "Learner" not in roles
-            ),
-            'collection': collection_id,
-            'course': course,
-            'object': object_id,
-            'roles': roles,
-            'target_object': targ_obj,
-            'token': retrieve_token(
-                user_id,
-                assignment.annotation_database_apikey,
-                assignment.annotation_database_secret_token
-            ),
-            'assignment': assignment,
-            'instructions': assignment_target.target_instructions,
-            'org': settings.ORGANIZATION,
-        }
-
-        if targ_obj.target_type == 'vd':
-            srcurl = targ_obj.target_content
-            if 'youtu' in srcurl:
-                typeSource = 'video/youtube'
-            else:
-                disassembled = urlparse(srcurl)
-                file_ext = splitext(basename(disassembled.path))[1]
-                typeSource = 'video/' + file_ext.replace('.', '')
-            original.update({'typeSource': typeSource})
-        elif targ_obj.target_type == 'ig':
-            original.update({'osd_json': targ_obj.target_content})
-            viewtype = assignment_target.get_view_type_for_mirador()
-            canvas_id = assignment_target.get_canvas_id_for_mirador()
-
-            if viewtype is not None:
-                original.update({'viewType': viewtype})
-            if canvas_id is not None:
-                original.update({'canvas_id': canvas_id})
-
-        if assignment_target.target_external_css:
-            original.update({
-                'custom_css': assignment_target.target_external_css
-            })
-        elif course_obj.course_external_css_default:
-            original.update({
-                'custom_css': course_obj.course_external_css_default
-            })
-        if not assignment.object_before(object_id) is None:
-            original['prev_object'] = assignment.object_before(object_id)
-
-        if not assignment.object_after(object_id) is None:
-            original['next_object'] = assignment.object_after(object_id)
-        original.update({
-            'dashboard_hidden': assignment_target.get_dashboard_hidden()
-        })
-
-        return render(
-            request,
-            '%s/detail.html' % targ_obj.target_type,
-            original
-        )
-    else:
-
-        # Set creator name, to be used later as default in addition of source material
-        if get_lti_value('lis_person_name_full', tool_provider) is not None:
-            request.session['creator_default'] = get_lti_value('lis_person_name_full', tool_provider)
-        debug_printer(set(roles))
-        # Check whether user is a admin, instructor or teaching assistant
-        if set(roles) & set(settings.ADMIN_ROLES):
-            # Set flag in session to later direct user to the appropriate version of the index
-            request.session['is_instructor'] = True
-
-            # For HX, students only access one object or collection, and don't have an index
-            # For ATG, students have the index  to choose where to go, so collection_id
-            # and object_id are probably blank for their session right now.
-            collection_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-            object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-            save_session(request,
-                user_id=user_id,
-                collection_id=collection_id,
-                object_id=object_id,
-                context_id=course,
-                roles=roles,
-                is_staff=True)
-        else:
-            save_session(request, user_id=user_id, is_staff=False)
-
-        lti_username = get_lti_value('lis_person_name_full', tool_provider)
-        if lti_username is None:
-            lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-            if not lti_username:
-                debug_printer('DEBUG - user_id not found in post.')
-                raise PermissionDenied()
+    # Check whether user is a admin, instructor or teaching assistant
+    if set(roles) & set(settings.ADMIN_ROLES):
         try:
             # See if the user already has a profile, and use it if so.
             lti_profile = LTIProfile.objects.get(anon_id=user_id)
@@ -208,79 +83,102 @@ def launch_lti(request):
             debug_printer('DEBUG - LTI Profile not found. New User to be created.')
             debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
             user, lti_profile = create_new_user(lti_username, user_id, roles)
-
-        # now it's time to deal with the course_id it does not associate
-        # with users as they can flow in and out in a MOOC
-        try:
-            course_object = LTICourse.get_course_by_id(course)
-            debug_printer('DEBUG - Course was found %s' % course)
-            # Add user to course_users if not already there
-            course_object.add_user(lti_profile)
-
-            # save the course name to the session so it auto-populate later.
-            request.session['course_name'] = course_object.course_name
-            request.session['hx_lti_course_id'] = course_object.id
-
-        except LTICourse.DoesNotExist:
-            debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
-
-            # Put a message on the screen to indicate to the user that the course doesn't exist
-            message_error = "Sorry, the course you are trying to reach does not exist."
-            messages.error(request, message_error)
-
-            if set(roles) & set(settings.ADMIN_ROLES):
-                # This must be the instructor's first time accessing the annotation tool
-                # Make him/her a new course within the tool
-
-                message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
-                messages.warning(request, message_error)
-
-                # create and save a new course for the instructor, with a default name of their canvas course's name
-                course_object = LTICourse.create_course(course, lti_profile)
-                if get_lti_value('context_title', tool_provider) is not None:
-                    course_object.course_name = get_lti_value('context_title', tool_provider)
-                    course_object.save()
-
-                    # save the course name to the session so it auto-populate later.
-                    request.session['course_name'] = course_object.course_name
-
-                # Right now there's an issue where instructors have to refresh the page after creating
-                # his/her course in order to recieve admin rights.
-                # I Wanted to have a recursive call solve this, but I haven't been able to get it working.
-                #return launch_lti(request)
-
-        # log the user into the Django backend
-        lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
-        login(request, lti_profile.user)
-
-        # Save id of current course in the session so we know what data to display
-        # in course_admin_hub and instructor_dashboard_view
-        save_session(request,
+            # log the user into the Django backend
+            lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, lti_profile.user)
+        save_session(
+            request,
             user_id=user_id,
             user_name=lti_username,
             context_id=course,
             roles=roles,
-            is_staff=any([r in settings.ADMIN_ROLES for r in roles]))
+            is_staff=True
+        )
+    else:
+        # For HX, students only access one object or collection, and don't
+        # have an index
+        # For ATG, students have the index  to choose where to go, so
+        # collection_id and object_id are probably blank for their session
+        # right now.
+        collection_id = get_lti_value(
+            settings.LTI_COLLECTION_ID,
+            tool_provider
+        )
+        object_id = get_lti_value(
+            settings.LTI_OBJECT_ID,
+            tool_provider
+        )
+        save_session(
+            request,
+            user_id=user_id,
+            user_name=lti_username,
+            context_id=course,
+            roles=roles,
+            is_staff=False
+        )
 
-        # For the use case where the course head wants to display an assignment object instead
-        # of the admin_hub upon launch (i.e. for embedded use), this allows the user
-        # to be routed directly to an assignment given the correct POST parameters,
-        # as by Luis' original method of putting collection_id and object_id in the
-        # LTI tool launch params.
-        try:
-            # Keeping the HX functionality whereby students are routed to specific assignment objects
-            # This is motivated by the Poetry in America Course
+    # now it's time to deal with the course_id it does not associate
+    # with users as they can flow in and out in a MOOC
+    try:
+        course_object = LTICourse.get_course_by_id(course)
+        debug_printer('DEBUG - Course was found %s' % course)
 
-            # If there are variables passed into the launch indicating a desired target object, render that object
-            assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-            object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
-            course_id = str(course)
+        # save the course name to the session so it auto-populate later.
+        save_session(
+            request,
+            course_name=course_object.course_name,
+            course_id=course_object.id,
+        )
+
+    except LTICourse.DoesNotExist:
+        debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
+
+        # Put a message on the screen to indicate to the user that the course doesn't exist
+        message_error = "Sorry, the course you are trying to reach does not exist."
+        messages.error(request, message_error)
+
+        if set(roles) & set(settings.ADMIN_ROLES):
+            # This must be the instructor's first time accessing the annotation tool
+            # Make him/her a new course within the tool
+
+            message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
+            messages.warning(request, message_error)
+
+            # create and save a new course for the instructor, with a default name of their canvas course's name
+            course_object = LTICourse.create_course(course, lti_profile)
+            if get_lti_value('context_title', tool_provider) is not None:
+                course_object.course_name = get_lti_value('context_title', tool_provider)
+                course_object.save()
+
+                # save the course name to the session so it auto-populate later.
+                save_session(
+                    request,
+                    course_name=course_object.course_name,
+                    hx_lti_course_id=course_object.id,
+                )
+
+    # For the use case where the course head wants to display an assignment object instead
+    # of the admin_hub upon launch (i.e. for embedded use), this allows the user
+    # to be routed directly to an assignment given the correct POST parameters,
+    # as by Luis' original method of putting collection_id and object_id in the
+    # LTI tool launch params.
+    try:
+        # Keeping the HX functionality whereby students are routed to specific assignment objects
+        # This is motivated by the Poetry in America Course
+
+        # If there are variables passed into the launch indicating a desired target object, render that object
+        assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+        course_id = str(course)
+        if set(roles) & set(settings.ADMIN_ROLES):
+            return course_admin_hub(request)
+        else:
             debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
             return access_annotation_target(request, course_id, assignment_id, object_id)
-        except:
-            debug_printer("DEBUG - User wants the index")
+    except:
+        debug_printer("DEBUG - User wants the index")
 
-        return course_admin_hub(request)
+    return course_admin_hub(request)
 
 
 @login_required
@@ -311,7 +209,6 @@ def edit_course(request, id):
     )
 
 
-@login_required
 def course_admin_hub(request):
     """
     The index view for both students and instructors. Without the 'is_instructor' flag,
@@ -324,11 +221,6 @@ def course_admin_hub(request):
         courses_for_user
     )
 
-    try:
-        is_instructor = request.session['is_instructor']
-    except:
-        is_instructor = False
-
     debug = files_in_courses
     return render(
         request,
@@ -336,7 +228,7 @@ def course_admin_hub(request):
         {
             'user': request.user,
             'email': request.user.email,
-            'is_instructor': request.user and request.user.is_authenticated() and is_instructor,
+            'is_instructor': request.session["is_staff"],
             'roles': lti_profile.roles,
             'courses': courses_for_user,
             'files': files_in_courses,
@@ -393,11 +285,7 @@ def access_annotation_target(
     original = {
         'user_id': user_id,
         'username': user_name,
-        'is_instructor': (
-            request.user and
-            request.user.is_authenticated() and
-            "Learner" not in roles
-        ),
+        'is_instructor': request.session["is_staff"],
         'collection': assignment_id,
         'course': course_id,
         'object': object_id,
