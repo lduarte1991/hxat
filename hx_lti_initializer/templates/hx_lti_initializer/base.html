@@ -26,7 +26,7 @@
             <div class="site-title">
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">The HarvardX Annotation Tool</a>
             </div>
-            <div class="user-greeting">Welcome, {{ user.username }}</div>
+            <div class="user-greeting">Welcome, {{ username }}</div>
         </header>
 
         <!-- Broken off into two sections, information on the left and content on the right -->
@@ -39,7 +39,13 @@
         </nav>
 
         <main class="container" role="main">
+            {% if org != "HARVARDX" %}
     	    {% block content %}{% endblock %}	
+            {% else %}
+            <p></p>
+            <p></p>
+            <p>Please contact your instructor, they have made a mistake configuring the tool. Yes, make fun of them.</p>
+            {% endif %}
         </main>
 
         <footer role="contentinfo">

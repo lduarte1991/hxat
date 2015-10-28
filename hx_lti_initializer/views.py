@@ -224,11 +224,12 @@ def course_admin_hub(request):
         request,
         'hx_lti_initializer/admin_hub.html',
         {
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'is_instructor': request.session["is_staff"],
             'roles': request.session["hx_roles"],
             'courses': courses_for_user,
             'files': files_in_courses,
+            'org': settings.ORGANIZATION,
             'debug': debug,
         }
     )
