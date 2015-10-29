@@ -12,6 +12,10 @@ from rest_framework import generics
 def get_course_id(request):
 	return request.session['hx_lti_course_id']
 
+def get_lti_profile_id(request):
+    lti_profile = LTIProfile.objects.get(user=request.user)
+    return lti_profile.id
+
 def open_target_object(request, collection_id, target_obj_id):
     try:
         targ_obj = TargetObject.objects.get(pk=target_obj_id)
@@ -73,7 +77,7 @@ def edit_source(request, id):
         {
             'form': form,
             'user': request.user,
-            'creator': request.session['creator_default'],
+            'creator': get_lti_profile_id(request),
             'course': get_course_id(request),
         }
     )
@@ -95,7 +99,7 @@ def handlePopAdd(request, addForm, field):
         'form': form,
         'field': field,
         'user': request.user,
-        'creator': request.session['creator_default'],
+        'creator': get_lti_profile_id(request),
         'course': get_course_id(request),
     }
     return render_to_response(
