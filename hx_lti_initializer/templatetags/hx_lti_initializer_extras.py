@@ -1,9 +1,10 @@
 from django.template.defaulttags import register
-
+from django.conf import settings
 from datetime import datetime
 from dateutil import tz
 from django import template
 from django.template.defaultfilters import stringfilter
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from re import sub
 
 from hx_lti_assignment.models import Assignment
@@ -94,3 +95,17 @@ def get_annotation_by_id(annotation_id, annotations):
 	if annotation_id in annotations:
 		return annotations[annotation_id]['text']
 	return '<i>Deleted Annotation</i>'
+
+@register.simple_tag
+def get_url_to_annotation_manual(**kwargs):
+	'''
+	Returns the URL to the annotation manual. When the URL is present in the django settings,
+	it returns this URL, otherwise it will return the static url passed in to this function.
+	'''
+	url = kwargs.get('default', '')
+	if settings.ANNOTATION_MANUAL_URL is not None:
+		url = settings.ANNOTATION_MANUAL_URL
+	if not url.startswith('http'):
+		url = static(url)
+	return url
+	
