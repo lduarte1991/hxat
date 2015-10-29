@@ -61,7 +61,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
-    #django'django_auth_lti.middleware.LTIAuthMiddleware',
+    #'django_auth_lti.middleware.LTIAuthMiddleware',
     # 'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
@@ -122,27 +122,6 @@ JENKINS_TASKS = (
     'django_jenkins.tasks.run_pep8',
     'django_jenkins.tasks.run_pylint',
 )
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-    },
-}
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
