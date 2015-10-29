@@ -247,8 +247,7 @@ def access_annotation_target(
     if user_id is None:
         user_name = request.session["hx_user_name"]
         user_id = request.session["hx_user_id"]
-        lti_profile = LTIProfile.objects.get(anon_id=user_id)
-        roles = lti_profile.roles
+        roles = request.session["hx_roles"]
     try:
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
