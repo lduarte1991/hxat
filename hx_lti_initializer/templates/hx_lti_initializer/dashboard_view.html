@@ -1,35 +1,18 @@
-<!-- TODO: base template? Any common html that can be factored out. -->
-<!-- Load static? -->
+{% extends 'hx_lti_initializer/base.html' %}
 {% load hx_lti_initializer_extras %}
+{% load static from staticfiles %} 
+{# Load the tag library #} 
+{% load bootstrap3 %} 
+{# Load CSS and JavaScript #} 
+{% bootstrap_css %} 
+{% bootstrap_javascript %} 
+{# Display django.contrib.messages as Bootstrap alerts #} 
+{% bootstrap_messages %}
 
-<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
-        <!-- TODO: is this staticfiles or http_static? -->
-        {% load static from staticfiles %} 
-        {# Load the tag library #} 
-        {% load bootstrap3 %} 
-        {# Load CSS and JavaScript #} 
-        {% bootstrap_css %} 
-        {% bootstrap_javascript %} 
-        {# Display django.contrib.messages as Bootstrap alerts #} 
-        {% bootstrap_messages %}
-        
-        <title>Instructor Dashboard</title>
-    </head>
-
-    <body>
-        <br/>
-        <div class="container">
-        <div class="navigation">
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
-        </div>
-        <br>
+{% block content %}
         {% if user_objects %}
-            <div>
+            <div style="margin: 1em 0;">
                 <div class="input-group">
                     <div class="input-group-btn search-panel">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -111,10 +94,6 @@
                 {% else %}
                 No annotations to display
             </div>
-        {% endif %}
-        </div>
-    </body>
-</html>
 
 <script>
 $(document).ready(function(){
@@ -175,3 +154,5 @@ $(document).ready(function(){
     }
 });
 </script>
+        {% endif %}
+{% endblock %}

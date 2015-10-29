@@ -367,6 +367,8 @@ def instructor_dashboard_view(request):
     user_objects = list(sorted(user_objects, key=lambda user: user['name'].lower()))
 
     context = {
+        'username': request.session['hx_user_name'],
+        'is_instructor': request.session["is_staff"],
         'user_objects': user_objects, # user objects with their associated annotations
         'annotation_dict': annotations_by_anno, # annotations keyed by id for easy reply lookup
     }
