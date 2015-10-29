@@ -22,15 +22,20 @@
 		jQuery('#id_target_content').summernote(options);
 		
 		// Autopopulate creator and course in target form
-		// Get name of creator and course
-		var creatorName = "{{ creator | safe }}";
-        var courseId = "{{ course | safe }}";
-        // Get values of options matching the creator name and course name
-        var creatorValue = $('#id_target_creator option').filter(function () { return $(this).text() == creatorName;}).val();
-        var courseValue = $('#id_target_courses option').filter(function () { return $(this).val() == courseId;}).val();
-        // Set current creator and current course as defaults in selectors
-        $('select[name=target_creator]').val(creatorValue);
-        $('select[name=target_courses]').val(courseValue);
+		var creatorId = "{{ creator | safe }}";
+		var courseId = "{{ course | safe }}";
+		var equals_option_value = function(val) {
+			return function() {
+				return $(this).val() == val;
+			};
+		};
+
+		var creatorValue = $('#id_target_creator option').filter(equals_option_value(creatorId)).val();
+		var courseValue = $('#id_target_courses option').filter(equals_option_value(courseId)).val();
+
+		// Set current creator and current course as defaults in selectors
+		$('select[name=target_creator]').val(creatorValue);
+		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 	});
 

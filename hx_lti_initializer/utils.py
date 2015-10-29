@@ -10,8 +10,10 @@ from django.conf import settings
 from ims_lti_py.tool_provider import DjangoToolProvider
 import base64
 import sys
+import time
 import datetime
 import jwt
+import requests
 
 # import Sample Target Object Model
 from target_object_database.models import TargetObject
@@ -188,3 +190,93 @@ class simple_utc(datetime.tzinfo):
 
     def utcoffset(self, dt):
         return datetime.timedelta(0)
+
+
+def fetch_annotations_by_course(context_id, token):
+    '''
+    Fetches the annotations of a given course from the CATCH database
+    '''
+    # build request
+    headers = {
+        "x-annotator-auth-token": token,
+        "Content-Type":"application/json"
+    }
+    limit = 10000 #TODO: How do we want to handle this?
+    request_url = "%s/search?contextId=%s&limit=%s" % (settings.ANNOTATION_DB_URL, context_id, limit)
+
+    debug_printer("DEBUG - fetch_annotations_by_course(): url: %s" % request_url)
+
+    # make request
+    request_start_time = time.clock()
+    r = requests.get(request_url, headers=headers)
+    request_end_time = time.clock()
+    request_elapsed_time = request_end_time - request_start_time
+
+    debug_printer("DEBUG - fetch_annotations_by_course(): annotation database response code: %s" % r.status_code)
+    debug_printer("DEBUG - fetch_annotations_by_course(): request time elapsed: %s seconds" % (request_elapsed_time))
+
+    try:
+        # this gets the whole request, including such things as 'count'
+        # however, that also means that the annotations come in as an object called 'rows,'
+        # where each row represents an annotation object.
+        # if more convenient, we could cut the top level and just return flat annotations.
+        annotations = r.json()
+        
+    except:
+        # If there are no annotations, the database should return a dictionary with empty rows,
+        # but in the event of another exception such as an authentication error, fail
+        # gracefully by manually passing in that empty response
+        annotations = {'rows':[]}
+        logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
+
+    return annotations
+
+def get_distinct_users_from_annotations(annotations):
+    '''
+    Given a set of annotation objects returned by the CATCH database,
+    this function returns a list of distinct user objects.
+    '''
+    rows = annotations['rows']
+    annotations_by_user = {}
+    for r in rows:
+        user_id = r['user']['id']
+        if user_id not in annotations_by_user:
+            annotations_by_user[user_id] = r['user']
+    users = list(sorted(annotations_by_user.values(), key=lambda user: user['id']))
+    return users
+
+def get_annotations_for_user_id(annotations, user_id):
+    '''
+    Given a set of annotation objects returned by the CATCH database
+    and an user ID, this functino returns all of the annotations
+    for that user.
+    '''
+    rows = annotations['rows']
+    return [r for r in rows if r['user']['id'] == user_id]
+
+def get_annotations_keyed_by_user_id(annotations):
+    '''
+    Given a set of annotation objects returned by the CATCH database,
+    this function returns a dictionary that maps user IDs to annotation objects.
+    '''
+    rows = annotations['rows']
+    annotations_by_user = {}
+    for r in rows:
+        user_id = r['user']['id']
+        annotations_by_user.setdefault(user_id, []).append(r)
+    return annotations_by_user
+
+def get_annotations_keyed_by_annotation_id(annotations):
+    '''
+    Given a set of annotation objects returned by the CATCH database,
+    this function returns a dictionary that maps annotation IDs to
+    annotation objects.
+    
+    The intended usage is for when you have an annotation that is a
+    reply to another annotation, and you want to lookup the parent
+    annotatino by its ID.
+    '''
+    rows = annotations['rows']
+    return dict([(r['id'], r) for r in rows])
+    
+
