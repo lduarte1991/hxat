@@ -54,7 +54,7 @@ def create_new_assignment(request):
                     {
                         'form': form,
                         'targets_form': targets_form,
-                        'user': request.user,
+                        'username': request.session['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
@@ -97,7 +97,7 @@ def create_new_assignment(request):
         {
             'form': form,
             'targets_form': targets_form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'number_of_targets': target_num,
             'debug': debug,
             'course_id': get_course_id(request),
@@ -153,7 +153,7 @@ def edit_assignment(request, id):
                     {
                         'form': form,
                         'targets_form': targets_form,
-                        'user': request.user,
+                        'username': request.session['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
@@ -175,7 +175,7 @@ def edit_assignment(request, id):
             'form': form,
             'targets_form': targets_form,
             'number_of_targets': target_num,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'debug': debug,
             'assignment_id': assignment.assignment_id,
             'course_id': get_course_id(request),

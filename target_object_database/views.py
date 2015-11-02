@@ -49,7 +49,7 @@ def create_new_source(request):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
         }
     )
 
@@ -76,7 +76,7 @@ def edit_source(request, id):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'creator': get_lti_profile_id(request),
             'course': get_course_id(request),
         }
@@ -98,7 +98,7 @@ def handlePopAdd(request, addForm, field):
     pageContext = {
         'form': form,
         'field': field,
-        'user': request.user,
+        'username': request.session['hx_user_name'],
         'creator': get_lti_profile_id(request),
         'course': get_course_id(request),
     }
