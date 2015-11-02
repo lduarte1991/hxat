@@ -324,7 +324,11 @@
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
 						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}" role="button">{% bootstrap_icon "cog" %}</td>
 						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
-						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'></td>
+						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}
+						{% if item.id.value %}
+						<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
+						{% endif %}
+						</td>
 					</tr>
 				{% endif %}
 			{% endfor %}
