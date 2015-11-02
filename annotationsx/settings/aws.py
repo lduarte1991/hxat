@@ -157,11 +157,13 @@ LTI_SETUP = {
     }
 }
 
+ANNOTATION_MANUAL_URL = None
 ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
 ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
 ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 
 if ORGANIZATION == "ATG":
+    ANNOTATION_MANUAL_URL = SECURE_SETTINGS["annotation_manual_url"]
     LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
     CONSUMER_KEY = LTI_OAUTH_CREDENTIALS.items()[0][0]
     LTI_SECRET = LTI_OAUTH_CREDENTIALS.items()[0][1]
