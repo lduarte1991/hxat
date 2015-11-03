@@ -417,6 +417,20 @@ def delete_assignment(request):
 
 
 def annotation_database_search(request):
+    '''
+    This view is intended to be called by the annotation dashboard when searching
+    the CATCH database for annotations.
+    
+    It's essentially a proxy for annotatorJS requests, with a permission check to
+    make sure the user is authorized to search the given course and collection.
+    
+    Required GET parameters:
+     - collectionId: this is the assignment model
+     - contextId: this is the course identifier as defined by LTI (the "course context")
+    
+    The optional GET parameters include those specified by the CATCH database as
+    search fields.
+    '''
     session_collection_id = request.session['hx_collection_id']
     session_context_id = request.session['hx_context_id']
 
