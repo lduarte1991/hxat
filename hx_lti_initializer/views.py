@@ -418,20 +418,17 @@ def delete_assignment(request):
 
 def annotation_database_search(request):
     session_collection_id = request.session['hx_collection_id']
-    session_object_id = request.session['hx_object_id']
     session_context_id = request.session['hx_context_id']
 
-    request_collection_id = request.GET['collectionId']
-    request_object_id = request.GET['uri']
-    request_context_id = request.GET['contextId']
+    request_collection_id = request.GET.get('collectionId', None)
+    request_context_id = request.GET.get('contextId', None)
 
     # verifies the query against session so they can't get unauthorized items
     if (session_collection_id != request_collection_id or
             session_context_id != request_context_id):
         return HttpResponse("You are not authorized to search for annotations")
 
-    collection_id = request.GET['collectionId']
-    assignment = get_object_or_404(Assignment, assignment_id=collection_id)
+    assignment = get_object_or_404(Assignment, assignment_id=request_collection_id)
 
     url_values = request.GET.urlencode()
     database_url = str(assignment.annotation_database_url).strip() + '/search?'
