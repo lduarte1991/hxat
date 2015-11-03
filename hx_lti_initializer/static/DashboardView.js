@@ -155,6 +155,7 @@
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
         }
+		item.tags = item.tags || [];
         return item;
     };
 
