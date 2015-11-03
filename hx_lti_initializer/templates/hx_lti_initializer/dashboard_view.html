@@ -46,7 +46,7 @@
                                                     <th class="col-md-1">Date</th>
                                                     <th>Assignment</th>
                                                     <th>Object</th>
-                                                    <th>Line</th>
+                                                    <th>Excerpt</th>
                                                     <th>Annotation</th>
                                                     <th>Tags</th>
                                                 </tr>
@@ -65,13 +65,17 @@
                                                         {% get_assignment_name annotation.collectionId %}
                                                     </td>
                                                     <td>
-                                                        <a href="admin_hub/{{ annotation.contextId }}/{{ annotation.collectionId }}/{{ annotation.uri }}/preview/">
+                                                        <a href="admin_hub/{{ annotation.contextId }}/{{ annotation.collectionId }}/{% get_target_id annotation.uri %}/preview/">
                                                             {% get_target_object_name annotation.uri %}
                                                         </a>
                                                     </td>
                                                     <td>
                                                         {% if annotation.parent == "0" %}
-                                                            "{{ annotation.quote }}"
+                                                            {% if annotation.media == "text" %}
+                                                                "{{ annotation.quote }}"
+                                                            {% else %}
+                                                                <img src="{{annotation.thumb}}" style="max-width:150px;max-height:150px;"/>
+                                                            {% endif %}
                                                         {% else %}
                                                             <b>Reply To:</b> "{% get_annotation_by_id annotation.parent annotation_dict %}"
                                                         {% endif %}

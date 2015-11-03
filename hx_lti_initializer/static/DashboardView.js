@@ -175,14 +175,16 @@
         divObject = '.annotationItem.item-'+annotation.id.toString();
 
         tagHtml = ""
-        annotationItem.tags.forEach(function(tag){
-            var style = "";
-            if (window.AController.main.tags[tag] !== undefined) {
-                var rgbColor = window.AController.main.tags[tag];
-                style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
-            };
-            tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
-        });
+        if (typeof annotationItem.tags !== "undefined") {
+            annotationItem.tags.forEach(function(tag){
+                var style = "";
+                if (window.AController.main.tags[tag] !== undefined) {
+                    var rgbColor = window.AController.main.tags[tag];
+                    style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+                };
+                tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
+            });
+        };
         jQuery(divObject + ' .tagList').html(tagHtml);
     };
     
@@ -205,14 +207,17 @@
         jQuery(divObject + ' .body').html(annotationItem.text);
 
         tagHtml = ""
-        annotationItem.tags.forEach(function(tag){
-            var style = "";
-            if (window.AController.main.tags[tag] !== undefined) {
-                var rgbColor = window.AController.main.tags[tag];
-                style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
-            };
-            tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
-        });
+
+        if (typeof annotationItem.tags !== "undefined") {
+            annotationItem.tags.forEach(function(tag){
+                var style = "";
+                if (window.AController.main.tags[tag] !== undefined) {
+                    var rgbColor = window.AController.main.tags[tag];
+                    style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+                };
+                tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
+            });
+        };
         jQuery(divObject + ' .tagList').html(tagHtml);
     };
 

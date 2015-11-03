@@ -142,6 +142,7 @@ AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations
 	annotations.forEach(function(annotation){
 		self.annotator.setupAnnotation(annotation);
 		self.annotator.plugins.Store.registerAnnotation(annotation);
+		self.updateAnnotationInMasterList(annotation);
 	});
 	self.annotator.publish("externalCallToHighlightTags");
 };
@@ -162,8 +163,14 @@ AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(
 AnnotatorEndpointController.prototype.getAnnotationById = function(id) {
 	var annotationId = parseInt(id, 10);
 	var annotations = this.annotationsMasterList;
+	var currentAnnotations = this.annotator.plugins.Store.annotations;
+	for (var index in currentAnnotations){
+		if  (currentAnnotations[index].id === annotationId){
+			return currentAnnotations[index];
+		}
+	}
 
-	for (index in annotations) {
+	for (var index in annotations) {
 		if (annotations[index].id === annotationId)
 			return annotations[index];
 	}
@@ -190,6 +197,7 @@ AnnotatorEndpointController.prototype.openEditorForReply = function(location) {
 };
 
 AnnotatorEndpointController.prototype.deleteAnnotation = function(annotation) {
+	this.updateAnnotationInMasterList(annotation);
 	this.annotator.deleteAnnotation(annotation);
 };
 
