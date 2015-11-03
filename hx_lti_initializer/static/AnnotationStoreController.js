@@ -16,7 +16,7 @@ AnnotationStoreController.prototype.setUpListener = function(listener, expected_
 	throw new Error("Abstract method!");
 };
 
-AnnotationStoreController.prototype.updateMasterList = function() {
+AnnotationStoreController.prototype.updateMasterList = function(focus_id, viewer){
 	throw new Error("Abstract method!");
 };
 
@@ -417,9 +417,20 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 	}
 };
 
-MiradorEndpointController.prototype.updateMasterList = function(){
+MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer){
 	// make a call to mirador endpoint to call CATCH to get a new instance
 	this.annotationsMasterList = this.endpoint.annotationsListCatch.slice();
+	if (typeof focus_id !== "undefined") {
+		var annotation = this.getAnnotationById(focus_id);
+		var self = this;
+		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
+		jQuery.publish('annotationListLoaded.' + self.window.id);
+		jQuery.subscribe('osdOpen.' + self.window.id, function(){
+			jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+		});
+		viewer.updateDashboard(0, 1, [annotation], false);
+
+	}
 };
 
 MiradorEndpointController.prototype.updateEndpointList = function(options){
