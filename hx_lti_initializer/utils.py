@@ -14,6 +14,7 @@ import time
 import datetime
 import jwt
 import requests
+import urllib
 
 # import Sample Target Object Model
 from target_object_database.models import TargetObject
@@ -201,8 +202,9 @@ def fetch_annotations_by_course(context_id, token):
         "x-annotator-auth-token": token,
         "Content-Type":"application/json"
     }
-    limit = 10000 #TODO: How do we want to handle this?
-    request_url = "%s/search?contextId=%s&limit=%s" % (settings.ANNOTATION_DB_URL, context_id, limit)
+    limit = -1 #TODO: How do we want to handle this?
+    encoded_context_id = urllib.quote_plus(context_id)
+    request_url = "%s/search?contextId=%s&limit=%s" % (settings.ANNOTATION_DB_URL, encoded_context_id, limit)
 
     debug_printer("DEBUG - fetch_annotations_by_course(): url: %s" % request_url)
 
