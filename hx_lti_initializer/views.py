@@ -339,6 +339,11 @@ def access_annotation_target(
             'dashboard_hidden': assignment_target.get_dashboard_hidden()
         })
 
+    get_paras = {}
+    for k in request.GET.keys():
+        get_paras[k] = request.GET[k]
+
+    original.update(get_paras)
     return render(request, '%s/detail.html' % targ_obj.target_type, original)
 
 

@@ -65,7 +65,7 @@
                                                         {% get_assignment_name annotation.collectionId %}
                                                     </td>
                                                     <td>
-                                                        <a href="admin_hub/{{ annotation.contextId }}/{{ annotation.collectionId }}/{% get_target_id annotation.uri %}/preview/">
+                                                        <a href="admin_hub/{{ annotation.contextId }}/{{ annotation.collectionId }}/{% get_target_id annotation.uri %}/preview/?focus_on_id={{annotation.id}}">
                                                             {% get_target_object_name annotation.uri %}
                                                         </a>
                                                     </td>
