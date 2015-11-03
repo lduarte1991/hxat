@@ -137,6 +137,9 @@ jQuery(function ($) {
 					default_tab: "{{ assignment.default_tab }}",
 					instructions: "{{instructions | escapejs }}",
 					dashboard_hidden: {{dashboard_hidden}},
+					{% if focus_on_id %}
+					focus_on_annotation: {{focus_on_id}},
+					{% endif %}
 				},
 			},
 		}

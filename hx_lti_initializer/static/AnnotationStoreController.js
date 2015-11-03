@@ -110,7 +110,7 @@ AnnotatorEndpointController.prototype.setUpListener = function(listener, expecte
 	});
 };
 
-AnnotatorEndpointController.prototype.updateMasterList = function() {
+AnnotatorEndpointController.prototype.updateMasterList = function(focus_id, viewer) {
 	var self = this;
 	var searchParameters = this.annotator.plugins.Store.options.loadFromSearch;
 	searchParameters.limit = -1;
@@ -119,7 +119,18 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 		if (data === null) {
 			data = {}
 		};
-		self.annotationsMasterList = data.rows || [];
+		if (typeof focus_id !== "undefined") {
+			data.rows.forEach(function(annotation){
+				var focus = parseInt(focus_id, 10);
+				if (annotation.id === focus) {
+					self.annotationsMasterList = [annotation];
+					self._clearAnnotator();
+					viewer.updateDashboard(0, 1, [annotation], false);
+				};
+			})
+		} else {
+			self.annotationsMasterList = data.rows || [];
+		}
 	};
 	search_url = this.annotator.plugins.Store._urlFor("search");
 	var options = this.annotator.plugins.Store._apiRequestOptions("search", searchParameters, onSuccess);

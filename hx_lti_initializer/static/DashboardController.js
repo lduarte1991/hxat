@@ -152,12 +152,17 @@
 		//console.log("AnnotationsLoaded Triggered");
 		var self = this;
 		this.dashboardReady.done(function() {
-			self.endpoint.updateMasterList();
-			if (self.endpoint.getNumOfAnnotationsOnScreen() > self.initOptions.pagination) {
-				self.endpoint.updateEndpointList({limit:self.initOptions.pagination});
-			};
-			self.viewer.clearDashboard();
-			self.viewer.updateDashboard(0, self.initOptions.pagination, annotations, false);
+			if (typeof self.initOptions.focus_on_annotation !== "undefined") {
+				self.endpoint.updateMasterList(self.initOptions.focus_on_annotation, self.viewer);
+				self.initOptions.focus_on_annotation = undefined;
+			} else {
+				self.endpoint.updateMasterList();
+				if (self.endpoint.getNumOfAnnotationsOnScreen() > self.initOptions.pagination) {
+					self.endpoint.updateEndpointList({limit:self.initOptions.pagination});
+				};
+				self.viewer.clearDashboard();
+				self.viewer.updateDashboard(0, self.initOptions.pagination, annotations, false);
+			}
 		});
 	};
 
