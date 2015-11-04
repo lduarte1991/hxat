@@ -61,7 +61,7 @@
 													{% if annotation.data.media == "text" %}
 														"{{ annotation.data.quote }}"
 													{% else %}
-														<img src="{{annotation.data.thumb}}" style="max-width:150px;max-height:150px;"/>
+														<img class="lazy" data-original="{{annotation.data.thumb}}" style="max-width:150px; max-height:150px;" />
 													{% endif %}
 												{% else %}
 													<b>Reply To:</b> "{{ annotation.parent_text }}"
@@ -84,12 +84,18 @@
 		No annotations to display
 	</div>
 {% endif %}
+{% endblock %}
+
+
+{% block javascript %}
+<script src="{% static "vendors/development/jquery.lazyload.js" %}"></script>
 <script>
 $(document).ready(function(){
-    // Search type (name by default)
-    var type = 'name';
-    // Get all panels 
-    var $panels = $('.panel');
+	// Lazy-load thumbnail images on the page (if any).
+	$("img.lazy").lazyload();
+	
+    var type = 'name'; // Search type (name by default)
+    var $panels = $('.panel'); // Get all panels 
     
     // Handles toggling for search bar dropdown
     $('.search-panel .dropdown-menu').find('a').click(function(e) {
