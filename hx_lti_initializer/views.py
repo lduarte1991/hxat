@@ -35,6 +35,7 @@ import urllib
 import json
 import sys
 import requests
+import time
 
 import logging
 logging.basicConfig()
@@ -358,13 +359,19 @@ def instructor_dashboard_view(request):
     context_id = request.session['hx_context_id']
     course_object = LTICourse.objects.get(course_id=context_id)
     token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
+        
+    fetch_start_time = time.time()
     course_annotations = fetch_annotations_by_course(context_id, token)
+    fetch_end_time = time.time()
+    fetch_elapsed_time = fetch_end_time - fetch_start_time
+
     user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
 
     context = {
         'username': request.session['hx_user_name'],
         'is_instructor': request.session["is_staff"],
         'user_annotations': user_annotations,
+        'fetch_annotations_time': fetch_elapsed_time,
     }
 
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)

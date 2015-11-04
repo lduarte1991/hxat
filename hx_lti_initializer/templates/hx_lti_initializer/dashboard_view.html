@@ -80,10 +80,10 @@
 			</div>
 			{% endfor %}
 		</div>
-		{% else %}
-		No annotations to display
-	</div>
+{% else %}
+	<div style="margin: 1em 0;">No annotations to display</div>
 {% endif %}
+<div style="color: #999; font-size: 11px; float: right;"><i>Loaded annotations in {{fetch_annotations_time|floatformat:4}} seconds.</i></div>
 {% endblock %}
 
 
