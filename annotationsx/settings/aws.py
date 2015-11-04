@@ -125,6 +125,35 @@ JENKINS_TASKS = (
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
+        },
+        'hx_lti_initializer': {
+            'handlers': ['console'],
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
+        },
+        'hx_lti_assignment': {
+            'handlers': ['console'],
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
+        },
+        'target_object_database': {
+            'handlers': ['console'],
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
+        },
+    },
+    
+}
+
 LTI_COURSE_ID = "context_id"
 LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"

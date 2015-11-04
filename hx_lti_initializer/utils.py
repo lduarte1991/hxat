@@ -7,6 +7,7 @@ from urlparse import urlparse
 from abstract_base_classes.target_object_database_api import *
 from models import *
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from ims_lti_py.tool_provider import DjangoToolProvider
 import base64
 import sys
@@ -15,9 +16,14 @@ import datetime
 import jwt
 import requests
 import urllib
+import re
+import logging
 
 # import Sample Target Object Model
+from hx_lti_assignment.models import Assignment
 from target_object_database.models import TargetObject
+
+logger = logging.getLogger(__name__)
 
 # If we were to restructure (not recommended because then we can't reconcile with HX),
 # these first 4 functions would be in utils.py
@@ -229,11 +235,10 @@ def fetch_annotations_by_course(context_id, token):
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
         annotations = {'rows':[]}
-        logging.error('Error decoding JSON from CATCH. Check to see if authentication is correctly configured')
 
     return annotations
 
-def get_distinct_users_from_annotations(annotations):
+def get_distinct_users_from_annotations(annotations, sort_key=None):
     '''
     Given a set of annotation objects returned by the CATCH database,
     this function returns a list of distinct user objects.
@@ -244,8 +249,27 @@ def get_distinct_users_from_annotations(annotations):
         user_id = r['user']['id']
         if user_id not in annotations_by_user:
             annotations_by_user[user_id] = r['user']
-    users = list(sorted(annotations_by_user.values(), key=lambda user: user['id']))
+    if sort_key is None:
+        sort_key = lambda user: user['id']
+    users = list(sorted(annotations_by_user.values(), key=sort_key))
     return users
+
+def get_distinct_assignment_objects(annotations):
+    '''
+    Given a set of annotation objects returned by the CATCH database,
+    this function returns a list of distinct course assignment objects identified
+    by the tuple: (context_id, assignment_id, object_id)
+    '''
+    rows = annotations['rows']
+    assignment_set = set()
+    for r in rows:
+        context_id = r['contextId']
+        assignment_id = r['collectionId']
+        object_id = str(r['uri'])
+        assignment_tuple = (context_id, assignment_id, object_id)
+        assignment_set.add(assignment_tuple)
+    assignment_objects = list(sorted(assignment_set))
+    return assignment_objects
 
 def get_annotations_for_user_id(annotations, user_id):
     '''
@@ -276,9 +300,149 @@ def get_annotations_keyed_by_annotation_id(annotations):
     
     The intended usage is for when you have an annotation that is a
     reply to another annotation, and you want to lookup the parent
-    annotatino by its ID.
+    annotation by its ID.
     '''
     rows = annotations['rows']
     return dict([(r['id'], r) for r in rows])
-    
 
+
+class DashboardAnnotations(object):
+    '''
+    This class is used to transform annotations retrieved from the CATCH DB into
+    a data structure that can be rendered on the instructor dashboard.
+    
+    The intended use case is to take a set of course annotations, group them by user,
+    and then augment them with additional information that is useful on the dashboard.
+    That includes things like the Assignment and TargetObject names associated with the
+    annotations, etc.
+    
+    Example usage:
+    
+        user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
+    
+    Notes:
+
+    This class is designed to minimize database hits by loading data up front.
+    The assumption is that the number of assignments and target objects in the tool
+    is going to be small compared to the number of annotations, so the memory use
+    should be negligible.
+    '''
+    def __init__(self, annotations):
+        self.annotations = annotations
+        self.annotation_by_id = self.get_annotations_by_id()
+        self.distinct_users = self.get_distinct_users()
+        self.assignment_name_of = self.get_assignments_dict()
+        self.target_objects_list = self.get_target_objects_list()
+        self.target_objects_by_id = {x['id']: x for x in self.target_objects_list}
+        self.target_objects_by_content = {x.get('target_content', '').strip(): x for x in self.target_objects_list}
+
+    def get_annotations_by_id(self):
+        return get_annotations_keyed_by_annotation_id(self.annotations)
+
+    def get_distinct_users(self):
+        sort_key = lambda user: user.get('name', '').strip().lower()
+        return get_distinct_users_from_annotations(self.annotations, sort_key)
+
+    def get_assignments_dict(self, ):
+        return dict(Assignment.objects.values_list('assignment_id', 'assignment_name'))
+
+    def get_target_objects_list(self):
+        return TargetObject.objects.values('id', 'target_title', 'target_content')
+
+    def get_annotations_by_user(self):
+        annotations_by_user = get_annotations_keyed_by_user_id(self.annotations)
+        users = []
+        for user in self.distinct_users:
+            user_id = user['id']
+            user_name = user['name']
+            annotations = []
+            for annotation in annotations_by_user[user_id]:
+                if self.assignment_object_exists(annotation):
+                    annotations.append({
+                        'data': annotation,
+                        'assignment_name': self.get_assignment_name(annotation),
+                        'target_preview_url': self.get_target_preview_url(annotation),
+                        'target_object_name': self.get_target_object_name(annotation),
+                        'parent_text': self.get_annotation_parent_value(annotation, 'text'),
+                    })
+            if len(annotations) > 0:
+                users.append({
+                    'id': user_id,
+                    'name': user_name,
+                    'annotations': annotations,
+                    'total_annotations': len(annotations),
+                })
+        return users
+
+    def get_target_id(self, media_type, object_id):
+        target_id = ''
+        if media_type == 'image':
+            trimmed_object_id = re.sub(r'/canvas/.*$', '', object_id)
+            if trimmed_object_id in self.target_objects_by_content:
+                target_id = self.target_objects_by_content[trimmed_object_id]['id']
+        else:
+            if object_id in self.target_objects_by_id:
+                target_id = object_id
+        return target_id
+    
+    def get_assignment_name(self, annotation):
+        collection_id = annotation['collectionId']
+        if collection_id in self.assignment_name_of:
+            return self.assignment_name_of[collection_id]
+        return ''
+    
+    def get_target_object_name(self, annotation):
+        media_type = annotation['media']
+        object_id = annotation['uri']
+        target_id = self.get_target_id(media_type, object_id)
+        if target_id in self.target_objects_by_id:
+            return self.target_objects_by_id[target_id]['target_title']
+        return ''
+
+    def get_target_preview_url(self, annotation):
+        annotation_id = annotation['id']
+        media_type = annotation['media']
+        context_id = annotation['contextId']
+        collection_id = annotation['collectionId']
+        url_format = "%s?focus_on_id=%s"
+        preview_url = ''
+        
+        if media_type == 'image':
+            target_id = self.get_target_id(media_type, annotation['uri'])
+            if target_id:
+                preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
+                    "course_id": context_id,
+                    "assignment_id": collection_id,
+                    "object_id": target_id,
+                }), annotation_id)
+        else:
+            preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
+                "course_id": context_id,
+                "assignment_id": collection_id,
+                "object_id": annotation['uri'],
+            }), annotation_id)
+        
+        
+        return preview_url
+    
+    def assignment_object_exists(self, annotation):
+        media_type = annotation['media']
+        collection_id = annotation['collectionId']
+        object_id = annotation['uri']
+        target_id = self.get_target_id(media_type, object_id)
+        return (collection_id in self.assignment_name_of) and target_id
+
+    def get_annotation_parent_value(self, annotation, attr):
+        parent_value = None
+        if annotation['parent']:
+            parent_id = annotation['parent']
+            parent_annotation = self.get_annotation_by_id(parent_id)
+            if parent_annotation is not None and attr in parent_annotation:
+                parent_value = parent_annotation[attr]
+        return parent_value
+
+    def get_annotation_by_id(self, annotation_id):
+        annotation_id = int(annotation_id)
+        if annotation_id in self.annotation_by_id:
+            return self.annotation_by_id[annotation_id]
+        return None
