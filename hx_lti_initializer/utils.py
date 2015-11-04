@@ -407,7 +407,7 @@ class DashboardAnnotations(object):
         media_type = annotation['media']
         context_id = annotation['contextId']
         collection_id = annotation['collectionId']
-        url_format = "%s?focus_id=%s"
+        url_format = "%s?focus_on_id=%s"
         preview_url = ''
         
         if media_type == 'image':
