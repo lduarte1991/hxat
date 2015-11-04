@@ -61,7 +61,7 @@
 													{% if annotation.data.media == "text" %}
 														"{{ annotation.data.quote }}"
 													{% else %}
-														<img class="lazy" data-original="{{annotation.data.thumb}}" style="max-width:150px; max-height:150px;" />
+														<img class="lazy" data-original="{{annotation.data.thumb}}" width="{{annotation.data.rangePosition.width}}" height="{{annotation.data.rangePosition.height}}" style="max-width:150px; max-height:150px;" />
 													{% endif %}
 												{% else %}
 													<b>Reply To:</b> "{{ annotation.parent_text }}"
@@ -90,10 +90,20 @@
 {% block javascript %}
 <script src="{% static "vendors/development/jquery.lazyload.js" %}"></script>
 <script>
-$(document).ready(function(){
-	// Lazy-load thumbnail images on the page (if any).
-	$("img.lazy").lazyload();
+$(document).ready(function() {
+	//------------------------
+	// Lazy-load thumbnail images.
+	// Triggers the lazy load when a panel is clicked.
+	$('img.lazy').lazyload({
+		event: "panelClick",
+		effect: "fadeIn"
+	});
+	$('.panel').on('click', function(evt) {
+		$("img.lazy", evt.currentTarget).trigger("panelClick");
+	});
 	
+	//------------------------
+	// Search functionality.
     var type = 'name'; // Search type (name by default)
     var $panels = $('.panel'); // Get all panels 
     
