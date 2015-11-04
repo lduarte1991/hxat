@@ -356,8 +356,6 @@ class DashboardAnnotations(object):
             user_id = user['id']
             user_name = user['name']
             annotations = []
-            total_annotations = 0
-            total_comments = 0
             for annotation in annotations_by_user[user_id]:
                 if self.assignment_object_exists(annotation):
                     annotations.append({
