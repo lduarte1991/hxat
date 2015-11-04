@@ -23,19 +23,8 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import (
-    debug_printer,
-    get_lti_value,
-    retrieve_token,
-    save_session,
-    create_new_user,
-    initialize_lti_tool_provider,
-    validate_request,
-    fetch_annotations_by_course,
-    get_annotations_keyed_by_user_id,
-    get_annotations_keyed_by_annotation_id,
-    get_distinct_users_from_annotations,
-    DashboardAnnotations)
+from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
+    validate_request, fetch_annotations_by_course, DashboardAnnotations)
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -360,6 +349,10 @@ def instructor_dashboard_view(request):
     '''
         Renders the instructor dashboard
     '''
+    # Check permission
+    if not request.session['is_staff']:
+        raise PermissionDenied("You must be a staff member to view the dashboard.")
+
     # Get all the relevant objects we're going to need for the dashboard
     user_id = request.session['hx_user_id']
     context_id = request.session['hx_context_id']

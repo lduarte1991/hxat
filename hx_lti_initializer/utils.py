@@ -327,7 +327,6 @@ class DashboardAnnotations(object):
     is going to be small compared to the number of annotations, so the memory use
     should be negligible.
     '''
-
     def __init__(self, annotations):
         self.annotations = annotations
         self.annotation_by_id = self.get_annotations_by_id()
