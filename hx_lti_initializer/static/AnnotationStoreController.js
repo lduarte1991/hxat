@@ -16,7 +16,7 @@ AnnotationStoreController.prototype.setUpListener = function(listener, expected_
 	throw new Error("Abstract method!");
 };
 
-AnnotationStoreController.prototype.updateMasterList = function() {
+AnnotationStoreController.prototype.updateMasterList = function(focus_id, viewer){
 	throw new Error("Abstract method!");
 };
 
@@ -110,7 +110,7 @@ AnnotatorEndpointController.prototype.setUpListener = function(listener, expecte
 	});
 };
 
-AnnotatorEndpointController.prototype.updateMasterList = function() {
+AnnotatorEndpointController.prototype.updateMasterList = function(focus_id, viewer) {
 	var self = this;
 	var searchParameters = this.annotator.plugins.Store.options.loadFromSearch;
 	searchParameters.limit = -1;
@@ -119,7 +119,18 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 		if (data === null) {
 			data = {}
 		};
-		self.annotationsMasterList = data.rows || [];
+		if (typeof focus_id !== "undefined") {
+			data.rows.forEach(function(annotation){
+				var focus = parseInt(focus_id, 10);
+				if (annotation.id === focus) {
+					self.annotationsMasterList = [annotation];
+					self._clearAnnotator();
+					viewer.updateDashboard(0, 1, [annotation], false);
+				};
+			})
+		} else {
+			self.annotationsMasterList = data.rows || [];
+		}
 	};
 	search_url = this.annotator.plugins.Store._urlFor("search");
 	var options = this.annotator.plugins.Store._apiRequestOptions("search", searchParameters, onSuccess);
@@ -406,9 +417,20 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 	}
 };
 
-MiradorEndpointController.prototype.updateMasterList = function(){
+MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer){
 	// make a call to mirador endpoint to call CATCH to get a new instance
 	this.annotationsMasterList = this.endpoint.annotationsListCatch.slice();
+	if (typeof focus_id !== "undefined") {
+		var annotation = this.getAnnotationById(focus_id);
+		var self = this;
+		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
+		jQuery.publish('annotationListLoaded.' + self.window.id);
+		jQuery.subscribe('osdOpen.' + self.window.id, function(){
+			jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+		});
+		viewer.updateDashboard(0, 1, [annotation], false);
+
+	}
 };
 
 MiradorEndpointController.prototype.updateEndpointList = function(options){
