@@ -403,25 +403,28 @@ class DashboardAnnotations(object):
         return ''
 
     def get_target_preview_url(self, annotation):
+        annotation_id = annotation['id']
         media_type = annotation['media']
         context_id = annotation['contextId']
         collection_id = annotation['collectionId']
+        url_format = "%s?focus_id=%s"
         preview_url = ''
         
         if media_type == 'image':
             target_id = self.get_target_id(media_type, annotation['uri'])
             if target_id:
-                preview_url = reverse('hx_lti_initializer:access_annotation_target', kwargs={
+                preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
                     "course_id": context_id,
                     "assignment_id": collection_id,
                     "object_id": target_id,
-                })
+                }), annotation_id)
         else:
-            preview_url = reverse('hx_lti_initializer:access_annotation_target', kwargs={
+            preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
                 "course_id": context_id,
                 "assignment_id": collection_id,
                 "object_id": annotation['uri'],
-            })
+            }), annotation_id)
+        
         
         return preview_url
     
