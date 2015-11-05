@@ -45,9 +45,9 @@
         }
 
         // variables used when resizing dashboards
-		this.resizing = false;
+        this.resizing = false;
         this.moving = false;
-		this.lastUp = 150;
+        this.lastUp = 150;
 
     };
 
@@ -155,7 +155,6 @@
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
         }
-        item.tags = item.tags || [];
         return item;
     };
 
@@ -236,38 +235,40 @@
     };
 
     $.DashboardView.prototype.setUpEmptyDashboard = function() {
-    	var self = this;
-		var el = self.initOptions.element;
-		el.html(self.initOptions.TEMPLATES.annotationSection({
-			annotationItems: [],
-		}));
+        var self = this;
+        var el = self.initOptions.element;
+        el.html(self.initOptions.TEMPLATES.annotationSection({
+            annotationItems: [],
+        }));
         
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
-		jQuery('.resize-handle.side').on('mousedown', function(e){
-			self.resizing = true;
+        jQuery('.resize-handle.side').on('mousedown', function(e){
+            self.resizing = true;
             self.moving = false;
-		});
-		
+            jQuery('.modal-navigation').removeClass('hidden'); 
+            jQuery('.editgroup').removeClass('hidden');
+        });
+        
         jQuery(document).on('mousemove', function(e){
-			if (!self.resizing){
+            if (!self.resizing){
                 self.resizing = false;
                 self.moving = false;
-				return;
-			}
-			e.preventDefault();
+                return;
+            }
+            e.preventDefault();
             self.moving = true;
-			
+            
             var section = jQuery('.annotationSection');
             var handle = jQuery('.resize-handle');
-			section.css('min-width', '0px');
+            section.css('min-width', '0px');
            
             var offset = section.width() - (e.clientX - section.offset().left);
-			section.css('width', offset);
-			section.css('right', '0px');
+            section.css('width', offset);
+            section.css('right', '0px');
             handle.css('right', offset);
-			self.lastUp = offset;
+            self.lastUp = offset;
 
-		}).on('mouseup', function(e){
+        }).on('mouseup', function(e){
 
             if (!self.resizing || !self.moving) {
                 self.resizing = false;
@@ -277,37 +278,40 @@
 
             self.resizing = false;
 
-			var section = jQuery('.annotationSection');
+            var section = jQuery('.annotationSection');
             var handle = jQuery('.resize-handle');
 
-			if(self.lastUp < 150){
-				jQuery('#leftCol').attr('class', 'col-xs-11');
-				section.css('width', '0px');
+            if(self.lastUp < 150){
+                jQuery('#leftCol').attr('class', 'col-xs-11');
+                section.css('width', '0px');
                 handle.css('right', '0px');
-				section.css('right', '-5px');
+                section.css('right', '-5px');
                 section.css('overflow-y', "hidden");
                 handle.find('i').removeClass('fa-arrow-right');
                 handle.find('i').addClass('fa-arrow-left');
-			} else {
-				jQuery('#leftCol').attr('class', 'col-xs-7');
-				section.css('min-width', '150px');
+                jQuery('.modal-navigation').addClass('hidden'); 
+                jQuery('.editgroup').addClass('hidden');
+
+            } else {
+                jQuery('#leftCol').attr('class', 'col-xs-7');
+                section.css('min-width', '150px');
                 section.css('overflow-y', "scroll");
                 section.css('right', '0px');
                 handle.find('i').addClass('fa-arrow-right');
                 handle.find('i').removeClass('fa-arrow-left');
-			}
+            }
 
             jQuery('.test').css('width', section.offset().left);
             window.dispatchEvent(new Event('resize'));
-		});
-		jQuery('.annotationSection').scroll(function() {
-			if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
+        });
+        jQuery('.annotationSection').scroll(function() {
+            if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
                 var offset = self.initOptions.endpoint.getNumOfAnnotationsOnScreen();
                 var pagination = self.initOptions.pagination;
                 var annotationList = self.initOptions.endpoint.annotationsMasterList;
                 self.updateDashboard(offset, pagination, annotationList, true);
-			}
-		});
+            }
+        });
        jQuery('.handle-button').click( function(e) {
             if (self.moving) {
                 return;
@@ -321,6 +325,8 @@
                 handle.css('right', '0px');
                 section.css('right', '-5px');
                 section.css('overflow-y', "hidden");
+                jQuery('.modal-navigation').addClass('hidden'); 
+                jQuery('.editgroup').addClass('hidden');
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
                 section.css('min-width', '150px');
@@ -328,16 +334,19 @@
                 handle.css('right', '300px');
                 section.css('right', '0px');
                 section.css('overflow-y', "scroll");
+                jQuery('.modal-navigation').removeClass('hidden'); 
+                jQuery('.editgroup').removeClass('hidden');
             }
             handle.find('i').toggleClass('fa-arrow-right');
             handle.find('i').toggleClass('fa-arrow-left');
+            
             jQuery('.test').css('width', section.offset().left);
             window.dispatchEvent(new Event('resize'));
         });
         jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         window.dispatchEvent(new Event('resize'));
         if (typeof jQuery.subscribe === 'function') {
-            jQuery.subscribe('windowUpdated', function(){
+            jQuery.subscribe('focusUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;
                 var section = jQuery('.annotationSection');
                 var handle = jQuery('.resize-handle');
@@ -391,71 +400,71 @@
     };
 
     $.DashboardView.prototype.createDateFromISO8601 = function(string) {
-		var d, date, offset, regexp, time, _ref;
-		regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" + "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" 
-		       + "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
-		d = string.match(new RegExp(regexp));
-		offset = 0;
-		date = new Date(d[1], 0, 1);
-		if (d[3]) {
-			date.setMonth(d[3] - 1);
-		}
-		if (d[5]) {
-			date.setDate(d[5]);
-		}
-		if (d[7]) {
-			date.setHours(d[7]);
-		}
-		if (d[8]) {
-			date.setMinutes(d[8]);
-		}
-		if (d[10]) {
-			date.setSeconds(d[10]);
-		}
-		if (d[12]) {
-			date.setMilliseconds(Number("0." + d[12]) * 1000);
-		}
-		if (d[14]) {
-			offset = (Number(d[16]) * 60) + Number(d[17]);
-			offset *= (_ref = d[15] === '-') != null ? _ref : {
-				1: -1
-			};
-		}
-		offset -= date.getTimezoneOffset();
-		time = Number(date) + (offset * 60 * 1000);
-		date.setTime(Number(time));
-		return date;
-	};
+        var d, date, offset, regexp, time, _ref;
+        regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" + "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" 
+               + "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+        d = string.match(new RegExp(regexp));
+        offset = 0;
+        date = new Date(d[1], 0, 1);
+        if (d[3]) {
+            date.setMonth(d[3] - 1);
+        }
+        if (d[5]) {
+            date.setDate(d[5]);
+        }
+        if (d[7]) {
+            date.setHours(d[7]);
+        }
+        if (d[8]) {
+            date.setMinutes(d[8]);
+        }
+        if (d[10]) {
+            date.setSeconds(d[10]);
+        }
+        if (d[12]) {
+            date.setMilliseconds(Number("0." + d[12]) * 1000);
+        }
+        if (d[14]) {
+            offset = (Number(d[16]) * 60) + Number(d[17]);
+            offset *= (_ref = d[15] === '-') != null ? _ref : {
+                1: -1
+            };
+        }
+        offset -= date.getTimezoneOffset();
+        time = Number(date) + (offset * 60 * 1000);
+        date.setTime(Number(time));
+        return date;
+    };
 
-	$.DashboardView.prototype.findAnnotationId = function(target, return_target) {
-		annotation_id = target.find('.idAnnotation').html();
-		// this next part is to double check that idannotation is grabbed from
-    	// within the tags and the quotes section
-		if (annotation_id === undefined) {
+    $.DashboardView.prototype.findAnnotationId = function(target, return_target) {
+        annotation_id = target.find('.idAnnotation').html();
+        // this next part is to double check that idannotation is grabbed from
+        // within the tags and the quotes section
+        if (annotation_id === undefined) {
             if (return_target) {
                 return this.findAnnotationId(target.parent(), true);
             } else {
-    		    return this.findAnnotationId(target.parent(), false);
+                return this.findAnnotationId(target.parent(), false);
             }
-    	}
+        }
 
-    	if (return_target) {
-    		return target;
-    	};
-		return annotation_id;
-	};
+        if (return_target) {
+            return target;
+        };
+        return annotation_id;
+    };
 
-	$.DashboardView.prototype.displayModalView = function(annotation, boundCallback) {
-		var self = this;
-		var annotationItem = self.formatAnnotation(annotation);
+    $.DashboardView.prototype.displayModalView = function(annotation, boundCallback) {
+        var self = this;
+        var annotationItem = self.formatAnnotation(annotation);
 
-		var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
-    	jQuery('.annotationSection').append(html);
-    	jQuery('.annotationSection').css('overflow-y', 'hidden');
-    	jQuery('.annotationModal #closeModal').click( function (e) {
-    		jQuery('.annotationModal').remove();
-    		jQuery('.annotationSection').css('overflow-y', 'scroll');
-    	});
+        var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
+        jQuery('.annotationSection').append(html);
+        jQuery('.annotationSection').css('overflow-y', 'hidden');
+        jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').css('overflow-y', 'scroll');
+        });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
             if (jQuery('.parentAnnotation').hasClass("hidden")) {
@@ -471,45 +480,45 @@
             }
         });
 
-    	jQuery('.annotationModal button.replybutton').click( function (e) {
-    		var button = jQuery(e.target);
-    		var options = {
-    			left: button.offset().left,
-    			top: button.offset().top,
+        jQuery('.annotationModal button.replybutton').click( function (e) {
+            var button = jQuery(e.target);
+            var options = {
+                left: button.offset().left,
+                top: button.offset().top,
                 repliesList: jQuery('.repliesList'),
                 templateReply: self.initOptions.TEMPLATES.editReplyItem(),
                 onSuccess: boundCallback,
-    		};
-    		
-    		self.initOptions.endpoint.openEditorForReply(options);
-       	});
+            };
+            
+            self.initOptions.endpoint.openEditorForReply(options);
+           });
 
-    	jQuery('.parentAnnotation .quoteText').click( function(e){
-			jQuery('html, body').animate({
-				scrollTop: jQuery(annotation.highlights[0]).offset().top },
-				'slow'
-			);
-    	});
+        jQuery('.parentAnnotation .quoteText').click( function(e){
+            jQuery('html, body').animate({
+                scrollTop: jQuery(annotation.highlights[0]).offset().top },
+                'slow'
+            );
+        });
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
             jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.bounds)
         });
 
-    	jQuery('.parentAnnotation #edit').click(function (e){
-    		if (annotationItem.authToEditButton) {
-    			self.initOptions.endpoint.editAnnotation(annotation, jQuery(e.target));
-    		};
-    	});
-		jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
-			title: "Would you like to delete your annotation?",
+        jQuery('.parentAnnotation #edit').click(function (e){
+            if (annotationItem.authToEditButton) {
+                self.initOptions.endpoint.editAnnotation(annotation, jQuery(e.target));
+            };
+        });
+        jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
+            title: "Would you like to delete your annotation?",
             placement: 'left',
-			onConfirm: function (){
-				if(annotationItem.authToDeleteButton) {
-					self.initOptions.endpoint.deleteAnnotation(annotation);
-				}
-			},
-		});
-	};
+            onConfirm: function (){
+                if(annotationItem.authToDeleteButton) {
+                    self.initOptions.endpoint.deleteAnnotation(annotation);
+                }
+            },
+        });
+    };
 
     $.DashboardView.prototype.sortAnnotationsByCreated = function(annotations) {
         var compareCreated = function(a, b) {
@@ -529,26 +538,26 @@
         return sorted_annotations;
     };
 
-	$.DashboardView.prototype.displayReplies = function(replies_unsorted) {
-		var self = this;
-		var replies = self.sortAnnotationsByCreated(replies_unsorted);
-		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-		var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
-		jQuery('.repliesList').css('margin-top', replies_offset);
-		jQuery('.repliesList').css('height', replies_height);
-		
-		var final_html = '';
+    $.DashboardView.prototype.displayReplies = function(replies_unsorted) {
+        var self = this;
+        var replies = self.sortAnnotationsByCreated(replies_unsorted);
+        var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+        var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+        jQuery('.repliesList').css('margin-top', replies_offset);
+        jQuery('.repliesList').css('height', replies_height);
+        
+        var final_html = '';
         self.initOptions.endpoint.list_of_replies = {};
 
-		
-		replies.forEach(function(annotation) {
-			var item = self.formatAnnotation(annotation);
-			var html = self.initOptions.TEMPLATES.replyItem(item);
-			final_html += html;
-			self.initOptions.endpoint.list_of_replies[item.id.toString()] = annotation;
-		});
-		
-		jQuery('.repliesList').html(final_html);
+        
+        replies.forEach(function(annotation) {
+            var item = self.formatAnnotation(annotation);
+            var html = self.initOptions.TEMPLATES.replyItem(item);
+            final_html += html;
+            self.initOptions.endpoint.list_of_replies[item.id.toString()] = annotation;
+        });
+        
+        jQuery('.repliesList').html(final_html);
         if (replies.length > 0) {
             var parentId = replies[0].parent;
             jQuery('.item-' + parentId).find('.replyNum').html(replies.length);
@@ -558,7 +567,7 @@
             var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
             jQuery('.repliesList').css('height', replies_height);
         });
-	};
+    };
 
     $.DashboardView.prototype.displayInstructions = function (instructions) {
         var self = this;
