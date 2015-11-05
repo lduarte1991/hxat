@@ -391,7 +391,12 @@ class DashboardAnnotations(object):
         self.assignment_name_of = self.get_assignments_dict()
         self.target_objects_list = self.get_target_objects_list()
         self.target_objects_by_id = {x['id']: x for x in self.target_objects_list}
-        self.target_objects_by_content = {x.get('target_content', '').strip(): x for x in self.target_objects_list}
+        self.target_objects_by_content = {
+            x.get('target_content', '').strip(): x
+            for x in self.target_objects_list
+            if x['target_type'] == 'ig'
+        }
+        self.preview_url_cache = {}
 
     def get_annotations_by_id(self):
         return get_annotations_keyed_by_annotation_id(self.annotations)
@@ -404,7 +409,7 @@ class DashboardAnnotations(object):
         return dict(Assignment.objects.values_list('assignment_id', 'assignment_name'))
 
     def get_target_objects_list(self):
-        return TargetObject.objects.values('id', 'target_title', 'target_content')
+        return TargetObject.objects.values('id', 'target_title', 'target_content', 'target_type')
 
     def get_annotations_by_user(self):
         annotations_by_user = get_annotations_keyed_by_user_id(self.annotations)
@@ -434,7 +439,7 @@ class DashboardAnnotations(object):
     def get_target_id(self, media_type, object_id):
         target_id = ''
         if media_type == 'image':
-            trimmed_object_id = re.sub(r'/canvas/.*$', '', object_id)
+            trimmed_object_id = object_id[0:object_id.find('/canvas/')] # only use regex if absolutely necessary
             if trimmed_object_id in self.target_objects_by_content:
                 target_id = self.target_objects_by_content[trimmed_object_id]['id']
         else:
@@ -463,23 +468,27 @@ class DashboardAnnotations(object):
         collection_id = annotation['collectionId']
         url_format = "%s?focus_on_id=%s"
         preview_url = ''
-        
+
         if media_type == 'image':
             target_id = self.get_target_id(media_type, annotation['uri'])
-            if target_id:
-                preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
+        else:
+            target_id = annotation['uri']
+
+        if target_id:
+            url_cache_key = "%s%s%s" % (context_id, collection_id, target_id)
+            if url_cache_key in self.preview_url_cache:
+                preview_url = self.preview_url_cache[url_cache_key]
+            else:
+                preview_url = reverse('hx_lti_initializer:access_annotation_target', kwargs={
                     "course_id": context_id,
                     "assignment_id": collection_id,
                     "object_id": target_id,
-                }), annotation_id)
-        else:
-            preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
-                "course_id": context_id,
-                "assignment_id": collection_id,
-                "object_id": annotation['uri'],
-            }), annotation_id)
-        
-        
+                })
+                self.preview_url_cache[url_cache_key] = preview_url
+
+        if preview_url:
+            preview_url = url_format % (preview_url, annotation_id)
+
         return preview_url
     
     def assignment_object_exists(self, annotation):
