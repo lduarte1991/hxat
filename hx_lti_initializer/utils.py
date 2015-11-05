@@ -198,19 +198,76 @@ class simple_utc(datetime.tzinfo):
     def utcoffset(self, dt):
         return datetime.timedelta(0)
 
+def get_annotation_db_credentials_by_course(context_id):
+    '''
+    Returns the distinct set of annotation database credentials (url, api key, secret token)
+    for a given course.
 
-def fetch_annotations_by_course(context_id, token):
+    The credentials are stored on a per-assignment basis, and a course will have many assignments.
+    The expected use case is that *one* credential (url, api key, secret token) will be
+    used across all assignments in a course, but it's possible that might not be the case.
+
+    Returns:
+
+    [
+        {
+            'annotation_database_url': 'http://catch-database.localhost/catch/annotator',
+            'annotation_database_apikey': 'Tpt7HaodxVDNQljaMjLz',
+            'annotation_database_secret_token': u'GWoXMgXkprYL4ZtkELyq',
+        },
+        {
+            'annotation_database_url': 'https://catch-database.localhost/catch/annotator',
+            'annotation_database_apikey': '069fK9KTLHugO7uxjfwN',
+            'annotation_database_secret_token': 'Xbi791aSsF4AVWjMhQnl',
+        }
+    ]
+    '''
+    fields = ['annotation_database_url', 'annotation_database_apikey', 'annotation_database_secret_token']
+    return Assignment.objects.filter(course__course_id=context_id).order_by(*fields).values(*fields).distinct(*fields)
+
+def fetch_annotations_by_course(context_id, user_id):
+    '''
+    Fetches annotations for all assignments in a course as given by the LTI context ID.
+    
+    This function accounts for the fact that annotation database credentials are stored
+    on a per-assignment level, so if course assignments have different annotation database
+    settings, they will be included in the results. In general, it's expected that a
+    course will have one annotation database setting used across assignments (URL, API KEY, SECRET),
+    but it's possible that this assumption could change by the simple fact that the settings
+    are saved on assignment models, and not on course models.
+    
+    Returns: [{"rows": [], "totalCount": 0 }]
+    '''
+    annotation_db_credentials = get_annotation_db_credentials_by_course(context_id)
+
+    results = {'rows': [], 'totalCount': 0}
+    for credential in annotation_db_credentials:
+        db_url = credential['annotation_database_url']
+        db_apikey = credential['annotation_database_apikey']
+        db_secret = credential['annotation_database_secret_token']
+        annotator_auth_token = retrieve_token(user_id, db_apikey, db_secret)
+        logger.debug("Fetching annotations with context_id=%s database_url=%s" % (context_id, db_url))
+        data = _fetch_annotations_by_course(context_id, db_url, annotator_auth_token)
+        #logger.debug("Annotations fetched: %s" % data)
+        if 'rows' in data:
+            results['rows'] += data['rows']
+        if 'totalCount' in data:
+            results['totalCount'] += int(data['totalCount'])
+
+    return results
+
+def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token, **kwargs):
     '''
     Fetches the annotations of a given course from the CATCH database
     '''
     # build request
     headers = {
-        "x-annotator-auth-token": token,
+        "x-annotator-auth-token": annotator_auth_token,
         "Content-Type":"application/json"
     }
-    limit = -1 #TODO: How do we want to handle this?
+    limit = kwargs.get('limit', -1) # Note: -1 means get everything there is
     encoded_context_id = urllib.quote_plus(context_id)
-    request_url = "%s/search?contextId=%s&limit=%s" % (settings.ANNOTATION_DB_URL, encoded_context_id, limit)
+    request_url = "%s/search?contextId=%s&limit=%s" % (annotation_db_url, encoded_context_id, limit)
 
     debug_printer("DEBUG - fetch_annotations_by_course(): url: %s" % request_url)
 
@@ -234,7 +291,7 @@ def fetch_annotations_by_course(context_id, token):
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
-        annotations = {'rows':[]}
+        annotations = {'rows':[], 'totalCount': 0}
 
     return annotations
 
@@ -334,7 +391,12 @@ class DashboardAnnotations(object):
         self.assignment_name_of = self.get_assignments_dict()
         self.target_objects_list = self.get_target_objects_list()
         self.target_objects_by_id = {x['id']: x for x in self.target_objects_list}
-        self.target_objects_by_content = {x.get('target_content', '').strip(): x for x in self.target_objects_list}
+        self.target_objects_by_content = {
+            x.get('target_content', '').strip(): x
+            for x in self.target_objects_list
+            if x['target_type'] == 'ig'
+        }
+        self.preview_url_cache = {}
 
     def get_annotations_by_id(self):
         return get_annotations_keyed_by_annotation_id(self.annotations)
@@ -347,7 +409,7 @@ class DashboardAnnotations(object):
         return dict(Assignment.objects.values_list('assignment_id', 'assignment_name'))
 
     def get_target_objects_list(self):
-        return TargetObject.objects.values('id', 'target_title', 'target_content')
+        return TargetObject.objects.values('id', 'target_title', 'target_content', 'target_type')
 
     def get_annotations_by_user(self):
         annotations_by_user = get_annotations_keyed_by_user_id(self.annotations)
@@ -377,7 +439,7 @@ class DashboardAnnotations(object):
     def get_target_id(self, media_type, object_id):
         target_id = ''
         if media_type == 'image':
-            trimmed_object_id = re.sub(r'/canvas/.*$', '', object_id)
+            trimmed_object_id = object_id[0:object_id.find('/canvas/')] # only use regex if absolutely necessary
             if trimmed_object_id in self.target_objects_by_content:
                 target_id = self.target_objects_by_content[trimmed_object_id]['id']
         else:
@@ -392,7 +454,7 @@ class DashboardAnnotations(object):
         return ''
     
     def get_target_object_name(self, annotation):
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         object_id = annotation['uri']
         target_id = self.get_target_id(media_type, object_id)
         if target_id in self.target_objects_by_id:
@@ -401,32 +463,36 @@ class DashboardAnnotations(object):
 
     def get_target_preview_url(self, annotation):
         annotation_id = annotation['id']
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         context_id = annotation['contextId']
         collection_id = annotation['collectionId']
         url_format = "%s?focus_on_id=%s"
         preview_url = ''
-        
+
         if media_type == 'image':
             target_id = self.get_target_id(media_type, annotation['uri'])
-            if target_id:
-                preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
+        else:
+            target_id = annotation['uri']
+
+        if target_id:
+            url_cache_key = "%s%s%s" % (context_id, collection_id, target_id)
+            if url_cache_key in self.preview_url_cache:
+                preview_url = self.preview_url_cache[url_cache_key]
+            else:
+                preview_url = reverse('hx_lti_initializer:access_annotation_target', kwargs={
                     "course_id": context_id,
                     "assignment_id": collection_id,
                     "object_id": target_id,
-                }), annotation_id)
-        else:
-            preview_url = url_format % (reverse('hx_lti_initializer:access_annotation_target', kwargs={
-                "course_id": context_id,
-                "assignment_id": collection_id,
-                "object_id": annotation['uri'],
-            }), annotation_id)
-        
-        
+                })
+                self.preview_url_cache[url_cache_key] = preview_url
+
+        if preview_url:
+            preview_url = url_format % (preview_url, annotation_id)
+
         return preview_url
     
     def assignment_object_exists(self, annotation):
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         collection_id = annotation['collectionId']
         object_id = annotation['uri']
         target_id = self.get_target_id(media_type, object_id)
@@ -434,7 +500,7 @@ class DashboardAnnotations(object):
 
     def get_annotation_parent_value(self, annotation, attr):
         parent_value = None
-        if annotation['parent']:
+        if 'parent' in annotation and annotation['parent']:
             parent_id = annotation['parent']
             parent_annotation = self.get_annotation_by_id(parent_id)
             if parent_annotation is not None and attr in parent_annotation:
