@@ -201,13 +201,14 @@ class simple_utc(datetime.tzinfo):
 def get_annotation_db_credentials_by_course(context_id):
     '''
     Returns the distinct set of annotation database credentials (url, api key, secret token)
-    for a given course. Recall that these credentials are stored on a per-assignment basis.
-    In most cases, the credentials will be the same across all assignments in a course, so
-    we would usually expect to *one* result (url, api key, secret token), but it's possible
-    to receive more if the values have been manually changed.
-    
+    for a given course.
+
+    The credentials are stored on a per-assignment basis, and a course will have many assignments.
+    The expected use case is that *one* credential (url, api key, secret token) will be
+    used across all assignments in a course, but it's possible that might not be the case.
+
     Returns:
-    
+
     [
         {
             'annotation_database_url': 'http://catch-database.localhost/catch/annotator',
@@ -215,7 +216,7 @@ def get_annotation_db_credentials_by_course(context_id):
             'annotation_database_secret_token': u'GWoXMgXkprYL4ZtkELyq',
         },
         {
-            'annotation_database_url': 'https://another-catch.localhost/catch/annotator',
+            'annotation_database_url': 'https://catch-database.localhost/catch/annotator',
             'annotation_database_apikey': '069fK9KTLHugO7uxjfwN',
             'annotation_database_secret_token': 'Xbi791aSsF4AVWjMhQnl',
         }
