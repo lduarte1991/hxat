@@ -350,21 +350,21 @@ def instructor_dashboard_view(request):
     '''
         Renders the instructor dashboard
     '''
-    # Check permission
+    # Check permissions
     if not request.session['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
-
+    
     # Get all the relevant objects we're going to need for the dashboard
-    user_id = request.session['hx_user_id']
     context_id = request.session['hx_context_id']
-    course_object = LTICourse.objects.get(course_id=context_id)
-    token = retrieve_token(user_id, settings.ANNOTATION_DB_API_KEY, settings.ANNOTATION_DB_SECRET_TOKEN)
-        
+    user_id = request.session['hx_user_id']
+    
+    # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
-    course_annotations = fetch_annotations_by_course(context_id, token)
+    course_annotations = fetch_annotations_by_course(context_id, user_id)
     fetch_end_time = time.time()
     fetch_elapsed_time = fetch_end_time - fetch_start_time
 
+    # Transform the raw annotation results into something useful for the dashboard
     user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
 
     context = {
