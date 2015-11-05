@@ -16,7 +16,7 @@ class TargetObject(LTI_TodApi):
     target_title = models.CharField(max_length=255)
     target_author = models.CharField(max_length=255)
     target_content = models.TextField()
-    target_citation = models.TextField()
+    target_citation = models.TextField(blank=True)
     target_created = models.DateTimeField(auto_now_add=True, auto_now=False)
     target_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     target_creator = models.ForeignKey(LTIProfile, null=True)

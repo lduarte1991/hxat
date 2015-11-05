@@ -11,6 +11,7 @@
 
 {% block content %}
 <script src="{% static "vendors/development/summernote.js" %}"></script>
+<link rel="stylesheet" href="{% static "css/base.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
@@ -62,17 +63,33 @@
 					jQuery('.tx').hide();
 					jQuery('.ig').show();
 					jQuery('#id_target_content').destroy();
+                    jQuery('#id_target_content').blur( function() {
+                        var content = jQuery('#id_target_content').val();
+                        var expression = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+                        var regex = new RegExp(expression);
+                        jQuery('#content-error').remove();
+                        if (content.match(regex) && content.match(regex).length === 1) {
+                            jQuery('#id_target_content').css('outline', 'none');
+                            jQuery('#id_target_content').css('outline-offset', 'none');
+                        } else {
+                            jQuery('#id_target_content').css('outline', 'red 2px solid');
+                            jQuery('#id_target_content').css('outline-offset', '5px');
+                            jQuery('#id_target_content').before('<p id="content-error" style="color:red; font-size:10pt;">Not a valid manifest URL. Make sure it\'s only one URL and that it begins with "https".</p>');
+                        }
+                    });
 					jQuery('label[for="id_target_content"]').text('Mirador Manifests');
 				}
 			});
 			jQuery('#id_target_type').trigger('change');
+            jQuery('#id_target_content').focus(function(){console.log("targetabouttochange");}).blur( function(){
+                console.log("Targetchanged");
+            });
 		});
 	</script>
 
 	<h2>Annotation Source</h2>
 
 	<form method="POST" class="post-form">{% csrf_token %}
-
 		<div class="form-group">
 			<label for="id_target_type">Annotation Type</label> 
 			<select class="form-control selectpicker" data-live-search="true" id="id_target_type" name="target_type">
@@ -92,6 +109,7 @@
 		</div>
 		<div class="form-group">
 			<label for="id_target_content">Source Content:</label> 
+            {{form.target_content.errors}}
 			<textarea id="id_target_content" name="target_content" class="form-control">{{ form.target_content.value | safe }}</textarea>
 		</div>
 		<div class="form-group">
