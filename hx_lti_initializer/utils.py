@@ -490,7 +490,7 @@ class DashboardAnnotations(object):
 
     def get_annotation_parent_value(self, annotation, attr):
         parent_value = None
-        if annotation['parent']:
+        if 'parent' in annotation and annotation['parent']:
             parent_id = annotation['parent']
             parent_annotation = self.get_annotation_by_id(parent_id)
             if parent_annotation is not None and attr in parent_annotation:
