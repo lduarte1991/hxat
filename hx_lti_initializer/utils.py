@@ -448,7 +448,7 @@ class DashboardAnnotations(object):
         return ''
     
     def get_target_object_name(self, annotation):
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         object_id = annotation['uri']
         target_id = self.get_target_id(media_type, object_id)
         if target_id in self.target_objects_by_id:
@@ -457,7 +457,7 @@ class DashboardAnnotations(object):
 
     def get_target_preview_url(self, annotation):
         annotation_id = annotation['id']
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         context_id = annotation['contextId']
         collection_id = annotation['collectionId']
         url_format = "%s?focus_on_id=%s"
@@ -482,7 +482,7 @@ class DashboardAnnotations(object):
         return preview_url
     
     def assignment_object_exists(self, annotation):
-        media_type = annotation['media']
+        media_type = annotation.get('media', None)
         collection_id = annotation['collectionId']
         object_id = annotation['uri']
         target_id = self.get_target_id(media_type, object_id)
