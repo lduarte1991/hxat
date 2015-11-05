@@ -425,13 +425,11 @@ MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer
 		var self = this;
 		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
 		jQuery.publish('annotationListLoaded.' + self.window.id);
-		console.log(annotation.bounds);
-		console.log(self.window.id);
+
 		try{
 			jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
 		} catch (e){
 			jQuery.subscribe('osdOpen.' + self.window.id, function(){
-				console.log("Getting inside...oh yeah...")
 				jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
 			});
 		}
