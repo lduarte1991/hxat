@@ -1,0 +1,52 @@
+{% if user_annotations %}
+{% for user in user_annotations %}
+<div class="panel-group" id="accordion">
+    <div class="panel panel-default">
+        <div data-toggle="collapse" data-parent="#accordion" href="#userpanel-{{ forloop.counter }}" class="panel-heading list-group-item" style="cursor: pointer;">
+            <h4 class="panel-title">{{ user.name }} ({{user.total_annotations}})</h4>
+        </div>
+        <div id="userpanel-{{ forloop.counter }}" class="panel-collapse collapse">
+            <div class="panel-body">
+                    <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th class="col-md-1">Date</th><!-- Only Date isn't of variable length -->
+                            <th>Assignment</th>
+                            <th>Object</th>
+                            <th>Excerpt</th>
+                            <th>Annotation</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for annotation in user.annotations %}
+                        <tr>
+                            <td>{{ annotation.data.updated | format_date }}</td> 
+                            <td>{{ annotation.assignment_name }}</td>
+                            <td><a href="{{ annotation.target_preview_url  }}">{{ annotation.target_object_name }}</a></td>
+                            <td>
+                                {% if annotation.data.parent == "0" %}
+                                    {% if annotation.data.media == "text" %}
+                                        "{{ annotation.data.quote }}"
+                                    {% else %}
+                                        <img class="lazy" data-original="{{annotation.data.thumb}}" width="{{annotation.data.rangePosition.width}}" height="{{annotation.data.rangePosition.height}}" style="max-width:150px; max-height:150px;" />
+                                    {% endif %}
+                                {% else %}
+                                    <b>Reply To:</b> "{{ annotation.parent_text }}"
+                                {% endif %}
+                            </td>
+                            <td>{{ annotation.data.text | safe }}</td>
+                            <td>{{ annotation.data.tags | format_tags }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div style="margin: 1em 0;">No annotations to display</div>
+{% endif %}
+<div style="color: #999; font-size: 11px; float: right;"><i>Fetched annotations in {{fetch_annotations_time|floatformat:4}} seconds.</i></div>
