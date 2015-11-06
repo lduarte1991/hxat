@@ -537,7 +537,7 @@ MiradorEndpointController.prototype.openEditorForReply = function(options) {
 		var annotation = {
 			collectionId: self.endpoint.collection_id,
 			contextId: self.endpoint.context_id,
-			uri: self.endpoint.uri,
+			uri: self.window.currentCanvasID,
 			permissions: self.endpoint.catchOptions.permissions,
 			user: self.endpoint.catchOptions.user,
 			archived: false,
@@ -548,7 +548,7 @@ MiradorEndpointController.prototype.openEditorForReply = function(options) {
 			parent: jQuery('.parentAnnotation .idAnnotation').html(),
 			media: "comment",
 		};
-		
+
 		self.endpoint.createCatchAnnotation(annotation);
 
 		jQuery('.replybutton').show();
