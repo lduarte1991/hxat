@@ -404,3 +404,8 @@ visibility:visible;
     visibility: hidden;
 }
 
+/* The following is temporary to move fullscreen button
+   in Mirador */
+.mirador-osd-fullscreen.hud-control{
+    right: 45px!important;
+}
