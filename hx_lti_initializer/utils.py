@@ -223,7 +223,10 @@ def get_annotation_db_credentials_by_course(context_id):
     ]
     '''
     fields = ['annotation_database_url', 'annotation_database_apikey', 'annotation_database_secret_token']
-    return Assignment.objects.filter(course__course_id=context_id).order_by(*fields).values(*fields).distinct(*fields)
+    return Assignment.objects.filter(course__course_id=context_id) \
+        .extra({"annotation_database_url": "TRIM(annotation_database_url)"}) \
+        .values(*fields) \
+        .distinct(*fields)
 
 def fetch_annotations_by_course(context_id, user_id):
     '''
@@ -242,9 +245,9 @@ def fetch_annotations_by_course(context_id, user_id):
 
     results = {'rows': [], 'totalCount': 0}
     for credential in annotation_db_credentials:
-        db_url = credential['annotation_database_url']
-        db_apikey = credential['annotation_database_apikey']
-        db_secret = credential['annotation_database_secret_token']
+        db_url = credential['annotation_database_url'].strip()
+        db_apikey = credential['annotation_database_apikey'].strip()
+        db_secret = credential['annotation_database_secret_token'].strip()
         annotator_auth_token = retrieve_token(user_id, db_apikey, db_secret)
         logger.debug("Fetching annotations with context_id=%s database_url=%s" % (context_id, db_url))
         data = _fetch_annotations_by_course(context_id, db_url, annotator_auth_token)
