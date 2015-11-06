@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth import login
 from django.contrib import messages
@@ -348,15 +349,34 @@ def access_annotation_target(
 
 def instructor_dashboard_view(request):
     '''
-        Renders the instructor dashboard
+        Renders the instructor dashboard (without annotations).
     '''
-    # Check permissions
+    if not request.session['is_staff']:
+        raise PermissionDenied("You must be a staff member to view the dashboard.")
+
+    context_id = request.session['hx_context_id']
+    user_id = request.session['hx_user_id']
+    context = {
+        'username': request.session['hx_user_name'],
+        'is_instructor': request.session["is_staff"],
+        'user_annotations': [],
+        'fetch_annotations_time': 0,
+        'dashboard_context_js': json.dumps({
+            'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
+        })
+    }
+    return render(request, 'hx_lti_initializer/dashboard_view.html', context)
+
+def instructor_dashboard_student_list_view(request):
+    '''
+    Renders the student annotations for the instructor dashboard.
+    Intended to be called via AJAX.
+    '''
     if not request.session['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
     
-    # Get all the relevant objects we're going to need for the dashboard
     context_id = request.session['hx_context_id']
-    user_id = request.session['hx_user_id']
+    user_id = request.session['hx_user_id']    
     
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
@@ -366,16 +386,13 @@ def instructor_dashboard_view(request):
 
     # Transform the raw annotation results into something useful for the dashboard
     user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
-
     context = {
         'username': request.session['hx_user_name'],
         'is_instructor': request.session["is_staff"],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
     }
-
-    return render(request, 'hx_lti_initializer/dashboard_view.html', context)
-
+    return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 
 def error_view(request, message):
     '''
