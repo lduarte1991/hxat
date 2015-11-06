@@ -18,23 +18,36 @@
 		</div>
 		<div class="form-group">
 			<label for="id_course_admins">Course admins:</label> 
-			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins">
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins" role="listbox">
 				{% for id,choice in form.fields.course_admins.choices %}
-				<option value="{{ id }}" {% if id in form.course_admins.value %} selected {% endif %}>{{ choice }}</option>
+				<option value="{{ id }}" aria-checked={% if id in form.course_admins.value %}"true" selected {% else %}"false"{% endif %} role="option">{{ choice }}</option>
 				{% endfor %}
 			</select> 
 		</div>
+		<!-- TODO: Add example of how to use-->
 		<div class="form-group">
 			<label for="id_course_external_css_default">External CSS Default:</label> 
+			
 			<input id="id_course_external_css_default" maxlength="255" name="course_external_css_default" class="form-control" type="text" value="{{form.course_external_css_default.value}}">
 		</div>
 		{% buttons %}
-		<button type="submit" class="save btn btn-primary">
+		<button type="submit" class="save btn btn-primary" role="button">
 		{% bootstrap_icon "star" %} Save
 		</button>
-		<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save btn btn-danger">
+		<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" role="button" class="save btn btn-danger">
 		{% bootstrap_icon "remove" %} Cancel
 		</a>
 		{% endbuttons %}
 	</form>
+	<script>
+
+		// the following takes care of accessibility issues with accessing drop down menu. It makes it so that when the user hits down on the search box they can choose an option and if they hit space bar they will select/deselect the option.
+		jQuery(document).ready(function(){
+			setTimeout(function() {
+				jQuery('.bs-searchbox input').on('keyup', function (e){ if (e.which === 40){jQuery('.dropdown-menu li:first-child a').focus();} });
+				jQuery('.dropdown-menu li').on('keyup', function (e){ if (e.which === 32 || e.which === 13){jQuery(e.currentTarget).find('a').click();} });
+				jQuery('.dropdown-menu li').attr('role', 'menuitem');
+			}, 1000);
+		});
+	</script>
 {% endblock %}

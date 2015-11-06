@@ -15,8 +15,8 @@
 {% bootstrap_messages %}
 <link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
 <style type="text/css">
-    body { padding: 0; margin: 0; overflow: hidden;}
-    #viewer { background: #333 url({% static "vendors/mirador/images/debut_dark.png" %}) left top repeat; width: 100%; height: 100%; position: fixed; }
+    body { font-size: 100%; }
+    #viewer { width: 100%; height: 100%;}
 </style>
   <script src="{% static "vendors/development/underscore.js" %}"></script>
   <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
@@ -53,10 +53,9 @@ $(function() {
         "mainMenuSettings" : {
            'show' : false
         },
-        "i18nPath" : "{% static "vendors/mirador/locales/" %}",
+        "buildPath" : "{% static "vendors/mirador/" %}",
         "layout" : "1x1",
         "saveSession" : false,
-        "logosLocation" : "{% static "vendors/mirador/images/logos/" %}",
         "data": [
         {% for i in target_object.get_target_content_as_list %}
         { "manifestUri": "{{ i }}", "location": "Harvard University"},
@@ -74,7 +73,7 @@ $(function() {
         	  "sidePanel" : false,
             "fullScreen" : false,
             "displayLayout": false,
-            "annotationOn": true,
+            "annotationState": "annoOnCreateOff",
             // This will eventually be put back in whenever we add layout options
             // to the admin hub
             // "layoutOptions" : 
@@ -135,6 +134,9 @@ $(function() {
             instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
             default_tab: "{{ assignment.default_tab }}",
             instructions: "{{instructions | escapejs }}",
+            {% if focus_on_id %}
+            focus_on_annotation: {{focus_on_id}},
+            {% endif %}
           },
         },
 

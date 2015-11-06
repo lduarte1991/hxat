@@ -9,6 +9,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 
+def get_course_id(request):
+	return request.session['hx_lti_course_id']
+
+def get_lti_profile_id(request):
+    lti_profile = LTIProfile.objects.get(user=request.user)
+    return lti_profile.id
 
 def open_target_object(request, collection_id, target_obj_id):
     try:
@@ -43,7 +49,7 @@ def create_new_source(request):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
         }
     )
 
@@ -70,7 +76,9 @@ def edit_source(request, id):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
+            'creator': get_lti_profile_id(request),
+            'course': get_course_id(request),
         }
     )
 
@@ -87,7 +95,13 @@ def handlePopAdd(request, addForm, field):
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))  # noqa
     else:
         form = addForm()
-    pageContext = {'form': form, 'field': field, 'user': request.user}
+    pageContext = {
+        'form': form,
+        'field': field,
+        'username': request.session['hx_user_name'],
+        'creator': get_lti_profile_id(request),
+        'course': get_course_id(request),
+    }
     return render_to_response(
         "target_object_database/source_form.html",
         RequestContext(request, pageContext)

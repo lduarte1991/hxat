@@ -1,0 +1,162 @@
+{% extends 'hx_lti_initializer/base.html' %}
+{% load hx_lti_initializer_extras %}
+{% load static from staticfiles %} 
+{# Load the tag library #} 
+{% load bootstrap3 %} 
+{# Load CSS and JavaScript #} 
+{% bootstrap_css %} 
+{% bootstrap_javascript %} 
+{# Display django.contrib.messages as Bootstrap alerts #} 
+{% bootstrap_messages %}
+
+
+{% block content %}
+{% if user_annotations %}
+	<div style="margin: 1em 0;">
+		<div class="input-group">
+			<div class="input-group-btn search-panel">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					<span id="search_concept">By Name</span> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="#name">By Name</a></li>
+					<li><a href="#content">By Content</a></li>
+				</ul>
+			</div>
+			<input type="text" id="studentsearch" class="form-control" placeholder="Search text...">
+			<input type="hidden" name="search_param" value="name" id="search_param">
+		</div>
+		<div id="student_list" class="list-group">
+			<br/>
+			{% for user in user_annotations %}
+			<div>
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div data-toggle="collapse" data-parent="#accordion" href="#userpanel-{{ forloop.counter }}" class="panel-heading list-group-item" style="cursor: pointer;">
+							<h4 class="panel-title">
+								{{ user.name }} ({{user.total_annotations}})
+							</h4>
+						</div>
+						<div id="userpanel-{{ forloop.counter }}" class="panel-collapse collapse">
+							<div class="panel-body">
+									<table class="table table-hover">
+									<thead>
+										<tr>
+											<th class="col-md-1">Date</th><!-- Only Date isn't of variable length -->
+											<th>Assignment</th>
+											<th>Object</th>
+											<th>Excerpt</th>
+											<th>Annotation</th>
+											<th>Tags</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for annotation in user.annotations %}
+										<tr>
+											<td>{{ annotation.data.updated | format_date }}</td> 
+											<td>{{ annotation.assignment_name }}</td>
+											<td><a href="{{ annotation.target_preview_url  }}">{{ annotation.target_object_name }}</a></td>
+											<td>
+												{% if annotation.data.parent == "0" %}
+													{% if annotation.data.media == "text" %}
+														"{{ annotation.data.quote }}"
+													{% else %}
+														<img class="lazy" data-original="{{annotation.data.thumb}}" width="{{annotation.data.rangePosition.width}}" height="{{annotation.data.rangePosition.height}}" style="max-width:150px; max-height:150px;" />
+													{% endif %}
+												{% else %}
+													<b>Reply To:</b> "{{ annotation.parent_text }}"
+												{% endif %}
+											</td>
+											<td>{{ annotation.data.text | safe }}</td>
+											<td>{{ annotation.data.tags | format_tags }}</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+{% else %}
+	<div style="margin: 1em 0;">No annotations to display</div>
+{% endif %}
+<div style="color: #999; font-size: 11px; float: right;"><i>Loaded annotations in {{fetch_annotations_time|floatformat:4}} seconds.</i></div>
+{% endblock %}
+
+
+{% block javascript %}
+<script src="{% static "vendors/development/jquery.lazyload.js" %}"></script>
+<script>
+$(document).ready(function() {
+	//------------------------
+	// Lazy-load thumbnail images.
+	// Triggers the lazy load when a panel is clicked.
+	$('img.lazy').lazyload({
+		event: "panelClick",
+		effect: "fadeIn"
+	});
+	$('.panel').on('click', function(evt) {
+		$("img.lazy", evt.currentTarget).trigger("panelClick");
+	});
+	
+	//------------------------
+	// Search functionality.
+    var type = 'name'; // Search type (name by default)
+    var $panels = $('.panel'); // Get all panels 
+    
+    // Handles toggling for search bar dropdown
+    $('.search-panel .dropdown-menu').find('a').click(function(e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#", "");
+        var concept = $(this).text();
+        $('.search-panel span#search_concept').text(concept);
+        $('.input-group #search_param').val(param);
+        // Update search type
+        type = param;
+        // Update view
+        update($('#studentsearch').val().toLowerCase());
+        
+    });
+    
+    // Search on key press
+    $('#studentsearch').on('keyup', function(e){
+        var val = this.value.toLowerCase();
+        
+        // Only trigger if alphanumeric character is entered
+        if ((e.which <= 90 && e.which >= 48)) {
+            update(val);
+        }
+        
+        // Collapse and show all panels
+        else if (val == '') {
+            $panels.show();
+            $('.panel-collapse').collapse('hide');
+        }
+    });
+    
+    // Updates view
+    function update(value) {
+        // lookup table for search type
+        var selector_for = {
+          'name': '.panel-title',
+          'content': '.panel-body'
+        };
+        
+        // match search type to selector
+        var selector = selector_for[type];
+        
+        if (selector && value != '') {
+            // Show panels that match user
+            $panels.show().filter(function(){
+                $('.panel-collapse').collapse('show');
+                var title = $(this).find(selector).text().toLowerCase();
+                return title.indexOf(value) < 0;
+            }).hide();
+        }
+    }
+});
+</script>
+{% endblock %}

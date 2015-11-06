@@ -1,0 +1,173 @@
+============================
+BUGS
+-- Can't use source material that someone else is already using
+    (Warning view shows when they try)
+
+-- Searching by user in the sidebar does not seem to be working (Annotation Text and Tag do though)
+    My (Harry's) hunch is that this is due to
+				self.queryDatabase({
+					"username": text,
+				});
+    from DashboardController.js
+    -- Maybe look at Harry's code from instructor dashboard for dynamic search
+
+-- On Fresh install, instructor has to refresh to get admin/edit privileges - for now there's a notice to refresh the page.
+
+-- 'include instructor tab' checkbox doesn't seem to have any effect
+    (hidden for now)
+
+-- choosing a pagination limit doesn't seem to have any effect
+    (This is likely a legacy of the old annotation display at the bottom - hidden for now)
+
+-- tags don't seem to have any color effects anymore (this must've been broken by one of luis' annotation funtionality commits).
+    (Warning text added to tell the user this is an issue)
+
+-- editing source material will make annotations show up in the wrong place (unless you only append)
+    √ short-term solution: give instructors an informative warning when they're editing.
+    -- mid-term solution: Check to see if there are any annotations on a target object, and if there are, hide the edit button
+    -- long-term, maybe we want to enable editing? Would be quite difficult. It may also be impossible w/ annotator.js
+    
+-- Sometimes triple-clicking the last line of a text will highlight the annotator tool, which makes for some wierd annotations.
+    This also occurs if you somehow manage to highlight the annotation icon by dragging over it.
+
+============================
+BROAD TODOS/ISSUES (To be done by fall launch)
+
+√? (in progress/demo fix completed in another repo) The db max length for the id (name) field is 30. What about long names?
+
+√? Django unique ID to be changed from user's name, to user's unique ID passed in by Canvas.
+    -- Change user creation
+    -- Change name display code
+    -- (demo fix already completed in another repo)
+
+-- Test Dashboard et. all to make sure thousands of annotations work.
+    (remember the annotations db requires explicit pagination, otherwise it defaults to 10)
+
+-- Unit Tests :(
+    -- Uncomment & try to fix old lduarte tests that we commented out earlier
+
+============================
+NOT A PRIORITY/TODO LONG-TERM:
+
+-- Flagging doesn't seem to be implemented in the new annotator.
+
+-- Revisit pagination in the instructor dashboard's request to the annotation db.
+    ( right now I've just put 10000 to ensure all annotations for the course come in,
+      but ideally there wouldn't be any magic #rs. Maybe a secure setting? )
+
+-- Examine 'External CSS Default' functionality (in Course Settings)
+
+-- Replies can only go 1 level deep. Do we want to be able to reply to replies?
+
+-- <br> tags are added at the end of every annotation, which can make them display strangely in the dashboard
+
+-- Implement editing functionality for replies? Right now it's just deletion.
+    (this was a bug earlier, but now is a TODO because Luis wisely changed the frontend - now it doesn't show 'edit/delete,' only 'delete')
+
+-- Decide whether we want to support deletion of source material. This is dangerous because it's a shared resource.
+    Perhaps this is something that only admins with access to the django backend should do. (which is how it works right now)
+
+-- Decide whether we want to hide the annotation DB tab from assignment creation
+    the typical instructor would likely not need it.
+
+-- Setting someone as a course admin only means that that person's annotations will show up
+    in the instructor tab. Actual admin rights are still based on roles. We may want to circle back 
+    to this based on desired functionality from our first users.
+
+-- Link to dashboard from the detail? So you don't have to go back to the index.
+    -- Find out what users want
+
+-- Sometimes going back/forward works smoothly,
+    sometimes the document expires. 'Refresh' always takes you back to the index.
+    Not a huge deal but something to keep in mind. iFrames are like that I guess.
+
+-- Assignment/annotation deletion from the catch database? Do we even want this?
+
+-- Hover to annotate? This was working at one point, I believe.
+
+-- Maybe make a better looking UI in the index view
+
+============================
+COMPLETED
+
+√ Restructure for TLT
+√ Get rid of hard-coded stuff in hx_lti_initializer.views
+√ Allow ourselves to stray from the launch page
+√ Improve Instructor index
+√ Create Student index
+√ Make sure annotations show up at right place on correct assignment
+√ Navigation improvements: add in a 'return to index' type of button
+√ Clicking on assignment objects shouldn't show the collection ID. Make those just plain text.
+√ Add requests library to requirements.txt
+√ Allow movement from instructor index to annotation objects
+√ Figure out what highlight options are/how we can use them (note: use them like this: "instructor:red")
+√ Make advised changes from Pull Request #3 (Harry and Christian's first one):
+    https://github.com/Harvard-ATG/annotationsx/pull/3#discussion_r35117072
+        √ ensure people with multiple roles will work
+        √ correct url routing
+√ 'Dashboard' feature
+	√ Mock-up
+	√ List of students who have annotated something
+	√ List of a specific student's annotations
+	√ Remove hard-coded data
+√ (fixed) All annotations for a student are shown in the dashboard, as opposed to just the ones for that course.
+√ Give instructor 'delete' permission on bad comments?
+√ Get rid of "resource_link_id=None" in configuration url...how does that get in there?? )
+    (Note: this was there from the django multi lti middleware class)
+√ Remove the need for <br/> tags in text entry to format text to be annotated (especially brutal for poems)
+√ Prettier URL routing code
+√ Make sure only the annotations for the correct course are coming in, not all the annotations the user has ever made.
+√ (fixed) Duplicate student names break the tool, it seems (Test Student). Make that not happen.
+    Right now, trailing whitespace is added recursively to make a unique name that still displays well.
+    Ideally the DB would be modified to allow something other than the student's name to be the primary key
+√ Create a default for an empty dashboard or a student with no annotations
+√ Refactor for TLT
+	√ all secure/variable settings should be in secure.py
+√ (fixed) Unicode in annotation object title bricks entire DB for all courses
+√ (fixed) Unicode assignment and target object names not showing up in dashboard
+√ Make sure only the students for the right course are shown in the dashboard.
+√ (fixed) Source material not showing up in 'edit assignment' view
+    explicit field meta declaration in assignment forms was messing up the relation
+√ (fixed) Can't add multiple texts to an assignment
+√ (fixed) Students can only be a member on one course, or else everything breaks.
+√ (fixed) Shorter Target Object names make skinny tables, which shrink after being opened. Little UI blip.
+√ (fixed) Edit button next to assignment opens objects list below it, before linking into the edit. Little UI blip.
+√ Assignment Deletion
+√ Infer default course title from LTI Launch
+√ Sidebar functionality (basic functionality is there)
+√ Hide irrelevant/unimplemented frontend fields
+    √ target creator or target course options in target object creation should be able to be inferred
+    √ External CSS
+    √ Tags are required right now, they should be hidden and turned on automatically
+√ Don't need 'to add a new course' etc. in the little left-float bubble.
+√ Set defaults for frontend fields that can usually be inferred
+    √ In 'Create Source Material'
+        √ Course should default to current course
+        √ Content creator should default to current user
+    √ In 'Create Assignment'
+        √ Annotation DB Key, URL, and Secret should have defaults pre-populated.
+√ (Fixed by Luis) The database token appears to be included in the JavaScript, which can be used to get the entire database
+√ Update Documentation
+√ Create high-level documentation
+√ (fixed) Can't reply to annotations
+√ (single-instructor invariant eliminated)
+    Can now have multiple instructors/TFs show up in the 'instructor' tab.
+√ (fixed) Sometimes annotation editing gets x-frame denied (just editing, which is weird)
+√ iFrame sizing
+√ (fixed) Editing from sidebar is broken in the latest commit (was working before). Deletion works though.
+√ Clean up the code for validating the target_object entry (create_new_assignment.html, jscript at the top)
+√ Put in an error/warning telling users what's going wrong when they try to add source material someone else is using.
+    √ Also when they don't select source material
+
+============================
+DIFFERENCES FROM LUIS
+-- Fetches a single course (named active_course) as opposed to fetching all courses for admin
+-- Routes student to modified admin_hub by default as opposed to directly to an assignment,
+    though we support that functionality as well
+-- Instructor can edit and delete student annotations
+-- Home button on assignment pages
+-- tagging enabled by default, and hidden from the frontend (the whole thing doesn't work unless tagging is on, so we have to force it to be on)
+-- Default tab to desplay for annotations is hidden, because it doesn't seem to be working.
+-- 'Include instructor tab' checkbox is hidden, because it doesn't seem to have any effect.
+-- Pagination tab is hidden, because it doesn't seem to have any effect
+-- Error view template and functionality for frontend errors

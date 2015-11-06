@@ -28,13 +28,14 @@
         <span class="glyphicon glyphicon-comment"></span>
         <span class="replyNum"> <%= totalComments %> </span>
     </div>
-    
-    <div class="tagList field side">
-        <% _.each(tags, function(tagItem){ %>
-            <div class="tag side">
-                <%= tagItem %>
-            </div>
-        <% }); %>
-    </div>
+    <% if (typeof tags !== "undefined") { %>
+        <div class="tagList field side">
+            <% _.each(tags, function(tagItem){ %>
+                <div class="tag side">
+                    <%= tagItem %>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
     
 </div>

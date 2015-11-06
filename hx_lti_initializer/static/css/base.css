@@ -213,9 +213,16 @@ footer {
 }
 
 .btn-danger {
-    color: #b31200!important;
+    background-color: #b31200!important;
 }
 
 .btn-default {
     color: #005d94!important;
+}
+
+.errorlist {
+    list-style-type: none;
+    color: red;
+    -webkit-margin-before: 0em;
+    -webkit-padding-start: 0px;
 }

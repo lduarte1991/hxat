@@ -39,10 +39,25 @@ class AssignmentTargets(models.Model):
             'order',
         ]
 
+    def get_target_external_options_list(self):
+        """
+        Returns a list of options that are saved to the target_external_options model attribute
+        in CSV format.
+        
+        Notes:
+        - since the model attribute could be null in the database, we have to
+          check if it's None before trying parse it.
+        - this field does not contain user-supplied values, so we don't need industrial-strength
+          CSV parsing.
+        """
+        if self.target_external_options is None:
+            return []
+        return self.target_external_options.split(',')    
+
     def get_view_type_for_mirador(self):
         """
         """
-        options = self.target_external_options.split(',')
+        options = self.get_target_external_options_list()
         if len(options) == 1:
             return "ImageView"
         else:
@@ -51,7 +66,7 @@ class AssignmentTargets(models.Model):
     def get_canvas_id_for_mirador(self):
         """
         """
-        options = self.target_external_options.split(',')
+        options = self.get_target_external_options_list()
         if len(options) == 1:
             return None
         else:
@@ -60,7 +75,7 @@ class AssignmentTargets(models.Model):
     def get_dashboard_hidden(self):
         """
         """
-        options = self.target_external_options.split(',')
+        options = self.get_target_external_options_list()
         if len(options) < 3:
             return "false"
         else:

@@ -16,7 +16,7 @@ AnnotationStoreController.prototype.setUpListener = function(listener, expected_
 	throw new Error("Abstract method!");
 };
 
-AnnotationStoreController.prototype.updateMasterList = function() {
+AnnotationStoreController.prototype.updateMasterList = function(focus_id, viewer){
 	throw new Error("Abstract method!");
 };
 
@@ -110,7 +110,7 @@ AnnotatorEndpointController.prototype.setUpListener = function(listener, expecte
 	});
 };
 
-AnnotatorEndpointController.prototype.updateMasterList = function() {
+AnnotatorEndpointController.prototype.updateMasterList = function(focus_id, viewer) {
 	var self = this;
 	var searchParameters = this.annotator.plugins.Store.options.loadFromSearch;
 	searchParameters.limit = -1;
@@ -119,7 +119,18 @@ AnnotatorEndpointController.prototype.updateMasterList = function() {
 		if (data === null) {
 			data = {}
 		};
-		self.annotationsMasterList = data.rows || [];
+		if (typeof focus_id !== "undefined") {
+			data.rows.forEach(function(annotation){
+				var focus = parseInt(focus_id, 10);
+				if (annotation.id === focus) {
+					self.annotationsMasterList = [annotation];
+					self._clearAnnotator();
+					viewer.updateDashboard(0, 1, [annotation], false);
+				};
+			})
+		} else {
+			self.annotationsMasterList = data.rows || [];
+		}
 	};
 	search_url = this.annotator.plugins.Store._urlFor("search");
 	var options = this.annotator.plugins.Store._apiRequestOptions("search", searchParameters, onSuccess);
@@ -142,6 +153,7 @@ AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations
 	annotations.forEach(function(annotation){
 		self.annotator.setupAnnotation(annotation);
 		self.annotator.plugins.Store.registerAnnotation(annotation);
+		self.updateAnnotationInMasterList(annotation);
 	});
 	self.annotator.publish("externalCallToHighlightTags");
 };
@@ -162,8 +174,14 @@ AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(
 AnnotatorEndpointController.prototype.getAnnotationById = function(id) {
 	var annotationId = parseInt(id, 10);
 	var annotations = this.annotationsMasterList;
+	var currentAnnotations = this.annotator.plugins.Store.annotations;
+	for (var index in currentAnnotations){
+		if  (currentAnnotations[index].id === annotationId){
+			return currentAnnotations[index];
+		}
+	}
 
-	for (index in annotations) {
+	for (var index in annotations) {
 		if (annotations[index].id === annotationId)
 			return annotations[index];
 	}
@@ -190,6 +208,7 @@ AnnotatorEndpointController.prototype.openEditorForReply = function(location) {
 };
 
 AnnotatorEndpointController.prototype.deleteAnnotation = function(annotation) {
+	this.updateAnnotationInMasterList(annotation);
 	this.annotator.deleteAnnotation(annotation);
 };
 
@@ -398,9 +417,26 @@ MiradorEndpointController.prototype.setUpListener = function(listener, expected_
 	}
 };
 
-MiradorEndpointController.prototype.updateMasterList = function(){
+MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer){
 	// make a call to mirador endpoint to call CATCH to get a new instance
 	this.annotationsMasterList = this.endpoint.annotationsListCatch.slice();
+	if (typeof focus_id !== "undefined") {
+		var annotation = this.getAnnotationById(focus_id);
+		var self = this;
+		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
+		jQuery.publish('annotationListLoaded.' + self.window.id);
+
+		try{
+			jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+		} catch (e){
+			jQuery.subscribe('osdOpen.' + self.window.id, function(){
+				jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+			});
+		}
+		
+		viewer.updateDashboard(0, 1, [annotation], false);
+
+	}
 };
 
 MiradorEndpointController.prototype.updateEndpointList = function(options){

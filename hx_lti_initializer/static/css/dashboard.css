@@ -308,9 +308,11 @@ button#hideParent {
 }
 
 .addReply {
+    width: 100%;
+}
+.addReplyFixedPosition {
     position: absolute;
     bottom: 0;
-    width: 100%;
 }
 
 .addReply button.btn.btn-primary.replybutton {
@@ -320,8 +322,8 @@ button#hideParent {
 .repliesList {
     text-align: center;
     padding-top: 25px;
-    padding-bottom: 45px;
-    height: inherit;
+    /* padding-bottom: 45px; */
+    /* height: inherit; */
     overflow-y: scroll;
 }
 
@@ -401,3 +403,4 @@ visibility:visible;
     color: #fff;
     visibility: hidden;
 }
+

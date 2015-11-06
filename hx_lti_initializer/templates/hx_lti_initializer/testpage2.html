@@ -1,5 +1,4 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
-</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -93,10 +92,12 @@ td {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+    padding-right: 5px;
     font-family: "arial", sans-serif;
 }
 
 th {
+    /*width: 100%;*/
     padding-top: 5px;
     padding-bottom: 5px;
     font-family: "arial", sans-serif;
@@ -143,6 +144,12 @@ li {
     background-size: contain;
 }
 
+#edit_assignment_td {
+    position: absolute;
+    left: -25;
+    border: none;
+}
+
 .copypaste{
     padding: 20px;
     text-align: center;
@@ -187,65 +194,82 @@ li {
 <div class="header">
 </div>
 <div class="container">
-<pre>
-{{debug}}
-</pre>
+<!--<pre>-->
+<!--{{debug}}-->
+<!--</pre>-->
     <div class="row">
         <div class="col-md-3">
             <div class="sidebar-top">
                 <div id="user-label">{{ user.username }}</div>
             </div>
+
+            {% if is_instructor %}
             <div class="sidebar">
+                <!--
                 <p>
                     <ul>
                         <li>To add a new course, simply initialize LTI tool as an administrator/instructor.</li>
                         <li>Change course settings to edit the name and any people to be considered "admins"</li>
                     </ul>
                 </p>
+                -->
                 <!--<div class="dashed-bar"></div>
                 <div class="dashed-bar"></div>
                 <p>
                     <a class="link" href="./tutorial">View Tutorial</a>
                 </p>-->
              </div>
+             <br>
+             <a role="button" href="instructor_dashboard_view"><div class="btn btn-default">Instructor Dashboard</div></a>
+            {% else %}
+                <div class="sidebar"></div>
+            {% endif %}
         </div>
         <div class="col-md-1"></div>
         <div class="col-md-8">
-            <div class="section-header">
-                Courses
-            </div>
+            <!--<div class="section-header">-->
+            <!--    Courses-->
+            <!--</div>-->
             {% for course in courses %}
             <div class="course-name">
                 {{ course.course_name }}
             </div>
-            {% if 'Administrator' in roles or 'Instructor' in roles %}
+            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
             <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}">Change Course Settings</a>
             {% endif %}
             <div id="copypaste-{{course.id}}"></div>
             <table class="table table-striped" id="assignments">
                 <tbody>
                     {% for assignment in course.assignment_set.all %}
+                    <tr>
+                        <td id="edit_assignment_td" style="cursor: auto; background-color: transparent">
+                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
+                            <a class="" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
+                            {% endif %}
+                        </td>
+                    <tr>
+                    
                     <tr data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable">
                         <td>
-                            {% if 'Administrator' in roles or 'Instructor' in roles %}
-                            <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
-                            {% endif %}
+                            <!--{% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}-->
+                            <!--<a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>-->
+                            <!--{% endif %}-->
                             {{ assignment.assignment_name }}
                             <span class="expandicon glyphicon glyphicon-chevron-down"></span>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <table class="table table-striped collapse" id="target-objects-{{ assignment.id }}">
+                            <table style="width: 100%; max-width: 100%" class="table table-hover collapse" id="target-objects-{{ assignment.id }}">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th class="col-md-1">
                                             Title
                                         </th>
-                                        <th>
+                                        <th class="col-md-1">
                                             Author
                                         </th>
-                                        <th>
+                                        <th class="col-md-1">
                                             Date Created
                                         </th>
                                     </tr>
@@ -255,11 +279,11 @@ li {
                                     {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                                     <tr>
                                         <td>
-                                            {% if 'Administrator' in roles or 'Instructor' in roles %}
-                                            <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
+                                            {% if 'Administrator' in roles or 'Instructor' in roles and is_instructor %}
+                                            <a onclick="alert('Warning! Editing source material content will mess up any existing annotations. Please proceed with caution.');" class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
                                             {% endif %}
                                             <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
-                                            (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
+                                            <!--(<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)-->
                                         </td>
                                         <td>
                                             {{ file.target_author }}
@@ -269,19 +293,12 @@ li {
                                         </td>
                                     </tr>
                                     {% endfor %}
-                                    <!-- <tr>
-                                        <td style="text-align:center;" colspan="3">
-                                                <a href="{% url 'target_object_database:create_new_source' %}" class="btn btn-success" role="button">
-
-                                                  {% bootstrap_icon "star" %} Add New Source Material
-                                                </a>
-                                        </td>
-                                    </tr> -->
                                 </tbody>
                             </table>
                         </td>
                     </tr>
                     {% endfor %}
+                    {% if is_instructor %}
                     <tr>
                         <td style="text-align:center;">
                             <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" class="btn btn-primary" role="button">
@@ -289,6 +306,7 @@ li {
                             </a>
                         </td>
                     </tr>
+                    {% endif %}
                 </tbody>
             </table>
             {% endfor %}

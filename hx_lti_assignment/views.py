@@ -1,6 +1,7 @@
 from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet  # noqa
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
+from hx_lti_initializer.models import LTICourse
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
@@ -8,14 +9,17 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import uuid
+from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
+def get_course_id(request):
+	return request.session['hx_lti_course_id']
 
 @login_required
 def create_new_assignment(request):
     """
     """
     debug = "Nothing"
-    form = ""
+    form = None
     if request.method == "POST":
         targets_form = AssignmentTargetsFormSet(request.POST)
         if targets_form.is_valid():
@@ -44,25 +48,59 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
+                return render(
+                    request,
+                    'hx_lti_assignment/create_new_assignment.html',
+                    {
+                        'form': form,
+                        'targets_form': targets_form,
+                        'username': request.session['hx_user_name'],
+                        'number_of_targets': target_num,
+                        'debug': debug,
+                        'course_id': get_course_id(request),
+                    }
+                )
         else:
+            # "The AssignmentTargets could not be created because the data didn't validate."
+            # we will never be able to use assignment_targets
+            # assignment_targets = targets_form.save(commit=False)
+            # TODO: is this the error functionality that we want?
+            # try:
+            #     target_num = len(assignment_targets)
+            # except:
+            #     return error_view(request, "Someone else is already using that object")
+            
+            # Old code - fails because there are (somehow) no assignment targets
+            #target_num = len(assignment_targets)
             target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
             debug_printer(targets_form.errors)
+            return error_view(request, "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.")
 
+    # GET
     else:
-        form = AssignmentForm()
+        # Initialize with database settings so instructor doesn't have to do this manually
+        form = AssignmentForm(initial={
+                'annotation_database_url': getattr(settings, 'ANNOTATION_DB_URL', ""),
+	            'annotation_database_apikey': getattr(settings, 'ANNOTATION_DB_API_KEY', ""),
+	            'annotation_database_secret_token': getattr(settings, 'ANNOTATION_DB_SECRET_TOKEN', ""),
+	            # TODO: Figure out a sensible default
+	            'pagination_limit': 20,
+            })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0
+        
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',
         {
             'form': form,
             'targets_form': targets_form,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'number_of_targets': target_num,
-            'debug': debug
+            'debug': debug,
+            'course_id': get_course_id(request),
         }
     )
 
@@ -81,6 +119,7 @@ def edit_assignment(request, id):
         )
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
+            print targets_form
             assignment_targets = targets_form.save(commit=False)
             changed = False
             if len(targets_form.deleted_objects) > 0:
@@ -94,6 +133,9 @@ def edit_assignment(request, id):
                 changed = True
             if changed:
                 targets_form = AssignmentTargetsFormSet(instance=assignment)
+        else:
+            return error_view(request, "Something went wrong. It's likely you have selected source material that is already in use elsewhere.")
+            
         for targs in assignment.assignment_objects.all():
             targets += '&assignment_objects=' + str(targs.id)
         post_values = QueryDict(targets, mutable=True)
@@ -102,12 +144,30 @@ def edit_assignment(request, id):
         if form.is_valid():
             assign1 = form.save(commit=False)
             assign1.save()
-            messages.success(request, 'Assignment was successfully created!')
+            messages.success(request, 'Assignment was successfully edited!')
             return redirect('hx_lti_initializer:course_admin_hub')
+        else:
+            return render(
+                    request,
+                    'hx_lti_assignment/create_new_assignment.html',
+                    {
+                        'form': form,
+                        'targets_form': targets_form,
+                        'username': request.session['hx_user_name'],
+                        'number_of_targets': target_num,
+                        'debug': debug,
+                        'course_id': get_course_id(request),
+                    }
+                )
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
 
+    try:
+        course_name = request.session['course_name']
+    except:
+        course_name = None
+    
     return render(
         request,
         'hx_lti_assignment/create_new_assignment.html',
@@ -115,7 +175,9 @@ def edit_assignment(request, id):
             'form': form,
             'targets_form': targets_form,
             'number_of_targets': target_num,
-            'user': request.user,
+            'username': request.session['hx_user_name'],
             'debug': debug,
+            'assignment_id': assignment.assignment_id,
+            'course_id': get_course_id(request),
         }
     )

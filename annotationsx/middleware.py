@@ -23,6 +23,13 @@ class XFrameOptionsMiddleware(object):
         debug_printer('DEBUG - X-Frame-Options Middleware')
         debug_printer(settings.SERVER_NAME)
         referrer = request.META.get('HTTP_REFERER')
+
+        # if this is localhost and non-https (i.e. development), we won't
+        # receive the referer header so just make the response exempt from xframe controls
+        if settings.SERVER_NAME == 'localhost':
+            setattr(response, 'xframe_options_exempt', True)
+            return response
+
         # means the person accessed site directly and not via iframe so
         # leave response as is
         if referrer is None:

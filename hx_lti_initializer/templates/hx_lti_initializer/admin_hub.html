@@ -17,6 +17,11 @@
         jQuery('#assignments .clickable').click(function(event){
             $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
         });
+        jQuery('.clickable').keypress(function(e){
+            if (e.which === 13) {
+                jQuery(this).click();
+            };
+        })
     });
     var printHelp = function(course_id, collection_id, object_id){
         var el = '#copypaste-' + course_id;
@@ -48,7 +53,7 @@
 <table class="table table-striped" id="assignments" role="grid">
     <tbody>
         {% for assignment in course.assignment_set.all %}
-        <tr role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
+        <tr tabindex="0" role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
             <td>
                 {% if 'Administrator' in roles or 'Instructor' in roles %}
                 <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
@@ -83,7 +88,9 @@
 	                                <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
 	                                {% endif %}
 	                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
+                                    {% if org == 'HARVARDX' %}
 	                                (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
+                                    {% endif %}
 	                            </td>
 	                            <td>
 	                                {{ file.target_author }}
