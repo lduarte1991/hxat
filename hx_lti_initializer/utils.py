@@ -246,8 +246,8 @@ def fetch_annotations_by_course(context_id, user_id):
     results = {'rows': [], 'totalCount': 0}
     for credential in annotation_db_credentials:
         db_url = credential['annotation_database_url'].strip()
-        db_apikey = credential['annotation_database_apikey'].strip()
-        db_secret = credential['annotation_database_secret_token'].strip()
+        db_apikey = credential['annotation_database_apikey']
+        db_secret = credential['annotation_database_secret_token']
         annotator_auth_token = retrieve_token(user_id, db_apikey, db_secret)
         logger.debug("Fetching annotations with context_id=%s database_url=%s" % (context_id, db_url))
         data = _fetch_annotations_by_course(context_id, db_url, annotator_auth_token)
