@@ -3,7 +3,6 @@ from django.conf import settings
 from datetime import datetime
 from dateutil import tz
 from django import template
-from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringfilter
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from re import sub

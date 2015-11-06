@@ -57,7 +57,7 @@ urlpatterns = patterns(
     ),
     # using a wildcard for the middle of the url, so lti_init/instructor_dashboard and lti_init/admin_hub/instructor_dashboard will both work
     url(r'\w/instructor_dashboard_view$', 'hx_lti_initializer.views.instructor_dashboard_view', name='instructor_dashboard_view'),
-
+    url(r'\w/instructor_dashboard_view/student_list$', 'hx_lti_initializer.views.instructor_dashboard_student_list_view', name='instructor_dashboard_student_list_view'),
     url(
         r'^delete_assignment/$',
         'hx_lti_initializer.views.delete_assignment',
