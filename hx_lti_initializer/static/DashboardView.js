@@ -389,13 +389,17 @@
 
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
-        })
+            if (typeof jQuery.publish !== "undefined") {
+                jQuery.publish('resizeMirador');
+            };
+            
+        });
         jQuery('.resize-handle').hover(function() {
             jQuery('.hide_label').css("visibility", "visible");
         },function() {
             jQuery('.hide_label').css("visibility", "hidden");
         });
-        //console.log("Set up empty");
+
         self.initOptions.controller.dashboardReady.resolve();
     };
 
@@ -573,10 +577,49 @@
         var self = this;
         var html = self.initOptions.TEMPLATES.annotationInstructions({'data':instructions});
         jQuery('.annotationSection').append(html);
+        jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
+    };
+
+    $.DashboardView.prototype.toggleFullscreen = function () {
+        var self = this;
+        var enterFullscreen = function() {
+          var el = document.documentElement;
+          if (el.requestFullscreen) {
+            el.requestFullscreen();
+          } else if (el.mozRequestFullScreen) {
+            el.mozRequestFullScreen();
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+          }
+        };
+
+        var exitFullscreen = function() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            
+        };
+
+        var isFullscreen = function() {
+          var $fullscreen = $(fullscreenElement());
+          return ($fullscreen.length > 0);
+        };
+
+        var fullscreenElement = function() {
+          return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+        };
+
+        fullscreenElement() ? exitFullscreen() : enterFullscreen();
     };
 
 } (AController));

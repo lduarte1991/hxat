@@ -377,21 +377,37 @@ button#hideParent {
 .annotationSection .annotation-instructions{
     cursor: pointer;
     text-align: right;
-    margin-right: 30px;
-    margin-top: -40px;
+    margin-right: 60px;
+    margin-top: -38px;
     height: 40px;
+    float: right;
+    
 }
 
-.annotationSection .annotation-instructions .title {
-    float: right;
+.annotationSection .annotation-fullscreen {
+    color: white;
+    font-size: 14pt;
+    cursor: pointer;
+    text-align: right;
     margin-right: 30px;
-    margin-top: 0px;
+    margin-top: -40px;
+    float:right;
+}
+
+.annotationSection .title, .annotationSection .fullscreen-label {
+    float: right;
+    margin-right: 100px;
+    margin-top: -33px;
     color: #fff;
     visibility: hidden;
 }
 
-.annotationSection .annotation-instructions:hover .title {
-visibility:visible;
+.annotationSection .annotation-instructions:hover + .title {
+    visibility:visible;
+}
+
+.annotationSection .annotation-fullscreen:hover + .fullscreen-label {
+    visibility:visible;
 }
 
 .annotationSection .annotation-instructions .hide_label {
@@ -404,8 +420,54 @@ visibility:visible;
     visibility: hidden;
 }
 
+.hide_label {
+    color: white;
+    margin-top: -33px;
+    margin-left: 10px;
+    float: left;
+    visibility: hidden;
+}
+
 /* The following is temporary to move fullscreen button
    in Mirador */
 .mirador-osd-fullscreen.hud-control{
     right: 45px!important;
+}
+
+/* Full screen
+---------------------------------------------------------------------------- */
+html:-webkit-full-screen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:-moz-full-screen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:-ms-fullscreen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:fullscreen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
 }

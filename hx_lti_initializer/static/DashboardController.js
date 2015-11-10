@@ -131,9 +131,11 @@
 		var annotationClicked = self.__bind(self.annotationClicked, self);
 		var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
 		var instructionsClicked = self.__bind(self.instructionsClicked, self);
+		var fullscreenClicked = self.__bind(self.fullscreenClicked, self);
 		var el = self.element;
 		el.on("click", ".annotationItem", annotationClicked);
 		el.on("click", ".annotation-instructions", instructionsClicked);
+		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
 	};
 
@@ -224,6 +226,10 @@
     	var target = jQuery(e.target);
 
     	self.viewer.displayInstructions(this.initOptions.instructions);
+    };
+
+    $.DashboardController.prototype.fullscreenClicked = function(e) {
+    	this.viewer.toggleFullscreen();
     };
 
     $.DashboardController.prototype.replyDeleteClicked = function(e) {

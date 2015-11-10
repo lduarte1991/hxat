@@ -2373,7 +2373,7 @@ a {
 
 /* main menu window options
 ---------------------------------------------------------------------------- */
-.mirador-window-options-menu {
+  .mirador-window-options-menu {
     list-style: none;
     margin: 0;
     padding: 10px 5px;
@@ -2392,7 +2392,7 @@ a {
   padding-left: 10px;
   margin: 8px 0px 8px 0px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1em;
 }
 
 .window-manifest-navigation {
@@ -2400,7 +2400,6 @@ a {
   width: 24%;
   text-align: right;
   padding-right: 10px;
-  font-size: 16px;
 }
 
 

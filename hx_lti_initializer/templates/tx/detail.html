@@ -45,8 +45,9 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <link rel="stylesheet" href="{{ custom_css }}">
+<div id="full-content" style="background-color:white">
 <div  id="viewer" class="test" style="padding-left:75px;padding-right:75px;" class="fit-to-canvas">
-	<div class="annotations-status on"><i class="fa fa-close"></i> <span class="hover-inst hidden">Hide Annotations</span></div>
+	<div class="annotations-status on" role="button"><i class="fa fa-close"></i> <span role="tooltip" class="hover-inst hidden">Hide Annotations</span></div>
 			{% if org = 'ATG' %}
 			<div class="navigation">
 	                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
@@ -55,9 +56,9 @@
 	        <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
     			<div class="instructions-title">
     				Instructions
-    				<span href="#" class="toggle-instructions" data-toggle="collapse" data-target=".instructions-body">Collapse Instructions</span>
+    				<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions">Collapse Instructions</span>
     			</div>
-				<div class="instructions-body collapse in" aria-expanded="true">{{instructions | safe}}</div>
+				<section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">{{instructions | safe}}</section>
 			</div>
 		<h1>{{ target_object.target_title | safe }}</h1>
 		{% if target_object.target_author != "None" %}
@@ -72,13 +73,14 @@
 		</div>
 		{% endif %}
 		{% if prev_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;" class="btn btn-primary" role="button"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View previous annotations page"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
 		{% endif %}
 		{% if next_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;" class="btn btn-primary" role="button">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View next annotations page">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
 		{% endif %}
 </div>
 <div id="dashboard" class="annotationListContainer">
+</div>
 </div>
 <script>
 jQuery(function ($) {

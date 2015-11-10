@@ -67,12 +67,14 @@
 			var store = annotator.plugins.Store;
 			if (jQuery('.annotations-status').hasClass('on')) {
 				jQuery('.annotations-status .hover-inst').html("Show annotations");
+				jQuery('.annotations-status').attr('aria-label', "Show annotations");
 				jQuery('.annotations-status i').removeClass('fa-close');
 				jQuery('.annotations-status i').addClass('fa-comments');
 				this.annotationsSaved = store.annotations.slice();
 				window.AController.dashboardObjectController.endpoint._clearAnnotator();
 			} else {
 				jQuery('.annotations-status .hover-inst').html("Hide annotations");
+				jQuery('.annotations-status').attr('aria-label', "Hide annotations");
 				jQuery('.annotations-status i').addClass('fa-close');
 				jQuery('.annotations-status i').removeClass('fa-comments');
 				this.annotationsSaved.forEach(function (annotation) {

@@ -1,15 +1,15 @@
 <div class="annotationItem item-<%= id %> side">
     <span class="idAnnotation"><%= id %></span>
-    <div class= "annotatedBy field side">
+    <div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">
         <%= user.name %>
     </div>
     <% var date = new Date(updated); %>
-    <div class="annotatedAt field side" title="<% print(date) %>">
+    <div class="annotatedAt field side" title="<% print(date) %>" aria-label="last updated <% print(jQuery.timeago(date)); %>">
         last updated <% print(jQuery.timeago(date)); %>
     </div>
     <% if (media === 'text') {%>
         <div class="quote field side">
-            <div class="quoteText"><%= quote %></div>
+            <div class="quoteText" aria-label="Excerpt selected for this annotation"><%= quote %></div>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
     <% } else if (media === 'image' && thumbnail) {%>
@@ -19,19 +19,19 @@
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
     <% } %>
-    
-    <div class="body field side">
+    <span class="hidden" id="text-label">Annotation text</span>
+    <div class="body field side" aria-describedby="text-label">
         <%= text %>
     </div>
     
-    <div class="totalreplies field side">
+    <div class="totalreplies field side" role="button" aria-label="Make or view replies to this annotation">
         <span class="glyphicon glyphicon-comment"></span>
         <span class="replyNum"> <%= totalComments %> </span>
     </div>
     <% if (typeof tags !== "undefined") { %>
         <div class="tagList field side">
             <% _.each(tags, function(tagItem){ %>
-                <div class="tag side">
+                <div class="tag side" aria-label="tag: <%= tagItem %>">
                     <%= tagItem %>
                 </div>
             <% }); %>
