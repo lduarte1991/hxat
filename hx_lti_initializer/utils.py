@@ -4,6 +4,7 @@ helpful elsewhere.
 """
 import django.shortcuts
 from urlparse import urlparse
+from django.core.exceptions import PermissionDenied
 from abstract_base_classes.target_object_database_api import *
 from models import *
 from django.conf import settings
@@ -32,7 +33,7 @@ def validate_request(req):
     Validates the request in order to permit or deny access to the LTI tool.
     """
     # print out the request to the terminal window if in debug mode
-    # this item is set in the settings, in the __init__.py file
+    # this item is set in the set tings, in the __init__.py file
     if settings.LTI_DEBUG:
         for item in sorted(req.POST.dict()):
             debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
