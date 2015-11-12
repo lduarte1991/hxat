@@ -130,6 +130,9 @@
 
         if (updateStore) {
             self.initOptions.endpoint.loadMoreAnnotations(offsetList);
+            if (offsetList.length > 0) {
+                jQuery('.annotationItem.item-' + offsetList[0].id).focus();
+            };
         };
         if (typeof jQuery('img').unveil === "function") {
             jQuery('img').unveil();
@@ -304,13 +307,19 @@
             jQuery('.test').css('width', section.offset().left);
             window.dispatchEvent(new Event('resize'));
         });
+        var loadMore = function(){
+            var offset = self.initOptions.endpoint.getNumOfAnnotationsOnScreen();
+            var pagination = self.initOptions.pagination;
+            var annotationList = self.initOptions.endpoint.annotationsMasterList;
+            self.updateDashboard(offset, pagination, annotationList, true);
+        };
         jQuery('.annotationSection').scroll(function() {
             if(jQuery(this).scrollTop() + jQuery(this).innerHeight() >= this.scrollHeight){
-                var offset = self.initOptions.endpoint.getNumOfAnnotationsOnScreen();
-                var pagination = self.initOptions.pagination;
-                var annotationList = self.initOptions.endpoint.annotationsMasterList;
-                self.updateDashboard(offset, pagination, annotationList, true);
+                loadMore();
             }
+        });
+        jQuery('#loadMoreButton').click(function(){
+            loadMore();
         });
        jQuery('.handle-button').click( function(e) {
             if (self.moving) {
@@ -506,7 +515,7 @@
         });
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
-            jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.bounds)
+            jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
         });
 
         jQuery('.parentAnnotation #edit').click(function (e){
