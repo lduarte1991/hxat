@@ -465,6 +465,7 @@
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
         jQuery('.annotationSection').append(html);
         jQuery('.annotationSection').css('overflow-y', 'hidden');
+        jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');

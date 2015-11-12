@@ -6,7 +6,7 @@
         <div class="annotation-fullscreen" role="button" aria-labeledby="sidebar-annotation-fullscreen">
             <i class="fa fa-expand"></i>
         </div>
-        <div class="fullscreen-label" id="sidebar-annotation-fulscreen">Toggle Fullscreen Mode</div>
+        <div class="fullscreen-label" id="sidebar-annotation-fullscreen">Toggle Fullscreen Mode</div>
         <div class="annotation-instructions" role="button" aria-labeledby="sidebar-annotations-instructions">
             <img src="/static/css/images/info28.png" alt="Show annotation instructions" style="width: 20px;height: 20px; float: right;" aria-labeledby="sidebar-annotations-instructions"/>  
         </div>
@@ -38,7 +38,7 @@
             <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>
         </div>
     </div>
-    <div class="annotationsHolder side" role="list">
+    <div class="annotationsHolder side" role="list" aria-label="annotations list">
 		<% _.each(annotationItems, function(item) { %>
 			<%= item %>
 		<% }); %>

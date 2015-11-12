@@ -47,7 +47,7 @@
 <link rel="stylesheet" href="{{ custom_css }}">
 <div id="full-content" style="background-color:white">
 <div  id="viewer" class="test" style="padding-left:75px;padding-right:75px;" class="fit-to-canvas">
-	<div class="annotations-status on" role="button"><i class="fa fa-close"></i> <span role="tooltip" class="hover-inst hidden">Hide Annotations</span></div>
+	<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 			{% if org = 'ATG' %}
 			<div class="navigation">
 	                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>

@@ -1,20 +1,20 @@
 <div class="annotationModal item-modal-<%= id %> side">
 	<span class="idAnnotation"><%= id %></span>
 	<div class="modal-navigation">
-		<button class="btn btn-default" id="closeModal"><i class="glyphicon glyphicon-arrow-left"></i></button>
+		<button class="btn btn-default" id="closeModal" aria-label="Go back to annotation list"><i class="glyphicon glyphicon-arrow-left"></i></button>
 		<div class="label"><%= user.name %>&apos;s Annotation</div>
-		<button class="btn btn-default" id="hideParent"><i class="glyphicon glyphicon-menu-hamburger"></i></button>
+		<button class="btn btn-default" id="hideParent" aria-label="Hide annotation"><i class="glyphicon glyphicon-menu-hamburger"></i></button>
 	</div>
-	<div class="parentAnnotation">
-		<div class= "annotatedBy field side">
+	<div class="parentAnnotation" role="group" aria-label="Annotation selected">
+		<div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">
 	        <%= user.name %>
 	    </div>
 	    <% var date = new Date(updated); %>
-	    <div class="annotatedAt field side" title="<% print(date) %>">
+	    <div class="annotatedAt field side" title="<% print(date) %>" aria-label="last updated <% print(jQuery.timeago(date)); %>">
 	        last updated <% print(jQuery.timeago(date)); %>
 	    </div>
 	    <% if (media === 'text') {%>
-        <div class="quote field side">
+        <div class="quote field side" aria-label="Excerpt from text">
             <div class="quoteText"><%= quote %></div>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
@@ -30,24 +30,24 @@
 	        <%= text %>
 	    </div>
 	    <% if (authorized) {%>
-		    <div class="btn-group btn-group-xs editgroup" role="group" aria-label="edit">
+		    <div class="btn-group btn-group-xs editgroup" role="group" aria-label="Edit/Delete Annotation">
 		    	<% if(authToEditButton) { %>
-			    <button class="btn btn-primary" id="edit"><i class="glyphicon glyphicon-pencil"></i> Edit </button>
+			    <button class="btn btn-primary" id="edit" aria-label="Edit annotation"><i class="glyphicon glyphicon-pencil"></i> Edit </button>
 			    <% } %>
 			    <% if(authToDeleteButton) { %>
-			    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
+			    <button class="btn btn-danger" id="delete" aria-label="Delete annotation" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
 			    <% } %>
 		    </div>
-		    <div class="btn-group btn-group-xs savegroup" role="group" aria-label="save-edit" style="display: none;">
-		    <button class="btn btn-primary" id="save"><i class="glyphicon glyphicon-floppy-disk"></i> Save </button>
-		    <button class="btn btn-danger" id="cancel" ><i class="glyphicon glyphicon-remove"></i> Cancel </button>
+		    <div class="btn-group btn-group-xs savegroup" role="group" aria-label="Save edits made to annotations" style="display: none;">
+		    <button class="btn btn-primary" id="save" aria-label="Save edits"><i class="glyphicon glyphicon-floppy-disk"></i> Save </button>
+		    <button class="btn btn-danger" id="cancel" aria-label="Cancel edits"><i class="glyphicon glyphicon-remove"></i> Cancel </button>
 		    </div>
 	    <% } %>
 	</div>
-	<div class="repliesList">
+	<div class="repliesList" role="list">
 	    Loading Replies...
 	</div>
 	<div class="addReply">
-		<button class="btn btn-primary replybutton"><i class="glyphicon glyphicon-pencil"></i>  Reply to Comment</button>
+		<button class="btn btn-primary replybutton" role="button" aria-label="Reply to annotation"><i class="glyphicon glyphicon-pencil"></i>  Reply to Annotation</button>
 	</div>
 </div>

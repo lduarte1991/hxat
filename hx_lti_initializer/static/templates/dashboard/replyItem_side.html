@@ -1,13 +1,13 @@
-<div class="replyItem item-<%= id%> side">
+<div class="replyItem item-<%= id%> side" role="listitem" aria-label="Reply to annotation">
 	<span class="idAnnotation"><%= id %></span>
 
 	 <div class="replytext field side">
         <%= text %>
     </div>
     <% if (authorized) {%>
-		<div class="btn-group btn-group-xs replyeditgroup" role="group" aria-label="edit" style="display:block;">
+		<div class="btn-group btn-group-xs replyeditgroup" role="group" aria-label="Delte reply" style="display:block;">
 		    <% if(authToDeleteButton) { %>
-		    <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
+		    <button class="btn btn-danger" id="delete" data-toggle="confirmation" aria-label="Delete reply"><i class="glyphicon glyphicon-remove"></i> Delete </button>
 		    <% } %>
 	    </div>
     <% } %>
