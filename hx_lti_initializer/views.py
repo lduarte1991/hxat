@@ -153,12 +153,12 @@ def launch_lti(request):
                 course_object.course_name = get_lti_value('context_title', tool_provider)
                 course_object.save()
 
-                # save the course name to the session so it auto-populate later.
-                save_session(
-                    request,
-                    course_name=course_object.course_name,
-                    hx_lti_course_id=course_object.id,
-                )
+            # save the course name to the session so it auto-populate later.
+            save_session(
+                request,
+                course_name=course_object.course_name,
+                hx_lti_course_id=course_object.id,
+            )
 
     # For the use case where the course head wants to display an assignment object instead
     # of the admin_hub upon launch (i.e. for embedded use), this allows the user
