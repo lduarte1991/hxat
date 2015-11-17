@@ -39,6 +39,7 @@ from django.core.servers.basehttp import get_internal_wsgi_application
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.models import LTICourse
 
+settings.LTI_OAUTH_CREDENTIALS = {}
 settings.LTI_OAUTH_CREDENTIALS['123key'] = 'secret'
 
 
