@@ -107,14 +107,14 @@
         </tr>
         {% endfor %}
         {% if is_instructor %}
-		<tr>
+        <tr>
             <td style="text-align:center;">
                 <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" class="btn btn-primary" role="button">
                 {% bootstrap_icon "star" %} Create New Assignment
                 </a>
             </td>
         </tr>
-		{% endif %}
+        {% endif %}
     </tbody>
 </table>
 {% endfor %}
