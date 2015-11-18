@@ -190,6 +190,7 @@ ANNOTATION_MANUAL_URL = None
 ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
 ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
 ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
+ANNOTATION_PAGINATION_LIMIT_DEFAULT = SECURE_SETTINGS.get("annotation_pagination_limit_default", 20)
 
 if ORGANIZATION == "ATG":
     ANNOTATION_MANUAL_URL = SECURE_SETTINGS["annotation_manual_url"]
