@@ -123,7 +123,7 @@ class TOD_ImplementationTests(TestCase):
         self.assertTrue(len(TOD_Implementation.get_own_targets_from_course("fake_course")) == 2)  # noqa
         self.assertRaises(ObjectDoesNotExist, TOD_Implementation.get_own_targets_from_course, 'fake_course2')  # noqa
         course2 = LTICourse.create_course('fake_course2', self.ltiprofile1)
-        self.assertTrue(len(TOD_Implementation.get_own_targets_from_course("fake_course2")) == 2)  # noqa
+        self.assertTrue(len(TOD_Implementation.get_own_targets_from_course("fake_course2")) == 0)  # noqa
 
     def test_get_dict_of_files_from_courses(self):
         """
