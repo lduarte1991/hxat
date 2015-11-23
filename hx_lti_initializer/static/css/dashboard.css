@@ -471,3 +471,8 @@ html:fullscreen {
   width: 100%;
   background-color:white;
 }
+
+.for-screen-readers-only {
+    margin-left:-9999px;
+    margin-top:-9999px;
+}
