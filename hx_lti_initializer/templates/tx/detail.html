@@ -30,6 +30,7 @@
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
 <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/accessibility-edx.js" %}"></script>
 <!--<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>-->
@@ -67,6 +68,21 @@
 		<div class="content">
 		{{ target_object.target_content | safe }}
 		</div>
+		<div role="button" aria-label="Use Keyboard Input to make annotations" class="fa fa-keyboard-o" style="cursor: pointer; font-size: 16pt;" id="keyboard-input-toggle" title="Make annotations using keyboard input"></div>
+		<div id="make_annotations_panel" class="hidden">
+			<h2>Make Annotations using Keyboard input</h2>
+			<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotaitons.</div>
+			<div class="hidden" id="annotation-maker">
+				<label for="id_annotation_text_screen_reader">Enter annotation for highlighted section:
+					<input type="text" id="id_annotation_text_screen_reader"/>
+				</label>
+				<label for="id_annotation_tag_screen_reader">Enter tags for this annotation (separate tags with a single space):
+					<input type="text" id="id_annotation_tag_screen_reader" />
+				</label>
+			</div>
+			<button role="button" class="btn btn-default" data-toggled="false">Make an annotation</button>
+			
+		</div>
 		{% if target_object.target_citation != "None" %}
 		<div class="citation" style="margin-top:20px;">
 		<i>{{ target_object.target_citation }}</i>
@@ -81,7 +97,7 @@
 </div>
 <div id="dashboard" class="annotationListContainer">
 </div>
-</div>
+
 <script>
 jQuery(function ($) {
     $(function() {
@@ -116,6 +132,7 @@ jQuery(function ($) {
 						{% endif %}
 						//'RichText',
 						'Reply',
+						//'Accessibility',
 						//'Touch',
 					],
 					'database_url': "/lti_init/annotation_api",
@@ -194,11 +211,215 @@ jQuery(function ($) {
 	    	}, 1000);
     	}, 1000);
     {% endif %}
+    var getTextCursor = function (element) {
+	    var caretOffset = 0;
+	    var doc = element.ownerDocument || element.document;
+	    var win = doc.defaultView || doc.parentWindow;
+	    var sel;
+	    if (typeof win.getSelection != "undefined") {
+	        sel = win.getSelection();
+	        if (sel.rangeCount > 0) {
+	            var range = win.getSelection().getRangeAt(0);
+	            var preCaretRange = range.cloneRange();
+	            preCaretRange.selectNodeContents(element);
+	            preCaretRange.setEnd(range.endContainer, range.endOffset);
+	            caretOffset = preCaretRange.toString().length;
+	        }
+	    } else if ( (sel = doc.selection) && sel.type != "Control") {
+	        var textRange = sel.createRange();
+	        var preCaretTextRange = doc.body.createTextRange();
+	        preCaretTextRange.moveToElementText(element);
+	        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+	        caretOffset = preCaretTextRange.text.length;
+	    }
+	    return caretOffset;
+	};
 	jQuery('.annotations-status').hover(function() {
 	    jQuery('.hover-inst').toggleClass("hidden");
 	});
 	jQuery('.annotations-status').click(function() {
 		AController.targetObjectController.toggleAnnotations();
 	});
+	var getRangesForAsterisks = function(){
+		var range = document.createRange();
+
+		found = [];
+		var find_ranges = function(item, value){
+			// if it's an  element node, search its children. We need textnodes
+			if (value.nodeType === 1) {
+				jQuery.each(value.childNodes, find_ranges);
+			} else if(value.nodeType === 3){
+				if(value.nodeValue){
+					var index = value.nodeValue.indexOf("*");
+					if (found.length > 0 && index == 0) {
+						var siblingNode = value.previousSibling;
+						while(siblingNode.nodeName == "BR"){
+							var currentNode = siblingNode;
+							siblingNode = siblingNode.previousSibling;
+							if (siblingNode === null) {
+								siblingNode = currentNode.parentNode.previousSibling;
+							};
+						}
+						while (siblingNode.nodeType == 1) {
+							siblingNode = siblingNode.lastChild;
+						};
+						found.push({"node": siblingNode, "offset": siblingNode.nodeValue.length});
+					} else if(index>-1){
+						found.push({"node": value, "offset": value.nodeValue.indexOf("*")});
+						
+						// in case start and end are in the same node
+						var secondIndex = value.nodeValue.indexOf("*", index+1);
+						if (secondIndex > -1) {
+							found.push({"node": value, "offset": secondIndex});
+						}
+					}
+				}
+			}
+		};
+		jQuery.each(
+			jQuery('.content .annotator-wrapper').find('*:contains("*")')[0].childNodes, find_ranges
+		);
+		if (found.length <= 0) {
+			console.log("User did not highlight anything");
+			return undefined;
+		} else if (found.length == 1) {
+			console.log("User only started a highglight and did not finish it");
+			return undefined;
+		} else if (found.length > 2) {
+			console.log("User did not read instructions to only highlight one item at a time");
+			return undefined;
+		} else {
+			var startNode = found[0].node;
+			var startOffset = found[0].offset;
+			var endNode = found[1].node;
+			var endOffset = found[1].offset;
+			if (endOffset !== 0) {
+				endOffset = endOffset - 1;
+			};
+
+			var root = AController.annotationCore.annotation_tool.wrapper[0];
+			range.setStart(startNode, startOffset);
+			range.setEnd(endNode, endOffset);
+
+			if (typeof Annotator !== "undefined") {
+				bRange = new Annotator.Range.BrowserRange(range);
+				normedRange = bRange.normalize().limit(root);
+				serializedRange = normedRange.serialize(root, '.annotator-hl');
+				jQuery(root).html(window.originalContent);
+				return serializedRange;
+			}
+		}
+
+		return undefined;
+	}
+	jQuery('#make_annotations_panel button').click(function(){
+		if (jQuery(this).attr('data-toggled') == "false") {
+			jQuery('.content').attr('contenteditable', 'true');
+			jQuery(this).attr('data-toggled', 'true');
+			jQuery(this).html("Save Highlights");
+			jQuery('.content')[0].focus();
+			window.keyCount = 0;
+			console.log(window.keyCount);
+			jQuery('.content').off('keydown');
+			jQuery('.content').on('keydown', function(event) {
+				var keyCode = event.keyCode;
+				// if you haven't already:
+				event = event || window.event;
+
+				switch(keyCode) {
+					case 37:
+					case 38:
+					case 39:
+					case 40:
+						break;
+					case 8:
+					    var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])-1) !== '*';
+					    if (window.keyCount == 0 || deleted) {
+							// to cancel the event:
+							if( event.preventDefault) event.preventDefault();
+							return false;
+						} else {
+							window.keyCount = window.keyCount-1;
+						}
+						break;
+					case 46:
+						var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])) !== '*';
+						if (window.keyCount == 0 || deleted) {
+							// to cancel the event:
+							if( event.preventDefault) event.preventDefault();
+							return false;
+						} else {
+							window.keyCount = window.keyCount-1;
+						}
+						break;
+					case 56:
+						if (!event.shiftKey) {
+							// to cancel the event:
+							if( event.preventDefault) event.preventDefault();
+							return false;
+						}
+						console.log(window.keyCount);
+						if (window.keyCount == 2) {
+							// to cancel the event:
+							if( event.preventDefault) event.preventDefault();
+							return false;
+						}
+						window.keyCount = window.keyCount+1;
+						break;
+					default:
+						// to cancel the event:
+						if( event.preventDefault) event.preventDefault();
+						return false;
+						break;
+				}
+			});
+			window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
+		} else if(jQuery(this).attr('data-toggled') == "true") {
+			var rangesForAsterisks = getRangesForAsterisks();
+			if (typeof rangesForAsterisks === "undefined") {
+				return;
+			};
+			jQuery(this).attr('data-toggled', 'saving');
+			jQuery('#make_annotations_panel').css('margin-left', '0px');
+			jQuery('#make_annotations_panel').css('margin-top', '0px');
+			jQuery('#annotation-maker').removeClass("hidden");
+			jQuery(this).html("Save Annotation");
+			jQuery('#id_annotation_text_screen_reader')[0].focus();
+			window.savingAnnotation = {
+				"ranges" : [rangesForAsterisks],
+				"collectionId": AController.annotationCore.initOptions.collection_id,
+				"contextId": AController.annotationCore.initOptions.context_id,
+				"uri": AController.annotationCore.initOptions.object_id,
+				"permissions": {
+					"admin": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+					"read": [],
+					"update": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+					"delete": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+				},
+				"user": AController.annotationCore.annotation_tool.plugins.Permissions.user,
+				"archived": false,
+				"parent": "0",
+				"media": "text",
+			};
+		} else {
+			jQuery(this).attr('data-toggled', 'false');
+			jQuery('.content').attr('contenteditable', 'false');
+			jQuery(this).html("Make an annotation");
+			jQuery('#annotation-maker').addClass("hidden");
+			var text = jQuery('#id_annotation_text_screen_reader').val();
+			var tags = jQuery('#id_annotation_tag_screen_reader').val().split(' ');
+			if (tags == "") {
+				tags = [];
+			};
+			window.savingAnnotation['text'] = text;
+			window.savingAnnotation['tags'] = tags;
+			AController.annotationCore.annotation_tool.plugins.Store.annotationCreated(window.savingAnnotation);
+			AController.annotationCore.annotation_tool.setupAnnotation(window.savingAnnotation);
+			AController.dashboardObjectController.annotationCreated(window.savingAnnotation);
+		}
+	});
+	jQuery('#keyboard-input-toggle').click(function(){
+		jQuery('#make_annotations_panel').toggleClass("hidden");
+	})
 </script>
 
