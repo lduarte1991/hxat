@@ -240,35 +240,83 @@ jQuery(function ($) {
 	jQuery('.annotations-status').click(function() {
 		AController.targetObjectController.toggleAnnotations();
 	});
-	var getRangesForAsterisks = function(){
+
+	var clearKeyboardInput = function(){
+		jQuery('#make_annotations_panel button').attr('data-toggled', 'false');
+		jQuery('.content').attr('contenteditable', 'false');
+		jQuery('#make_annotations_panel button').html("Make an annotation");
+		jQuery('#annotation-maker').addClass("hidden");
+		jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html(window.originalContent);
+	};
+
+	/*
+	 * getRangesForDelimiter
+	 * It checks through the target text to check if the delimiter was used
+	 * If so it expects there to be at least and at most 2 instances
+	 * It will then perform a calculation to get the appropriate SerializedRange
+	 * Otherwise it should return undefined
+	 * 
+	 * @param {string} delimiter - string used for boundaries of range
+	 * @returns {SerializedRange} range for string between the pair of delimiters
+	 */
+	var getRangesForDelimiter = function(delimiter){
 		var range = document.createRange();
 
 		found = [];
+
+		/*
+		 * find_ranges
+		 * It checks to see if the node contains the delimiter
+		 * and if it does find the delimiter, it will add it to
+		 * the found list variable above
+		 *
+		 * @param {Number} item - index of the node
+		 * @param {object} value - actual node
+		 */
 		var find_ranges = function(item, value){
 			// if it's an  element node, search its children. We need textnodes
 			if (value.nodeType === 1) {
 				jQuery.each(value.childNodes, find_ranges);
 			} else if(value.nodeType === 3){
+
+				// stupid check to make sure that we are in a TextNode
 				if(value.nodeValue){
-					var index = value.nodeValue.indexOf("*");
+
+					// gets the offset of the first delimiter
+					var index = value.nodeValue.indexOf(delimiter);
+
+					// if this is the second time we've found a delimiter
+					// and it's the first item in the list, then we hit a corner case
+					// The issue here is that the highlight would end on the first character
+					// of a new node, which would INCLUDE the first character being highlighted
+					// this was not the intention of the user, otherwise the index would have been 1
+					// The solution is to look back at previous siblings or previous parents
+					// and get the offset of the full nodeValue. 
 					if (found.length > 0 && index == 0) {
 						var siblingNode = value.previousSibling;
+
+						// make sure that previous sibling is not a break tag or a non-text node
 						while(siblingNode.nodeName == "BR"){
 							var currentNode = siblingNode;
 							siblingNode = siblingNode.previousSibling;
 							if (siblingNode === null) {
 								siblingNode = currentNode.parentNode.previousSibling;
 							};
-						}
+						};
+
+						// try to find the last textnode while you are still in an element node
 						while (siblingNode.nodeType == 1) {
 							siblingNode = siblingNode.lastChild;
 						};
+
+						// add the node to the found list
 						found.push({"node": siblingNode, "offset": siblingNode.nodeValue.length});
-					} else if(index>-1){
-						found.push({"node": value, "offset": value.nodeValue.indexOf("*")});
+					} else if(index>-1) {
+						// the regular case is you've found the node and offset so push them
+						found.push({"node": value, "offset": value.nodeValue.indexOf(delimiter)});
 						
-						// in case start and end are in the same node
-						var secondIndex = value.nodeValue.indexOf("*", index+1);
+						// corner case: start and end are in the same node
+						var secondIndex = value.nodeValue.indexOf(delimiter, index+1);
 						if (secondIndex > -1) {
 							found.push({"node": value, "offset": secondIndex});
 						}
@@ -276,9 +324,13 @@ jQuery(function ($) {
 				}
 			}
 		};
+
+		// using the "contains:()" selector in jquery, find where the delimiter appears.
 		jQuery.each(
-			jQuery('.content .annotator-wrapper').find('*:contains("*")')[0].childNodes, find_ranges
+			jQuery('.content .annotator-wrapper').find('*:contains('+delimiter+')')[0].childNodes, find_ranges
 		);
+
+		// double check we get 2 and only two items selected for highlighting
 		if (found.length <= 0) {
 			console.log("User did not highlight anything");
 			return undefined;
@@ -289,18 +341,21 @@ jQuery(function ($) {
 			console.log("User did not read instructions to only highlight one item at a time");
 			return undefined;
 		} else {
+
+			// if everything went great, then create an appropriate range using Annotator
 			var startNode = found[0].node;
 			var startOffset = found[0].offset;
 			var endNode = found[1].node;
 			var endOffset = found[1].offset;
 			if (endOffset !== 0) {
-				endOffset = endOffset - 1;
+				endOffset = endOffset - delimiter.length;
 			};
 
 			var root = AController.annotationCore.annotation_tool.wrapper[0];
 			range.setStart(startNode, startOffset);
 			range.setEnd(endNode, endOffset);
 
+			// turn that into a serializedRange to be stored in the database
 			if (typeof Annotator !== "undefined") {
 				bRange = new Annotator.Range.BrowserRange(range);
 				normedRange = bRange.normalize().limit(root);
@@ -311,15 +366,29 @@ jQuery(function ($) {
 		}
 
 		return undefined;
-	}
+	};
+	
+	// deals with the button that turns on keyboard annotations
 	jQuery('#make_annotations_panel button').click(function(){
+		
+		// if person is trying to start making an annotation via keyboard
 		if (jQuery(this).attr('data-toggled') == "false") {
+
+			// make the text editable and change UI to reflect change
 			jQuery('.content').attr('contenteditable', 'true');
 			jQuery(this).attr('data-toggled', 'true');
 			jQuery(this).html("Save Highlights");
+			
+			// automatically bring person to beginning of target text
+			// this helps orient a person using a screen reader
 			jQuery('.content')[0].focus();
+
+			// makes sure that key count is set to 0 again so that you
+			// can only make two asterisks
 			window.keyCount = 0;
-			console.log(window.keyCount);
+
+			// in case this is not the first time that a person is making an annotation
+			// via keyboard input, this unloads event. 
 			jQuery('.content').off('keydown');
 			jQuery('.content').on('keydown', function(event) {
 				var keyCode = event.keyCode;
@@ -327,13 +396,25 @@ jQuery(function ($) {
 				event = event || window.event;
 
 				switch(keyCode) {
+					// left arrow key
 					case 37:
+					// up arrow key
 					case 38:
+					// right arrow key
 					case 39:
+					// bottom arrow key
 					case 40:
+						// arrow keys should work normally
 						break;
+					// backspace key
 					case 8:
+
+						// make sure that item you are trying to backspace is the delimiter
+						// TODO: change this asterisk to delimiter
 					    var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])-1) !== '*';
+					    
+					    // if it isn't an asterisk, prevent the user from deleting it
+					    // likewise prevent them if they never even typed an asterisk in the first place
 					    if (window.keyCount == 0 || deleted) {
 							// to cancel the event:
 							if( event.preventDefault) event.preventDefault();
@@ -342,8 +423,14 @@ jQuery(function ($) {
 							window.keyCount = window.keyCount-1;
 						}
 						break;
+					// delete key
 					case 46:
+						// make sure item you are trying to [forward] delete is the delimiter
+						// TODO: change this asterisk to delimiter
 						var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])) !== '*';
+						
+						// like above, if it isn't an asterisk prevent user from deleting it
+						// likewise prevent them if they never even typed an asterisk in the first place
 						if (window.keyCount == 0 || deleted) {
 							// to cancel the event:
 							if( event.preventDefault) event.preventDefault();
@@ -352,19 +439,32 @@ jQuery(function ($) {
 							window.keyCount = window.keyCount-1;
 						}
 						break;
+					// 8/* button
 					case 56:
+
+						// if person hit 8 and not * then prevent them from doing so
 						if (!event.shiftKey) {
 							// to cancel the event:
 							if( event.preventDefault) event.preventDefault();
 							return false;
 						}
-						console.log(window.keyCount);
+
+						// likewise prevent the if they were trying to add more than 2 delimiters
 						if (window.keyCount == 2) {
 							// to cancel the event:
 							if( event.preventDefault) event.preventDefault();
 							return false;
 						}
 						window.keyCount = window.keyCount+1;
+						break;
+					case 27:
+						clearKeyboardInput();
+						break;
+					case 13:
+						jQuery('#make_annotations_panel button').click();
+						break;
+					case 9:
+						jQuery('#make_annotations_panel button')[0].focus();
 						break;
 					default:
 						// to cancel the event:
@@ -373,9 +473,11 @@ jQuery(function ($) {
 						break;
 				}
 			});
+
+			// save the original content of the tool so you can set it back to normal later
 			window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
 		} else if(jQuery(this).attr('data-toggled') == "true") {
-			var rangesForAsterisks = getRangesForAsterisks();
+			var rangesForAsterisks = getRangesForDelimiter("*");
 			if (typeof rangesForAsterisks === "undefined") {
 				return;
 			};
@@ -402,10 +504,7 @@ jQuery(function ($) {
 				"media": "text",
 			};
 		} else {
-			jQuery(this).attr('data-toggled', 'false');
-			jQuery('.content').attr('contenteditable', 'false');
-			jQuery(this).html("Make an annotation");
-			jQuery('#annotation-maker').addClass("hidden");
+			clearKeyboardInput();
 			var text = jQuery('#id_annotation_text_screen_reader').val();
 			var tags = jQuery('#id_annotation_tag_screen_reader').val().split(' ');
 			if (tags == "") {
