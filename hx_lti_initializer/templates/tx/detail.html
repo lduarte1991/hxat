@@ -247,6 +247,9 @@ jQuery(function ($) {
 		jQuery('#make_annotations_panel button').html("Make an annotation");
 		jQuery('#annotation-maker').addClass("hidden");
 		jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html(window.originalContent);
+		Annotator._instances[0].destroy();
+		AController.annotationCore.element = jQuery('.content');
+		AController.annotationCore.init("text");
 	};
 
 	/*
