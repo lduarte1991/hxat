@@ -457,13 +457,19 @@ jQuery(function ($) {
 						}
 						window.keyCount = window.keyCount+1;
 						break;
+					// Esc button
 					case 27:
+						// sets the target text back to normal and erases delimiter marks
 						clearKeyboardInput();
 						break;
+					// Enter button
 					case 13:
+						// submits highlights like pressing the "Save Highlights" button
 						jQuery('#make_annotations_panel button').click();
 						break;
+					// Tab button
 					case 9:
+						// moves it to the "Save Highlights" button
 						jQuery('#make_annotations_panel button')[0].focus();
 						break;
 					default:
@@ -477,16 +483,30 @@ jQuery(function ($) {
 			// save the original content of the tool so you can set it back to normal later
 			window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
 		} else if(jQuery(this).attr('data-toggled') == "true") {
+			// if user has submitted highlights
+
+			// find range of the delimiter
+			// TODO: have a setting somewhere to set the delimiter
 			var rangesForAsterisks = getRangesForDelimiter("*");
+
+			// If it couldn't find any ranges, (i.e. you forgot one or both delimiters do nothing)
+			// TODO: show a warning error
 			if (typeof rangesForAsterisks === "undefined") {
+				jQuery('.content').css('outline', '2px solid red');
 				return;
 			};
+
+			// show the small form to add text and tags to annotation
 			jQuery(this).attr('data-toggled', 'saving');
 			jQuery('#make_annotations_panel').css('margin-left', '0px');
 			jQuery('#make_annotations_panel').css('margin-top', '0px');
 			jQuery('#annotation-maker').removeClass("hidden");
 			jQuery(this).html("Save Annotation");
+			
+			// focus on the first one for screen reader's sake!
 			jQuery('#id_annotation_text_screen_reader')[0].focus();
+
+			// create an annotation to be saved once they've added text and tags
 			window.savingAnnotation = {
 				"ranges" : [rangesForAsterisks],
 				"collectionId": AController.annotationCore.initOptions.collection_id,
@@ -505,18 +525,30 @@ jQuery(function ($) {
 			};
 		} else {
 			clearKeyboardInput();
+
+			// tags and text input, if tags is empty, change it to empty list
 			var text = jQuery('#id_annotation_text_screen_reader').val();
 			var tags = jQuery('#id_annotation_tag_screen_reader').val().split(' ');
 			if (tags == "") {
 				tags = [];
 			};
+
+			// add them to the annotation to be saved
 			window.savingAnnotation['text'] = text;
 			window.savingAnnotation['tags'] = tags;
+
+			// this sends a trigger to Annotator to tell it to send the annotation to be saved to the database
 			AController.annotationCore.annotation_tool.plugins.Store.annotationCreated(window.savingAnnotation);
+
+			// this adds the actual highlight to the target text
 			AController.annotationCore.annotation_tool.setupAnnotation(window.savingAnnotation);
+
+			// this adds the annotation to the dashboard
 			AController.dashboardObjectController.annotationCreated(window.savingAnnotation);
 		}
 	});
+
+	// display/hide options to input annotations via keyboard
 	jQuery('#keyboard-input-toggle').click(function(){
 		jQuery('#make_annotations_panel').toggleClass("hidden");
 	})
