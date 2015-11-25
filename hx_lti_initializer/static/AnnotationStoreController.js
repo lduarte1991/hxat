@@ -216,29 +216,57 @@ AnnotatorEndpointController.prototype.editAnnotation = function(annotation, butt
 	var self = this;
 	var button = jQuery(event.target);
 
-	var positionAdder = {
-		display: "block",
-		left: button.offset().left,
-		top: button.scrollTop(),
-	}
+	var options = {
+		focus: true,
+		width: "100%",
+		airMode: true,
+	};
 
+	jQuery('.parentAnnotation .body').summernote(options);
+	jQuery('.parentAnnotation .body').css({
+		"outline": "1px solid white",
+    	"margin-right": "10px",
+    	"margin-bottom": "10px",
+    	"padding": "3px",
+    	"border": "2px solid gray",
+	});
+	jQuery('.parentAnnotation .editgroup').hide();
+	jQuery('.parentAnnotation .savegroup').show();
+
+	var currentBody = jQuery('.parentAnnotation .body').html();
+	jQuery('.parentAnnotation .body').code(currentBody);
 	var annotation_to_update = annotation;
-	
-	var update_parent = function() {
-     	cleanup_parent();
-    	var response = self.annotator.updateAnnotation(annotation_to_update);
-    	return response;
-    };
-    var cleanup_parent = function() {
-    	self.annotator.unsubscribe('annotationEditorHidden', cleanup_parent);
-    	return self.annotator.unsubscribe('annotationEditorSubmit', update_parent);
-    };
+	var closeEditingMode = function(){
+		jQuery('.parentAnnotation .body').css({
+			"outline": "0px",
+	    	"margin-right": "0px",
+	    	"margin-bottom": "0px",
+	    	"padding": "0px",
+	    	"border": "0px",
+		});
+		jQuery('.parentAnnotation .editgroup').show();
+		jQuery('.parentAnnotation .savegroup').hide();
+		if (jQuery('.parentAnnotation .body').summernote !== undefined) {
+			jQuery('.parentAnnotation .body').destroy();
+		} else if(tinymce !== undefined){
+			tinymce.remote();
+		}
+	};
 
-    self.annotator.subscribe('annotationEditorHidden', cleanup_parent);
-    self.annotator.subscribe('annotationEditorSubmit', update_parent);
-	self.annotator.showEditor(annotation_to_update, positionAdder);
-	
-	jQuery('.annotator-widget').addClass('fullscreen');
+    jQuery('.parentAnnotation .savegroup #save').click(function(e) {
+		annotation_to_update.text = jQuery('.parentAnnotation .body').code();
+		self.annotator.updateAnnotation(annotation_to_update);
+
+		closeEditingMode();
+		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
+		jQuery('.repliesList').css('margin-top', replies_offset);
+	});
+
+	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {
+		closeEditingMode();
+		jQuery('.parentAnnotation .body').html(currentBody);
+	});
+
 };
 
 AnnotatorEndpointController.prototype.loadRepliesForParentAnnotation = function(annotation_id, displayFunction) {
@@ -578,26 +606,45 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 	jQuery('.parentAnnotation .savegroup').show();
 
 	var currentBody = jQuery('.parentAnnotation .body').html();
+	jQuery('.parentAnnotation .body').css({
+		"outline": "1px solid white",
+    	"margin-right": "10px",
+    	"margin-bottom": "10px",
+    	"padding": "3px",
+    	"border": "2px solid gray",
+	});
+	var closeEditingMode = function(){
+		jQuery('.parentAnnotation .body').css({
+			"outline": "0px",
+	    	"margin-right": "0px",
+	    	"margin-bottom": "0px",
+	    	"padding": "0px",
+	    	"border": "0px",
+		});
+		jQuery('.parentAnnotation .editgroup').show();
+		jQuery('.parentAnnotation .savegroup').hide();
+		if (jQuery('.parentAnnotation .body').summernote !== undefined) {
+			jQuery('.parentAnnotation .body').destroy();
+		} else if(tinymce !== undefined){
+			tinymce.remote();
+		}
+	};
 
 	var self = this;
 	jQuery('.parentAnnotation .savegroup #save').click(function(e) {
-		tinymce.remove();
 		var annotation = self.getAnnotationById(jQuery('.parentAnnotation .idAnnotation').html());
 		annotation.text = jQuery('.parentAnnotation .body').html();
 		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
 		jQuery.publish('annotationUpdated.'+self.window.id, oaAnnotation);
-		jQuery('.parentAnnotation .editgroup').show();
-		jQuery('.parentAnnotation .savegroup').hide();
+		closeEditingMode();
 
 		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
 		jQuery('.repliesList').css('margin-top', replies_offset);
 	});
 
 	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {
-		tinymce.remove();
+		closeEditingMode();
 		jQuery('.parentAnnotation .body').html(currentBody);
-		jQuery('.parentAnnotation .editgroup').show();
-		jQuery('.parentAnnotation .savegroup').hide();
 	});
 
 };
@@ -660,7 +707,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		var annotations = data.rows || [];
 
 		self.endpoint.annotationsListCatch = annotations;
-		self.updateMasterList();
+		self.updateMasterList();ƒ
 		self.window.annotationsList = [];
 
 		annotations.forEach(function(annotation) {
