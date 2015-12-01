@@ -15,7 +15,7 @@
 {% bootstrap_messages %}
 <link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
 <style type="text/css">
-    #viewer { height: 100%;}
+    #viewer { height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
 </style>
   <script src="{% static "vendors/development/underscore.js" %}"></script>
   <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
@@ -36,15 +36,25 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/mirador-token-input.css" %}">
   </head>
   <body>
+  <div role="navigation" id="navigationBar" style="height:50px; background:black; top:0; display:block; position:absolute; width: 100%;">
+    <div class="pagintation" style="width:300px;overflow:auto">
+      {% if prev_object %}
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin:8px;position:relative;margin-left:20px;opacity:0.9;transition-duration:0.4s" class="btn btn-default" role="button" id="prev_target_object"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+      {% endif %}
+        {% if prev_object or next_object %}
+        <div class="pages" style="float:left;font-size: 2em;color: white; font-family: Arial; margin-top:10px;margin-left:10px;margin-right:10px">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
+        {% endif %}
+      {% if next_object %}
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+      {% endif %}
+  </div>
+    <div style="margin-right: 50px; float:right; margin-top:-42px;font-size:16pt; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
+  </div>
+  <div class="main" role="main" style="position:absolute;top:50px;height:100%;">
 <div id="viewer" class="test">
-  {% if prev_object %}
-  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;bottom:0;;position:absolute;margin-left:20px;z-index:999999;opacity:0.3;transition-duration:0.4s" class="btn btn-primary" role="button" id="prev_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
-  {% endif %}
-  {% if next_object %}
-  <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;bottom:0;right:0;position:absolute;margin-right:120px;z-index:9;opacity:0.3;transition-duration:0.4s" class="btn btn-primary" role="button" id="next_target_object" onmouseover="jQuery(this).css('opacity', 0.9);" onmouseout="jQuery(this).css('opacity', 0.3);">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
-  {% endif %}
 </div>
 <div id="dashboard"></div>
+</div>
 <script>
 $(function() {
       var mir = Mirador({
@@ -72,7 +82,7 @@ $(function() {
         	  "sidePanel" : false,
             "fullScreen" : false,
             "displayLayout": false,
-            "annotationState": "annoOnCreateOff",
+            "annotationState": "annoOffCreateOff",
             // This will eventually be put back in whenever we add layout options
             // to the admin hub
             // "layoutOptions" : 
@@ -145,6 +155,119 @@ $(function() {
       AController(options);
     });
   
+</script>
+<br />
+<script>
+  var toggleqtip = function(){
+    jQuery('#keyboard-input-button').qtip({
+        id: 'key-control-annotation',
+        content: {
+            text: "In order to use keyboard inputs, you must click on the image once. Then you can use the 'W', 'A', 'S', and 'D' keys to move up, left, down, and right respectively. You can also use '-' to zoom out, '=' to zoom in, and 'm' to make an annotation.",
+            // Use first steps content...
+            title: {
+                text: "Control via keyboard",
+                button: false
+            }
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center',
+            target: jQuery('#keyboard-input-button'),
+            // Also use first steps position target...
+            viewport: $(window) // ...and make sure it stays on-screen if possible
+        },
+        show: {
+            event: false,
+            // Only show when show() is called manually
+            ready: true // Also show on page load
+        },
+        events: {
+            render: function(event, api) {
+                // Grab tooltip element
+                var tooltip = api.elements.tooltip;
+            }
+        }
+    });
+};
+  jQuery('#keyboard-input-button').on('mouseup', function (event){
+    jQuery('.keyboard-command-area').attr('aria-label', 'Click this button to turn on keyboard input. To use keyboard input, select this area. Then use "W", "A", "S", "D" to move around. "-" to zoom out, "=" to zoom in" and lowercase "m" to make an annotation.');
+    jQuery('.openseadragon-canvas').attr('tabindex', '-1');
+    
+    document.getElementById('viewer').querySelector('.openseadragon-canvas').focus();
+    jQuery('.keyboard-command-area')[0].focus();
+    jQuery('#keyboard-input-button').css('color', '#ffff00');
+  });
+  jQuery('#keyboard-input-button').on('mouseenter', function(){
+    toggleqtip();
+  });
+  jQuery('#keyboard-input-button').on('keydown', function(event){
+    var keyCode = event.keyCode;
+    event = event || window.event;
+
+    switch(keyCode) {
+        case 32:
+        case 13:
+          toggleqtip();
+          jQuery('#keyboard-input-button').css('color', '#ffff00');
+          break;
+    }
+  });
+  jQuery('#keyboard-input-button').on('blur', function(event){
+    if (event.tooltip !== undefined) {
+      jQuery('#keyboard-input-button').qtip().toggle(false);
+    };
+  });
+  jQuery('#keyboard-input-button').on('mouseleave', function(event){
+    jQuery('#keyboard-input-button').qtip().toggle(false);
+  });
+
+  jQuery('#viewer').off('keyup');
+  jQuery('#viewer').on('keyup', function(event) {
+    var keyCode = event.keyCode;
+    // if you haven't already:
+    event = event || window.event;
+
+    switch(keyCode) {
+      // 'a' key
+      case 77:
+        AController.dashboardObjectController.annotationViaKeyboardInput();
+        jQuery('.newreplygroup #delete').click(function (e) {
+          jQuery('.annotationModal #closeModal').click();
+        });
+        jQuery('.newreplygroup #save').click(function (e) {
+          var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
+          if (tags == ['']) {
+            tags = [];
+          };
+
+          var miraWindow = AController.dashboardObjectController.endpoint.window;
+          var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
+          var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
+          var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
+          thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
+          var annotation = {
+            collectionId: miraEndpoint.collection_id,
+            contextId: miraEndpoint.context_id,
+            uri: miraWindow.currentCanvasID,
+            permissions: miraEndpoint.catchOptions.permissions,
+            user: miraEndpoint.catchOptions.user,
+            archived: false,
+            rangePosition: bounds,
+            bounds: bounds,
+            thumb: thumb,
+            ranges: [],
+            tags: tags,
+            text: jQuery('.replyItemEdit .replytext').val(),
+            parent: "0",
+            media: "image",
+          };
+
+          AController.dashboardObjectController.endpoint.endpoint.createCatchAnnotation(annotation);
+          jQuery('.annotationModal #closeModal').click();
+        });
+        break;
+    }
+  });
 </script>
 </body>
 </html>

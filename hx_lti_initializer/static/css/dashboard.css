@@ -2,7 +2,7 @@
 
 .annotationSection.side{
 	position: fixed;
-	top: 0;
+	top: 50px;
 	right: 0;
 	left: auto;
 	width: 300px;
@@ -55,7 +55,7 @@
     width: 40px;
     height: 40px;
     padding: 3px;
-    margin-top: 40px;
+    margin-top: 90px;
     padding-left: 8px;
     font-size: 18pt;
     margin-left: -30px;
@@ -212,9 +212,10 @@
 .annotationModal {
     width: inherit;
     height: 100%;
+    height: calc(100% - 50px);
     background-color: white;
     position: fixed;
-    top: 0;
+    top: 50px;
     z-index: 1000;
 }
 
@@ -238,6 +239,18 @@ button#hideParent {
 
 .annotationModal .idAnnotation {
 	display: none;
+}
+
+.annotationModal.item-new-annotation .replyItemEdit .replytext.field{
+    margin-top:40px;
+    width: 95%;
+    width: calc(100% - 10px);
+}
+
+.annotationModal.item-new-annotation .replyItemEdit #id_tags {
+    width: 95%;
+    margin-top: 5px;
+    width: calc(100% - 10px);
 }
 
 .parentAnnotation {

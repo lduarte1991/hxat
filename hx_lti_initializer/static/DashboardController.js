@@ -228,6 +228,11 @@
     	self.viewer.displayInstructions(this.initOptions.instructions);
     };
 
+    $.DashboardController.prototype.annotationViaKeyboardInput = function(e){
+    	var self = this;
+    	self.viewer.annotationViaKeyboardInput();
+    };
+
     $.DashboardController.prototype.fullscreenClicked = function(e) {
     	this.viewer.toggleFullscreen();
     };

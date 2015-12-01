@@ -632,4 +632,17 @@
         fullscreenElement() ? exitFullscreen() : enterFullscreen();
     };
 
+    $.DashboardView.prototype.annotationViaKeyboardInput = function(){
+        var self = this;
+        var html = self.initOptions.TEMPLATES.editReplyItem({"isNewAnnotation": true});
+        jQuery('.annotationSection').append(html);
+        jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').css('overflow-y', 'scroll');
+            jQuery('#keyboard-input-button').css('color', 'white');
+            jQuery('#keyboard-input-button')[0].focus();
+        });
+        jQuery('.annotationModal textarea')[0].focus();
+    };
+
 } (AController));

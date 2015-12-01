@@ -400,14 +400,16 @@ var MiradorEndpointController = function(deferredObject) {
 				window.AController.targetObjectController.colorizeEditor();
 			};
 		});
-		jQuery.subscribe('bottomPanelSet.' + self.window.id, function(ev, isVisible) {
-			if (isVisible) {
-				jQuery('#prev_target_object').css('bottom', '130px');
-				jQuery('#next_target_object').css('bottom', '130px');
-			} else {
-				jQuery('#prev_target_object').css('bottom', '0px');
-				jQuery('#next_target_object').css('bottom', '0px');
-			}
+		jQuery.subscribe('imageRectangleUpdated', function(event, options){
+			if (options.id == self.window.id) {
+				self.currentImageBounds = {
+					"height": options.osdBounds.height.toString(),
+					"width": options.osdBounds.width.toString(),
+					"x": options.osdBounds.x.toString(),
+					"y": options.osdBounds.y.toString(),
+				};
+				
+			};
 		});
 	});
 	self.annotationsMasterList = [];
