@@ -37,7 +37,11 @@
   </head>
   <body>
   <div role="navigation" id="navigationBar" style="height:50px; background:black; top:0; display:block; position:absolute; width: 100%;">
+    {% if is_instructor or org == "ATG" %}
+      <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" style="float:left; font-size: 2.5em; color: white; cursor:pointer;margin-top:7px; margin-left: 15px;"><i class="fa fa-home"></i></a>
+      {% endif %}
     <div class="pagintation" style="width:300px;overflow:auto">
+
       {% if prev_object %}
       <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin:8px;position:relative;margin-left:20px;opacity:0.9;transition-duration:0.4s" class="btn btn-default" role="button" id="prev_target_object"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
       {% endif %}
@@ -45,10 +49,13 @@
         <div class="pages" style="float:left;font-size: 2em;color: white; font-family: Arial; margin-top:10px;margin-left:10px;margin-right:10px">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
         {% endif %}
       {% if next_object %}
-      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:left;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
       {% endif %}
   </div>
-    <div style="margin-right: 50px; float:right; margin-top:-42px;font-size:16pt; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
+    <div style="margin-right: 50px; float:right; margin-top:-45px;font-size:20pt; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
+     <div class="annotation-fullscreen" role="button" aria-label="Toggle Fullscreen Mode" style="color: white; float: right; margin-right: 17px; margin-top: -42px; font-size: 16pt; cursor:pointer;">
+            <i class="fa fa-expand"></i>
+        </div>
   </div>
   <div class="main" role="main" style="position:absolute;top:50px;height:100%;">
 <div id="viewer" class="test">
@@ -268,6 +275,44 @@ $(function() {
         break;
     }
   });
+var toggleFullscreen = function () {
+        var self = this;
+        var enterFullscreen = function() {
+          var el = document.documentElement;
+          if (el.requestFullscreen) {
+            el.requestFullscreen();
+          } else if (el.mozRequestFullScreen) {
+            el.mozRequestFullScreen();
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+          }
+        };
+
+        var exitFullscreen = function() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            
+        };
+
+        var isFullscreen = function() {
+          var $fullscreen = $(fullscreenElement());
+          return ($fullscreen.length > 0);
+        };
+
+        var fullscreenElement = function() {
+          return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+        };
+
+        fullscreenElement() ? exitFullscreen() : enterFullscreen();
+    };
+  jQuery('.annotation-fullscreen').click(toggleFullscreen);
 </script>
 </body>
 </html>

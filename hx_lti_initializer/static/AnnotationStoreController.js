@@ -400,13 +400,38 @@ var MiradorEndpointController = function(deferredObject) {
 				window.AController.targetObjectController.colorizeEditor();
 			};
 		});
+		self.imageLimits = {};
+		var currentId = self.window.currentCanvasID;
+		jQuery.each(self.window.imagesList, function(index, value) {
+			if (value['@id'] == currentId) {
+				self.imageLimits['height'] = value.height;
+				self.imageLimits['width'] = value.width;
+			};
+		});
 		jQuery.subscribe('imageRectangleUpdated', function(event, options){
 			if (options.id == self.window.id) {
+				var xChecked = options.osdBounds.x;
+				var yChecked = options.osdBounds.y;
+				var heightChecked = options.osdBounds.height;
+				var widthChecked = options.osdBounds.width;
+				if (xChecked < 0) {
+					xChecked = 0;
+				}
+				if(heightChecked > self.imageLimits.height){
+					heightChecked = self.imageLimits.height;
+				}
+				if (yChecked < 0) {
+					yChecked = 0;
+				}
+				if(widthChecked > self.imageLimits.width){
+					widthChecked = self.imageLimits.width;
+				}
+
 				self.currentImageBounds = {
-					"height": options.osdBounds.height.toString(),
-					"width": options.osdBounds.width.toString(),
-					"x": options.osdBounds.x.toString(),
-					"y": options.osdBounds.y.toString(),
+					"height": heightChecked.toString(),
+					"width": widthChecked.toString(),
+					"x": xChecked.toString(),
+					"y": yChecked.toString(),
 				};
 				
 			};

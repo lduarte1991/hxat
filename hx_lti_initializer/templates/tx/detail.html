@@ -47,7 +47,27 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <link rel="stylesheet" href="{{ custom_css }}">
 <div id="full-content" style="background-color:white">
-<div  id="viewer" class="test" style="padding-left:75px;padding-right:75px;" class="fit-to-canvas">
+<div role="navigation" id="navigationBar" style="position:fixed;height:50px; background:black; top:0; display:block; width: 100%; z-index:999;">
+{% if is_instructor or org == "ATG" %}
+      <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" style="float:left; font-size: 2em; color: white; cursor:pointer;margin-top:7px; margin-left: 15px;"><i class="fa fa-home"></i></a>
+      {% endif %}
+    <div class="pagintation" style="width:300px;overflow:auto">
+      {% if prev_object %}
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin:8px;position:relative;margin-left:20px;opacity:0.9;transition-duration:0.4s" class="btn btn-default" role="button" id="prev_target_object"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+      {% endif %}
+        {% if prev_object or next_object %}
+        <div class="pages" style="float:left;font-size: 1.5em;color: white; font-family: Arial; margin-top:10px;margin-left:10px;margin-right:10px">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
+        {% endif %}
+      {% if next_object %}
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:left;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+      {% endif %}
+  </div>
+  <div role="button" aria-label="Use Keyboard Input to make annotations" class="fa fa-keyboard-o" style="margin-right: 50px; float:right; margin-top:-42px;font-size:20pt; color:white; cursor:pointer;" id="keyboard-input-toggle" title="Make annotations using keyboard input"></div>
+  <div class="annotation-fullscreen" role="button" aria-label="Toggle Fullscreen Mode" style="color: white; float: right; margin-right: 17px; margin-top: -42px; font-size: 16pt; cursor:pointer;">
+            <i class="fa fa-expand"></i>
+        </div>
+        </div>
+<div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
 	<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 			{% if org = 'ATG' %}
 			<div class="navigation">
@@ -68,7 +88,7 @@
 		<div class="content">
 		{{ target_object.target_content | safe }}
 		</div>
-		<div role="button" aria-label="Use Keyboard Input to make annotations" class="fa fa-keyboard-o" style="cursor: pointer; font-size: 16pt;" id="keyboard-input-toggle" title="Make annotations using keyboard input"></div>
+		
 		<div id="make_annotations_panel" class="hidden">
 			<h2>Make Annotations using Keyboard input</h2>
 			<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotaitons.</div>
@@ -87,12 +107,6 @@
 		<div class="citation" style="margin-top:20px;">
 		<i>{{ target_object.target_citation }}</i>
 		</div>
-		{% endif %}
-		{% if prev_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View previous annotations page"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
-		{% endif %}
-		{% if next_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View next annotations page">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
 		{% endif %}
 </div>
 <div id="dashboard" class="annotationListContainer">
@@ -554,6 +568,52 @@ jQuery(function ($) {
 	// display/hide options to input annotations via keyboard
 	jQuery('#keyboard-input-toggle').click(function(){
 		jQuery('#make_annotations_panel').toggleClass("hidden");
-	})
+		if (jQuery('#make_annotations_panel').hasClass('hidden')) {
+			jQuery('#keyboard-input-toggle').css('color', 'white');
+			
+		} else {
+			jQuery('#keyboard-input-toggle').css('color', '#FFFF00');
+			setTimeout(function(){jQuery('#make_annotations_panel button')[0].focus();}, 500);
+		}
+	});
+
+	var toggleFullscreen = function () {
+        var self = this;
+        var enterFullscreen = function() {
+          var el = document.documentElement;
+          if (el.requestFullscreen) {
+            el.requestFullscreen();
+          } else if (el.mozRequestFullScreen) {
+            el.mozRequestFullScreen();
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+          }
+        };
+
+        var exitFullscreen = function() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            
+        };
+
+        var isFullscreen = function() {
+          var $fullscreen = $(fullscreenElement());
+          return ($fullscreen.length > 0);
+        };
+
+        var fullscreenElement = function() {
+          return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+        };
+
+        fullscreenElement() ? exitFullscreen() : enterFullscreen();
+    };
+	jQuery('.annotation-fullscreen').click(toggleFullscreen);
 </script>
 
