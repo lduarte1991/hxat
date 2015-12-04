@@ -477,10 +477,19 @@
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
         jQuery('.annotationSection').append(html);
         jQuery('.annotationSection').css('overflow-y', 'hidden');
+        jQuery('.group-wrap').addClass("hidden");
+        jQuery('.filter-options').addClass("hidden");
+        jQuery('.search-bar').addClass("hidden");
+        jQuery('.annotationsHolder').addClass("hidden");
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.group-wrap').removeClass("hidden");
+            jQuery('.filter-options').removeClass("hidden");
+            jQuery('.search-bar').removeClass("hidden");
+            jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
+            setTimeout(function(){jQuery('.annotationsHolder .item-'+annotation.id + " .totalreplies").focus();}, 500);
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
