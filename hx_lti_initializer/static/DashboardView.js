@@ -167,6 +167,7 @@
     $.DashboardView.prototype.addCreatedAnnotation = function(mediaType, annotation) {
         var self = this;
         var annotationItem = self.formatAnnotation(annotation);
+        annotationItem.index = self.initOptions.endpoint.annotationsMasterList.length;
         var html = self.initOptions.TEMPLATES[self.templateTypes[mediaType]](annotationItem);
         jQuery(self.holders[mediaType]).prepend(html);
         if (typeof jQuery('img').unveil === "function") {
@@ -228,6 +229,10 @@
 
     $.DashboardView.prototype.deleteAnnotation = function(annotation) {
         if (jQuery('.annotationModal').length > 0) {
+            jQuery('.group-wrap').removeClass("hidden");
+            jQuery('.filter-options').removeClass("hidden");
+            jQuery('.search-bar').removeClass("hidden");
+            jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
         }
@@ -489,18 +494,17 @@
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
-            setTimeout(function(){jQuery('.annotationsHolder .item-'+annotation.id + " .totalreplies").focus();}, 500);
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
             if (jQuery('.parentAnnotation').hasClass("hidden")) {
                 var replies_offset = jQuery('.modal-navigation').offset().top -jQuery('.annotationModal').offset().top;
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').height()- jQuery('.modal-navigation').height();
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight()- jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
                 jQuery('.repliesList').css('height', replies_height);
                 jQuery('.repliesList').css('margin-top', replies_offset + 20);
             } else {
                 var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height()- jQuery('#navigationBar').height();
                 jQuery('.repliesList').css('height', replies_height);
                 jQuery('.repliesList').css('margin-top', replies_offset);
             }
@@ -512,7 +516,7 @@
                 left: button.offset().left,
                 top: button.offset().top,
                 repliesList: jQuery('.repliesList'),
-                templateReply: self.initOptions.TEMPLATES.editReplyItem(),
+                templateReply: self.initOptions.TEMPLATES.editReplyItem({"isNewAnnotation": false}),
                 onSuccess: boundCallback,
             };
             
@@ -568,7 +572,7 @@
         var self = this;
         var replies = self.sortAnnotationsByCreated(replies_unsorted);
         var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-        var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+        var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
         jQuery('.repliesList').css('margin-top', replies_offset);
         jQuery('.repliesList').css('height', replies_height);
         
@@ -590,7 +594,7 @@
         };
 
         jQuery(window).resize(function(){
-            var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+            var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
             jQuery('.repliesList').css('height', replies_height);
         });
     };
