@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html>
+<head>
 {% load staticfiles %}
 {% load list_of_ids %}
 <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
@@ -46,11 +48,13 @@
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
 <link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
 <link rel="stylesheet" href="{{ custom_css }}">
+<title>Annotation Tool | Text | {{ target_object.target_title }}</title>
+</head>
 <div id="full-content" style="background-color:white">
-<div role="navigation" id="navigationBar" style="position:fixed;height:50px; background:black; top:0; display:block; width: 100%; z-index:999;">
+<div role="navigation" id="navigationBar" style="position:fixed;height:50px; background:black; top:0; display:block; width: 100%; z-index:999;" aria-label="Annotation Tool">
 
 {% if is_instructor or org == "ATG" %}
-      <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" style="float:left; font-size: 2em; color: white; cursor:pointer;margin-top:7px; margin-left: 15px;"><i class="fa fa-home"></i></a>
+      <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" style="float:left; font-size: 2em; color: white; cursor:pointer;margin-top:7px; margin-left: 15px;" role="button" aria-label="Annotation Tool | Admin Hub"><i class="fa fa-home"></i></a>
       {% endif %}
     <div class="pagintation" style="width:300px;overflow:auto">
       {% if prev_object %}
@@ -71,6 +75,7 @@
         <div class="logo" aria-label="HarvardX Logo" style="margin-top:-45px; height:50px; width:100px; margin-left:auto; margin-right:auto; position:relative;"><img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" /></div>
         {% endif %}
         </div>
+        <section role="main" aria-label="Annotation Tool Text Content"
 <div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
 	<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 			{% if org = 'ATG' %}
@@ -113,8 +118,10 @@
 		</div>
 		{% endif %}
 </div>
+<section role="main" aria-label="Annotation Tool Annotations">
 <div id="dashboard" class="annotationListContainer">
 </div>
+</section>
 
 <script>
 jQuery(function ($) {
