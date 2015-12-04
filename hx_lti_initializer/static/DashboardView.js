@@ -169,6 +169,9 @@
         var annotationItem = self.formatAnnotation(annotation);
         annotationItem.index = self.initOptions.endpoint.annotationsMasterList.length;
         var html = self.initOptions.TEMPLATES[self.templateTypes[mediaType]](annotationItem);
+        if (jQuery('.annotationItem').length == 0) {
+            jQuery(self.holders[mediaType]).html('');
+        };
         jQuery(self.holders[mediaType]).prepend(html);
         if (typeof jQuery('img').unveil === "function") {
             jQuery('img').unveil('trigger');
@@ -243,6 +246,9 @@
             divObject = '.annotationItem.item-'+annotation.id.toString();
         }
         jQuery(divObject).remove();
+        if (jQuery('.annotationItem').length == 0) {
+            jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>')
+        };
     };
 
     $.DashboardView.prototype.setUpEmptyDashboard = function() {
