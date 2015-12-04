@@ -8,7 +8,7 @@ from forms import SourceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
-from hx_lti_initializer import debug_printer
+from hx_lti_initializer.utils import debug_printer
 
 def get_course_id(request):
 	return request.session['hx_lti_course_id']
