@@ -58,13 +58,13 @@
       {% endif %}
     <div class="pagintation" style="width:300px;overflow:auto">
       {% if prev_object %}
-      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin:8px;position:relative;margin-left:20px;opacity:0.9;transition-duration:0.4s" class="btn btn-default" role="button" id="prev_target_object"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin:8px;position:relative;margin-left:20px;opacity:0.9;transition-duration:0.4s" class="btn btn-default" role="button" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
       {% endif %}
         {% if prev_object or next_object %}
-        <div class="pages" style="float:left;font-size: 1.5em;color: white; font-family: Arial; margin-top:10px;margin-left:10px;margin-right:10px">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
+        <div class="pages" style="float:left;font-size: 1.5em;color: white; font-family: Arial; margin-top:10px;margin-left:10px;margin-right:10px" aria-label="You are in document {{assignment_target.order}} out of {{assignment.assignment_objects.count}}.">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
         {% endif %}
       {% if next_object %}
-      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:left;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+      <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:left;margin:8px;position:relative;opacity:0.9;transition-duration:0.4s;" class="btn btn-default" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
       {% endif %}
   </div>
   <div role="button" aria-label="Use Keyboard Input to make annotations" class="fa fa-keyboard-o" style="margin-right: 50px; float:right; margin-top:-42px;font-size:20pt; color:white; cursor:pointer;" id="keyboard-input-toggle" title="Make annotations using keyboard input"></div>

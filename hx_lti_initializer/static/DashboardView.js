@@ -105,7 +105,7 @@
     };
 
     $.DashboardView.prototype.clearDashboard = function(){
-        jQuery('.annotationsHolder').html("");
+        jQuery('.annotationsHolder').html('');
     };
 
     $.DashboardView.prototype.updateDashboard = function(offset, pagination_limit, annotationsList, updateStore){
@@ -122,10 +122,10 @@
         for (var i = startIndex; i < endIndex; i++) {
             var annotation = annotationsList[i];
             var item = self.formatAnnotation(annotation);
+            item.index = i+1;
             var html = self.initOptions.TEMPLATES.annotationItem(item);
             jQuery('.annotationsHolder').append(html);
             offsetList.push(annotation);
-            
         };
 
         if (updateStore) {
@@ -136,6 +136,9 @@
         };
         if (typeof jQuery('img').unveil === "function") {
             jQuery('img').unveil();
+        };
+        if (annotationsList.length == 0) {
+            jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>');
         };
         
     };

@@ -39,10 +39,15 @@
         </div>
     </div>
     
-    <div class="annotationsHolder side" role="list" aria-label="annotations list">
+    <div class="annotationsHolder side" role="list" aria-label="Annotations" >
 		<% _.each(annotationItems, function(item) { %>
 			<%= item %>
 		<% }); %>
+        <% if (annotationItems.length == 0) { %>
+            <div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>
+        <% } else {%>
+             <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>
+        <% } %>
 	</div>
-    <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>
+   
 </div>
