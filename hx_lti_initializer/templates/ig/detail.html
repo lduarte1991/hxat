@@ -56,6 +56,9 @@
      <div class="annotation-fullscreen" role="button" aria-label="Toggle Fullscreen Mode" style="color: white; float: right; margin-right: 17px; margin-top: -42px; font-size: 16pt; cursor:pointer;">
             <i class="fa fa-expand"></i>
         </div>
+        {% if org == "HARVARDX" %}
+        <div class="logo" aria-label="HarvardX Logo" style="margin-top:-45px; height:50px; margin-left: auto; margin-right:auto; position:relative;width:100px;"><img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" /></div>
+        {% endif %}
   </div>
   <div class="main" role="main" style="position:absolute;top:50px;height:100%;">
 <div id="viewer" class="test">
@@ -89,7 +92,7 @@ $(function() {
         	  "sidePanel" : false,
             "fullScreen" : false,
             "displayLayout": false,
-            "annotationState": "annoOffCreateOff",
+            "annotationState": "annoOnCreateOff",
             // This will eventually be put back in whenever we add layout options
             // to the admin hub
             // "layoutOptions" : 
