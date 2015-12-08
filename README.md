@@ -1,13 +1,13 @@
-#AnnotationsX
-Harvard ATG's port of the edX Annotation tool to the Canvas LMS platform, forked from [hx-annotations-lti](https://github.com/lduarte1991/hx-annotations-lti).
+#The HarvardX Annotation Tool (The HxAT)
+LTI tool used by HarvardX to provide annotations to Text and Images to be used in edX courses. 
 
 #Installation
 
 1. Download the source code
-`git clone https://github.com/Harvard-ATG/annotationsx`
+`git clone https://github.com/lduarte1991/hx-annotations-lti`
 
 2. Add a file named 'secure.py' to your settings directory. (See 'secure.py example' at the bottom)
-`AnnotationsX/annotationsx/settings/secure.py`
+`/annotationsx/settings/secure.py`
 
 3. Install requirements 
 	`sudo pip install -r requirements.txt`
@@ -91,38 +91,10 @@ SECURE_SETTINGS = {
 ```
 
 #Differences from hx-annotations-lti
-Below is an overview of the differences between Harvard ATG's [fork](https://github.com/Harvard-ATG/annotationsx) and [hx-annotations-lti](https://github.com/lduarte1991/hx-annotations-lti):
+Below is an overview of the differences between HarvardX and ATG (though they are both working from the same branch, there is an `ORG` variable set up in `secure.py` which allows for the small set of differences):
 ### Major Changes
 * Installation: The tool is now integrated with [django-app-lti](https://github.com/Harvard-ATG/django-app-lti), so setup is now via XML configuration. As a result, the tool is launched from the left hand nav of Canvas as opposed to a module. Note that the functionality of adding the tool as a module is still available if needed.
 * Authentication: Students are routed to a modified version of `admin_hub` with restricted privileges as opposed to an assignment page upon application launch
-* An instructor dashboard which enables instructors to view annotations by student 
-* Ability to delete assignments
-* Added sessions via cookies
-* Commented out certain features that have not yet been implemented or are deprecated:
-	* Edit Course Form
-		* Add CSS default is commented out (not yet implemented)
-		* The Course admins selector is commented out (deprecated)
-	* Assignment Form
-		* Under Annotator Settings, the Allow Highlights checkbox is automatically checked and hidden as a temporary fix to a bug which was preventing the display of annotations in the sidebar
-	* The Add New Source Material button is commented out (deprecated), although the addition of new source material can still be accomplished from the Assignment Form
-	* Setup Info dialog commented out (deprecated)
-
-### Minor Changes
-* Instructors have edit and delete privileges for the annotations of all users.
-* The Instructor tab of the sidebar filters for the annotations of all users who are `course_admins` for an assignment. Note that this is different from `ADMIN_ROLES`(`secure.py`).
-* Only displays the data for the course (`active_course`) on which the tool is installed, as opposed to all courses for the user
-* Default course name: On creation, the course name is set to the `context_title` LTI launch parameter by default
-* Default population of forms:
-  * Assignment Form 
-	  * The Course selector is set to the current course by default
-		* Database Settings is pre-populated with values from `secure.py`
-		*  Under Annotation Table settings, the Pagination limit is set to 20 by default 
-	* Target Form
-		* The Course selector is set to the current course by default
-		* The Creator selector is set to the current user by default
-* Home buttons on assignment pages
-* Small UI/cosmetic changes
-* Minor bug fixes
 
 ## Launch
 The location/workflow of the tool within canvas has been altered for ATG/FAS.
