@@ -157,7 +157,7 @@ def launch_lti(request):
             save_session(
                 request,
                 course_name=course_object.course_name,
-                hx_lti_course_id=course_object.id,
+                course_id=course_object.id,
             )
 
     # For the use case where the course head wants to display an assignment object instead
