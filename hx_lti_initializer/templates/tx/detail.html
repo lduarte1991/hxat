@@ -75,7 +75,7 @@
         <div class="logo" aria-label="HarvardX Logo" style="margin-top:-45px; height:50px; width:100px; margin-left:auto; margin-right:auto; position:relative;"><img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" /></div>
         {% endif %}
         </div>
-        <section role="main" aria-label="Annotation Tool Text Content"
+        <section role="application" aria-label="Annotation Tool Text Content">
 <div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
 	<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 			{% if org = 'ATG' %}
@@ -98,7 +98,7 @@
 		{{ target_object.target_content | safe }}
 		</div>
 		
-		<div id="make_annotations_panel" class="hidden">
+		<section id="make_annotations_panel" class="hidden" role="region" aria-label="Make annotations using keyboard input">
 			<h2>Make Annotations using Keyboard input</h2>
 			<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotations.</div>
 			<div class="hidden" id="annotation-maker">
@@ -111,7 +111,7 @@
 			</div>
 			<button role="button" class="btn btn-default" data-toggled="false">Make an annotation</button>
 			
-		</div>
+		</section>
 		{% if target_object.target_citation != "None" %}
 		<div class="citation" style="margin-top:20px;">
 		<i>{{ target_object.target_citation }}</i>
@@ -269,6 +269,8 @@ jQuery(function ($) {
 	var clearKeyboardInput = function(){
 		jQuery('#make_annotations_panel button').attr('data-toggled', 'false');
 		jQuery('.content').attr('contenteditable', 'false');
+		jQuery('.content').attr('role', '');
+		jQuery('.content').attr('aria-multiline', 'false');
 		jQuery('#make_annotations_panel button').html("Make an annotation");
 		jQuery('#annotation-maker').addClass("hidden");
 		jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html(window.originalContent);
@@ -407,6 +409,9 @@ jQuery(function ($) {
 			// make the text editable and change UI to reflect change
 			jQuery('.content').attr('contenteditable', 'true');
 			jQuery(this).attr('data-toggled', 'true');
+			jQuery('.content').attr('role', 'textbox');
+			jQuery('.content').attr('tabindex', '0');
+			jQuery('.content').attr('aria-multiline', 'true');
 			jQuery(this).html("Save Highlights");
 			
 			// automatically bring person to beginning of target text

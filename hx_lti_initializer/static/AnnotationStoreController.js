@@ -734,7 +734,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		var annotations = data.rows || [];
 
 		self.endpoint.annotationsListCatch = annotations;
-		self.updateMasterList();ƒ
+		self.updateMasterList();
 		self.window.annotationsList = [];
 
 		annotations.forEach(function(annotation) {

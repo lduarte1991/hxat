@@ -138,7 +138,7 @@
             jQuery('img').unveil();
         };
         if (annotationsList.length == 0) {
-            jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>');
+            //jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>');
         };
         
     };
@@ -625,7 +625,7 @@
           } else if (el.mozRequestFullScreen) {
             el.mozRequestFullScreen();
           } else if (el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen();
+            el.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
           } else if (el.msRequestFullscreen) {
             el.msRequestFullscreen();
           }
@@ -648,7 +648,7 @@
         };
 
         var fullscreenElement = function() {
-          return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+            return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
         };
 
         fullscreenElement() ? exitFullscreen() : enterFullscreen();

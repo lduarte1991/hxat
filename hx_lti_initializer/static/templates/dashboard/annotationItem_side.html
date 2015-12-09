@@ -1,4 +1,4 @@
-<div class="annotationItem item-<%= id %> side" role="listitem" aria-label="Annotation #<%=index%>">
+<div class="annotationItem item-<%= id %> side" role="listitem" aria-label="Annotation #<%=index%> created by <%= user.name %>">
     <span class="idAnnotation"><%= id %></span>
     <div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">
         <%= user.name %>
@@ -9,7 +9,7 @@
     </div>
     <% if (media === 'text') {%>
         <div class="quote field side">
-            <div class="quoteText" aria-label="Excerpt selected for this annotation"><%= quote %></div>
+            <div class="quoteText" aria-label="Excerpt selected for this annotation: <%= quote %>"><%= quote %></div>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
     <% } else if (media === 'image' && thumbnail) {%>
@@ -20,11 +20,11 @@
         </div>
     <% } %>
     <div style="display:none;" id="annotationTextLabel">Annotation text</div>
-    <div class="body field side" aria-describedby="annotationTextLabel">
+    <div class="body field side" aria-label="Comment: <%=text %>">
         <%= text %>
     </div>
     
-    <div class="totalreplies field side" role="button" aria-label="Make or view replies to this annotation">
+    <div class="totalreplies field side" role="button" aria-label="Make or view replies Annotation #<%=index %>">
         <span class="glyphicon glyphicon-comment"></span>
         <span class="replyNum"> <%= totalComments %> </span>
     </div>

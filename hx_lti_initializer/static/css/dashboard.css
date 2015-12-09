@@ -8,6 +8,7 @@
 	width: 300px;
 	min-width: 150px;
 	height: 100%;
+    height: calc(100% - 50px);
 	background-image:url(images/debut_dark.png);
 	padding: 5px;
 	overflow-x: hidden;
@@ -391,7 +392,7 @@ button#hideParent {
     cursor: pointer;
     text-align: right;
     margin-right: 30px;
-    margin-top: -38px;
+    margin-top: 9px;
     height: 40px;
     float: right;
     
