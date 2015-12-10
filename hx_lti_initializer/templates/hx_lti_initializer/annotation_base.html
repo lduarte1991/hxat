@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block beginningscripts %}{% endblock %}
+        {% load staticfiles %}
+        {% load list_of_ids %}
+        {# Load the tag library #}
+        {% load bootstrap3 %}
+
+        {# Load CSS and JavaScript #}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        {# Display django.contrib.messages as Bootstrap alerts #}
+        {% bootstrap_messages %}
+
+        {% block javascript %}{% endblock %}
+        {% block cssfiles %}{% endblock %}
+
+        {# library for dashboard templates #}
+        <script src="{% static "vendors/development/underscore.js" %}"></script>
+        {# library for "last updated X hours ago" for annotations #}
+        <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
+        {# library to guess timezone of user #}
+        <script src="{% static "vendors/development/jstz.js" %}"></script>
+        {# library to have dialog box come up to confirm whether user wants to delte or not #}
+        <script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
+        {# library for tokenizing tags #}
+        <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
+
+        {# files needed to run the HxAT #}
+        <script src="{% static "AController.js" %}"></script>
+        <script src="{% static "AnnotationMain.js" %}"></script>
+        {% block annotationCore %}{% endblock %}
+        <script src="{% static "AnnotationStoreController.js" %}"></script>
+        <script src="{% static "DashboardController.js" %}"></script>
+        <script src="{% static "DashboardView.js" %}"></script>
+        <script src="{% static "TargetObjectController.js" %}"></script>
+
+        {# stylesheet for icons, dashboard and instructions #}
+        <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+        <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+        <link rel="stylesheet" href="{% static "css/instructions.css" %}">
+        <link rel="stylesheet" href="{% static "css/annotation_base.css" %}">
+
+        {% block tokeninputcss %}{% endblock %}
+        <link rel="stylesheet" href="{{ custom_css }}">
+        <title>{% block title %}Annotation Tool {% endblock %}</title>
+    </head>
+    <body>
+    <div id="full-content" style="background-color:white">
+        <nav role="navigation" id="navigationBar" aria-label="Annotation Tool">
+            {% if is_instructor or org == "ATG" %}
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotaiton Tool Assignment Hub"><i class="fa fa-home"></i></a>
+            {% endif %}
+            <div class="pagination">
+                {% if prev_object %}
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" class="btn btn-default" role="button" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+                {% endif %}
+                {% if prev_object or next_object %}
+                    <div class="pages" aria-label="You are in document {{assignment_target.order}} out of {{assignment.assignment_objects.count}}.">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
+                {% endif %}
+                {% if next_object %}
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" class="btn btn-default" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+                {% endif %}
+            </div>
+            
+            <div class="annotation-fullscreen" role="button" aria-label="Toggle Fullscreen Mode">
+                <i class="fa fa-expand"></i>
+            </div>
+            {% block keyboardinput %}{% endblock %}
+            {% if org == "HARVARDX" %}
+                <div class="logo" aria-label="HarvardX Logo">
+                    <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" />
+                </div>
+            {% endif %}
+        </nav>
+
+        {% block mainapplication %}{% endblock %}
+
+        <section role="application" aria-label="Annotaiton Tool | Annotations List">
+            <div id="dashboard" class="annotationListContainer"></div>
+        </section>
+    </div>
+    {% block endscripts %}{% endblock %}
+
+    <script>
+        var toggleFullscreen = function () {
+            var self = this;
+            var enterFullscreen = function() {
+              var el = document.documentElement;
+              if (el.requestFullscreen) {
+                el.requestFullscreen();
+              } else if (el.mozRequestFullScreen) {
+                el.mozRequestFullScreen();
+              } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+              } else if (el.msRequestFullscreen) {
+                el.msRequestFullscreen();
+              }
+            };
+
+            var exitFullscreen = function() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                
+            };
+
+            var isFullscreen = function() {
+              var $fullscreen = $(fullscreenElement());
+              return ($fullscreen.length > 0);
+            };
+
+            var fullscreenElement = function() {
+              return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+            };
+
+            fullscreenElement() ? exitFullscreen() : enterFullscreen();
+        };
+        jQuery('.annotation-fullscreen').click(toggleFullscreen);
+    </script>
+    </body>
+</html>
