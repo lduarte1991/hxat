@@ -105,7 +105,7 @@
     };
 
     $.DashboardView.prototype.clearDashboard = function(){
-        jQuery('.annotationsHolder').html("");
+        jQuery('.annotationsHolder').html('');
     };
 
     $.DashboardView.prototype.updateDashboard = function(offset, pagination_limit, annotationsList, updateStore){
@@ -122,10 +122,10 @@
         for (var i = startIndex; i < endIndex; i++) {
             var annotation = annotationsList[i];
             var item = self.formatAnnotation(annotation);
+            item.index = i+1;
             var html = self.initOptions.TEMPLATES.annotationItem(item);
             jQuery('.annotationsHolder').append(html);
             offsetList.push(annotation);
-            
         };
 
         if (updateStore) {
@@ -136,6 +136,9 @@
         };
         if (typeof jQuery('img').unveil === "function") {
             jQuery('img').unveil();
+        };
+        if (annotationsList.length == 0) {
+            //jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>');
         };
         
     };
@@ -164,7 +167,11 @@
     $.DashboardView.prototype.addCreatedAnnotation = function(mediaType, annotation) {
         var self = this;
         var annotationItem = self.formatAnnotation(annotation);
+        annotationItem.index = self.initOptions.endpoint.annotationsMasterList.length;
         var html = self.initOptions.TEMPLATES[self.templateTypes[mediaType]](annotationItem);
+        if (jQuery('.annotationItem').length == 0) {
+            jQuery(self.holders[mediaType]).html('');
+        };
         jQuery(self.holders[mediaType]).prepend(html);
         if (typeof jQuery('img').unveil === "function") {
             jQuery('img').unveil('trigger');
@@ -225,6 +232,10 @@
 
     $.DashboardView.prototype.deleteAnnotation = function(annotation) {
         if (jQuery('.annotationModal').length > 0) {
+            jQuery('.group-wrap').removeClass("hidden");
+            jQuery('.filter-options').removeClass("hidden");
+            jQuery('.search-bar').removeClass("hidden");
+            jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
         }
@@ -235,6 +246,9 @@
             divObject = '.annotationItem.item-'+annotation.id.toString();
         }
         jQuery(divObject).remove();
+        if (jQuery('.annotationItem').length == 0) {
+            jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>')
+        };
     };
 
     $.DashboardView.prototype.setUpEmptyDashboard = function() {
@@ -474,8 +488,16 @@
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
         jQuery('.annotationSection').append(html);
         jQuery('.annotationSection').css('overflow-y', 'hidden');
+        jQuery('.group-wrap').addClass("hidden");
+        jQuery('.filter-options').addClass("hidden");
+        jQuery('.search-bar').addClass("hidden");
+        jQuery('.annotationsHolder').addClass("hidden");
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.group-wrap').removeClass("hidden");
+            jQuery('.filter-options').removeClass("hidden");
+            jQuery('.search-bar').removeClass("hidden");
+            jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
@@ -483,12 +505,12 @@
             jQuery('.parentAnnotation').toggleClass("hidden");
             if (jQuery('.parentAnnotation').hasClass("hidden")) {
                 var replies_offset = jQuery('.modal-navigation').offset().top -jQuery('.annotationModal').offset().top;
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').height()- jQuery('.modal-navigation').height();
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight()- jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
                 jQuery('.repliesList').css('height', replies_height);
                 jQuery('.repliesList').css('margin-top', replies_offset + 20);
             } else {
                 var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height()- jQuery('#navigationBar').height();
                 jQuery('.repliesList').css('height', replies_height);
                 jQuery('.repliesList').css('margin-top', replies_offset);
             }
@@ -500,7 +522,7 @@
                 left: button.offset().left,
                 top: button.offset().top,
                 repliesList: jQuery('.repliesList'),
-                templateReply: self.initOptions.TEMPLATES.editReplyItem(),
+                templateReply: self.initOptions.TEMPLATES.editReplyItem({"isNewAnnotation": false}),
                 onSuccess: boundCallback,
             };
             
@@ -556,7 +578,7 @@
         var self = this;
         var replies = self.sortAnnotationsByCreated(replies_unsorted);
         var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-        var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+        var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
         jQuery('.repliesList').css('margin-top', replies_offset);
         jQuery('.repliesList').css('height', replies_height);
         
@@ -578,7 +600,7 @@
         };
 
         jQuery(window).resize(function(){
-            var replies_height = jQuery(window).height() - jQuery('.replybutton').height() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height();
+            var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
             jQuery('.repliesList').css('height', replies_height);
         });
     };
@@ -603,7 +625,7 @@
           } else if (el.mozRequestFullScreen) {
             el.mozRequestFullScreen();
           } else if (el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen();
+            el.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
           } else if (el.msRequestFullscreen) {
             el.msRequestFullscreen();
           }
@@ -626,10 +648,23 @@
         };
 
         var fullscreenElement = function() {
-          return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
+            return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement);
         };
 
         fullscreenElement() ? exitFullscreen() : enterFullscreen();
+    };
+
+    $.DashboardView.prototype.annotationViaKeyboardInput = function(){
+        var self = this;
+        var html = self.initOptions.TEMPLATES.editReplyItem({"isNewAnnotation": true});
+        jQuery('.annotationSection').append(html);
+        jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').css('overflow-y', 'scroll');
+            jQuery('#keyboard-input-button').css('color', 'white');
+            jQuery('#keyboard-input-button')[0].focus();
+        });
+        jQuery('.annotationModal textarea')[0].focus();
     };
 
 } (AController));

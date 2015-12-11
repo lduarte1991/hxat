@@ -1,191 +1,186 @@
-<!DOCTYPE html>
+{% extends 'hx_lti_initializer/annotation_base.html' %}
+
 {% load staticfiles %}
 {% load list_of_ids %}
+{% block beginningscripts %}
 <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
-<script src="{% static "vendors/development/underscore.js" %}"></script>
-<script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
-<script src="{% static "vendors/development/jstz.js" %}"></script>
-<script src="{% static "vendors/development/json2.js" %}"></script>
 <link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
-{# Load the tag library #}
-{% load bootstrap3 %}
+{% endblock %}
 
+{% load bootstrap3 %}
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-<script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
-<script src="{% static "vendors/development/summernote.js" %}"></script>
-<!--<script src="{% static "vendors/tinymce/tinymce.min.js" %}"></script>-->
-<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
-<script src="{% static "AController.js" %}"></script>
-<script src="{% static "AnnotationMain.js" %}"></script>
-<script src="{% static "AnnotationCore.js" %}"></script>
-<script src="{% static "AnnotationStoreController.js" %}"></script>
-<script src="{% static "DashboardController.js" %}"></script>
-<script src="{% static "DashboardView.js" %}"></script>
-<script src="{% static "TargetObjectController.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
-<script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
-<!--<script src="{% static "vendors/Annotator/plugins/accessibility-edx.js" %}"></script>-->
-<!--<script src="{% static "vendors/Annotator/plugins/richText-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/grouping-annotator.js" %}"></script>
-<script src="{% static "vendors/Annotator/plugins/annotator.touch.js" %}"></script>-->
-<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
-<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
-<link rel="stylesheet" href="{% static "css/dashboard.css" %}">
-<link rel="stylesheet" href="{% static "css/instructions.css" %}">
-<!--<link rel="stylesheet" href="{% static "vendors/catch/main.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/richText-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/grouping-annotator.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/annotator.touch.css" %}">-->
-<link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
-<link rel="stylesheet" href="{{ custom_css }}">
-<div id="full-content" style="background-color:white">
-<div  id="viewer" class="test" style="padding-left:75px;padding-right:75px;" class="fit-to-canvas">
-	<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
-			{% if org = 'ATG' %}
-			<div class="navigation">
-	                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
-	        </div>
-	        {% endif %}
-	        <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
-    			<div class="instructions-title">
-    				Instructions
-    				<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions">Collapse Instructions</span>
-    			</div>
-				<section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">{{instructions | safe}}</section>
-			</div>
-		<h1>{{ target_object.target_title | safe }}</h1>
-		{% if target_object.target_author != "None" %}
-		<h3>by {{ target_object.target_author | safe }}</h3>
-		{% endif %}
-		<div class="content">
-		{{ target_object.target_content | safe }}
-		</div>
-		<div role="button" aria-label="Use Keyboard Input to make annotations" class="fa fa-keyboard-o" style="cursor: pointer; font-size: 16pt;" id="keyboard-input-toggle" title="Make annotations using keyboard input"></div>
-		<div id="make_annotations_panel" class="hidden">
-			<h2>Make Annotations using Keyboard input</h2>
-			<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotaitons.</div>
-			<div class="hidden" id="annotation-maker">
-				<label for="id_annotation_text_screen_reader">Enter annotation for highlighted section:
-					<input type="text" id="id_annotation_text_screen_reader"/>
-				</label>
-				<label for="id_annotation_tag_screen_reader">Enter tags for this annotation (separate tags with a single space):
-					<input type="text" id="id_annotation_tag_screen_reader" />
-				</label>
-			</div>
-			<button role="button" class="btn btn-default" data-toggled="false">Make an annotation</button>
-			
-		</div>
-		{% if target_object.target_citation != "None" %}
-		<div class="citation" style="margin-top:20px;">
-		<i>{{ target_object.target_citation }}</i>
-		</div>
-		{% endif %}
-		{% if prev_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" style="float:left;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View previous annotations page"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
-		{% endif %}
-		{% if next_object %}
-		<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" style="float:right;margin-bottom:20px;" class="btn btn-primary" role="button" aria-label="View next annotations page">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
-		{% endif %}
-</div>
-<div id="dashboard" class="annotationListContainer">
-</div>
 
+{% block javascript %}
+<script src="{% static "vendors/development/json2.js" %}"></script>
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+{% endblock %}
+
+{% block annotationCore %}
+<script src="{% static "AnnotationCore.js" %}"></script>
+{% endblock %}
+
+{% block tokeninputcss %}
+<link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
+{% endblock %}
+
+{% block title %}
+Annotation Tool | Text | {{ target_object.target_title }}
+{% endblock %}
+
+{% block keyboardinput %}
+<div role="button" aria-label="Use Keyboard Input to make annotations. To make an annotation, click the 'Make an Annotation' button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the 'Save Highlights' button." class="fa fa-keyboard-o" title="Make annotations using keyboard input" id="keyboard-input-toggle-text"></div>
+{% endblock %}
+
+{% block mainapplication %}
+<section role="application" aria-label="Annotation Tool Text Content">
+	<div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
+		<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
+		{% if org = 'ATG' %}
+      		<div class="navigation">
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+          	</div>
+        {% endif %}
+        <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
+        	<div class="instructions-title">
+            	Instructions
+	            <span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions">Collapse Instructions</span>
+          	</div>
+        	<section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">{{instructions | safe}}</section>
+        </div>
+        <h1>{{ target_object.target_title | safe }}</h1>
+	    {% if target_object.target_author != "None" %}
+		    <h3>by {{ target_object.target_author | safe }}</h3>
+	    {% endif %}
+	    <div class="content">
+		    {{ target_object.target_content | safe }}
+	    </div>
+    
+	    <section id="make_annotations_panel" class="hidden" role="region" aria-label="Make annotations using keyboard input">
+	    	<h2>Make Annotations using Keyboard input</h2>
+      		<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotations.</div>
+      		<div class="hidden" id="annotation-maker">
+        		<label for="id_annotation_text_screen_reader">Enter annotation for highlighted section:
+          			<input type="text" id="id_annotation_text_screen_reader"/>
+        		</label>
+		        <label for="id_annotation_tag_screen_reader">Enter tags for this annotation (separate tags with a single space):
+		        	<input type="text" id="id_annotation_tag_screen_reader" />
+		        </label>
+      		</div>
+      		<button role="button" class="btn btn-default" data-toggled="false">Make an annotation</button>
+	    </section>
+	    {% if target_object.target_citation != "None" %}
+    		<div class="citation" style="margin-top:20px;">
+    			<i>{{ target_object.target_citation }}</i>
+    		</div>
+    	{% endif %}
+      </div>
+	</div>
+</section>
+{% endblock %}
+
+{% block endscripts %}
 <script>
 jQuery(function ($) {
     $(function() {
-		var options = {
-			commonInfo: {
-				mediaType: "text", // {{ media_type }}
-				context_id: "{{ course }}",
-				collection_id: "{{ collection }}",
-				object_id: {{ object }},
-				token: "{{ token }}",
-				username: "{{ username }}",
-				user_id: "{{ user_id }}",
-				is_instructor: "{{ is_instructor }}",
-				pagination: {{ assignment.pagination_limit }},
-			},
-			annotationMainOptions: {
-				{% if assignment.allow_highlights %}
-				'highlightTags_options': "{{ assignment.highlights_options }}",
-				{% endif %}
-			},
-			annotationCoreOptions: {
-				annotationElement: jQuery(".content"),
-				initOptions: {
-					'plugins': [
-						// order matters, auth before store
-						'Auth',
-						'Permissions',
-						'Store',
-						'SummernoteRichText',
-						{% if assignment.allow_highlights %}
-						'HighlightTags',
-						{% endif %}
-						//'RichText',
-						'Reply',
-						//'Accessibility',
-						//'Touch',
-					],
-					'database_url': "/lti_init/annotation_api",
-					'citation': "{{ target_object.target_citation | escapejs }}",
-					{% if assignment.allow_highlights %}
-					'highlightTags_options': "{{ assignment.highlights_options }}",
-					{% endif %}
-				},
-			},
-			targetObjectOptions: {
-			},
-			dashboardControllerOptions: {
-				annotationElement: jQuery("#dashboard"),
-				initOptions: {
-					template_urls: '{% static "templates/dashboard/"%}',
-					showPublicPrivateSelectors: true,
-					showMediaSelector: false,
-					flags: false,
-					imageRootUrl: "{% static "vendors/catch/img"%}",
-					instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
-					default_tab: "{{ assignment.default_tab }}",
-					instructions: "{{instructions | escapejs }}",
-					dashboard_hidden: {{dashboard_hidden}},
-					{% if focus_on_id %}
-					focus_on_annotation: {{focus_on_id}},
-					{% endif %}
-				},
-			},
-		}
-		AController(options);
-		if (typeof Annotator.Plugin["Grouping"] === 'function') {
-			options = {
-	    		optionsOVA: {
-		    		posBigNew: 'none',
-		    		default_tab: 'Public',
-		    		annotation_tool: AController.annotationCore.annotation_tool,
-		    	}
-	    	}
+    var options = {
+      commonInfo: {
+        mediaType: "text", // {{ media_type }}
+        context_id: "{{ course }}",
+        collection_id: "{{ collection }}",
+        object_id: {{ object }},
+        token: "{{ token }}",
+        username: "{{ username }}",
+        user_id: "{{ user_id }}",
+        is_instructor: "{{ is_instructor }}",
+        pagination: {{ assignment.pagination_limit }},
+      },
+      annotationMainOptions: {
+        {% if assignment.allow_highlights %}
+        'highlightTags_options': "{{ assignment.highlights_options }}",
+        {% endif %}
+      },
+      annotationCoreOptions: {
+        annotationElement: jQuery(".content"),
+        initOptions: {
+          'plugins': [
+            // order matters, auth before store
+            'Auth',
+            'Permissions',
+            'Store',
+            'SummernoteRichText',
+            {% if assignment.allow_highlights %}
+            'HighlightTags',
+            {% endif %}
+            //'RichText',
+            'Reply',
+            //'Accessibility',
+            //'Touch',
+          ],
+          'database_url': "/lti_init/annotation_api",
+          'citation': "{{ target_object.target_citation | escapejs }}",
+          {% if assignment.allow_highlights %}
+          'highlightTags_options': "{{ assignment.highlights_options }}",
+          {% endif %}
+        },
+      },
+      targetObjectOptions: {
+      },
+      dashboardControllerOptions: {
+        annotationElement: jQuery("#dashboard"),
+        initOptions: {
+          template_urls: '{% static "templates/dashboard/"%}',
+          showPublicPrivateSelectors: true,
+          showMediaSelector: false,
+          flags: false,
+          imageRootUrl: "{% static "vendors/catch/img"%}",
+          instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+          default_tab: "{{ assignment.default_tab }}",
+          instructions: "{{instructions | escapejs }}",
+          dashboard_hidden: {{dashboard_hidden}},
+          {% if focus_on_id %}
+          focus_on_annotation: {{focus_on_id}},
+          {% endif %}
+        },
+      },
+    }
+    AController(options);
+    if (typeof Annotator.Plugin["Grouping"] === 'function') {
+      options = {
+          optionsOVA: {
+            posBigNew: 'none',
+            default_tab: 'Public',
+            annotation_tool: AController.annotationCore.annotation_tool,
+          }
+        }
             AController.annotationCore.annotation_tool.addPlugin("Grouping", options);
-		}
-	});
+    }
+  });
 });
 </script>
 <script type="text/javascript">
-	jQuery('.toggle-instructions').click(function (){
-		if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
-			jQuery('.toggle-instructions').html('Expand Instructions');
-		} else {
-			jQuery('.toggle-instructions').html('Collapse Instructions');
-		}
-	});
-	// Sends a message to canvas to resize the iframe so we don't have scrolling issues
-	{% if org == 'ATG' %}
+  jQuery('.toggle-instructions').click(function (){
+    if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+      jQuery('.toggle-instructions').html('Expand Instructions');
+    } else {
+      jQuery('.toggle-instructions').html('Collapse Instructions');
+    }
+  });
+  // Sends a message to canvas to resize the iframe so we don't have scrolling issues
+  {% if org == 'ATG' %}
     $(document).ready(function() {
         var receiver = "https://canvas.harvard.edu";
         var message = {
@@ -197,363 +192,382 @@ jQuery(function ($) {
     }, 1000);
     {% endif %}
     {% if focus_on_id %}
-    	$(document).ready(function(){
-    		setTimeout(function(){
-	    		var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
-	    		if (typeof annotation.highlights === "undefined") {
-	    			AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
-	    		}
-	    		jQuery('html, body').animate({
-					scrollTop: jQuery(annotation.highlights[0]).offset().top },
-					'slow'
-				);
+      $(document).ready(function(){
+        setTimeout(function(){
+          var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
+          if (typeof annotation.highlights === "undefined") {
+            AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
+          }
+          jQuery('html, body').animate({
+          scrollTop: jQuery(annotation.highlights[0]).offset().top },
+          'slow'
+        );
 
-	    	}, 1000);
-    	}, 1000);
+        }, 1000);
+      }, 1000);
     {% endif %}
     var getTextCursor = function (element) {
-	    var caretOffset = 0;
-	    var doc = element.ownerDocument || element.document;
-	    var win = doc.defaultView || doc.parentWindow;
-	    var sel;
-	    if (typeof win.getSelection != "undefined") {
-	        sel = win.getSelection();
-	        if (sel.rangeCount > 0) {
-	            var range = win.getSelection().getRangeAt(0);
-	            var preCaretRange = range.cloneRange();
-	            preCaretRange.selectNodeContents(element);
-	            preCaretRange.setEnd(range.endContainer, range.endOffset);
-	            caretOffset = preCaretRange.toString().length;
-	        }
-	    } else if ( (sel = doc.selection) && sel.type != "Control") {
-	        var textRange = sel.createRange();
-	        var preCaretTextRange = doc.body.createTextRange();
-	        preCaretTextRange.moveToElementText(element);
-	        preCaretTextRange.setEndPoint("EndToEnd", textRange);
-	        caretOffset = preCaretTextRange.text.length;
-	    }
-	    return caretOffset;
-	};
-	jQuery('.annotations-status').hover(function() {
-	    jQuery('.hover-inst').toggleClass("hidden");
-	});
-	jQuery('.annotations-status').click(function() {
-		AController.targetObjectController.toggleAnnotations();
-	});
+      var caretOffset = 0;
+      var doc = element.ownerDocument || element.document;
+      var win = doc.defaultView || doc.parentWindow;
+      var sel;
+      if (typeof win.getSelection != "undefined") {
+          sel = win.getSelection();
+          if (sel.rangeCount > 0) {
+              var range = win.getSelection().getRangeAt(0);
+              var preCaretRange = range.cloneRange();
+              preCaretRange.selectNodeContents(element);
+              preCaretRange.setEnd(range.endContainer, range.endOffset);
+              caretOffset = preCaretRange.toString().length;
+          }
+      } else if ( (sel = doc.selection) && sel.type != "Control") {
+          var textRange = sel.createRange();
+          var preCaretTextRange = doc.body.createTextRange();
+          preCaretTextRange.moveToElementText(element);
+          preCaretTextRange.setEndPoint("EndToEnd", textRange);
+          caretOffset = preCaretTextRange.text.length;
+      }
+      return caretOffset;
+  };
+  jQuery('.annotations-status').hover(function() {
+      jQuery('.hover-inst').toggleClass("hidden");
+  });
+  jQuery('.annotations-status').click(function() {
+    AController.targetObjectController.toggleAnnotations();
+  });
 
-	var clearKeyboardInput = function(){
-		jQuery('#make_annotations_panel button').attr('data-toggled', 'false');
-		jQuery('.content').attr('contenteditable', 'false');
-		jQuery('#make_annotations_panel button').html("Make an annotation");
-		jQuery('#annotation-maker').addClass("hidden");
-		jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html(window.originalContent);
-		Annotator._instances[0].destroy();
-		AController.annotationCore.element = jQuery('.content');
-		AController.annotationCore.init("text");
-	};
+  var clearKeyboardInput = function(){
+    jQuery('#make_annotations_panel button').attr('data-toggled', 'false');
+    jQuery('.content').attr('contenteditable', 'false');
+    jQuery('.content').attr('role', '');
+    jQuery('.content').attr('tabindex', '');
+    jQuery('.content').attr('aria-multiline', 'false');
+    jQuery('#make_annotations_panel button').html("Make an annotation");
+    jQuery('#annotation-maker').addClass("hidden");
+    jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html(window.originalContent);
+    Annotator._instances[0].destroy();
+    AController.annotationCore.element = jQuery('.content');
+    AController.annotationCore.init("text");
+  };
 
-	/*
-	 * getRangesForDelimiter
-	 * It checks through the target text to check if the delimiter was used
-	 * If so it expects there to be at least and at most 2 instances
-	 * It will then perform a calculation to get the appropriate SerializedRange
-	 * Otherwise it should return undefined
-	 * 
-	 * @param {string} delimiter - string used for boundaries of range
-	 * @returns {SerializedRange} range for string between the pair of delimiters
-	 */
-	var getRangesForDelimiter = function(delimiter){
-		var range = document.createRange();
+  /*
+   * getRangesForDelimiter
+   * It checks through the target text to check if the delimiter was used
+   * If so it expects there to be at least and at most 2 instances
+   * It will then perform a calculation to get the appropriate SerializedRange
+   * Otherwise it should return undefined
+   * 
+   * @param {string} delimiter - string used for boundaries of range
+   * @returns {SerializedRange} range for string between the pair of delimiters
+   */
+  var getRangesForDelimiter = function(delimiter){
+    var range = document.createRange();
 
-		found = [];
+    found = [];
 
-		/*
-		 * find_ranges
-		 * It checks to see if the node contains the delimiter
-		 * and if it does find the delimiter, it will add it to
-		 * the found list variable above
-		 *
-		 * @param {Number} item - index of the node
-		 * @param {object} value - actual node
-		 */
-		var find_ranges = function(item, value){
-			// if it's an  element node, search its children. We need textnodes
-			if (value.nodeType === 1) {
-				jQuery.each(value.childNodes, find_ranges);
-			} else if(value.nodeType === 3){
+    /*
+     * find_ranges
+     * It checks to see if the node contains the delimiter
+     * and if it does find the delimiter, it will add it to
+     * the found list variable above
+     *
+     * @param {Number} item - index of the node
+     * @param {object} value - actual node
+     */
+    var find_ranges = function(item, value){
+      // if it's an  element node, search its children. We need textnodes
+      if (value.nodeType === 1) {
+        jQuery.each(value.childNodes, find_ranges);
+      } else if(value.nodeType === 3){
 
-				// stupid check to make sure that we are in a TextNode
-				if(value.nodeValue){
+        // stupid check to make sure that we are in a TextNode
+        if(value.nodeValue){
 
-					// gets the offset of the first delimiter
-					var index = value.nodeValue.indexOf(delimiter);
+          // gets the offset of the first delimiter
+          var index = value.nodeValue.indexOf(delimiter);
 
-					// if this is the second time we've found a delimiter
-					// and it's the first item in the list, then we hit a corner case
-					// The issue here is that the highlight would end on the first character
-					// of a new node, which would INCLUDE the first character being highlighted
-					// this was not the intention of the user, otherwise the index would have been 1
-					// The solution is to look back at previous siblings or previous parents
-					// and get the offset of the full nodeValue. 
-					if (found.length > 0 && index == 0) {
-						var siblingNode = value.previousSibling;
+          // if this is the second time we've found a delimiter
+          // and it's the first item in the list, then we hit a corner case
+          // The issue here is that the highlight would end on the first character
+          // of a new node, which would INCLUDE the first character being highlighted
+          // this was not the intention of the user, otherwise the index would have been 1
+          // The solution is to look back at previous siblings or previous parents
+          // and get the offset of the full nodeValue. 
+          if (found.length > 0 && index == 0) {
+            var siblingNode = value.previousSibling;
 
-						// make sure that previous sibling is not a break tag or a non-text node
-						while(siblingNode.nodeName == "BR"){
-							var currentNode = siblingNode;
-							siblingNode = siblingNode.previousSibling;
-							if (siblingNode === null) {
-								siblingNode = currentNode.parentNode.previousSibling;
-							};
-						};
+            // make sure that previous sibling is not a break tag or a non-text node
+            while(siblingNode.nodeName == "BR"){
+              var currentNode = siblingNode;
+              siblingNode = siblingNode.previousSibling;
+              if (siblingNode === null) {
+                siblingNode = currentNode.parentNode.previousSibling;
+              };
+            };
 
-						// try to find the last textnode while you are still in an element node
-						while (siblingNode.nodeType == 1) {
-							siblingNode = siblingNode.lastChild;
-						};
+            // try to find the last textnode while you are still in an element node
+            while (siblingNode.nodeType == 1) {
+              siblingNode = siblingNode.lastChild;
+            };
 
-						// add the node to the found list
-						found.push({"node": siblingNode, "offset": siblingNode.nodeValue.length});
-					} else if(index>-1) {
-						// the regular case is you've found the node and offset so push them
-						found.push({"node": value, "offset": value.nodeValue.indexOf(delimiter)});
-						
-						// corner case: start and end are in the same node
-						var secondIndex = value.nodeValue.indexOf(delimiter, index+1);
-						if (secondIndex > -1) {
-							found.push({"node": value, "offset": secondIndex});
-						}
-					}
-				}
-			}
-		};
+            // add the node to the found list
+            found.push({"node": siblingNode, "offset": siblingNode.textContent.length});
+          } else if(index>-1) {
+            // the regular case is you've found the node and offset so push them
+            found.push({"node": value, "offset": value.textContent.indexOf(delimiter)});
+            
+            // corner case: start and end are in the same node
+            var secondIndex = value.textContent.indexOf(delimiter, index+1);
+            if (secondIndex > -1) {
+              found.push({"node": value, "offset": secondIndex});
+            }
+          }
+        }
+      }
+    };
 
-		// using the "contains:()" selector in jquery, find where the delimiter appears.
-		jQuery.each(
-			jQuery('.content .annotator-wrapper').find('*:contains('+delimiter+')')[0].childNodes, find_ranges
-		);
+    // using the "contains:()" selector in jquery, find where the delimiter appears.
+    jQuery.each(
+      jQuery('.content .annotator-wrapper').find('*:contains('+delimiter+')'), function(index, value) {
+        jQuery.each(value.childNodes, find_ranges);
+      }
+    );
 
-		// double check we get 2 and only two items selected for highlighting
-		if (found.length <= 0) {
-			console.log("User did not highlight anything");
-			return undefined;
-		} else if (found.length == 1) {
-			console.log("User only started a highglight and did not finish it");
-			return undefined;
-		} else if (found.length > 2) {
-			console.log("User did not read instructions to only highlight one item at a time");
-			return undefined;
-		} else {
+    // double check we get 2 and only two items selected for highlighting
+    if (found.length <= 0) {
+      console.log("User did not highlight anything");
+      return undefined;
+    } else if (found.length == 1) {
+      console.log("User only started a highglight and did not finish it");
+      return undefined;
+    } else if (found.length > 2) {
+      console.log("User did not read instructions to only highlight one item at a time");
+      return undefined;
+    } else {
 
-			// if everything went great, then create an appropriate range using Annotator
-			var startNode = found[0].node;
-			var startOffset = found[0].offset;
-			var endNode = found[1].node;
-			var endOffset = found[1].offset;
-			if (endOffset !== 0) {
-				endOffset = endOffset - delimiter.length;
-			};
+      // if everything went great, then create an appropriate range using Annotator
+      var startNode = found[0].node;
+      var startOffset = found[0].offset;
+      console.log(startOffset);
+      var endNode = found[1].node;
+      var endOffset = found[1].offset;
+      console.log(endOffset);
+      if (endOffset !== 0) {
+        endOffset = endOffset - delimiter.length;
+      };
 
-			var root = AController.annotationCore.annotation_tool.wrapper[0];
-			range.setStart(startNode, startOffset);
-			range.setEnd(endNode, endOffset);
+      var root = AController.annotationCore.annotation_tool.wrapper[0];
+      range.setStart(startNode, startOffset);
+      range.setEnd(endNode, endOffset);
 
-			// turn that into a serializedRange to be stored in the database
-			if (typeof Annotator !== "undefined") {
-				bRange = new Annotator.Range.BrowserRange(range);
-				normedRange = bRange.normalize().limit(root);
-				serializedRange = normedRange.serialize(root, '.annotator-hl');
-				jQuery(root).html(window.originalContent);
-				return serializedRange;
-			}
-		}
+      // turn that into a serializedRange to be stored in the database
+      if (typeof Annotator !== "undefined") {
+        bRange = new Annotator.Range.BrowserRange(range);
+        normedRange = bRange.normalize().limit(root);
+        serializedRange = normedRange.serialize(root, '.annotator-hl');
+        jQuery(root).html(window.originalContent);
+        return serializedRange;
+      }
+    }
 
-		return undefined;
-	};
-	
-	// deals with the button that turns on keyboard annotations
-	jQuery('#make_annotations_panel button').click(function(){
-		
-		// if person is trying to start making an annotation via keyboard
-		if (jQuery(this).attr('data-toggled') == "false") {
+    return undefined;
+  };
+  
+  // deals with the button that turns on keyboard annotations
+  jQuery('#make_annotations_panel button').click(function(){
+    
+    // if person is trying to start making an annotation via keyboard
+    if (jQuery(this).attr('data-toggled') == "false") {
 
-			// make the text editable and change UI to reflect change
-			jQuery('.content').attr('contenteditable', 'true');
-			jQuery(this).attr('data-toggled', 'true');
-			jQuery(this).html("Save Highlights");
-			
-			// automatically bring person to beginning of target text
-			// this helps orient a person using a screen reader
-			jQuery('.content')[0].focus();
+      // make the text editable and change UI to reflect change
+      jQuery('.content').attr('contenteditable', 'true');
+      jQuery(this).attr('data-toggled', 'true');
+      jQuery('.content').attr('role', 'textbox');
+      jQuery('.content').attr('tabindex', '0');
+      jQuery('.content').attr('aria-multiline', 'true');
+      jQuery(this).html("Save Highlights");
+      
+      // automatically bring person to beginning of target text
+      // this helps orient a person using a screen reader
+      jQuery('.content')[0].focus();
 
-			// makes sure that key count is set to 0 again so that you
-			// can only make two asterisks
-			window.keyCount = 0;
+      // makes sure that key count is set to 0 again so that you
+      // can only make two asterisks
+      window.keyCount = 0;
 
-			// in case this is not the first time that a person is making an annotation
-			// via keyboard input, this unloads event. 
-			jQuery('.content').off('keydown');
-			jQuery('.content').on('keydown', function(event) {
-				var keyCode = event.keyCode;
-				// if you haven't already:
-				event = event || window.event;
+      // in case this is not the first time that a person is making an annotation
+      // via keyboard input, this unloads event. 
+      jQuery('.content').off('keydown');
+      jQuery('.content').on('keydown', function(event) {
+        var keyCode = event.keyCode;
+        // if you haven't already:
+        event = event || window.event;
 
-				switch(keyCode) {
-					// left arrow key
-					case 37:
-					// up arrow key
-					case 38:
-					// right arrow key
-					case 39:
-					// bottom arrow key
-					case 40:
-						// arrow keys should work normally
-						break;
-					// backspace key
-					case 8:
+        switch(keyCode) {
+          // left arrow key
+          case 37:
+          // up arrow key
+          case 38:
+          // right arrow key
+          case 39:
+          // bottom arrow key
+          case 40:
+            // arrow keys should work normally
+            break;
+          // backspace key
+          case 8:
 
-						// make sure that item you are trying to backspace is the delimiter
-						// TODO: change this asterisk to delimiter
-					    var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])-1) !== '*';
-					    
-					    // if it isn't an asterisk, prevent the user from deleting it
-					    // likewise prevent them if they never even typed an asterisk in the first place
-					    if (window.keyCount == 0 || deleted) {
-							// to cancel the event:
-							if( event.preventDefault) event.preventDefault();
-							return false;
-						} else {
-							window.keyCount = window.keyCount-1;
-						}
-						break;
-					// delete key
-					case 46:
-						// make sure item you are trying to [forward] delete is the delimiter
-						// TODO: change this asterisk to delimiter
-						var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])) !== '*';
-						
-						// like above, if it isn't an asterisk prevent user from deleting it
-						// likewise prevent them if they never even typed an asterisk in the first place
-						if (window.keyCount == 0 || deleted) {
-							// to cancel the event:
-							if( event.preventDefault) event.preventDefault();
-							return false;
-						} else {
-							window.keyCount = window.keyCount-1;
-						}
-						break;
-					// 8/* button
-					case 56:
+            // make sure that item you are trying to backspace is the delimiter
+            // TODO: change this asterisk to delimiter
+              var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])-1) !== '*';
+              
+              // if it isn't an asterisk, prevent the user from deleting it
+              // likewise prevent them if they never even typed an asterisk in the first place
+              if (window.keyCount == 0 || deleted) {
+              // to cancel the event:
+              if( event.preventDefault) event.preventDefault();
+              return false;
+            } else {
+              window.keyCount = window.keyCount-1;
+            }
+            break;
+          // delete key
+          case 46:
+            // make sure item you are trying to [forward] delete is the delimiter
+            // TODO: change this asterisk to delimiter
+            var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])) !== '*';
+            
+            // like above, if it isn't an asterisk prevent user from deleting it
+            // likewise prevent them if they never even typed an asterisk in the first place
+            if (window.keyCount == 0 || deleted) {
+              // to cancel the event:
+              if( event.preventDefault) event.preventDefault();
+              return false;
+            } else {
+              window.keyCount = window.keyCount-1;
+            }
+            break;
+          // 8/* button
+          case 56:
 
-						// if person hit 8 and not * then prevent them from doing so
-						if (!event.shiftKey) {
-							// to cancel the event:
-							if( event.preventDefault) event.preventDefault();
-							return false;
-						}
+            // if person hit 8 and not * then prevent them from doing so
+            if (!event.shiftKey) {
+              // to cancel the event:
+              if( event.preventDefault) event.preventDefault();
+              return false;
+            }
 
-						// likewise prevent the if they were trying to add more than 2 delimiters
-						if (window.keyCount == 2) {
-							// to cancel the event:
-							if( event.preventDefault) event.preventDefault();
-							return false;
-						}
-						window.keyCount = window.keyCount+1;
-						break;
-					// Esc button
-					case 27:
-						// sets the target text back to normal and erases delimiter marks
-						clearKeyboardInput();
-						break;
-					// Enter button
-					case 13:
-						// submits highlights like pressing the "Save Highlights" button
-						jQuery('#make_annotations_panel button').click();
-						break;
-					// Tab button
-					case 9:
-						// moves it to the "Save Highlights" button
-						jQuery('#make_annotations_panel button')[0].focus();
-						break;
-					default:
-						// to cancel the event:
-						if( event.preventDefault) event.preventDefault();
-						return false;
-						break;
-				}
-			});
+            // likewise prevent the if they were trying to add more than 2 delimiters
+            if (window.keyCount == 2) {
+              // to cancel the event:
+              if( event.preventDefault) event.preventDefault();
+              return false;
+            }
+            window.keyCount = window.keyCount+1;
+            break;
+          // Esc button
+          case 27:
+            // sets the target text back to normal and erases delimiter marks
+            clearKeyboardInput();
+            break;
+          // Enter button
+          case 13:
+            // submits highlights like pressing the "Save Highlights" button
+            jQuery('#make_annotations_panel button').click();
+            return false;
+            break;
+          // Tab button
+          case 9:
+            // moves it to the "Save Highlights" button
+            jQuery('#make_annotations_panel button')[0].focus();
+            return false;
+            break;
+          default:
+            // to cancel the event:
+            if( event.preventDefault) event.preventDefault();
+            return false;
+            break;
+        }
+      });
 
-			// save the original content of the tool so you can set it back to normal later
-			window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
-		} else if(jQuery(this).attr('data-toggled') == "true") {
-			// if user has submitted highlights
+      // save the original content of the tool so you can set it back to normal later
+      window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
+    } else if(jQuery(this).attr('data-toggled') == "true") {
+      // if user has submitted highlights
 
-			// find range of the delimiter
-			// TODO: have a setting somewhere to set the delimiter
-			var rangesForAsterisks = getRangesForDelimiter("*");
+      // find range of the delimiter
+      // TODO: have a setting somewhere to set the delimiter
+      var rangesForAsterisks = getRangesForDelimiter("*");
 
-			// If it couldn't find any ranges, (i.e. you forgot one or both delimiters do nothing)
-			// TODO: show a warning error
-			if (typeof rangesForAsterisks === "undefined") {
-				jQuery('.content').css('outline', '2px solid red');
-				return;
-			};
+      // If it couldn't find any ranges, (i.e. you forgot one or both delimiters do nothing)
+      // TODO: show a warning error
+      if (typeof rangesForAsterisks === "undefined") {
+        jQuery('.content').css('outline', '2px solid red');
+        return;
+      };
 
-			// show the small form to add text and tags to annotation
-			jQuery(this).attr('data-toggled', 'saving');
-			jQuery('#make_annotations_panel').css('margin-left', '0px');
-			jQuery('#make_annotations_panel').css('margin-top', '0px');
-			jQuery('#annotation-maker').removeClass("hidden");
-			jQuery(this).html("Save Annotation");
-			
-			// focus on the first one for screen reader's sake!
-			jQuery('#id_annotation_text_screen_reader')[0].focus();
+      // show the small form to add text and tags to annotation
+      jQuery(this).attr('data-toggled', 'saving');
+      jQuery('#make_annotations_panel').css('margin-left', '0px');
+      jQuery('#make_annotations_panel').css('margin-top', '0px');
+      jQuery('#annotation-maker').removeClass("hidden");
+      jQuery(this).html("Save Annotation");
+      
+      // focus on the first one for screen reader's sake!
+      jQuery('#id_annotation_text_screen_reader')[0].focus();
 
-			// create an annotation to be saved once they've added text and tags
-			window.savingAnnotation = {
-				"ranges" : [rangesForAsterisks],
-				"collectionId": AController.annotationCore.initOptions.collection_id,
-				"contextId": AController.annotationCore.initOptions.context_id,
-				"uri": AController.annotationCore.initOptions.object_id,
-				"permissions": {
-					"admin": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
-					"read": [],
-					"update": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
-					"delete": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
-				},
-				"user": AController.annotationCore.annotation_tool.plugins.Permissions.user,
-				"archived": false,
-				"parent": "0",
-				"media": "text",
-			};
-		} else {
-			clearKeyboardInput();
+      // create an annotation to be saved once they've added text and tags
+      window.savingAnnotation = {
+        "ranges" : [rangesForAsterisks],
+        "collectionId": AController.annotationCore.initOptions.collection_id,
+        "contextId": AController.annotationCore.initOptions.context_id,
+        "uri": AController.annotationCore.initOptions.object_id,
+        "permissions": {
+          "admin": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+          "read": [],
+          "update": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+          "delete": [AController.annotationCore.annotation_tool.plugins.Permissions.user.id],
+        },
+        "user": AController.annotationCore.annotation_tool.plugins.Permissions.user,
+        "archived": false,
+        "parent": "0",
+        "media": "text",
+      };
+    } else {
+      clearKeyboardInput();
 
-			// tags and text input, if tags is empty, change it to empty list
-			var text = jQuery('#id_annotation_text_screen_reader').val();
-			var tags = jQuery('#id_annotation_tag_screen_reader').val().split(' ');
-			if (tags == "") {
-				tags = [];
-			};
+      // tags and text input, if tags is empty, change it to empty list
+      var text = jQuery('#id_annotation_text_screen_reader').val();
+      var tags = jQuery('#id_annotation_tag_screen_reader').val().split(' ');
+      if (tags == "") {
+        tags = [];
+      };
 
-			// add them to the annotation to be saved
-			window.savingAnnotation['text'] = text;
-			window.savingAnnotation['tags'] = tags;
+      // add them to the annotation to be saved
+      window.savingAnnotation['text'] = text;
+      window.savingAnnotation['tags'] = tags;
 
-			// this sends a trigger to Annotator to tell it to send the annotation to be saved to the database
-			AController.annotationCore.annotation_tool.plugins.Store.annotationCreated(window.savingAnnotation);
+      // this sends a trigger to Annotator to tell it to send the annotation to be saved to the database
+      AController.annotationCore.annotation_tool.plugins.Store.annotationCreated(window.savingAnnotation);
 
-			// this adds the actual highlight to the target text
-			AController.annotationCore.annotation_tool.setupAnnotation(window.savingAnnotation);
+      // this adds the actual highlight to the target text
+      AController.annotationCore.annotation_tool.setupAnnotation(window.savingAnnotation);
 
-			// this adds the annotation to the dashboard
-			AController.dashboardObjectController.annotationCreated(window.savingAnnotation);
-		}
-	});
+      // this adds the annotation to the dashboard
+      AController.dashboardObjectController.annotationCreated(window.savingAnnotation);
+    }
+  });
 
-	// display/hide options to input annotations via keyboard
-	jQuery('#keyboard-input-toggle').click(function(){
-		jQuery('#make_annotations_panel').toggleClass("hidden");
-	})
+  // display/hide options to input annotations via keyboard
+  jQuery('#keyboard-input-toggle-text').click(function(){
+    jQuery('#make_annotations_panel').toggleClass("hidden");
+    if (jQuery('#make_annotations_panel').hasClass('hidden')) {
+      jQuery('#keyboard-input-toggle-text').css('color', 'white');
+      clearKeyboardInput();
+    } else {
+      jQuery('#keyboard-input-toggle-text').css('color', '#FFFF00');
+      setTimeout(function(){jQuery('#make_annotations_panel button')[0].focus();}, 500);
+    }
+  });
 </script>
-
+{% endblock %}

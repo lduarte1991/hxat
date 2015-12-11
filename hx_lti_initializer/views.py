@@ -302,9 +302,11 @@ def access_annotation_target(
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
+        original['assignment_target'] = assignment_target
 
     if not assignment.object_after(object_id) is None:
         original['next_object'] = assignment.object_after(object_id)
+        original['assignment_target'] = assignment_target
 
     if targ_obj.target_type == 'vd':
         srcurl = targ_obj.target_content
