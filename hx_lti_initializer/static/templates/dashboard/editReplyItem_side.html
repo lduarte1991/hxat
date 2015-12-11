@@ -1,7 +1,20 @@
+<% if (isNewAnnotation) { %>
+<div class="annotationModal item-new-annotation side">
+<div class="modal-navigation">
+		<button class="btn btn-default" id="closeModal" aria-label="Cancel - Go back to annotations"><i class="glyphicon glyphicon-arrow-left"></i></button>
+		<div class="label">Create a new annotation</div>
+	</div>
+<% } %>
 <div class="replyItemEdit side">
 	 <textarea class="replytext field side" placeholder="Add your comment here..."></textarea>
+	 <% if (isNewAnnotation) { %>
+	 	<input aria-label="Enter tags (separated by a single space)" type="text" id="id_tags" />
+	 <% } %>
 		<div class="btn-group btn-group-xs newreplygroup" role="group" aria-label="edit" style="padding-top:10px;">
 		    <button class="btn btn-primary" id="save" ><i class="glyphicon glyphicon-floppy-disk"></i> Save </button>
             <button class="btn btn-danger" id="delete" data-toggle="confirmation"><i class="glyphicon glyphicon-remove"></i> Delete </button>
 	    </div>
 </div>
+<% if (isNewAnnotation) { %>
+</div>
+<% } %>

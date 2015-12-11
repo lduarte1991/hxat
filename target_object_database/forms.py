@@ -15,7 +15,7 @@ class SourceForm(forms.ModelForm):
             possible_to = TargetObject.objects.filter(target_content__icontains=data)[0]
         except:
             pass
-        if possible_to is not None:
+        if possible_to is not None and possible_to.target_type == "ig":
             msg = "This image manifest already exists and is named %s" % possible_to
             self.add_error('target_content', msg)
 

@@ -400,14 +400,41 @@ var MiradorEndpointController = function(deferredObject) {
 				window.AController.targetObjectController.colorizeEditor();
 			};
 		});
-		jQuery.subscribe('bottomPanelSet.' + self.window.id, function(ev, isVisible) {
-			if (isVisible) {
-				jQuery('#prev_target_object').css('bottom', '130px');
-				jQuery('#next_target_object').css('bottom', '130px');
-			} else {
-				jQuery('#prev_target_object').css('bottom', '0px');
-				jQuery('#next_target_object').css('bottom', '0px');
-			}
+		self.imageLimits = {};
+		var currentId = self.window.currentCanvasID;
+		jQuery.each(self.window.imagesList, function(index, value) {
+			if (value['@id'] == currentId) {
+				self.imageLimits['height'] = value.height;
+				self.imageLimits['width'] = value.width;
+			};
+		});
+		jQuery.subscribe('imageRectangleUpdated', function(event, options){
+			if (options.id == self.window.id) {
+				var xChecked = options.osdBounds.x;
+				var yChecked = options.osdBounds.y;
+				var heightChecked = options.osdBounds.height;
+				var widthChecked = options.osdBounds.width;
+				if (xChecked < 0) {
+					xChecked = 0;
+				}
+				if(heightChecked > self.imageLimits.height){
+					heightChecked = self.imageLimits.height;
+				}
+				if (yChecked < 0) {
+					yChecked = 0;
+				}
+				if(widthChecked > self.imageLimits.width){
+					widthChecked = self.imageLimits.width;
+				}
+
+				self.currentImageBounds = {
+					"height": heightChecked.toString(),
+					"width": widthChecked.toString(),
+					"x": xChecked.toString(),
+					"y": yChecked.toString(),
+				};
+				
+			};
 		});
 	});
 	self.annotationsMasterList = [];
@@ -707,7 +734,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		var annotations = data.rows || [];
 
 		self.endpoint.annotationsListCatch = annotations;
-		self.updateMasterList();ƒ
+		self.updateMasterList();
 		self.window.annotationsList = [];
 
 		annotations.forEach(function(annotation) {

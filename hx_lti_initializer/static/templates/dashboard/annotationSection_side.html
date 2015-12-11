@@ -2,16 +2,12 @@
     <div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>
 </div>
 <div class="annotationSection side">
-    <div class="group-wrap">
-        <div class="annotation-fullscreen" role="button" aria-labeledby="sidebar-annotation-fullscreen">
-            <i class="fa fa-expand"></i>
-        </div>
-        <div class="fullscreen-label" id="sidebar-annotation-fullscreen">Toggle Fullscreen Mode</div>
-        <div class="annotation-instructions" role="button" aria-labeledby="sidebar-annotations-instructions">
+    <div class="annotation-instructions" role="button" aria-labeledby="sidebar-annotations-instructions">
             <img src="/static/css/images/info28.png" alt="Show annotation instructions" style="width: 20px;height: 20px; float: right;" aria-labeledby="sidebar-annotations-instructions"/>  
         </div>
         <div class="title" id="sidebar-annotations-instructions">View Annotation Instructions</div>
         <div class="hide_label" id="sidebar-hide-sidebar-instructions">Click to hide/show sidebar</div>
+    <div class="group-wrap">
         <div class="annotation-filter-buttons btn-group">
         	<button type="button" class="btn user-filter" id='mynotes' aria-label="View only my annotations" role="button">My Notes</button>
         	<button type="button" class="btn user-filter" id='instructor' aria-label="View only instructor annotations" role="button">Instructor</button>
@@ -19,6 +15,14 @@
         </div>
     </div>
     <div class="separator-solid side"></div>
+    <div class="filter-options side">
+        <div class="search-label">Search by:</div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>
+            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>
+            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>
+        </div>
+    </div>
     <div class="search-bar side">
         <div id="search-info" style="display:none">The following allows you to search annotations. The default filter is to search for a username, but make sure to change filter to annotation text or tag for other types of searches.</div>
     	<div class="input-group">
@@ -30,18 +34,16 @@
             </div>
         </div>
     </div>
-    <div class="filter-options side">
-        <div class="search-label">Search by:</div>
-    	<div class="btn-group">
-            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>
-            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>
-            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>
-        </div>
-    </div>
-    <div class="annotationsHolder side" role="list" aria-label="annotations list">
+    
+    <div class="annotationsHolder side" role="list" aria-label="Annotations" >
 		<% _.each(annotationItems, function(item) { %>
 			<%= item %>
 		<% }); %>
+        <% if (annotationItems.length == 0) { %>
+            <div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>
+        <% } else {%>
+             <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>
+        <% } %>
 	</div>
-    <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>
+   
 </div>
