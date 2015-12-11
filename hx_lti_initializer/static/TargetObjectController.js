@@ -15,7 +15,9 @@
 	$.TargetObjectController.prototype.init = function(){
 		if (this.initOptions.mediaType == "text") {
 			this.setUpTargetAsText(this.initOptions.annotationElement, this.initOptions.object_id);
-		};
+		} else if (this.initOptions.mediaType == "image") {
+			this.setUpTargetAsImage(this.initOptions.annotationElement, this.initOptions.object_id);
+		}
 	};
 
 	$.TargetObjectController.prototype.setUpTargetAsText = function(element, targetObject) {
@@ -381,6 +383,119 @@
     } else {
       jQuery('#keyboard-input-toggle-text').css('color', '#FFFF00');
       setTimeout(function(){jQuery('#make_annotations_panel button')[0].focus();}, 500);
+    }
+  });
+	};
+
+	$.TargetObjectController.prototype.setUpTargetAsImage = function(element, targetObject) {
+		var toggleqtip = function(){
+    jQuery('#keyboard-input-button').qtip({
+        id: 'key-control-annotation',
+        content: {
+            text: "In order to use keyboard inputs, you must click on the image once. Then you can use the 'W', 'A', 'S', and 'D' keys to move up, left, down, and right respectively. You can also use '-' to zoom out, '=' to zoom in, and 'm' to make an annotation.",
+            // Use first steps content...
+            title: {
+                text: "Control via keyboard",
+                button: false
+            }
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center',
+            target: jQuery('#keyboard-input-button'),
+            // Also use first steps position target...
+            viewport: $(window) // ...and make sure it stays on-screen if possible
+        },
+        show: {
+            event: false,
+            // Only show when show() is called manually
+            ready: true // Also show on page load
+        },
+        events: {
+            render: function(event, api) {
+                // Grab tooltip element
+                var tooltip = api.elements.tooltip;
+            }
+        }
+    });
+};
+  jQuery('#keyboard-input-button').on('mouseup', function (event){
+    jQuery('.keyboard-command-area').attr('aria-label', 'Click this button to turn on keyboard input. To use keyboard input, select this area. Then use "W", "A", "S", "D" to move around. "-" to zoom out, "=" to zoom in" and lowercase "m" to make an annotation.');
+    jQuery('.openseadragon-canvas').attr('tabindex', '-1');
+    
+    document.getElementById('viewer').querySelector('.openseadragon-canvas').focus();
+    jQuery('.keyboard-command-area')[0].focus();
+    jQuery('#keyboard-input-button').css('color', '#ffff00');
+  });
+  jQuery('#keyboard-input-button').on('mouseenter', function(){
+    toggleqtip();
+  });
+  jQuery('#keyboard-input-button').on('keydown', function(event){
+    var keyCode = event.keyCode;
+    event = event || window.event;
+
+    switch(keyCode) {
+        case 32:
+        case 13:
+          toggleqtip();
+          jQuery('#keyboard-input-button').css('color', '#ffff00');
+          break;
+    }
+  });
+  jQuery('#keyboard-input-button').on('blur', function(event){
+    if (event.tooltip !== undefined) {
+      jQuery('#keyboard-input-button').qtip().toggle(false);
+    };
+  });
+  jQuery('#keyboard-input-button').on('mouseleave', function(event){
+    jQuery('#keyboard-input-button').qtip().toggle(false);
+  });
+
+  jQuery('#viewer').off('keyup');
+  jQuery('#viewer').on('keyup', function(event) {
+    var keyCode = event.keyCode;
+    // if you haven't already:
+    event = event || window.event;
+
+    switch(keyCode) {
+      // 'a' key
+      case 77:
+        AController.dashboardObjectController.annotationViaKeyboardInput();
+        jQuery('.newreplygroup #delete').click(function (e) {
+          jQuery('.annotationModal #closeModal').click();
+        });
+        jQuery('.newreplygroup #save').click(function (e) {
+          var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
+          if (tags == ['']) {
+            tags = [];
+          };
+
+          var miraWindow = AController.dashboardObjectController.endpoint.window;
+          var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
+          var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
+          var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
+          thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
+          var annotation = {
+            collectionId: miraEndpoint.collection_id,
+            contextId: miraEndpoint.context_id,
+            uri: miraWindow.currentCanvasID,
+            permissions: miraEndpoint.catchOptions.permissions,
+            user: miraEndpoint.catchOptions.user,
+            archived: false,
+            rangePosition: bounds,
+            bounds: bounds,
+            thumb: thumb,
+            ranges: [],
+            tags: tags,
+            text: jQuery('.replyItemEdit .replytext').val(),
+            parent: "0",
+            media: "image",
+          };
+
+          AController.dashboardObjectController.endpoint.endpoint.createCatchAnnotation(annotation);
+          jQuery('.annotationModal #closeModal').click();
+        });
+        break;
     }
   });
 	};

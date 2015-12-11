@@ -24,6 +24,17 @@
 <style type="text/css">
     #viewer { height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
 </style>
+<style type="text/css">
+#home{
+  font-size: 2.5em !important;
+}
+.pages{
+  font-size: 2.5em !important;
+}
+.annotation-fullscreen{
+  font-size: 2.5em !important;
+}
+</style>
 {% endblock %}
 
 {% block tokeninputcss %}
@@ -41,222 +52,61 @@
 </section>
 {% endblock %}
 
-{% block endscripts %}
-<script>
-$(function() {
-      var mir = Mirador({
-        "id": "viewer",
-        "mainMenuSettings" : {
-           'show' : false
-        },
-        "buildPath" : "{% static "vendors/mirador/" %}",
-        "layout" : "1x1",
-        "saveSession" : false,
-        "data": [
-        {% for i in target_object.get_target_content_as_list %}
-        { "manifestUri": "{{ i }}", "location": "Harvard University"},
-        {% endfor %}
-        ],
-        "windowObjects": [
-          {
-            "loadedManifest": "{{ target_object.get_target_content_as_list.0 }}",
-        	  "viewType" : "{{ viewType }}",
-            {% if canvas_id %}
-              "canvasID" : "{{ canvas_id }}",
-            {% endif %}
-            "annotationLayer" : true,
-            "annotationCreation" : true,
-        	  "sidePanel" : false,
-            "fullScreen" : false,
-            "displayLayout": false,
-            "annotationState": "annoOnCreateOff",
-            // This will eventually be put back in whenever we add layout options
-            // to the admin hub
-            // "layoutOptions" : 
-            //  {
-            //  "newObject" : true,
-            //  "close" : false,
-            //  "slotRight" : false,
-            //  "slotLeft" : false,
-            //  "slotAbove" : false,
-            //  "slotBelow" : false
-            //  }
-          },
-        ],
-        "annotationEndpoint": 
-          {
-          "name":"Harvard CATCH Production",
-          "module": "CatchEndpoint",
-          "options": {
-            token: "{{ token }}",
-            // The endpoint of the store on your server.
-            prefix: "/lti_init/annotation_api",
-            userid : "{{ user_id }}",
-            username : "{{ username }}",
-            roles : "{{ roles }}",
-            collection_id : "{{ collection }}",
-            context_id : "{{ course }}",
-          }
-        }
-      });
-      
-      var options = {
-          commonInfo: {
-          mediaType: "image", // {{ media_type }}
-          context_id: "{{ course }}",
-          collection_id: "{{ collection }}",
-          object_id: {{ object }},
-          token: "{{ token }}",
-          username: "{{ username }}",
-          user_id: "{{ user_id }}",
-          is_instructor: "{{ is_instructor }}",
-          pagination: {{ assignment.pagination_limit }},
-        },
-        
-        annotationMainOptions: {
-          {% if assignment.allow_highlights %}
-          'highlightTags_options': "{{ assignment.highlights_options }}",
-          {% endif %}
-        },
-        
-        dashboardControllerOptions: {
-          annotationElement: jQuery("#dashboard"),
-          initOptions: {
-            template_urls: '{% static "templates/dashboard/"%}',
-            showPublicPrivateSelectors: true,
-            showMediaSelector: false,
-            flags: false,
-            imageRootUrl: "{% static "vendors/catch/img"%}",
-            instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
-            default_tab: "{{ assignment.default_tab }}",
-            instructions: "{{instructions | escapejs }}",
-            {% if focus_on_id %}
-            focus_on_annotation: {{focus_on_id}},
-            {% endif %}
-          },
-        },
-
-        targetObjectOptions: {
-        },
-      };
-      AController(options);
-    });
-  
-</script>
-<br />
-<script>
-  var toggleqtip = function(){
-    jQuery('#keyboard-input-button').qtip({
-        id: 'key-control-annotation',
-        content: {
-            text: "In order to use keyboard inputs, you must click on the image once. Then you can use the 'W', 'A', 'S', and 'D' keys to move up, left, down, and right respectively. You can also use '-' to zoom out, '=' to zoom in, and 'm' to make an annotation.",
-            // Use first steps content...
-            title: {
-                text: "Control via keyboard",
-                button: false
-            }
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom center',
-            target: jQuery('#keyboard-input-button'),
-            // Also use first steps position target...
-            viewport: $(window) // ...and make sure it stays on-screen if possible
-        },
-        show: {
-            event: false,
-            // Only show when show() is called manually
-            ready: true // Also show on page load
-        },
-        events: {
-            render: function(event, api) {
-                // Grab tooltip element
-                var tooltip = api.elements.tooltip;
-            }
-        }
-    });
-};
-  jQuery('#keyboard-input-button').on('mouseup', function (event){
-    jQuery('.keyboard-command-area').attr('aria-label', 'Click this button to turn on keyboard input. To use keyboard input, select this area. Then use "W", "A", "S", "D" to move around. "-" to zoom out, "=" to zoom in" and lowercase "m" to make an annotation.');
-    jQuery('.openseadragon-canvas').attr('tabindex', '-1');
-    
-    document.getElementById('viewer').querySelector('.openseadragon-canvas').focus();
-    jQuery('.keyboard-command-area')[0].focus();
-    jQuery('#keyboard-input-button').css('color', '#ffff00');
-  });
-  jQuery('#keyboard-input-button').on('mouseenter', function(){
-    toggleqtip();
-  });
-  jQuery('#keyboard-input-button').on('keydown', function(event){
-    var keyCode = event.keyCode;
-    event = event || window.event;
-
-    switch(keyCode) {
-        case 32:
-        case 13:
-          toggleqtip();
-          jQuery('#keyboard-input-button').css('color', '#ffff00');
-          break;
+{% block extraOptions %}
+var mir = Mirador({
+  "id": "viewer",
+  "mainMenuSettings" : {
+     'show' : false
+  },
+  "buildPath" : "{% static "vendors/mirador/" %}",
+  "layout" : "1x1",
+  "saveSession" : false,
+  "data": [
+  {% for i in target_object.get_target_content_as_list %}
+  { "manifestUri": "{{ i }}", "location": "Harvard University"},
+  {% endfor %}
+  ],
+  "windowObjects": [
+    {
+      "loadedManifest": "{{ target_object.get_target_content_as_list.0 }}",
+  	  "viewType" : "{{ viewType }}",
+      {% if canvas_id %}
+        "canvasID" : "{{ canvas_id }}",
+      {% endif %}
+      "annotationLayer" : true,
+      "annotationCreation" : true,
+  	  "sidePanel" : false,
+      "fullScreen" : false,
+      "displayLayout": false,
+      "annotationState": "annoOnCreateOff",
+      // This will eventually be put back in whenever we add layout options
+      // to the admin hub
+      // "layoutOptions" : 
+      //  {
+      //  "newObject" : true,
+      //  "close" : false,
+      //  "slotRight" : false,
+      //  "slotLeft" : false,
+      //  "slotAbove" : false,
+      //  "slotBelow" : false
+      //  }
+    },
+  ],
+  "annotationEndpoint": 
+    {
+    "name":"Harvard CATCH Production",
+    "module": "CatchEndpoint",
+    "options": {
+      token: "{{ token }}",
+      // The endpoint of the store on your server.
+      prefix: "/lti_init/annotation_api",
+      userid : "{{ user_id }}",
+      username : "{{ username }}",
+      roles : "{{ roles }}",
+      collection_id : "{{ collection }}",
+      context_id : "{{ course }}",
     }
-  });
-  jQuery('#keyboard-input-button').on('blur', function(event){
-    if (event.tooltip !== undefined) {
-      jQuery('#keyboard-input-button').qtip().toggle(false);
-    };
-  });
-  jQuery('#keyboard-input-button').on('mouseleave', function(event){
-    jQuery('#keyboard-input-button').qtip().toggle(false);
-  });
-
-  jQuery('#viewer').off('keyup');
-  jQuery('#viewer').on('keyup', function(event) {
-    var keyCode = event.keyCode;
-    // if you haven't already:
-    event = event || window.event;
-
-    switch(keyCode) {
-      // 'a' key
-      case 77:
-        AController.dashboardObjectController.annotationViaKeyboardInput();
-        jQuery('.newreplygroup #delete').click(function (e) {
-          jQuery('.annotationModal #closeModal').click();
-        });
-        jQuery('.newreplygroup #save').click(function (e) {
-          var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
-          if (tags == ['']) {
-            tags = [];
-          };
-
-          var miraWindow = AController.dashboardObjectController.endpoint.window;
-          var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
-          var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
-          var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
-          thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
-          var annotation = {
-            collectionId: miraEndpoint.collection_id,
-            contextId: miraEndpoint.context_id,
-            uri: miraWindow.currentCanvasID,
-            permissions: miraEndpoint.catchOptions.permissions,
-            user: miraEndpoint.catchOptions.user,
-            archived: false,
-            rangePosition: bounds,
-            bounds: bounds,
-            thumb: thumb,
-            ranges: [],
-            tags: tags,
-            text: jQuery('.replyItemEdit .replytext').val(),
-            parent: "0",
-            media: "image",
-          };
-
-          AController.dashboardObjectController.endpoint.endpoint.createCatchAnnotation(annotation);
-          jQuery('.annotationModal #closeModal').click();
-        });
-        break;
-    }
-  });
-  jQuery('#home').css('font-size', '2.5em');
-  jQuery('.pages').css('font-size', '2.5em');
-  jQuery('.annotation-fullscreen').css('font-size', '2.5em');
-</script>
+  }
+});   
+options.commonInfo.mediaType = 'image';
 {% endblock %}
