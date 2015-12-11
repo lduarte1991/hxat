@@ -82,9 +82,87 @@
             <div id="dashboard" class="annotationListContainer"></div>
         </section>
     </div>
-    {% block endscripts %}{% endblock %}
 
     <script>
+        var options = {
+            commonInfo: {
+                context_id: "{{ course }}",
+                collection_id: "{{ collection }}",
+                object_id: {{ object }},
+                token: "{{ token }}",
+                username: "{{ username }}",
+                user_id: "{{ user_id }}",
+                is_instructor: "{{ is_instructor }}",
+                pagination: {{ assignment.pagination_limit }},
+            },
+
+            annotationMainOptions: {
+              {% if assignment.allow_highlights %}
+              'highlightTags_options': "{{ assignment.highlights_options }}",
+              {% endif %}
+            },
+
+            dashboardControllerOptions: {
+                annotationElement: jQuery("#dashboard"),
+                initOptions: {
+                    template_urls: '{% static "templates/dashboard/"%}',
+                    showPublicPrivateSelectors: true,
+                    showMediaSelector: false,
+                    flags: false,
+                    imageRootUrl: "{% static "vendors/catch/img"%}",
+                    instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+                    default_tab: "{{ assignment.default_tab }}",
+                    instructions: "{{instructions | escapejs }}",
+                    dashboard_hidden: {{dashboard_hidden}},
+                    {% if focus_on_id %}
+                    focus_on_annotation: {{focus_on_id}},
+                    {% endif %}
+                },
+            },
+
+            targetObjectOptions: {
+                annotationElement: jQuery('#viewer'),
+            }
+        };
+        {% block extraOptions %}
+        {% endblock %}
+        AController(options);
+
+        jQuery('.toggle-instructions').click(function (){
+            if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+                jQuery('.toggle-instructions').html('Expand Instructions');
+            } else {
+                jQuery('.toggle-instructions').html('Collapse Instructions');
+            }
+        });
+      
+        // Sends a message to canvas to resize the iframe so we don't have scrolling issues
+        {% if org == 'ATG' %}
+        $(document).ready(function() {
+            var receiver = "https://canvas.harvard.edu";
+            var message = {
+                subject: "lti.frameResize",
+                height: $(".fit-to-canvas").height()
+            };
+            console.log("sending message to receiver: ", message, receiver);
+            window.parent.postMessage(JSON.stringify(message), receiver);
+        }, 1000);
+        {% endif %}
+        {% if focus_on_id %}
+        $(document).ready(function(){
+            setTimeout(function(){
+                var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
+                if (typeof annotation.highlights === "undefined") {
+                AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
+                }
+                jQuery('html, body').animate({
+                    scrollTop: jQuery(annotation.highlights[0]).offset().top + jQuery('#navigationBar').height(); },
+                    'slow'
+                );
+            }, 1000);
+          }, 1000);
+        {% endif %}
+
         var toggleFullscreen = function () {
             var self = this;
             var enterFullscreen = function() {
@@ -127,5 +205,6 @@
         };
         jQuery('.annotation-fullscreen').click(toggleFullscreen);
     </script>
+    {% block endscripts %}{% endblock %}
     </body>
 </html>
