@@ -51,7 +51,7 @@
     <div id="full-content" style="background-color:white">
         <nav role="navigation" id="navigationBar" aria-label="Annotation Tool">
             {% if is_instructor or org == "ATG" %}
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotaiton Tool Assignment Hub"><i class="fa fa-home"></i></a>
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotation Tool Assignment Hub"><i class="fa fa-home"></i></a>
             {% endif %}
             <div class="pagination">
                 {% if prev_object %}
@@ -94,7 +94,10 @@
               } else if (el.mozRequestFullScreen) {
                 el.mozRequestFullScreen();
               } else if (el.webkitRequestFullscreen) {
-                el.webkitRequestFullscreen();
+                el.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                if (!document.webkitCurrentFullScreenElement) {
+                    el.webkitRequestFullscreen()
+                }
               } else if (el.msRequestFullscreen) {
                 el.msRequestFullscreen();
               }
