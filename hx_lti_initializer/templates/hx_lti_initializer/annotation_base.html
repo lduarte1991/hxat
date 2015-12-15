@@ -84,7 +84,10 @@
     </div>
 
     <script>
+        // options for the HxAT
         var options = {
+
+            // this info will be shared among the various sections of the tool
             commonInfo: {
                 context_id: "{{ course }}",
                 collection_id: "{{ collection }}",
@@ -96,12 +99,14 @@
                 pagination: {{ assignment.pagination_limit }},
             },
 
+            // this should handle the colorization of the target
             annotationMainOptions: {
               {% if assignment.allow_highlights %}
               'highlightTags_options': "{{ assignment.highlights_options }}",
               {% endif %}
             },
 
+            // this handles setting up the dashboard that collects the annotations
             dashboardControllerOptions: {
                 annotationElement: jQuery("#dashboard"),
                 initOptions: {
@@ -120,21 +125,15 @@
                 },
             },
 
+            // this sets up the content itself (e.g. keyboard input)
             targetObjectOptions: {
                 annotationElement: jQuery('#viewer'),
             }
         };
         {% block extraOptions %}
         {% endblock %}
-        AController(options);
 
-        jQuery('.toggle-instructions').click(function (){
-            if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
-                jQuery('.toggle-instructions').html('Expand Instructions');
-            } else {
-                jQuery('.toggle-instructions').html('Collapse Instructions');
-            }
-        });
+        AController(options);
       
         // Sends a message to canvas to resize the iframe so we don't have scrolling issues
         {% if org == 'ATG' %}
@@ -148,13 +147,18 @@
             window.parent.postMessage(JSON.stringify(message), receiver);
         }, 1000);
         {% endif %}
+
+        // Checks to see if the user is coming from the instructor dashboard
         {% if focus_on_id %}
         $(document).ready(function(){
             setTimeout(function(){
+                //if so we make sure to add just the annotation required
                 var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
                 if (typeof annotation.highlights === "undefined") {
-                AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
+                    AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
                 }
+
+                // if it's a text annotation, it should scroll down to it
                 jQuery('html, body').animate({
                     scrollTop: jQuery(annotation.highlights[0]).offset().top + jQuery('#navigationBar').height(); },
                     'slow'
@@ -163,6 +167,7 @@
           }, 1000);
         {% endif %}
 
+        // Allows HxAT to work in fullscreen mode
         var toggleFullscreen = function () {
             var self = this;
             var enterFullscreen = function() {

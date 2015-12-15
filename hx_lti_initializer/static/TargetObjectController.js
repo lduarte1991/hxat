@@ -385,6 +385,14 @@
       setTimeout(function(){jQuery('#make_annotations_panel button')[0].focus();}, 500);
     }
   });
+
+    jQuery('.toggle-instructions').click(function (){
+      if (jQuery('.toggle-instructions').html() == "Collapse Instructions") {
+          jQuery('.toggle-instructions').html('Expand Instructions');
+      } else {
+          jQuery('.toggle-instructions').html('Collapse Instructions');
+      }
+   });
 	};
 
 	$.TargetObjectController.prototype.setUpTargetAsImage = function(element, targetObject) {
