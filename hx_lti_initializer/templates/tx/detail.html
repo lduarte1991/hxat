@@ -93,6 +93,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
 {% endblock %}
 
 {% block extraOptions %}
+  // makes sure that the HxAT also instantiates Annotator for the text tool
   options.commonInfo.mediaType = 'text';
   options.annotationCoreOptions = {
     annotationElement: jQuery(".content"),
