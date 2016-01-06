@@ -48,7 +48,7 @@
         <title>{% block title %}Annotation Tool {% endblock %}</title>
     </head>
     <body>
-    <div id="full-content" style="background-color:white">
+    <div id="full-content">
         <nav role="navigation" id="navigationBar" aria-label="Annotation Tool">
             {% if is_instructor or org == "ATG" %}
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotation Tool Assignment Hub"><i class="fa fa-home"></i></a>
@@ -78,7 +78,7 @@
 
         {% block mainapplication %}{% endblock %}
 
-        <section role="application" aria-label="Annotaiton Tool | Annotations List">
+        <section role="application" aria-label="Annotation Tool | Annotations List">
             <div id="dashboard" class="annotationListContainer"></div>
         </section>
     </div>

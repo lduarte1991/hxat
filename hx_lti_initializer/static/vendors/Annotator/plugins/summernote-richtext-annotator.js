@@ -31,8 +31,14 @@ Annotator.Plugin.SummernoteRichText.prototype.pluginInit = function() {
 	});
 
 	self.annotator.subscribe("annotationEditorShown", function() {
+		// checks to make sure it can fit on screen
 		$('#annotator-field-0').summernote(self.options);
 		self.checkOrientation();
+
+		// then it will restart summernote, otherwise it may cause all <li> to have Save
+		// and cancel buttons.
+		$('#annotator-field-0').destroy();
+		setTimeout(function(){$('#annotator-field-0').summernote(self.options)}, 100);
 	});
 
 	self.annotator.subscribe("annotationEditorHidden", function() {

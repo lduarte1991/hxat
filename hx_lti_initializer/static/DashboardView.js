@@ -121,10 +121,24 @@
         var offsetList = []
         for (var i = startIndex; i < endIndex; i++) {
             var annotation = annotationsList[i];
-            var item = self.formatAnnotation(annotation);
-            item.index = i+1;
-            var html = self.initOptions.TEMPLATES.annotationItem(item);
+            var annotationItem = self.formatAnnotation(annotation);
+            annotationItem.index = i+1;
+            var html = self.initOptions.TEMPLATES.annotationItem(annotationItem);
             jQuery('.annotationsHolder').append(html);
+            divObject = '.annotationItem.item-'+annotation.id.toString();
+
+            var tagHtml = "";
+            if (typeof annotationItem.tags !== "undefined") {
+                annotationItem.tags.forEach(function(tag){
+                    var style = "";
+                    if (window.AController.main.tags[tag] !== undefined) {
+                        var rgbColor = window.AController.main.tags[tag];
+                        style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+                    };
+                    tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
+                });
+            };
+            jQuery(divObject + ' .tagList').html(tagHtml);
             offsetList.push(annotation);
         };
 
@@ -160,6 +174,13 @@
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
+        } else if (item.media === "video") {
+            item.rangeTime.start= typeof vjs !== 'undefined' ?
+                vjs.formatTime(item.rangeTime.start) :
+                item.rangeTime.start;
+            item.rangeTime.end= typeof vjs !== 'undefined'?
+                vjs.formatTime(item.rangeTime.end) :
+                item.rangeTime.end;
         }
         return item;
     };
@@ -538,6 +559,32 @@
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
             jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
+        });
+
+        jQuery('.parentAnnotation .playMediaButton ').click ( function(e) {
+            var player = AController.targetObjectController.vid;
+            player.annotator = AController.annotationCore.annotation_tool;
+            //player.annotations.showAnnotation(annotation);
+            var playFunction = function() {
+                // Fix problem with youtube videos in the first play. The plugin don't have this trigger
+                if (player.techName === 'Youtube') {
+                    var startAPI = function() {
+                        player.annotations.showAnnotation(annotation);
+                    }
+                    if (player.annotations.loaded)
+                        startAPI();
+                    else
+                        player.one('loadedRangeSlider', startAPI); // show Annotations once the RangeSlider is loaded
+                } else {
+                    player.annotations.showAnnotation(annotation);
+                }
+            };
+            if (player.paused()) {
+                player.play();
+                player.one('playing', playFunction);
+            } else {
+                playFunction();
+            }
         });
 
         jQuery('.parentAnnotation #edit').click(function (e){
