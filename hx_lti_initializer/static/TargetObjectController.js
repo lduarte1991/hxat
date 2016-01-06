@@ -14,12 +14,13 @@
      */
     $.TargetObjectController.prototype.init = function(){
 
-        if (this.initOptions.mediaType == "text") {
-                this.setUpTargetAsText(this.initOptions.annotationElement, this.initOptions.object_id);
-        } else if (this.initOptions.mediaType == "image") {
-                this.setUpTargetAsImage(this.initOptions.annotationElement, this.initOptions.object_id);
+        if (this.initOptions.mediaType === "text") {
+            this.setUpTargetAsText(this.initOptions.annotationElement, this.initOptions.object_id);
+        } else if (this.initOptions.mediaType === "image") {
+            this.setUpTargetAsImage(this.initOptions.annotationElement, this.initOptions.object_id);
+        } else if (this.initOptions.mediaType === "video") {
+            this.setUpTargetAsVideo(this.initOptions.annotationElement, this.initOptions.object_id);
         }
-    
     };
 
     $.TargetObjectController.prototype.setUpTargetAsText = function(element, targetObject) {
@@ -184,10 +185,8 @@
                 // if everything went great, then create an appropriate range using Annotator
                 var startNode = found[0].node;
                 var startOffset = found[0].offset;
-                console.log(startOffset);
                 var endNode = found[1].node;
                 var endOffset = found[1].offset;
-                console.log(endOffset);
                 if (endOffset !== 0) {
                     endOffset = endOffset - delimiter.length;
                 };
@@ -573,7 +572,21 @@
         };
 
         $.TargetObjectController.prototype.setUpTargetAsVideo = function(element, targetObject) {
+            var vidElement = jQuery(element).find('video')[0];
+            if (typeof videojs !== undefined) {
+                this.vid = videojs(vidElement, {
+                    techOrder: ['html5', 'flash', 'youtube']
+                }, {});
 
+                var self = this;
+                jQuery(document).bind('annotation_core_init', function() {
+                    self.vid.rangeslider(jQuery.extend(true, {}, {}));
+                    self.vid.annotations(jQuery.extend(true, {}, {posBigNew: "none"}));
+                });
+                jQuery(self.vid).on('annotationsDisplayed', function(){
+                    AController.annotationCore.annotation_tool.publish('externalCallToHighlightTags');
+                });
+            };  
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {

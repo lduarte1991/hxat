@@ -152,7 +152,7 @@
     border-radius: 1px;
     padding-left: 10px;
     color: #777;
-    margin-top: 40px;
+    margin-top: 20px;
     font-style: italic;
     font-family: Times New Roman;
     font-size: 10pt;
@@ -160,7 +160,7 @@
 
 .annotationItem .zoomToImageBounds {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .annotationItem .zoomToImageBounds .annotation-thumbnail{
