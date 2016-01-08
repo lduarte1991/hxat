@@ -6,9 +6,13 @@
  ***/
 
 (function($) {
-	$.AnnotationMain = function(options) {
-		this.options = options;
+	$.AnnotationMain = function(options_param) {
+		if (window.AController.main) {
+			return window.AController.main;
+		};
+		this.initOptions = jQuery.extend({}, options_param);
 		this.tags = this.setUpHighlightTags();
+		return this;
 	};
 
 	/* initForText
@@ -81,8 +85,9 @@
 	};
 
 	$.AnnotationMain.prototype.setUpHighlightTags = function(){
-		var self = this;
-		var tagOptions = self.options.annotationMainOptions.highlightTags_options;
+		var self = window.AController.main || this;
+		console.log(self);
+		var tagOptions = self.initOptions.annotationMainOptions.highlightTags_options;
 		if (typeof tagOptions !== 'undefined') {
 			var fin = {};
 			var prelim = tagOptions.split(',');
