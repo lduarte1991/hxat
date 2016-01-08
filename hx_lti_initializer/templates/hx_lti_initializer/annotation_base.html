@@ -78,7 +78,7 @@
 
         {% block mainapplication %}{% endblock %}
 
-        <section role="application" aria-label="Annotaiton Tool | Annotations List">
+        <section role="application" aria-label="Annotation Tool | Annotations List">
             <div id="dashboard" class="annotationListContainer"></div>
         </section>
     </div>
@@ -117,6 +117,7 @@
                     imageRootUrl: "{% static "vendors/catch/img"%}",
                     instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
                     default_tab: "{{ assignment.default_tab }}",
+                    show_instructor_tab: "{{assignment.include_instructor_tab}}",
                     instructions: "{{instructions | escapejs }}",
                     dashboard_hidden: {{dashboard_hidden}},
                     {% if focus_on_id %}

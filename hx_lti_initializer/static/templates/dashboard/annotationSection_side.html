@@ -10,7 +10,9 @@
     <div class="group-wrap">
         <div class="annotation-filter-buttons btn-group">
         	<button type="button" class="btn user-filter" id='mynotes' aria-label="View only my annotations" role="button">My Notes</button>
-        	<button type="button" class="btn user-filter" id='instructor' aria-label="View only instructor annotations" role="button">Instructor</button>
+            <% if (show_instructor_tab === "True") {%>
+            	<button type="button" class="btn user-filter" id='instructor' aria-label="View only instructor annotations" role="button">Instructor</button>
+            <% } %>
         	<button type="button" class="btn user-filter" id='public' aria-label="View everybody's annotations" role="button">Public</button>
         </div>
     </div>
