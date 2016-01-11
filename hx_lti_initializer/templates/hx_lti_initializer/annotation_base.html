@@ -51,7 +51,7 @@
     <div id="full-content" style="background-color:white">
         <nav role="navigation" id="navigationBar" aria-label="Annotation Tool">
             {% if is_instructor or org == "ATG" %}
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotaiton Tool Assignment Hub"><i class="fa fa-home"></i></a>
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" id="home" role="button" aria-label="Annotation Tool Assignment Hub"><i class="fa fa-home"></i></a>
             {% endif %}
             <div class="pagination">
                 {% if prev_object %}
@@ -82,9 +82,92 @@
             <div id="dashboard" class="annotationListContainer"></div>
         </section>
     </div>
-    {% block endscripts %}{% endblock %}
 
     <script>
+        // options for the HxAT
+        var options = {
+
+            // this info will be shared among the various sections of the tool
+            commonInfo: {
+                context_id: "{{ course }}",
+                collection_id: "{{ collection }}",
+                object_id: {{ object }},
+                token: "{{ token }}",
+                username: "{{ username }}",
+                user_id: "{{ user_id }}",
+                is_instructor: "{{ is_instructor }}",
+                pagination: {{ assignment.pagination_limit }},
+            },
+
+            // this should handle the colorization of the target
+            annotationMainOptions: {
+              {% if assignment.allow_highlights %}
+              'highlightTags_options': "{{ assignment.highlights_options }}",
+              {% endif %}
+            },
+
+            // this handles setting up the dashboard that collects the annotations
+            dashboardControllerOptions: {
+                annotationElement: jQuery("#dashboard"),
+                initOptions: {
+                    template_urls: '{% static "templates/dashboard/"%}',
+                    showPublicPrivateSelectors: true,
+                    showMediaSelector: false,
+                    flags: false,
+                    imageRootUrl: "{% static "vendors/catch/img"%}",
+                    instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+                    default_tab: "{{ assignment.default_tab }}",
+                    instructions: "{{instructions | escapejs }}",
+                    dashboard_hidden: {{dashboard_hidden}},
+                    {% if focus_on_id %}
+                    focus_on_annotation: {{focus_on_id}},
+                    {% endif %}
+                },
+            },
+
+            // this sets up the content itself (e.g. keyboard input)
+            targetObjectOptions: {
+                annotationElement: jQuery('#viewer'),
+            }
+        };
+        {% block extraOptions %}
+        {% endblock %}
+
+        AController(options);
+      
+        // Sends a message to canvas to resize the iframe so we don't have scrolling issues
+        {% if org == 'ATG' %}
+        $(document).ready(function() {
+            var receiver = "https://canvas.harvard.edu";
+            var message = {
+                subject: "lti.frameResize",
+                height: $(".fit-to-canvas").height()
+            };
+            console.log("sending message to receiver: ", message, receiver);
+            window.parent.postMessage(JSON.stringify(message), receiver);
+        }, 1000);
+        {% endif %}
+
+        // Checks to see if the user is coming from the instructor dashboard
+        {% if focus_on_id %}
+        $(document).ready(function(){
+            setTimeout(function(){
+                //if so we make sure to add just the annotation required
+                var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
+                if (typeof annotation.highlights === "undefined") {
+                    AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
+                }
+
+                // if it's a text annotation, it should scroll down to it
+                jQuery('html, body').animate({
+                    scrollTop: jQuery(annotation.highlights[0]).offset().top + jQuery('#navigationBar').height(); },
+                    'slow'
+                );
+            }, 1000);
+          }, 1000);
+        {% endif %}
+
+        // Allows HxAT to work in fullscreen mode
         var toggleFullscreen = function () {
             var self = this;
             var enterFullscreen = function() {
@@ -94,7 +177,10 @@
               } else if (el.mozRequestFullScreen) {
                 el.mozRequestFullScreen();
               } else if (el.webkitRequestFullscreen) {
-                el.webkitRequestFullscreen();
+                el.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                if (!document.webkitCurrentFullScreenElement) {
+                    el.webkitRequestFullscreen()
+                }
               } else if (el.msRequestFullscreen) {
                 el.msRequestFullscreen();
               }
@@ -124,5 +210,6 @@
         };
         jQuery('.annotation-fullscreen').click(toggleFullscreen);
     </script>
+    {% block endscripts %}{% endblock %}
     </body>
 </html>
