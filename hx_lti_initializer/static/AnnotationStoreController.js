@@ -214,7 +214,6 @@ AnnotatorEndpointController.prototype.deleteAnnotation = function(annotation) {
 
 AnnotatorEndpointController.prototype.editAnnotation = function(annotation, button) {
 	var self = this;
-	var button = jQuery(event.target);
 
 	var options = {
 		focus: true,
@@ -258,8 +257,6 @@ AnnotatorEndpointController.prototype.editAnnotation = function(annotation, butt
 		self.annotator.updateAnnotation(annotation_to_update);
 
 		closeEditingMode();
-		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-		jQuery('.repliesList').css('margin-top', replies_offset);
 	});
 
 	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {
@@ -664,9 +661,6 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
 		jQuery.publish('annotationUpdated.'+self.window.id, oaAnnotation);
 		closeEditingMode();
-
-		var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-		jQuery('.repliesList').css('margin-top', replies_offset);
 	});
 
 	jQuery('.parentAnnotation .savegroup #cancel').click(function(e) {

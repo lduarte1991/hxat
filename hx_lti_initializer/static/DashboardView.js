@@ -487,7 +487,6 @@
 
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
         jQuery('.annotationSection').append(html);
-        jQuery('.annotationSection').css('overflow-y', 'hidden');
         jQuery('.group-wrap').addClass("hidden");
         jQuery('.filter-options').addClass("hidden");
         jQuery('.search-bar').addClass("hidden");
@@ -503,17 +502,6 @@
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
-            if (jQuery('.parentAnnotation').hasClass("hidden")) {
-                var replies_offset = jQuery('.modal-navigation').offset().top -jQuery('.annotationModal').offset().top;
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight()- jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-                jQuery('.repliesList').css('height', replies_height);
-                jQuery('.repliesList').css('margin-top', replies_offset + 20);
-            } else {
-                var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height()- jQuery('#navigationBar').height();
-                jQuery('.repliesList').css('height', replies_height);
-                jQuery('.repliesList').css('margin-top', replies_offset);
-            }
         });
 
         jQuery('.annotationModal button.replybutton').click( function (e) {
@@ -577,10 +565,6 @@
     $.DashboardView.prototype.displayReplies = function(replies_unsorted) {
         var self = this;
         var replies = self.sortAnnotationsByCreated(replies_unsorted);
-        var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-        var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-        jQuery('.repliesList').css('margin-top', replies_offset);
-        jQuery('.repliesList').css('height', replies_height);
         
         var final_html = '';
         self.initOptions.endpoint.list_of_replies = {};
@@ -598,11 +582,6 @@
             var parentId = replies[0].parent;
             jQuery('.item-' + parentId).find('.replyNum').html(replies.length);
         };
-
-        jQuery(window).resize(function(){
-            var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-            jQuery('.repliesList').css('height', replies_height);
-        });
     };
 
     $.DashboardView.prototype.displayInstructions = function (instructions) {

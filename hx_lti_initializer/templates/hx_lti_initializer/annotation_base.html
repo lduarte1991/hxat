@@ -141,7 +141,7 @@
             var receiver = "https://canvas.harvard.edu";
             var message = {
                 subject: "lti.frameResize",
-                height: $(".fit-to-canvas").height()
+                height: $("body").height()
             };
             console.log("sending message to receiver: ", message, receiver);
             window.parent.postMessage(JSON.stringify(message), receiver);

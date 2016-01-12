@@ -2,8 +2,8 @@
 	<span class="idAnnotation"><%= id %></span>
 	<div class="modal-navigation">
 		<button class="btn btn-default" id="closeModal" aria-label="Go back to annotation list"><i class="glyphicon glyphicon-arrow-left"></i></button>
-		<div class="label"><%= user.name %>&apos;s Annotation</div>
 		<button class="btn btn-default" id="hideParent" aria-label="Hide annotation"><i class="glyphicon glyphicon-menu-hamburger"></i></button>
+		<div class="label"><%= user.name %>&apos;s Annotation</div>
 	</div>
 	<div class="parentAnnotation" role="group" aria-label="Annotation selected">
 		<div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">
@@ -44,10 +44,10 @@
 		    </div>
 	    <% } %>
 	</div>
-	<div class="repliesList" role="list">
-	    Loading Replies...
-	</div>
 	<div class="addReply">
 		<button class="btn btn-primary replybutton" role="button" aria-label="Reply to annotation"><i class="glyphicon glyphicon-pencil"></i>  Reply to Annotation</button>
+	</div>
+	<div class="repliesList" role="list">
+	    Loading Replies...
 	</div>
 </div>
