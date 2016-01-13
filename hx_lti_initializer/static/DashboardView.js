@@ -77,6 +77,7 @@
             jQuery(self.filterButtons[0]).addClass('disabled');
             var button = '#' + self.initOptions.default_tab.toLowerCase().replace(' ', '');
             jQuery(button).addClass('disabled');
+            setTimeout(function(){jQuery(button).click();}, 500);
         });
     };
 
@@ -256,6 +257,7 @@
         var el = self.initOptions.element;
         el.html(self.initOptions.TEMPLATES.annotationSection({
             annotationItems: [],
+            show_instructor_tab: self.initOptions.show_instructor_tab,
         }));
         
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));

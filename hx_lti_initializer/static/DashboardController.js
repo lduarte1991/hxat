@@ -81,6 +81,7 @@
 				pagination: self.initOptions.pagination,
 				controller: self,
 				default_tab: self.initOptions.default_tab,
+				show_instructor_tab: self.initOptions.show_instructor_tab,
 			});
 		});
 
