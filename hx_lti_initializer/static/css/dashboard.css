@@ -12,7 +12,7 @@
 	background-image:url(images/debut_dark.png);
 	padding: 5px;
 	overflow-x: hidden;
-	overflow-y: scroll;
+	overflow-y: auto; /* let the browser control when to show/hide the scrollbar based on the content */
     -moz-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
     -webkit-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
     box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
@@ -218,7 +218,13 @@
     height: 100%;
     background-color: white;
     z-index: 1000;
-	padding-right: 15px; /* accounts for scrollbar potentially overlapping content */
+}
+/* This rule is intended to provide a buffer on the right-hand side so
+the scrollbar doesn't overlap the content of the annotationModal */
+.annotationModal .parentAnnotation,
+.annotationModal .addReply,
+.annotationModal .repliesList .replyItem {
+	padding-right: 20px;
 }
 
 .modal-navigation {

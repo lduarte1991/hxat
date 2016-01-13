@@ -237,7 +237,6 @@
             jQuery('.search-bar').removeClass("hidden");
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
         }
         var divObject = ""
         if (typeof annotation !== "object") {
@@ -303,7 +302,6 @@
                 section.css('width', '0px');
                 handle.css('right', '0px');
                 section.css('right', '-5px');
-                section.css('overflow-y', "hidden");
                 handle.find('i').removeClass('fa-arrow-right');
                 handle.find('i').addClass('fa-arrow-left');
                 jQuery('.modal-navigation').addClass('hidden'); 
@@ -312,7 +310,6 @@
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
                 section.css('min-width', '150px');
-                section.css('overflow-y', "scroll");
                 section.css('right', '0px');
                 handle.find('i').addClass('fa-arrow-right');
                 handle.find('i').removeClass('fa-arrow-left');
@@ -347,7 +344,6 @@
                 section.css('width', '0px');
                 handle.css('right', '0px');
                 section.css('right', '-5px');
-                section.css('overflow-y', "hidden");
                 jQuery('.modal-navigation').addClass('hidden'); 
                 jQuery('.editgroup').addClass('hidden');
             } else {
@@ -356,7 +352,6 @@
                 section.css('width', '300px');
                 handle.css('right', '300px');
                 section.css('right', '0px');
-                section.css('overflow-y', "scroll");
                 jQuery('.modal-navigation').removeClass('hidden'); 
                 jQuery('.editgroup').removeClass('hidden');
             }
@@ -380,7 +375,6 @@
                     section.css('width', '300px');
                     handle.css('right', '300px');
                     section.css('right', '0px');
-                    section.css('overflow-y', "scroll");
                     handle.find('i').addClass('fa-arrow-right');
                     handle.find('i').removeClass('fa-arrow-left');
                 } else {
@@ -388,7 +382,6 @@
                     section.css('width', '0px');
                     handle.css('right', '0px');
                     section.css('right', '-5px');
-                    section.css('overflow-y', "hidden");
                     handle.find('i').removeClass('fa-arrow-right');
                     handle.find('i').addClass('fa-arrow-left');
                 }
@@ -404,7 +397,6 @@
             section.css('width', '0px');
             handle.css('right', '0px');
             section.css('right', '-5px');
-            section.css('overflow-y', "hidden");
             handle.find('i').removeClass('fa-arrow-right');
             handle.find('i').addClass('fa-arrow-left');
             jQuery('.test').css('width', section.offset().left);
@@ -498,7 +490,6 @@
             jQuery('.search-bar').removeClass("hidden");
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
@@ -591,7 +582,6 @@
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
     };
 
@@ -639,7 +629,6 @@
         jQuery('.annotationSection').append(html);
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
             jQuery('#keyboard-input-button').css('color', 'white');
             jQuery('#keyboard-input-button')[0].focus();
         });
