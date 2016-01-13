@@ -478,6 +478,7 @@
         var annotationItem = self.formatAnnotation(annotation);
 
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
+        var saved_section_scrolltop = jQuery('.annotationSection').scrollTop();
         jQuery('.annotationSection').append(html).scrollTop(0);
         jQuery('.group-wrap').addClass("hidden");
         jQuery('.filter-options').addClass("hidden");
@@ -490,6 +491,7 @@
             jQuery('.search-bar').removeClass("hidden");
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
