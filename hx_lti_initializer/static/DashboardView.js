@@ -478,7 +478,7 @@
         var annotationItem = self.formatAnnotation(annotation);
 
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
-        jQuery('.annotationSection').append(html);
+        jQuery('.annotationSection').append(html).scrollTop(0);
         jQuery('.group-wrap').addClass("hidden");
         jQuery('.filter-options').addClass("hidden");
         jQuery('.search-bar').addClass("hidden");
