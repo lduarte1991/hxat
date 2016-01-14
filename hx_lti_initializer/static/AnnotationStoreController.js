@@ -163,12 +163,17 @@ AnnotatorEndpointController.prototype.addNewAnnotationToMasterList = function(an
 };
 
 AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation) {
-	var index = this.annotationsMasterList.indexOf(annotation);
-	if (index > -1) {
-		this.annotationsMasterList.splice(index, 1);
-		return false;
-	};
-	return true;
+    var found = -1;
+    this.annotationsMasterList.forEach(function(ann, index) {
+        if (annotation.id === ann.id) {
+            found = index;
+        };
+    });
+    if (found > -1) {
+        this.annotationsMasterList.splice(found, 1);
+        return false;
+    };
+    return true;
 };
 
 AnnotatorEndpointController.prototype.getAnnotationById = function(id) {
