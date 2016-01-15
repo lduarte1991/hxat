@@ -238,7 +238,6 @@
             jQuery('.search-bar').removeClass("hidden");
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
         }
         var divObject = ""
         if (typeof annotation !== "object") {
@@ -305,7 +304,6 @@
                 section.css('width', '0px');
                 handle.css('right', '0px');
                 section.css('right', '-5px');
-                section.css('overflow-y', "hidden");
                 handle.find('i').removeClass('fa-arrow-right');
                 handle.find('i').addClass('fa-arrow-left');
                 jQuery('.modal-navigation').addClass('hidden'); 
@@ -314,7 +312,6 @@
             } else {
                 jQuery('#leftCol').attr('class', 'col-xs-7');
                 section.css('min-width', '150px');
-                section.css('overflow-y', "scroll");
                 section.css('right', '0px');
                 handle.find('i').addClass('fa-arrow-right');
                 handle.find('i').removeClass('fa-arrow-left');
@@ -349,7 +346,6 @@
                 section.css('width', '0px');
                 handle.css('right', '0px');
                 section.css('right', '-5px');
-                section.css('overflow-y', "hidden");
                 jQuery('.modal-navigation').addClass('hidden'); 
                 jQuery('.editgroup').addClass('hidden');
             } else {
@@ -358,7 +354,6 @@
                 section.css('width', '300px');
                 handle.css('right', '300px');
                 section.css('right', '0px');
-                section.css('overflow-y', "scroll");
                 jQuery('.modal-navigation').removeClass('hidden'); 
                 jQuery('.editgroup').removeClass('hidden');
             }
@@ -382,7 +377,6 @@
                     section.css('width', '300px');
                     handle.css('right', '300px');
                     section.css('right', '0px');
-                    section.css('overflow-y', "scroll");
                     handle.find('i').addClass('fa-arrow-right');
                     handle.find('i').removeClass('fa-arrow-left');
                 } else {
@@ -390,7 +384,6 @@
                     section.css('width', '0px');
                     handle.css('right', '0px');
                     section.css('right', '-5px');
-                    section.css('overflow-y', "hidden");
                     handle.find('i').removeClass('fa-arrow-right');
                     handle.find('i').addClass('fa-arrow-left');
                 }
@@ -406,7 +399,6 @@
             section.css('width', '0px');
             handle.css('right', '0px');
             section.css('right', '-5px');
-            section.css('overflow-y', "hidden");
             handle.find('i').removeClass('fa-arrow-right');
             handle.find('i').addClass('fa-arrow-left');
             jQuery('.test').css('width', section.offset().left);
@@ -488,8 +480,8 @@
         var annotationItem = self.formatAnnotation(annotation);
 
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
-        jQuery('.annotationSection').append(html);
-        jQuery('.annotationSection').css('overflow-y', 'hidden');
+        var saved_section_scrolltop = jQuery('.annotationSection').scrollTop();
+        jQuery('.annotationSection').append(html).scrollTop(0);
         jQuery('.group-wrap').addClass("hidden");
         jQuery('.filter-options').addClass("hidden");
         jQuery('.search-bar').addClass("hidden");
@@ -501,21 +493,10 @@
             jQuery('.search-bar').removeClass("hidden");
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
+            jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
-            if (jQuery('.parentAnnotation').hasClass("hidden")) {
-                var replies_offset = jQuery('.modal-navigation').offset().top -jQuery('.annotationModal').offset().top;
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight()- jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-                jQuery('.repliesList').css('height', replies_height);
-                jQuery('.repliesList').css('margin-top', replies_offset + 20);
-            } else {
-                var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-                var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height()- jQuery('#navigationBar').height();
-                jQuery('.repliesList').css('height', replies_height);
-                jQuery('.repliesList').css('margin-top', replies_offset);
-            }
         });
 
         jQuery('.annotationModal button.replybutton').click( function (e) {
@@ -579,10 +560,6 @@
     $.DashboardView.prototype.displayReplies = function(replies_unsorted) {
         var self = this;
         var replies = self.sortAnnotationsByCreated(replies_unsorted);
-        var replies_offset = jQuery('.parentAnnotation').offset().top -jQuery('.annotationModal').offset().top + jQuery('.parentAnnotation').height();
-        var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-        jQuery('.repliesList').css('margin-top', replies_offset);
-        jQuery('.repliesList').css('height', replies_height);
         
         var final_html = '';
         self.initOptions.endpoint.list_of_replies = {};
@@ -600,11 +577,6 @@
             var parentId = replies[0].parent;
             jQuery('.item-' + parentId).find('.replyNum').html(replies.length);
         };
-
-        jQuery(window).resize(function(){
-            var replies_height = jQuery(window).height() - jQuery('.replybutton').outerHeight() - jQuery('.parentAnnotation').height() - jQuery('.modal-navigation').height() - jQuery('#navigationBar').height();
-            jQuery('.repliesList').css('height', replies_height);
-        });
     };
 
     $.DashboardView.prototype.displayInstructions = function (instructions) {
@@ -614,7 +586,6 @@
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
         });
     };
 
@@ -662,7 +633,6 @@
         jQuery('.annotationSection').append(html);
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
-            jQuery('.annotationSection').css('overflow-y', 'scroll');
             jQuery('#keyboard-input-button').css('color', 'white');
             jQuery('#keyboard-input-button')[0].focus();
         });
