@@ -35,8 +35,9 @@
         <nav class="navigation" role="navigation" aria-label="Main Menu">
             <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
             {% if is_instructor %}
-            <a href="{% get_url_to_annotation_manual default="pages/instructor_manual/hxat-instructor-manual.html" %}">Manual</a>
-            <a role="button" href="instructor_dashboard_view">Instructor Dashboard</a>
+				{% get_annotation_manual  default_url="pages/instructor_manual/hxat-instructor-manual.html" default_target="_self" as annotation_manual %}
+				<a target="{{ annotation_manual.target }}" href="{{ annotation_manual.url }}">Manual</a>
+				<a role="button" href="instructor_dashboard_view">Instructor Dashboard</a>
             {% endif %}
         </nav>
 

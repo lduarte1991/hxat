@@ -56,16 +56,19 @@ def format_tags(tagslist):
 	'''
 	return ', '.join(tagslist)
 
-@register.simple_tag
-def get_url_to_annotation_manual(**kwargs):
+@register.assignment_tag
+def get_annotation_manual(**kwargs):
 	'''
 	Returns the URL to the annotation manual. When the URL is present in the django settings,
-	it returns this URL, otherwise it will return the static url passed in to this function.
+	it returns this URL, otherwise it will return the default url passed in to this function.
 	'''
-	url = kwargs.get('default', '')
+	url = kwargs.get('default_url', '')
+	target = kwargs.get('default_target', '_self')
 	if settings.ANNOTATION_MANUAL_URL is not None:
 		url = settings.ANNOTATION_MANUAL_URL
 	if not url.startswith('http'):
 		url = static(url)
-	return url
+	if settings.ANNOTATION_MANUAL_TARGET is not None:
+		target = settings.ANNOTATION_MANUAL_TARGET
+	return {'url': url, 'target': target}
 	
