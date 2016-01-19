@@ -29,6 +29,7 @@ from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_tok
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
+from ims_lti_py.tool_provider import DjangoToolProvider
 
 from urlparse import urlparse
 import urllib2
@@ -74,6 +75,10 @@ def launch_lti(request):
         if not lti_username:
             debug_printer('DEBUG - user_id not found in post.')
             raise PermissionDenied()
+
+    lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
+    if lti_grade_url is not None:
+        save_session(request, is_graded=True, lti_params=request.POST)
 
     # Check whether user is a admin, instructor or teaching assistant
     if set(roles) & set(settings.ADMIN_ROLES):
@@ -514,6 +519,16 @@ def annotation_database_create(request):
         data=json.dumps(json_body),
         headers=headers
     )
+
+    if request.session['is_graded'] and response.status_code == 200:
+        consumer_key = settings.CONSUMER_KEY
+        secret = settings.LTI_SECRET
+        params = request.session['lti_params']
+        tool_provider = DjangoToolProvider(consumer_key, secret, params)
+        outcome = tool_provider.post_replace_result(1)
+        debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
+            successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
+        ))
 
     return HttpResponse(response)
 
