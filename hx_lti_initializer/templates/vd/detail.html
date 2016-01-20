@@ -21,6 +21,7 @@
 <script src="{% static "vendors/development/summernote.js" %}"></script>
 <script src="{% static "vendors/development/video.dev.js" %}"></script>
 <script src="{% static "vendors/development/vjs.youtube.js" %}"></script>
+<script src="{% static "vendors/development/videojs-transcript.js" %}"></script>
 <script src="{% static "vendors/development/jquery-Watch.js" %}"></script>
 <script src="{% static "vendors/development/rangeslider.js" %}"></script>
 <script src="{% static "vendors/development/videojs-annotator-plugin.js" %}"></script>
@@ -36,6 +37,7 @@
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/video-js.min.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/videojs-transcript.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/rangeslider.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/ova.css" %}">
 <link rel="stylesheet" href="{% static "css/video_annotation.css" %}">
@@ -58,11 +60,13 @@ Annotation Tool | Video | {{ target_object.target_title }}
 
 {% block mainapplication %}
 <section role="application" aria-label="Annotation Tool Video Content" style="height: 100%">
-	<div  id="viewer" class="test" style="padding-top:50px; height:100%;" class="fit-to-canvas">
+	<div  id="viewer" class="test" style="padding-top:50px; height:80%;" class="fit-to-canvas">
 		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:100%;">
       <source src="{{ target_object.target_content | safe }}" type='video/youtube' />
+      <track kind="captions" src="/static/2NRQPzSNXLM.srt" srclang="en" label="English" default />
     </video>
 	</div>
+  <div id="transcript" style="height:20%; overflow-y: scroll; background-color:white; color:black;"></div>
 </section>
 {% endblock %}
 
