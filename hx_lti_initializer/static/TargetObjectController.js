@@ -577,8 +577,13 @@
                 this.vid = videojs(vidElement, {
                     techOrder: ['html5', 'flash', 'youtube']
                 }, {});
-
                 var self = this;
+                    var options = {
+                        showTitle: false,
+                        showTrackSelector: false,
+                    };
+                    var transcript = self.vid.transcript(options);
+                    document.querySelector('#transcript').appendChild(transcript.el());
                 jQuery(document).bind('annotation_core_init', function() {
                     self.vid.rangeslider(jQuery.extend(true, {}, {}));
                     self.vid.annotations(jQuery.extend(true, {}, {posBigNew: "none"}));
