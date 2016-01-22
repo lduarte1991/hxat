@@ -78,7 +78,8 @@ def launch_lti(request):
 
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
     if lti_grade_url is not None:
-        save_session(request, is_graded=True, lti_params=request.POST)
+        save_session(request, is_graded=True)
+    save_session(request, lti_params=request.POST)
 
     # Check whether user is a admin, instructor or teaching assistant
     if set(roles) & set(settings.ADMIN_ROLES):
@@ -520,15 +521,18 @@ def annotation_database_create(request):
         headers=headers
     )
 
-    if request.session['is_graded'] and response.status_code == 200:
-        consumer_key = settings.CONSUMER_KEY
-        secret = settings.LTI_SECRET
-        params = request.session['lti_params']
-        tool_provider = DjangoToolProvider(consumer_key, secret, params)
-        outcome = tool_provider.post_replace_result(1)
-        debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
-            successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
-        ))
+    try:
+        if request.session['is_graded'] and response.status_code == 200:
+            consumer_key = settings.CONSUMER_KEY
+            secret = settings.LTI_SECRET
+            params = request.session['lti_params']
+            tool_provider = DjangoToolProvider(consumer_key, secret, params)
+            outcome = tool_provider.post_replace_result(1)
+            debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
+                successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
+            ))
+    except:
+        debug_printer("is_graded was not found in the session")
 
     return HttpResponse(response)
 
