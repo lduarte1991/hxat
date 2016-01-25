@@ -444,8 +444,10 @@ videojs.Youtube.prototype.onStateChange = function(state){
       case YT.PlayerState.ENDED:
         // Replace YouTube play button by our own
         if (!this.player_.options()['ytcontrols']) {
-          this.player_el_.getElementsByClassName('vjs-poster')[0].style.display = 'block';
-          this.player_.bigPlayButton.show();
+          // commented out because adding the first line pushes the live transcript down
+          // and the second line has a button appear over the youtube play button and looks weird.
+          //this.player_el_.getElementsByClassName('vjs-poster')[0].style.display = 'block';
+          //this.player_.bigPlayButton.show();
         }
 
         this.player_.trigger('ended');

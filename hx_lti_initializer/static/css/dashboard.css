@@ -16,6 +16,8 @@
     -moz-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
     -webkit-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
     box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    /* For videojs */
+    z-index: 999;
     /* For IE 8 */
     -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=270, Color='rgba(0,0,0,0.3)')";
 }
