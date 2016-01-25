@@ -240,8 +240,8 @@ var scrollerProto = function(plugin) {
 
   // Scroll an element's parent so the element is brought into view.
   var scrollToElement = function (element) {
-    if (this.canScroll()) {
-      var parent = element.parentElement;
+    if (this.canScroll(element)) {
+      var parent = element.parentElement.parentElement.parentElement;
       var parentOffsetBottom = parent.offsetTop + parent.clientHeight;
       var elementOffsetBottom = element.offsetTop + element.clientHeight;
       var relTop = element.offsetTop - parent.offsetTop;
@@ -270,9 +270,11 @@ var scrollerProto = function(plugin) {
   };
 
   // Return whether the element is scrollable.
-  var canScroll = function () {
+  var canScroll = function (element) {
     var el = this.element;
-    return el.scrollHeight > el.offsetHeight;
+    var scrollable = el.scrollHeight+el.offsetTop;
+    var offsettop = element.offsetTop + element.clientHeight;
+    return scrollable > offsettop;
   };
 
   // Return whether the user is interacting with the transcript.

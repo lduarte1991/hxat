@@ -3730,7 +3730,7 @@ vjs.RemainingTimeDisplay.prototype.updateContent = function(){
 vjs.FullscreenToggle = vjs.Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    //vjs.Button.call(this, player, options);
   }
 });
 
