@@ -10,6 +10,7 @@ from models import *
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from ims_lti_py.tool_provider import DjangoToolProvider
+from os.path import splitext, basename
 import base64
 import sys
 import time
