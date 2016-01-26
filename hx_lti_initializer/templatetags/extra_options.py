@@ -1,5 +1,6 @@
 from django.template import Library
 from django import template
+from target_object_database.models import get_extension
 
 register = Library()
 
@@ -50,6 +51,39 @@ def do_captureas(parser, token):
     parser.delete_first_token()
     return CaptureasNode(nodelist, args)
 
+
+@register.filter_function
+def just_the_youtube_vid_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    if len(result) < 3:
+        if get_extension(result[0]) == "video/youtube":
+            return result[0]
+        else:
+            return ""
+    if len(result) == 3:
+        return result[0]
+
+@register.filter_function
+def just_the_html5_vid_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    if len(result) < 3:
+        if get_extension(result[0]) != "video/youtube":
+            return result[0]
+        else:
+            return ""
+    if len(result) == 3:
+        return result[1]
+
+@register.filter_function
+def just_the_transcript_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    return result[len(result) - 1]
 
 class CaptureasNode(template.Node):
     def __init__(self, nodelist, varname):

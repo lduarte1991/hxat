@@ -61,7 +61,7 @@ Annotation Tool | Video | {{ target_object.target_title }}
 {% block mainapplication %}
 <section role="application" aria-label="Annotation Tool Video Content" style="height: 100%">
 	<div  id="viewer" class="test" style="padding-top:50px; height:80%;" class="fit-to-canvas">
-		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:80%;">
+		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:80%;" data-setup='{ "playbackRates": [0.5, 1, 1.5, 2] }'>
       {{ target_object.get_target_content_for_video | safe }}
       <!-- <source src="{{ target_object.target_content | safe }}" type='video/youtube' />
       <track kind="captions" src="/static/2NRQPzSNXLM.srt" srclang="en" label="English" default /> -->
