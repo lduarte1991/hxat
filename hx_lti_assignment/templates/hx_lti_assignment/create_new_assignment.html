@@ -98,7 +98,6 @@
         	var canvas_id = jQuery('#' + orderNum + '-target_options_canvas_id').val();
         	var dashboard_hidden = jQuery('#' + orderNum + '-target_options_dashboard_hidden').is(":checked") ? "true" : "false";
         	var options = viewtype + "," + canvas_id + "," + dashboard_hidden;
-        	console.log(options.replace(/undefined/g, ""));
         	jQuery('#id_assignmenttargets_set-' + orderNum + '-target_external_options').val(options.replace(/undefined/g, ""));
         });
 

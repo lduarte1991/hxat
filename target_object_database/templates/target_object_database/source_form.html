@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load extra_options %}
 {% load staticfiles %}
 {% load bootstrap3 %}
 
@@ -38,7 +39,47 @@
 		$('select[name=target_creator]').val(creatorValue);
 		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
+
+		window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link}}";
+		window.html5Link = "{{form.target_content.value | just_the_html5_vid_link}}";
+		window.transcript_link = "{{form.target_content.value | just_the_transcript_link}}";
+
 	});
+
+	var createVideoFields = function() {
+		jQuery('.vdchange').before("<div class='form-group vd'>\
+			<label for=\"id_youtube_vid_link\">Youtube Video Link:</label>\
+			<input id=\"id_youtube_vid_link\" maxlength=\"255\" name=\"youtube_vid_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.youtubeLink+"\">\
+			<div class=\"help_text\">If you don't include an HTML5-approved video (e.g. .mp4), you must include a youtube video.</div>\
+			</div><div class='form-group vd'>\
+			<label for=\"id_html5_vid_link\">HTML5 Video Link:</label>\
+			<input id=\"id_html5_vid_link\" maxlength=\"255\" name=\"html5_vid_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.html5Link+"\">\
+			<div class=\"help_text\">If you don't include a Youtube video (e.g. .mp4), you must include an HTML5-approved video.</div>\
+			</div><div class='form-group vd'>\
+			<label for=\"id_transcript_link\">Transcript Link:</label>\
+			<input id=\"id_transcript_link\" maxlength=\"255\" name=\"transcript_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.transcript_link+"\">\
+			</div>");
+		jQuery('.video_option').change(function (e){
+        	var youtube_vid_link = jQuery('#id_youtube_vid_link').val();
+        	var html5_vid_link = jQuery('#id_html5_vid_link').val();
+        	var transcript_link = jQuery('#id_transcript_link').val();
+        	if (html5_vid_link == "") {
+        		if (transcript_link == "") {
+        			jQuery('#id_target_content').html(youtube_vid_link);
+        		} else {
+        			jQuery('#id_target_content').html(youtube_vid_link + ';' + transcript_link);
+        		}
+        	} else if (youtube_vid_link == "") {
+        		if (transcript_link == "") {
+        			jQuery('#id_target_content').html(html5_vid_link);
+        		} else {
+        			jQuery('#id_target_content').html(html5_vid_link + ';' + transcript_link);
+        		}
+        	} else {
+        		jQuery('#id_target_content').html(youtube_vid_link + ';' + html5_vid_link + ";" + transcript_link);
+        	}
+        });
+	}
 
 		jQuery(document).ready(function() {
 			jQuery('#id_target_type').change(function() {
@@ -51,6 +92,7 @@
 					jQuery('.tx').hide();
 					jQuery('.vd').show();
 					jQuery('#id_target_content').destroy();
+					createVideoFields();
 					jQuery('label[for="id_target_content"]').text('Video Link');
 				} else if (value === "tx") {
 					jQuery('.ig').hide();
@@ -107,7 +149,7 @@
 			<label for="id_target_author">Source Author:</label> 
 			<input id="id_target_author" maxlength="255" name="target_author" class="form-control" type="text" value="{{ form.target_author.value }}">
 		</div>
-		<div class="form-group">
+		<div class="form-group vdchange ig tx">
 			<label for="id_target_content">Source Content:</label> 
             {{form.target_content.errors}}
 			<textarea id="id_target_content" name="target_content" class="form-control">{{ form.target_content.value | safe }}</textarea>
