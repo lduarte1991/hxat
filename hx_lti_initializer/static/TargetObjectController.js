@@ -575,7 +575,7 @@
             var vidElement = jQuery(element).find('video')[0];
             if (typeof videojs !== undefined) {
                 this.vid = videojs(vidElement, {
-                    techOrder: ['html5', 'flash', 'youtube']
+                    techOrder: ['youtube', 'html5', 'flash']
                 }, {});
                 var self = this;
                     var options = {
