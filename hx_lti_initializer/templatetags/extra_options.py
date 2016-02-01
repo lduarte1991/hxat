@@ -33,9 +33,23 @@ def just_dashboard_hidden(extra_options):
         return False
     result = extra_options.split(',')
     if len(result) < 3:
-        return ""
+        return False
     else:
         if result[2].strip() == "true":
+            return True
+        else:
+            return False
+
+
+@register.filter_function
+def just_transcript_hidden(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 4:
+        return False
+    else:
+        if result[3].strip() == "true":
             return True
         else:
             return False

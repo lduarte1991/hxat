@@ -425,6 +425,12 @@
             jQuery('.test').css('width', section.offset().left);
         };
 
+        if (self.initOptions.controller.initOptions.transcript_hidden) {
+            jQuery('#transcript').hide(10, function(){
+              jQuery('#viewer').css('height', '100%');
+            });
+        }
+
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
             if (typeof jQuery.publish !== "undefined") {

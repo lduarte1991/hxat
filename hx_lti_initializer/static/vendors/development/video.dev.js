@@ -81,6 +81,11 @@ vjs.options = {
   // defaultVolume: 0.85,
   'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
 
+  // default playback rates
+  'playbackRates': [],
+  // Add playback rate selection by adding rates
+  // 'playbackRates': [0.5, 1, 1.5, 2],
+
   // Included control sets
   'children': {
     'mediaLoader': {},
@@ -3448,6 +3453,20 @@ vjs.Player.prototype.listenForUserActivity = function(){
   });
 };
 
+vjs.Player.prototype.playbackRate = function(rate) {
+  if (rate !== undefined) {
+    this.techCall('setPlaybackRate', rate);
+    return this;
+  }
+
+  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+    return this.techGet('playbackRate');
+  } else {
+    return 1.0;
+  }
+
+};
+
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
 // readyState: function(){ return this.techCall('readyState'); },
@@ -3536,8 +3555,11 @@ vjs.ControlBar.prototype.options_ = {
     'progressControl': {},
     'fullscreenToggle': {},
     'volumeControl': {},
-    'muteToggle': {}
+    'muteToggle': {},
     // 'volumeMenuButton': {}
+    'playbackRateMenuButton': {},
+    'transcriptToggle': {},
+    'downloadMenuButton': {},
   }
 };
 
@@ -4191,6 +4213,219 @@ vjs.VolumeMenuButton.prototype.createEl = function(){
   });
 };
 vjs.VolumeMenuButton.prototype.update = vjs.MuteToggle.prototype.update;
+
+vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
+  /** @constructor */
+  init: function(player, options){
+    vjs.MenuButton.call(this, player, options);
+
+    this.updateVisibility();
+    this.updateLabel();
+
+    player.on('loadstart', vjs.bind(this, this.updateVisibility));
+    player.on('ratechange', vjs.bind(this, this.updateLabel));
+  }
+});
+
+vjs.PlaybackRateMenuButton.prototype.createEl = function(){
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-playback-rate vjs-menu-button vjs-control',
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Playback Rate</span></div>'
+  });
+
+  this.labelEl_ = vjs.createEl('div', {
+    className: 'vjs-playback-rate-value',
+    innerHTML: 1.0
+  });
+
+  el.appendChild(this.labelEl_);
+
+  return el;
+};
+
+// Menu creation
+vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
+  var menu = new vjs.Menu(this.player());
+  var rates = this.player().options()['playbackRates'];
+
+  if (rates) {
+    for (var i = rates.length - 1; i >= 0; i--) {
+      menu.addChild(
+        new vjs.PlaybackRateMenuItem(this.player(), { 'rate': rates[i] + 'x'})
+        );
+    };
+  }
+
+  return menu;
+};
+
+vjs.PlaybackRateMenuButton.prototype.updateARIAAttributes = function(){
+  // Current playback rate
+  this.el().setAttribute('aria-valuenow', this.player().playbackRate());
+};
+
+vjs.PlaybackRateMenuButton.prototype.onClick = function(){
+  // select next rate option
+  var currentRate = this.player().playbackRate();
+  var rates = this.player().options()['playbackRates'];
+  // this will select first one if the last one currently selected
+  var newRate = rates[0];
+  for (var i = 0; i <rates.length ; i++) {
+    if (rates[i] > currentRate) {
+      newRate = rates[i];
+      break;
+    }
+  };
+  this.player().playbackRate(newRate);
+  this.labelEl_.innerHTML = newRate + 'x';
+};
+
+vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
+  return this.player().tech
+    && this.player().tech.features['playbackRate']
+    && this.player().options()['playbackRates']
+    && this.player().options()['playbackRates'].length > 0
+  ;
+};
+
+/**
+ * Hide playback rate controls when they're no playback rate options to select
+ */
+vjs.PlaybackRateMenuButton.prototype.updateVisibility = function(){
+  if (this.playbackRateSupported()) {
+    this.removeClass('vjs-hidden');
+  } else {
+    this.addClass('vjs-hidden');
+  }
+};
+
+/**
+ * Update button label when rate changed
+ */
+vjs.PlaybackRateMenuButton.prototype.updateLabel = function(){
+  if (this.playbackRateSupported()) {
+    this.labelEl_.innerHTML = this.player().playbackRate() + 'x';
+  }
+};
+
+/**
+ * The specific menu item type for selecting a playback rate
+ *
+ * @constructor
+ */
+vjs.PlaybackRateMenuItem = vjs.MenuItem.extend({
+  contentElType: 'button',
+  /** @constructor */
+  init: function(player, options){
+    var label = this.label = options['rate'];
+    var rate = this.rate = parseFloat(label, 10);
+
+    // Modify options for parent MenuItem class's init.
+    options['label'] = label;
+    options['selected'] = rate === 1;
+    vjs.MenuItem.call(this, player, options);
+
+    this.player().on('ratechange', vjs.bind(this, this.update));
+  }
+});
+
+vjs.PlaybackRateMenuItem.prototype.onClick = function(){
+  vjs.MenuItem.prototype.onClick.call(this);
+  this.player().playbackRate(this.rate);
+  this.player().controlBar.playbackRateMenuButton.labelEl_.innerHTML = this.rate + "x";
+};
+
+vjs.PlaybackRateMenuItem.prototype.update = function(){
+  this.selected(this.player().playbackRate() == this.rate);
+};
+
+vjs.TranscriptToggle = vjs.Button.extend({
+  /** @constructor */
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
+  }
+});
+
+vjs.TranscriptToggle.prototype.buttonText = 'Transcript';
+
+vjs.TranscriptToggle.prototype.buildCSSClass = function(){
+  return 'vjs-transcript-control ' + vjs.Button.prototype.buildCSSClass.call(this);
+};
+
+vjs.TranscriptToggle.prototype.onClick = function(){
+  if (jQuery('#transcript').is(":hidden")){
+    jQuery("#transcript").show();
+    jQuery('#viewer').css('height', '80%');
+  } else {
+    jQuery('#transcript').hide(10, function(){
+      jQuery('#viewer').css('height', '100%');
+    });
+  }
+  
+};
+
+vjs.DownloadMenuButton = vjs.MenuButton.extend({
+  init: function(player, options) {
+    vjs.MenuButton.call(this, player, options);
+  }
+});
+
+vjs.DownloadMenuButton.prototype.createEl = function(){
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-download-control vjs-control vjs-menu-button',
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Download Video/Transcript</span></div>',
+  });
+
+  return el;
+};
+
+vjs.DownloadMenuButton.prototype.createMenu = function (){
+  var menu = new vjs.Menu(this.player());
+  var downloads = this.player().options()['downloadItems'];
+  var self = this;
+
+  if (downloads) {
+
+    for (var i = downloads.length - 1; i >= 0; i--) {
+      if (downloads[i] === 'video') {
+        jQuery.each(this.player().options_.sources, function(index, value) {
+          if (value.type === "video/mp4") {
+            menu.addChild(
+              new vjs.DownloadMenuItem(self.player(), {'downloadItem': 'Download Video', 'source': value.src})
+            );
+          }
+        });
+      };
+      if (downloads[i] === 'transcript') {
+        jQuery.each(this.player().options_.tracks, function(index, value) {
+          console.log(value);
+            menu.addChild(
+              new vjs.DownloadMenuItem(self.player(), {'downloadItem': 'Download ' + value.label + ' Transcript', 'source': value.src})
+            );
+        });
+      };
+    };
+    
+  };
+
+  return menu;
+};
+
+vjs.DownloadMenuItem = vjs.MenuItem.extend({
+  contentElType: 'button',
+  init: function(player, options) {
+    var label = this.label = options['downloadItem'];
+    var src = this.src = options['source'];
+
+    options['label'] = label;
+    vjs.MenuItem.call(this, player, options);
+  }
+});
+
+vjs.DownloadMenuItem.prototype.onClick = function() {
+  vjs.MenuItem.prototype.onClick.call(this);
+  window.open(this.src);
+};
 /* Poster Image
 ================================================================================ */
 /**
@@ -4460,11 +4695,12 @@ vjs.MediaTechController.prototype.features = {
 
   // Resizing plugins using request fullscreen reloads the plugin
   'fullscreenResize': false,
+  'playbackRate': true,
 
   // Optional events that we can manually mimic with timers
   // currently not triggered by video-js-swf
   'progressEvents': false,
-  'timeupdateEvents': false
+  'timeupdateEvents': false,
 };
 
 vjs.media = {};
@@ -4502,6 +4738,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
     this.features['volumeControl'] = vjs.Html5.canControlVolume();
+
+    // just in case; or is it excessively...
+    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
@@ -4718,6 +4957,9 @@ vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
+vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
+vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
@@ -4741,6 +4983,12 @@ vjs.Html5.canControlVolume = function(){
   var volume =  vjs.TEST_VID.volume;
   vjs.TEST_VID.volume = (volume / 2) + 0.1;
   return volume !== vjs.TEST_VID.volume;
+};
+
+vjs.Html5.canControlPlaybackRate = function(){
+  var playbackRate = Html5.TEST_VID.playbackRate;
+  Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== Html5.TEST_VID.playbackRate;
 };
 
 // List of all HTML5 events (various uses).

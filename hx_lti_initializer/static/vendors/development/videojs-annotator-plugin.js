@@ -104,7 +104,8 @@ Util.mousePosition = function(e, offsetEl) {
                 plugin.components[index].init_();
             }
 
-            player.annotations.BigNewAn.show();
+            player.annotations.AnConBut.show();
+            //player.annotations.BigNewAn.show();
         
             // set the position of the big buttom
             plugin.setposBigNew(plugin.options.posBigNew);
@@ -195,8 +196,8 @@ Util.mousePosition = function(e, offsetEl) {
             this.updatePrecision = 3;
             
             // Components and Quick Aliases
-            this.BigNewAn = this.components.BigNewAnnotation = player.BigNewAnnotation;
-            this.AnConBut = this.components.AnContainerButtons = controlBar.AnContainerButtons;
+            //this.BigNewAn = this.components.BigNewAnnotation = player.BigNewAnnotation;
+            this.AnConBut = this.components.AnContainerButtons = player.AnContainerButtons;
             this.ShowSt = this.components.ShowStatistics = this.AnConBut.ShowStatistics;
             this.NewAn = this.components.NewAnnotation = this.AnConBut.NewAnnotation;
             this.ShowAn =this.components.ShowAnnotations = this.AnConBut.ShowAnnotations;
@@ -250,8 +251,8 @@ Util.mousePosition = function(e, offsetEl) {
                 };
                 ischanged();
             });
-            
-            this.BigNewAn.hide(); // Hide until the video is load
+            this.AnConBut.hide();
+           // this.BigNewAn.hide(); // Hide until the video is load
         },
         newan: function(start, end) {
             var player = this.player;
@@ -482,14 +483,14 @@ Util.mousePosition = function(e, offsetEl) {
             this.backDSTime.setTimes();
         },
         setposBigNew: function(pos) {
-            var pos = pos || 'ul';
+            /*var pos = pos || 'ul';
             var el = this.player.BigNewAnnotation.el_;
             videojs.removeClass(el, 'ul');
             videojs.removeClass(el, 'ur');
             videojs.removeClass(el, 'c');
             videojs.removeClass(el, 'bl');
             videojs.removeClass(el, 'br');
-            videojs.addClass(el, pos);
+            videojs.addClass(el, pos);*/
         },
         pressedKey: function (key) {
             var player = this.player;
@@ -521,7 +522,7 @@ Util.mousePosition = function(e, offsetEl) {
             var emtoPx = parseFloat($(this.backDSBar.el_).css('width'));
             var playerHeight = parseFloat($(player.el_).css('height'));
             var controlBarHeight = parseFloat($(player.controlBar.el_).css('height'));
-            var newHeight = (playerHeight - controlBarHeight) / emtoPx - 5;
+            var newHeight = (playerHeight - controlBarHeight - 80) / emtoPx - 5;
             this.BackAnDisplay.el_.style.height = this.backDSBar.el_.style.height = (newHeight + 'em');
             this.BackAnDisplay.el_.style.top = this.backDSBar.el_.style.top = "-" + (newHeight + 3 + 'em');
             this.BackAnDisplayScroll.el_.children[0].style.top = "-" + (newHeight + 5 + 'em');
@@ -651,10 +652,10 @@ Util.mousePosition = function(e, offsetEl) {
     // ----------------CREATE new Components for video-js---------------- //
 
     // --Charge the new Component into videojs
-    videojs.ControlBar.prototype.options_.children.AnContainerButtons = {}; // Container with the css for the buttons
+    videojs.Player.prototype.options_.children.AnContainerButtons = {}; // Container with the css for the buttons
     videojs.ControlBar.prototype.options_.children.BackAnDisplay = {}; // Range Slider Time Bar
     videojs.ControlBar.prototype.options_.children.BackAnDisplayScroll = {}; // Range Slider Time Bar
-    videojs.options.children.BigNewAnnotation = {}; // Big Button New Annotation
+   // videojs.options.children.BigNewAnnotation = {}; // Big Button New Annotation
 
 
 
@@ -666,32 +667,32 @@ Util.mousePosition = function(e, offsetEl) {
      * @param {Object=} options
      * @constructor
      */
-    videojs.BigNewAnnotation = videojs.Button.extend({
-        /** @constructor */
-        init: function(player, options) {
-            videojs.Button.call(this, player, options);
-        }
-    });
+    // videojs.BigNewAnnotation = videojs.Button.extend({
+    //     /** @constructor */
+    //     init: function(player, options) {
+    //         videojs.Button.call(this, player, options);
+    //     }
+    // });
 
-    videojs.BigNewAnnotation.prototype.init_ = function() {
-        this.an = this.player_.annotations;
-        // Hide Button if the user has selected readOnly in the Annotator options
-        var opts = this.an.options.optionsAnnotator;
-        if (typeof opts !== 'undefined' && typeof opts.readOnly !== 'undefined' && opts.readOnly)
-            this.hide();
-    };
+    // videojs.BigNewAnnotation.prototype.init_ = function() {
+    //     this.an = this.player_.annotations;
+    //     // Hide Button if the user has selected readOnly in the Annotator options
+    //     var opts = this.an.options.optionsAnnotator;
+    //     if (typeof opts !== 'undefined' && typeof opts.readOnly !== 'undefined' && opts.readOnly)
+    //         this.hide();
+    // };
 
-    videojs.BigNewAnnotation.prototype.createEl = function() {
-        return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-big-new-annotation vjs-menu-button vjs-control',
-            innerHTML: '<div class="vjs-big-menu-button vjs-control">A</div>',
-            title: 'New Annotation',
-        });
-    };
+    // videojs.BigNewAnnotation.prototype.createEl = function() {
+    //     return videojs.Button.prototype.createEl.call(this, 'div', {
+    //         className: 'vjs-big-new-annotation vjs-menu-button vjs-control',
+    //         innerHTML: '<div class="vjs-big-menu-button vjs-control">A</div>',
+    //         title: 'New Annotation',
+    //     });
+    // };
 
-    videojs.BigNewAnnotation.prototype.onClick = function() {
-        this.an.newan();
-    };
+    // videojs.BigNewAnnotation.prototype.onClick = function() {
+    //     this.an.newan();
+    // };
 
     // -- Player--> ControlBar--> AnContainerButtons
 
@@ -714,15 +715,15 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.AnContainerButtons.prototype.options_ = {
         children: {
-            'ShowStatistics': {},
             'ShowAnnotations': {},
             'NewAnnotation': {},
+            'ShowStatistics': {},
         }
     };
 
     videojs.AnContainerButtons.prototype.createEl = function() {
         return videojs.Component.prototype.createEl.call(this, 'div', {
-            className: 'vjs-container-button-annotation vjs-menu-button vjs-control',
+            className: 'vjs-container-button-annotation',
         });
     };
 
@@ -748,7 +749,7 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.ShowStatistics.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-statistics-annotation vjs-menu-button vjs-control',
+            className: 'vjs-statistics-annotation vjs-control',
             title: 'Show the Statistics',
         });
     };
@@ -782,7 +783,7 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.ShowAnnotations.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-showannotations-annotation vjs-menu-button vjs-control',
+            className: 'vjs-showannotations-annotation vjs-control',
             title: 'Show Annotations',
         });
     };
@@ -819,7 +820,7 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.NewAnnotation.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-new-annotation vjs-menu-button vjs-control',
+            className: 'vjs-new-annotation vjs-control',
             title: 'New Annotation',
         });
     };

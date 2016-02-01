@@ -346,6 +346,10 @@ def access_annotation_target(
             'dashboard_hidden': assignment_target.get_dashboard_hidden()
         })
 
+    original.update({
+            'transcript_hidden': assignment_target.get_transcript_hidden()
+        })
+
     get_paras = {}
     for k in request.GET.keys():
         get_paras[k] = request.GET[k]

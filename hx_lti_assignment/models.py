@@ -81,6 +81,15 @@ class AssignmentTargets(models.Model):
         else:
             return options[2] if options[2] != '' else "false"
 
+    def get_transcript_hidden(self):
+        """
+        """
+        options = self.get_target_external_options_list()
+        if len(options) < 4:
+            return "false"
+        else:
+            return options[3] if options[3] != '' else "false"
+
 
 class Assignment(models.Model):
     """
