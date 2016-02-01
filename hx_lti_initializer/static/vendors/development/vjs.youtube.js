@@ -274,6 +274,8 @@ videojs.Youtube.prototype.pause = function(){ this.ytplayer.pauseVideo(); };
 videojs.Youtube.prototype.paused = function(){ return (this.ytplayer)?(this.lastState !== YT.PlayerState.PLAYING && this.lastState !== YT.PlayerState.BUFFERING):true; };
 videojs.Youtube.prototype.currentTime = function(){ return (this.ytplayer && this.ytplayer.getCurrentTime)?this.ytplayer.getCurrentTime():0; };
 videojs.Youtube.prototype.setCurrentTime = function(seconds){ this.ytplayer.seekTo(seconds, true); this.player_.trigger('timeupdate'); };
+videojs.Youtube.prototype.playbackRate = function(){ return this.ytplayer.getPlaybackRate();};
+videojs.Youtube.prototype.setPlaybackRate = function(rate) {this.ytplayer.setPlaybackRate(rate);};
 videojs.Youtube.prototype.duration = function(){ return (this.ytplayer && this.ytplayer.getDuration)?this.ytplayer.getDuration():0; };
 
 videojs.Youtube.prototype.volume = function() {

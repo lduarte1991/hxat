@@ -97,7 +97,8 @@
         	var viewtype = jQuery('#' + orderNum + '-target_options_view_type').val();
         	var canvas_id = jQuery('#' + orderNum + '-target_options_canvas_id').val();
         	var dashboard_hidden = jQuery('#' + orderNum + '-target_options_dashboard_hidden').is(":checked") ? "true" : "false";
-        	var options = viewtype + "," + canvas_id + "," + dashboard_hidden;
+        	var transcript_hidden = jQuery('#' + orderNum + '-target_options_transcript_hidden').is(":checked") ? "true" : "false";
+        	var options = viewtype + "," + canvas_id + "," + dashboard_hidden + ',' + transcript_hidden;
         	jQuery('#id_assignmenttargets_set-' + orderNum + '-target_external_options').val(options.replace(/undefined/g, ""));
         });
 
@@ -156,7 +157,9 @@
 						 		<input maxlength="255" id="'+new_item_id+'-target_options_canvas_id" data-counter="'+new_item_id+'" type="text" class="mirador_option form-control" value=""></input>\
 								<textarea id="id_assignmenttargets_set-'+new_item_id+'-target_external_options" name="assignmenttargets_set-'+new_item_id+'-target_external_options" class="form-control hidden"></textarea>\
 						 		<input id="'+new_item_id+'-target_options_dashboard_hidden" data-counter="'+new_item_id+'" type="checkbox" class="mirador_option form-control" value=""></input>\
-						 		<label for="'+new_item_id+'-target_options_dashboard_hidden">Hide Dashboard on Load</label>\
+						 		<label for="'+new_item_id+'-target_options_dashboard_hidden">Hide Dashboard on Load</label><br>\
+						 		<input id="'+new_item_id+'-target_options_transcript_hidden" data-counter="'+new_item_id+'" type="checkbox" class="mirador_option form-control" value=""></input>\
+						 		<label for="'+new_item_id+'-target_options_transcript_hidden">Hide Video Transcript on Load (when applicable)</label>\
 					</div>\
 			</td>\
 			<td>\
@@ -259,7 +262,9 @@
 						 		<label>Open to Page (Canvas ID):</label>
 						 		<input maxlength="255" id="0-target_options_canvas_id" data-counter="0" type="text" class="mirador_option form-control" value=""></input>
 						 		<input id="0-target_options_dashboard_hidden" data-counter="0" type="checkbox" class="mirador_option form-control" value=""></input>
-						 		<label for="0-target_options_dashboard_hidden">Hide Dashboard on Load</label>
+						 		<label for="0-target_options_dashboard_hidden">Hide Dashboard on Load</label><br>
+						 		<input id="0-target_options_transcript_hidden" data-counter="0" type="checkbox" class="mirador_option form-control" value=""></input>
+						 		<label for="0-target_options_transcript_hidden">Hide Transcript on Load (when applicable)</label>
 								<textarea id="id_assignmenttargets_set-0-target_external_options" name="assignmenttargets_set-0-target_external_options" class="form-control hidden"></textarea>
 					</div>
 				</td>
@@ -313,7 +318,9 @@
 								 {% endif %}
 								{% endfor %}
 								<input id="{{forloop.counter0}}-target_options_dashboard_hidden" type="checkbox" {% if item.target_external_options.value|just_dashboard_hidden %} checked {% endif %} class="mirador_option" data-counter="{{forloop.counter0}}"></input>
-								<label for="{{forloop.counter0}}-target_options_dashboard_hidden">Hide Dashboard on Load</label>
+								<label for="{{forloop.counter0}}-target_options_dashboard_hidden">Hide Dashboard on Load</label><br>
+								<input id="{{forloop.counter0}}-target_options_transcript_hidden" type="checkbox" {% if item.target_external_options.value|just_transcript_hidden %} checked {% endif %} class="mirador_option" data-counter="{{forloop.counter0}}"></input>
+								<label for="{{forloop.counter0}}-target_options_transcript_hidden">Hide Transcript on Load (when applicable)</label>
 								<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.counter0}}-target_external_options" class="form-control hidden">{{ item.target_external_options.value }}</textarea>
 							</div>
 						</td>
