@@ -55,6 +55,34 @@ def just_transcript_hidden(extra_options):
             return False
 
 
+@register.filter_function
+def just_transcript_download(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 5:
+        return False
+    else:
+        if result[4].strip() == "true":
+            return True
+        else:
+            return False
+
+
+@register.filter_function
+def just_video_download(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 6:
+        return False
+    else:
+        if result[5].strip() == "true":
+            return True
+        else:
+            return False
+
+
 @register.tag(name='captureas')
 def do_captureas(parser, token):
     try:
@@ -92,12 +120,14 @@ def just_the_html5_vid_link(content):
     if len(result) == 3:
         return result[1]
 
+
 @register.filter_function
 def just_the_transcript_link(content):
     if content is None:
         return ""
     result = content.split(';')
     return result[len(result) - 1]
+
 
 class CaptureasNode(template.Node):
     def __init__(self, nodelist, varname):

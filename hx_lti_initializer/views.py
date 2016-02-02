@@ -343,12 +343,20 @@ def access_annotation_target(
         })
 
     original.update({
-            'dashboard_hidden': assignment_target.get_dashboard_hidden()
-        })
+        'dashboard_hidden': assignment_target.get_dashboard_hidden()
+    })
 
     original.update({
-            'transcript_hidden': assignment_target.get_transcript_hidden()
-        })
+        'transcript_hidden': assignment_target.get_transcript_hidden()
+    })
+
+    original.update({
+        'transcript_download': assignment_target.get_transcript_download()
+    })
+
+    original.update({
+        'video_download': assignment_target.get_video_download()
+    })
 
     get_paras = {}
     for k in request.GET.keys():
