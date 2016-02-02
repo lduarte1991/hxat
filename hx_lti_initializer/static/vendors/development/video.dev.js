@@ -4366,7 +4366,12 @@ vjs.TranscriptToggle.prototype.onClick = function(){
 
 vjs.DownloadMenuButton = vjs.MenuButton.extend({
   init: function(player, options) {
-    vjs.MenuButton.call(this, player, options);
+
+    var downloads = player.options()['downloadItems'];
+    console.log(downloads);
+    if (downloads.length > 0){
+      vjs.MenuButton.call(this, player, options);
+    } 
   }
 });
 
@@ -4375,7 +4380,7 @@ vjs.DownloadMenuButton.prototype.createEl = function(){
     className: 'vjs-download-control vjs-control vjs-menu-button',
     innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Download Video/Transcript</span></div>',
   });
-
+  
   return el;
 };
 

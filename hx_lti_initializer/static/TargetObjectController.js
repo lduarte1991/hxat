@@ -573,12 +573,18 @@
 
         $.TargetObjectController.prototype.setUpTargetAsVideo = function(element, targetObject) {
             var vidElement = jQuery(element).find('video')[0];
-            console.log(vidElement);
+            var d_items = [];
+            if (this.initOptions.transcript_download) {
+                d_items.push('transcript');
+            };
+            if (this.initOptions.video_download) {
+                d_items.push('video');
+            };
             if (typeof videojs !== undefined) {
                 this.vid = videojs(vidElement, {
                     techOrder: ['youtube', 'html5', 'flash'],
                     playbackRates:[0.5, 1, 1.5, 2],
-                    downloadItems: ['video', 'transcript'],
+                    downloadItems: d_items,
                 }, {});
                 var self = this;
                     var options = {

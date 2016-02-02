@@ -11,6 +11,11 @@ vjs.DownloadMenuButton.prototype.createEl = function(){
 		className: 'vjs-download-control',
 		innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Download Video/Transcript</span></div>',
 	});
+	var downloads = this.player().options()['downloadItems'];
+	console.log(downloads);
+	if (downloads.length == 0) {
+		return null;
+	};
 
 	return el;
 };
@@ -18,7 +23,6 @@ vjs.DownloadMenuButton.prototype.createEl = function(){
 vjs.DownloadMenuButton.prototype.createMenu = function (){
 	var menu = new vjsMenu(this.player());
 	var downloads = this.player().options()['downloadItems'];
-
 	if (downloads) {
 		if (downloads['video']) {
 			menu.addChild(
