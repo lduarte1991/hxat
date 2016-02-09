@@ -35,6 +35,46 @@
     cursor:pointer;
     border-bottom: 1px solid #888;
 }
+.annotationSection.side .handleAnnotations #printAnnotations{
+    color: white;
+    font-size: 10pt;
+    float: left;
+    margin-top: 15px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+.annotationSection.side .handleAnnotations #exportAnnotations{
+    color: white;
+    font-size: 10pt;
+    float: right;
+    margin-top: 15px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.annotationSection.side .handleAnnotations #importAnnotations{
+    color: white;
+    font-size: 10pt;
+    float: right;
+    margin-top: 15px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.annotationModal #importItems {
+    margin-top: 70px;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+    height: 150px;
+}
+
+.annotationModal #importarea {
+    margin-top: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+}
 
 .annotationItem.side:nth-child(even) {
     background-color: #eee;
