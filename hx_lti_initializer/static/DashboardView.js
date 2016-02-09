@@ -8,7 +8,8 @@
                 "annotationModal",
                 "replyItem",
                 "editReplyItem",
-                'annotationInstructions',
+                "annotationInstructions",
+                "importItems",
             ],
             TEMPLATES: {},
             suffix: "side",
@@ -105,8 +106,78 @@
         return jQuery("button.user-filter.disabled");
     };
 
-    $.DashboardView.prototype.clearDashboard = function(){
+    $.DashboardView.prototype.clearDashboard = function() {
         jQuery('.annotationsHolder').html('');
+    };
+
+    $.DashboardView.prototype.addPrintButton = function() {
+        jQuery('.handleAnnotations').show();
+    };
+
+    $.DashboardView.prototype.removePrintButton = function() {
+        jQuery('.handleAnnotations').hide();
+    };
+
+    $.DashboardView.prototype.printAnnotations = function() {
+        var annotations = this.initOptions.controller.endpoint.annotationsMasterList;
+        var html = "<style>table, th, td { border: 1px solid black;} table { border-collapse: collapse; } td, th {padding: 10px;} </style><table><tr><th>Username</th><th>Excerpt</th><th>Annotation</th><th>Tag</th><th>Timestamp</th></tr><tr>";
+        jQuery.each(annotations, function(index, annotation) {
+            html += "<td>" + annotation.user.name + "</td>";
+            if (annotation.media === "text") {
+                html += "<td>" + annotation.quote + "</td>";
+            } else if(annotation.media === "image") {
+                html += "<td><img src=\""+annotation.thumb+"\" style=\"max-width: 150px; max-height: 150px;\"/></td>"
+            } else if (annotation.media === "video") {
+                html += "<td>" + annotation.rangeTime.start + " - " + annotation.rangeTime.end + "</td>";
+            }
+            
+            html += "<td>" + annotation.text + "</td><td>";
+            if (annotation.tags && annotation.tags.length > 0) {
+                jQuery.each(annotation.tags, function(tagIndex, tagName) {
+                    html += tagName + "<br>";
+                });
+            };
+            html += "<td>" + annotation.updated + "</td></tr>";
+        });
+        html += "</table>";
+        var wnd = window.open("about:blank", "", "_blank");
+        wnd.document.write(html);
+    };
+
+    $.DashboardView.prototype.exportAnnotations = function() {
+        var annotations = this.initOptions.controller.endpoint.annotationsMasterList;
+        html = "<textarea style='width:600px; height:600px;'>"+ JSON.stringify(annotations, null, 4)+"</textarea>";
+        var wnd = window.open("about:blank", "", "_blank");
+        wnd.document.write(html);
+    };
+
+    $.DashboardView.prototype.importAnnotations = function() {
+        var self = this;
+        var html = this.initOptions.TEMPLATES.importItems();
+        var saved_section_scrolltop = jQuery('.annotationSection').scrollTop();
+        jQuery('.annotationSection').append(html).scrollTop(0);
+        jQuery('.annotationModal #closeModal').click( function (e) {
+            jQuery('.group-wrap').removeClass("hidden");
+            jQuery('.filter-options').removeClass("hidden");
+            jQuery('.search-bar').removeClass("hidden");
+            jQuery('.annotationsHolder').removeClass("hidden");
+            jQuery('.annotationModal').remove();
+            jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
+        });
+
+        jQuery('.annotationModal #importarea').click( function(e) {
+            var content = JSON.parse(jQuery('.annotationModal #importItems').val());
+            var endpoint = self.initOptions.controller.endpoint.endpoint;
+            jQuery.each(content, function(index, value) {
+                value.id = undefined;
+                value.collectionId = endpoint.collection_id;
+                value.contextId = endpoint.context_id;
+
+                endpoint.createCatchAnnotation(value);
+            });
+            jQuery('.annotationModal #closeModal').trigger('click');
+            jQuery('.mirador-osd-refresh-mode').trigger('click');
+        });
     };
 
     $.DashboardView.prototype.updateDashboard = function(offset, pagination_limit, annotationsList, updateStore){
@@ -334,7 +405,16 @@
         jQuery('#loadMoreButton').click(function(){
             loadMore();
         });
-       jQuery('.handle-button').click( function(e) {
+        jQuery('#printAnnotations').click(function(){
+            self.printAnnotations();
+        });
+        jQuery('#exportAnnotations').click(function(){
+            self.exportAnnotations();
+        });
+        jQuery('#importAnnotations').click(function(){
+            self.importAnnotations();
+        });
+        jQuery('.handle-button').click( function(e) {
             if (self.moving) {
                 return;
             };

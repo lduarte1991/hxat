@@ -94,16 +94,19 @@
 			self.endpoint.queryDatabase({
 				"user_id": undefined,
 			}, self.initOptions.pagination, self.initOptions.media);
+			self.viewer.removePrintButton();
 		});
 		jQuery('#mynotes').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.user_id,
 			}, self.initOptions.pagination, self.initOptions.media);
+			self.viewer.addPrintButton();
 		});
 		jQuery('#instructor').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.instructors,
 			}, self.initOptions.pagination, self.initOptions.media);
+			self.viewer.removePrintButton();
 		});
 		
 		jQuery('button#search-submit').click(function (e) {

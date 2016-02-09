@@ -36,7 +36,11 @@
             </div>
         </div>
     </div>
-    
+    <div class="handleAnnotations">
+        <div id="printAnnotations"> <i class="fa fa-print"></i>   Print My Notes</div>
+        <div id="exportAnnotations"> <i class="fa fa-cloud-download"></i> Export</div>
+        <div id="importAnnotations"> <i class="fa fa-cloud-upload"></i> Import</div>
+    </div>
     <div class="annotationsHolder side" role="list" aria-label="Annotations" >
 		<% _.each(annotationItems, function(item) { %>
 			<%= item %>
