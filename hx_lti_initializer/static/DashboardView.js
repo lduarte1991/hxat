@@ -167,12 +167,15 @@
 
         jQuery('.annotationModal #importarea').click( function(e) {
             var content = JSON.parse(jQuery('.annotationModal #importItems').val());
-            var endpoint = self.initOptions.controller.endpoint.endpoint;
+            var endpoint = self.initOptions.endpoint.endpoint;
             jQuery.each(content, function(index, value) {
                 value.id = undefined;
                 value.collectionId = endpoint.collection_id;
                 value.contextId = endpoint.context_id;
-
+                if (value.user.name === endpoint.username) {
+                    value.user.id = endpoint.userid;
+                }
+                
                 endpoint.createCatchAnnotation(value);
             });
             jQuery('.annotationModal #closeModal').trigger('click');
