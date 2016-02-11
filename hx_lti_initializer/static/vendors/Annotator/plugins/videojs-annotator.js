@@ -21,7 +21,7 @@ Annotator.Plugin.VideoJS = (function(_super) {
     VideoJS.prototype.input = null;
 
     VideoJS.prototype.pluginInit = function() {
-        console.log("VideoJS-pluginInit");
+        //console.log("VideoJS-pluginInit");
         // Check that annotator is working
         if (!Annotator.supported()) {
             return;

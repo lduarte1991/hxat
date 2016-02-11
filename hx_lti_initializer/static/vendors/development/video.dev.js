@@ -4368,7 +4368,6 @@ vjs.DownloadMenuButton = vjs.MenuButton.extend({
   init: function(player, options) {
 
     var downloads = player.options()['downloadItems'];
-    console.log(downloads);
     if (downloads.length > 0){
       vjs.MenuButton.call(this, player, options);
     } 

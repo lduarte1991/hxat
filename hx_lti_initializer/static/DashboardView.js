@@ -444,7 +444,7 @@
             };
             
         });
-        jQuery('.resize-handle').hover(function() {
+        jQuery('.handle-button').hover(function() {
             jQuery('.hide_label').css("visibility", "visible");
         },function() {
             jQuery('.hide_label').css("visibility", "hidden");
