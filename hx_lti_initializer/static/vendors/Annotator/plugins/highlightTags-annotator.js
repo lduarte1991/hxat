@@ -148,10 +148,8 @@ Annotator.Plugin.HighlightTags.prototype.getRGB = function(item){
 };
 
 Annotator.Plugin.HighlightTags.prototype.colorize = function() {
-	console.log("colorizing");
 	var self = Annotator._instances[0].plugins.HighlightTags;
 	var annotations = Array.prototype.slice.call($(".annotator-hl"));
-	console.log(annotations);
 	for (annNum = 0; annNum < annotations.length; ++annNum) {
 	    var anns = $.data(annotations[annNum],"annotation");
 	    if (typeof anns.tags !== "undefined" && anns.tags.length == 0) {

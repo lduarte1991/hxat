@@ -71,6 +71,16 @@
     cursor:pointer;
 }
 
+.handle-button {
+    position: absolute;
+    float: right;
+    top: 5px;
+    right: 15px;
+    font-size: 2em;
+    color: white;
+    cursor: pointer;
+}
+
 .resize-handle.side > .handle-button > img {
     width: 25px;
 }
@@ -404,7 +414,7 @@ button#hideParent {
     font-size: 14pt;
     cursor: pointer;
     text-align: right;
-    margin-right: 30px;
+    margin-right: 60px;
     margin-top: -40px;
     float:right;
 }

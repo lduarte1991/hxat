@@ -76,7 +76,7 @@ function RangeSlider_(options){
 	}
 	
 	
-	console.log("Loaded Plugin RangeSlider");
+	//console.log("Loaded Plugin RangeSlider");
 }
 videojs.plugin('rangeslider', RangeSlider_);
 

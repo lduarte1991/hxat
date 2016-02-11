@@ -158,7 +158,7 @@ Util.mousePosition = function(e, offsetEl) {
         }
         player.one('loadedRangeSlider', initialVideoFinished); // Loaded RangeSlider
     
-        console.log("Loaded Annotation Plugin");
+        //console.log("Loaded Annotation Plugin");
     }
     videojs.plugin('annotations', vjsAnnotation_);
 
