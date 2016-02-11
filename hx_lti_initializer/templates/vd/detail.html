@@ -26,13 +26,13 @@
 <script src="{% static "vendors/development/rangeslider.js" %}"></script>
 <script src="{% static "vendors/development/videojs-annotator-plugin.js" %}"></script>
 <script src="{% static "vendors/development/video-speed.js" %}"></script>
-<script src="{% static "vendors/development/video-download.js" %}"></script>
+<script src="{% static "vendors/development/mousetrap.js" %}"></script>
 <script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
 <script src="{% static "vendors/Annotator/plugins/videojs-annotator.js" %}"></script>
-
+<script src="{% static "vendors/Annotator/plugins/timeRangeEditor-annotator.js" %}"></script>
 {% endblock %}
 
 {% block cssfiles %}
@@ -93,6 +93,7 @@ Annotation Tool | Video | {{ target_object.target_title }}
         'Reply',
         //'Accessibility',
         //'Touch',
+        'TimeRangeEditor',
       ],
       'database_url': "/lti_init/annotation_api",
       'citation': "{{ target_object.target_citation | escapejs }}",

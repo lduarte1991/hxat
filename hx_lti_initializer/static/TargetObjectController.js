@@ -600,7 +600,25 @@
                 jQuery(self.vid).on('annotationsDisplayed', function(){
                     AController.annotationCore.annotation_tool.publish('externalCallToHighlightTags');
                 });
-            };  
+            };
+
+            var self = this;
+            Mousetrap.bind('k', function(e){
+                if (self.vid.paused()) {
+                    self.vid.play();
+                } else {
+                    self.vid.pause();
+                }
+            });
+            Mousetrap.bind('j', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepBack();
+            });
+            Mousetrap.bind('l', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepForward();
+            });
+            Mousetrap.bind('m', function(e){
+                jQuery('.vjs-new-annotation').trigger('click');
+            });
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {
