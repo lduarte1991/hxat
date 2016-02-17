@@ -47,7 +47,8 @@ def validate_request(req):
         debug_printer('DEBUG - Anonymous ID was not present in request.')
         raise PermissionDenied()
     if ('lis_person_sourcedid' not in req.POST and
-            'lis_person_name_full' not in req.POST):
+            'lis_person_name_full' not in req.POST and
+            req.POST['user_id'] != "student"):
         debug_printer('DEBUG - Username or Name was not present in request.')
         raise PermissionDenied()
 
