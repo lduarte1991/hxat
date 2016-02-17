@@ -601,9 +601,8 @@
                     AController.annotationCore.annotation_tool.publish('externalCallToHighlightTags');
                 });
             };
-
             var self = this;
-            Mousetrap.bind('k', function(e){
+            Mousetrap.bind(['k', 'space'], function(e){
                 if (self.vid.paused()) {
                     self.vid.play();
                 } else {
@@ -616,8 +615,26 @@
             Mousetrap.bind('l', function(e){
                 self.vid.controlBar.progressControl.seekBar.stepForward();
             });
-            Mousetrap.bind('m', function(e){
+            Mousetrap.bind('n', function(e){
                 jQuery('.vjs-new-annotation').trigger('click');
+            });
+
+            Mousetrap.bind('m', function(e){
+                self.vid.muted(!self.vid.muted());
+            });
+
+            var iframe = jQuery(self.vid.el()).find('iframe')[0];
+            Mousetrap(iframe).bind('j', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepBack();
+            });
+            Mousetrap(iframe).bind('l', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepForward();
+            });
+            Mousetrap(iframe).bind('n', function(e){
+                jQuery('.vjs-new-annotation').trigger('click');
+            });
+            Mousetrap(iframe).bind('m', function(e){
+                self.vid.muted(!self.vid.muted());
             });
         };
 
