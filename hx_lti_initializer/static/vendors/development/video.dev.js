@@ -4356,9 +4356,12 @@ vjs.TranscriptToggle.prototype.onClick = function(){
   if (jQuery('#transcript').is(":hidden")){
     jQuery("#transcript").show();
     jQuery('#viewer').css('height', '80%');
+    translate_editor = (jQuery(window).height() - (jQuery('#viewer').height() + 50)) * -1;
+    AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY('+translate_editor+'px)');
   } else {
     jQuery('#transcript').hide(10, function(){
       jQuery('#viewer').css('height', '100%');
+      AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY(0px)');
     });
   }
   
