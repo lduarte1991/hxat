@@ -121,7 +121,9 @@
                     show_instructor_tab: "{{assignment.include_instructor_tab}}",
                     instructions: "{{instructions | escapejs }}",
                     dashboard_hidden: {{dashboard_hidden}},
+                    {% if transcript_hidden %}
                     transcript_hidden: {{transcript_hidden}},
+                    {% endif %}
                     {% if focus_on_id %}
                     focus_on_annotation: {{focus_on_id}},
                     {% endif %}
