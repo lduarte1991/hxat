@@ -596,12 +596,18 @@
                 jQuery(document).bind('annotation_core_init', function() {
                     self.vid.rangeslider(jQuery.extend(true, {}, {}));
                     self.vid.annotations(jQuery.extend(true, {}, {posBigNew: "none"}));
+                    jQuery(self.vid.annotations.rsdl.el()).watch('left', function(data, i){
+                        jQuery('#startTimeFilter').val(self.vid.annotations.rsdbl.el_.firstChild.innerHTML);
+                    });
+                    jQuery(self.vid.annotations.rsdr.el()).watch('left', function(data, i){
+                        jQuery('#endTimeFilter').val(self.vid.annotations.rsdbr.el_.firstChild.innerHTML);
+                    });
                 });
                 jQuery(self.vid).on('annotationsDisplayed', function(){
                     AController.annotationCore.annotation_tool.publish('externalCallToHighlightTags');
                 });
             };
-            var self = this;
+            var self = this;            
             Mousetrap.bind(['k', 'space'], function(e){
                 if (self.vid.paused()) {
                     self.vid.play();
@@ -621,6 +627,81 @@
 
             Mousetrap.bind('m', function(e){
                 self.vid.muted(!self.vid.muted());
+            });
+
+            Mousetrap.bind('a', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showDisplay();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.hideDisplay();
+                    } else {
+                        self.vid.annotations.showDisplay();
+                        self.vid.userActive(true);
+                    }
+                }
+            });
+
+            Mousetrap.bind('s', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showStatistics();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.showStatistics();
+                        self.vid.userActive(true);
+                    } else {
+                        self.vid.annotations.hideStatistics();
+                    }
+                }
+            });
+
+            Mousetrap.bind('A', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = 0.0;
+                if (secs_left > 5.0) {
+                    newleft = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+
+            Mousetrap.bind('D', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+             Mousetrap.bind('J', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = 0.0;
+                if (secs_left > 5.0) {
+                    newright = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });
+
+            Mousetrap.bind('L', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
             });
 
             Mousetrap.bind('t', function(e){
@@ -664,6 +745,36 @@
                     });
                 }
             });
+
+            Mousetrap(iframe).bind('a', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showDisplay();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.hideDisplay();
+                    } else {
+                        self.vid.annotations.showDisplay();
+                        self.vid.userActive(true);
+                    }
+                }
+            });
+
+            Mousetrap(iframe).bind('s', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showStatistics();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.showStatistics();
+                        self.vid.userActive(true);
+                    } else {
+                        self.vid.annotations.hideStatistics();
+                    }
+                    
+                }
+            });            
+
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {

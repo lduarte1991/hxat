@@ -279,7 +279,7 @@
             annotationItems: [],
             show_instructor_tab: self.initOptions.show_instructor_tab,
         }));
-        
+        console.log(self.initOptions);
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
         jQuery('.resize-handle.side').on('mousedown', function(e){
             self.resizing = true;
@@ -442,6 +442,42 @@
             jQuery('.hide_label').css("visibility", "visible");
         },function() {
             jQuery('.hide_label').css("visibility", "hidden");
+        });
+
+        if (AController.targetObjectController.initOptions.mediaType === "video") {
+            jQuery('#timeRangeFilter').css('display', 'block');
+        }
+
+        jQuery('#startTimeFilter').change(function() {
+            if (AController.targetObjectController.vid !== undefined) {
+                var time = jQuery('#startTimeFilter').val().split(':');
+                var timeSecs = 0;
+                if (time.length == 3) {
+                    timeSecs = parseInt(time[0], 10) * 60 * 60 + parseInt(time[1],10) * 60 + parseInt(time[2], 10);
+                } else if (time.length == 2) {
+                    timeSecs = parseInt(time[0], 10) * 60 + parseInt(time[1], 10);
+                }
+                timeSecs = AController.targetObjectController.vid.rangeslider._percent(timeSecs);
+                AController.targetObjectController.vid.annotations.rsd.setPosition(0, timeSecs);
+            } else {
+                console.log("uh oh... or not if this isn't a video");
+            }
+        });
+
+        jQuery('#endTimeFilter').change(function() {
+            if (AController.targetObjectController.vid !== undefined) {
+                var time = jQuery('#endTimeFilter').val().split(':');
+                var timeSecs = 0;
+                if (time.length == 3) {
+                    timeSecs = parseInt(time[0], 10) * 60 * 60 + parseInt(time[1],10) * 60 + parseInt(time[2], 10);
+                } else if (time.length == 2) {
+                    timeSecs = parseInt(time[0], 10) * 60 + parseInt(time[1], 10);
+                }
+                timeSecs = AController.targetObjectController.vid.rangeslider._percent(timeSecs);
+                AController.targetObjectController.vid.annotations.rsd.setPosition(1, timeSecs);
+            } else {
+                console.log("uh oh... or not if this isn't a video");
+            }
         });
 
         self.initOptions.controller.dashboardReady.resolve();
