@@ -21,7 +21,7 @@ def update_read_permissions(data):
        - permissions.read = [user_id, ADMIN_GROUP_ID] # semi-private (user + admins only)
     
     '''
-    logger.debug("update_read_permissions(): %s" % json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
+    logger.debug("update_read_permissions(): data: %s" % json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
     has_permissions = ('permissions' in data and 'read' in data['permissions'])
     if not has_permissions:
         return data
@@ -32,18 +32,25 @@ def update_read_permissions(data):
     
     has_parent = ('parent' in data and data['parent'] != '' and data['parent'] != '0')
     if has_parent:
-        # This is here to ensure that when a reply is created, it remains visible to the
-        # author of the parent annotation, even if the reply has unchecked "Allow anyone to view
-        # this annotation" in the annotator editor. Ideally, the annotator UI field should either 
-        # be removed from the annotator editor for replies, or work as expected. That is, when checked, 
-        # only the annotation author, reply author, and thread participants have read permission. 
+        # Ensure that when a reply is created, it remains visible to the author of the parent
+        # annotation, even if the reply has unchecked "Allow anyone to view this annotation" in
+        # the annotator editor. Ideally, the annotator UI field should either be removed from the
+        # annotator editor for replies, or work as expected. That is, when checked, only the annotation
+        # author, reply author, and thread participants have read permission. 
         data['permissions']['read'] = []
-        logger.debug("update_read_permissions(): reply: %s" % data['permissions']['read'])
     else:
-        # Ensure the annotation is readable by course admins
         read_permissions = data['permissions']['read']
+
+        # Ensure that the annotation author's user_id is present in the read permissions.
+        # This might not be the case if an admin changes a public annotation to private,
+        # since annotator will set the admin's user_id, and not the author's user_id.
+        if data['user']['id'] not in read_permissions:
+            read_permissions.insert(0, data['user']['id'])
+
+        # Ensure the annotation is readable by course admins.
         if ADMIN_GROUP_ID not in read_permissions:
             read_permissions.append(ADMIN_GROUP_ID)
-            logger.debug("update_read_permissions(): annotation: %s" % read_permissions)
+    
+    logger.debug("update_read_permissions(): read_permissions: %s" % read_permissions)
 
     return data
