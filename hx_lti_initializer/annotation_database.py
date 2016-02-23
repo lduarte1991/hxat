@@ -51,6 +51,6 @@ def update_read_permissions(data):
         if ADMIN_GROUP_ID not in read_permissions:
             read_permissions.append(ADMIN_GROUP_ID)
     
-    logger.debug("update_read_permissions(): read_permissions: %s" % read_permissions)
+    logger.debug("update_read_permissions(): read_permissions: %s" % data['permissions']['read'])
 
     return data
