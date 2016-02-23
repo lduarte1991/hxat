@@ -592,6 +592,8 @@ def annotation_database_update(request, annotation_id):
     session_is_staff = request.session['is_staff']
 
     json_body = json.loads(request.body)
+    if settings.ORGANIZATION == "ATG":
+        annotation_database.update_read_permissions(json_body)
 
     request_collection_id = json_body['collectionId']
     request_object_id = str(json_body['uri'])
@@ -633,5 +635,5 @@ def annotation_database_update(request, annotation_id):
         headers=headers
     )
 
-    return HttpResponse(response)
+    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
 
