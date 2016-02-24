@@ -193,6 +193,15 @@ def retrieve_token(userid, apikey, secret):
 
     return token
 
+def get_admin_ids(context_id):
+    """
+        Returns a set of the user ids of all users with an admin role
+    """
+    course_object = LTICourse.get_course_by_id(context_id)
+    admins = course_object.course_admins.all()
+    admin_ids = [admin.get_id() for admin in admins]
+
+    return admin_ids
 
 class simple_utc(datetime.tzinfo):
     def tzname(self):

@@ -25,7 +25,8 @@ from hx_lti_initializer.models import LTIProfile, LTICourse, User
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
-    validate_request, fetch_annotations_by_course, DashboardAnnotations)
+    validate_request, fetch_annotations_by_course, get_admin_ids, DashboardAnnotations)
+from hx_lti_initializer import annotation_database
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from django.contrib.sites.models import get_current_site
@@ -387,7 +388,7 @@ def instructor_dashboard_student_list_view(request):
     
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
-    course_annotations = fetch_annotations_by_course(context_id, user_id)
+    course_annotations = fetch_annotations_by_course(context_id, annotation_database.ADMIN_GROUP_ID)
     fetch_end_time = time.time()
     fetch_elapsed_time = fetch_end_time - fetch_start_time
 
@@ -458,6 +459,7 @@ def annotation_database_search(request):
     '''
     session_collection_id = request.session['hx_collection_id']
     session_context_id = request.session['hx_context_id']
+    session_is_staff = request.session['is_staff']
 
     request_collection_id = request.GET.get('collectionId', None)
     request_context_id = request.GET.get('contextId', None)
@@ -474,9 +476,18 @@ def annotation_database_search(request):
     headers = {
         'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']
     }
+    
+    # Override the auth token for ATG when the user is a course administrator,
+    # so they can query against private annotations that have granted permission to the admin group.
+    if settings.ORGANIZATION == "ATG" and session_is_staff:
+        headers['x-annotator-auth-token'] = retrieve_token(
+            annotation_database.ADMIN_GROUP_ID,
+            assignment.annotation_database_apikey,
+            assignment.annotation_database_secret_token
+        )
 
     response = requests.post(database_url, headers=headers, params=url_values)
-    return HttpResponse(response)
+    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
 
 
 @csrf_exempt
@@ -493,6 +504,9 @@ def annotation_database_create(request):
     request_object_id = str(json_body['uri'])
     request_context_id = json_body['contextId']
     request_user_id = json_body['user']['id']
+    
+    if settings.ORGANIZATION == "ATG":
+        annotation_database.update_read_permissions(json_body)
 
     debug_printer("%s: %s" % (session_user_id, request_user_id))
     debug_printer("%s: %s" % (session_collection_id, request_collection_id))
@@ -534,7 +548,7 @@ def annotation_database_create(request):
     except:
         debug_printer("is_graded was not found in the session")
 
-    return HttpResponse(response)
+    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
 
 
 @csrf_exempt
@@ -578,6 +592,8 @@ def annotation_database_update(request, annotation_id):
     session_is_staff = request.session['is_staff']
 
     json_body = json.loads(request.body)
+    if settings.ORGANIZATION == "ATG":
+        annotation_database.update_read_permissions(json_body)
 
     request_collection_id = json_body['collectionId']
     request_object_id = str(json_body['uri'])
@@ -619,22 +635,5 @@ def annotation_database_update(request, annotation_id):
         headers=headers
     )
 
-    return HttpResponse(response)
+    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
 
-
-def get_admin_ids():
-    """
-        Returns a set of the user ids of all users with an admin role
-    """
-    admins = []
-    admin_ids = set()
-
-    # Get users with an admin role
-    for role in settings.ADMIN_ROLES:
-        admins += list(LTIProfile.objects.filter(roles=role))
-
-    # Add their ids to admin_ids
-    for admin in admins:
-        admin_ids.add(admin.get_id())
-
-    return admin_ids

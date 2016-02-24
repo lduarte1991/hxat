@@ -117,6 +117,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
       {% if assignment.allow_highlights %}
       'highlightTags_options': "{{ assignment.highlights_options }}",
       {% endif %}
+      'showViewPermissionsCheckbox': {% if org == 'ATG' %}true{% else %}false{% endif %}
     },
   };
 {% endblock %}
