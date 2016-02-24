@@ -773,6 +773,52 @@
                     }
                     
                 }
+            });
+            Mousetrap(iframe).bind('A', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = 0.0;
+                if (secs_left > 5.0) {
+                    newleft = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+
+            Mousetrap(iframe).bind('D', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+             Mousetrap(iframe).bind('J', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = 0.0;
+                if (secs_left > 5.0) {
+                    newright = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });
+
+            Mousetrap(iframe).bind('L', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
             });            
 
         };
@@ -839,6 +885,6 @@
                 }
                 jQuery('.annotations-status').toggleClass("on");
             };
-        }
+        };
 
 }(AController));

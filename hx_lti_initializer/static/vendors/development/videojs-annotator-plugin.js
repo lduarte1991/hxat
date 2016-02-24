@@ -465,6 +465,8 @@ Util.mousePosition = function(e, offsetEl) {
             var end = end || duration;
             var annotationsHTML = $.makeArray($(this.player.el_).find('.vjs-anpanel-annotation .annotator-hl'));
             var count = 0;
+            var wrapper = $('.annotator-wrapper').parent()[0];
+            var annotator = $.data(wrapper, 'annotator');
             for (var index in annotationsHTML) {
                 var an = $.data(annotationsHTML[index], 'annotation');
                 var expressionLeft = includeLeft ? (an.rangeTime.end >= start) : (an.rangeTime.start >= start);
@@ -473,10 +475,12 @@ Util.mousePosition = function(e, offsetEl) {
                     var annotationHTML = an.highlights[0].children[0];
                     annotationHTML.style.marginTop = (-1 * parseFloat(annotationHTML.style.top) + count) + 'em';
                     $(an.highlights[0]).show();
+                    annotator.publish('annotationShown', an.id);
                     count++;
                 } else if (this._isVideoJS(an) && typeof an.highlights[0] !== 'undefined') {
                     $(an.highlights[0]).hide();
                     an.highlights[0].children[0].style.marginTop = '';
+                    annotator.publish('annotationHidden', an.id);
                 }
             }
             // Set the times in the scroll time panel

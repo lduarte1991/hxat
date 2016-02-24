@@ -480,6 +480,16 @@
             }
         });
 
+        if (Annotator !== undefined && Annotator.prototype.isPrototypeOf(AController.annotationCore.annotation_tool)) {
+            console.log('it was all defined. problem is probably not here.');
+            AController.annotationCore.annotation_tool.subscribe('annotationHidden', function(annotationId) {
+                jQuery('.annotationItem.item-' + annotationId).hide();
+            });
+            AController.annotationCore.annotation_tool.subscribe('annotationShown', function(annotationId) {
+                jQuery('.annotationItem.item-' + annotationId).show();
+            });
+        }
+
         self.initOptions.controller.dashboardReady.resolve();
     };
 
