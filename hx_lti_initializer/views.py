@@ -474,7 +474,8 @@ def annotation_database_search(request):
     url_values = request.GET.urlencode()
     database_url = str(assignment.annotation_database_url).strip() + '/search?'
     headers = {
-        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']
+        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
+        'content-type': 'application/json',
     }
     
     # Override the auth token for ATG when the user is a course administrator,
