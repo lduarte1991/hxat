@@ -1,4 +1,5 @@
 <div class="annotationItem item-<%= id %> side" role="listitem" aria-label="Annotation #<%=index%> created by <%= user.name %>">
+    <div style="overflow:auto;">
     <span class="idAnnotation"><%= id %></span>
     <div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">
         <%= user.name %>
@@ -6,6 +7,7 @@
     <% var date = new Date(updated); %>
     <div class="annotatedAt field side" title="<% print(date) %>" aria-label="last updated <% print(jQuery.timeago(date)); %>">
         last updated <% print(jQuery.timeago(date)); %>
+    </div>
     </div>
     <% if (media === 'text') {%>
         <div class="quote field side">
@@ -15,6 +17,14 @@
     <% } else if (media === 'image' && thumbnail) {%>
         <div class="zoomToImageBounds">
             <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';"/>
+            <span class="idAnnotation" style="display:none"><%= id %></span>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    <% } else if (media === "video") {%>
+        <div class="playMediaButton" style="text-align:center;">
+            <div class="btn btn-default" style="text-align:center;margin-top:20px;">
+                Segment <%= rangeTime.start %> - <%= rangeTime.end %>
+            </div>
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>

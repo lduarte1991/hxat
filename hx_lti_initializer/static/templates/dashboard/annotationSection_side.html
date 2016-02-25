@@ -1,5 +1,5 @@
 <div class="resize-handle side">
-    <div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>
+    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->
 </div>
 <div class="annotationSection side">
     <div class="annotation-instructions" role="button" aria-labeledby="sidebar-annotations-instructions">
@@ -34,6 +34,10 @@
                 <button title="Search" class="btn btn-default" type="submit" id="search-submit" role="button" aria-label="Submit search"><i class="glyphicon glyphicon-search"></i></button>
                 <button title="Clear" class="btn btn-default" type="clear" id="search-clear" role="button" aria-label="Clear search input"><i class="glyphicon glyphicon-ban-circle"></i></button>
             </div>
+        </div>
+        <div id="timeRangeFilter" style="display:none; color:white; margin-top:15px; margin-bottom:-30px">
+            <label for="startTimeFilter">Start:</label> <input type="text" id="startTimeFilter" style="display:inline; width:20%; color: black;" value="0:00"/>
+            <label for="endTimeFilter">End:</label> <input type="text" id="endTimeFilter" style="display:inline;width:20%; color: black;" value="0:00"/>
         </div>
     </div>
     

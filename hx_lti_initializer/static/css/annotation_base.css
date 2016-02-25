@@ -1,5 +1,22 @@
+html {
+	height:100%;
+}
+
+body {
+	height: 100%;
+}
+
+.annotator-wrapper {
+	height: 100%;
+}
+
 #full-content {
 	background-color:white;
+	height: 100%;
+}
+
+.vjs-controltimepanel-RS input {
+	background: rgba(0,0,0,0)!important;
 }
 
 #navigationBar {
@@ -10,6 +27,7 @@
 	display: block;
 	width: 100%;
 	z-index:999;
+	overflow:hidden;
 }
 
 .pagination {
@@ -53,14 +71,14 @@ a#next_target_object {
 .annotation-fullscreen {
 	color: white;
 	float: right;
-	margin-right: 20px;
+	margin-right: 50px;
 	margin-top: 5px;
 	font-size: 2em;
 	cursor: pointer;
 }
 
 .logo {
-	margin-top: -70px;
+	top: -70px;
 	height: 50px;
 	width: 100px;
 	margin-left: auto;
@@ -75,4 +93,8 @@ a#next_target_object {
 	font-size: 2em;
 	color: white;
 	cursor: pointer;
+}
+
+.vjs-control-bar {
+	z-index: 99;
 }

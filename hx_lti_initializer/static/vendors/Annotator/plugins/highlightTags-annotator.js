@@ -156,8 +156,10 @@ Annotator.Plugin.HighlightTags.prototype.colorize = function() {
 	        
 	        // image annotations should not change the background of the highlight
 	        // only the border so as not to block the image behind it.
-	        if (anns.media !== "image") {
+	        if (anns.media === "text") {
 	            $(annotations[annNum]).css("background-color", "");
+	        } else if(anns.media === "video") {
+	        	$(annotations[annNum].firstChild).css("background-color", "");
 	        } else {
 	            $(annotations[annNum]).css("border", "2px solid rgb(255, 255, 255)");
 	            $(annotations[annNum]).css("outline", "2px solid rgb(0, 0, 0)");
@@ -171,11 +173,35 @@ Annotator.Plugin.HighlightTags.prototype.colorize = function() {
 	                if (typeof self.colors[anns.tags[index]] !== "undefined") {
 	                    var finalcolor = self.colors[anns.tags[index]];
 	                    // if it's a text change the background
-	                    if (anns.media !== "image") {
+	                    if (anns.media === "text") {
 	                        $(annotations[annNum]).css(
 	                            "background", 
 	                            // last value, 0.3 is the standard highlight opacity for annotator
 	                            "rgba(" + finalcolor.red + ", " + finalcolor.green + ", " + finalcolor.blue + ", 0.3)"
+	                        );
+	                    } else if (anns.media === "video") {
+	                    	// following functions from http://stackoverflow.com/questions/20734317/create-linear-gradient-for-a-given-hex-value-in-javascript
+	                    	var ratio = 1.24;
+	                    	function componentToHex(c) {
+								var hex = c.toString(16);
+								return hex.length == 1 ? "0" + hex : hex;
+							}
+
+							function rgbToHex(r, g, b) {
+								return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+							}
+	                    	var finalgradient = {
+	                    		red: Math.floor(finalcolor.red / ratio),
+	                    		green: Math.floor(finalcolor.green / ratio),
+	                    		blue: Math.floor(finalcolor.blue / ratio),
+	                    	}
+	                        $(annotations[annNum].firstChild).css(
+	                            "background", 
+	                            "rgba(" + finalcolor.red + ", " + finalcolor.green + ", " + finalcolor.blue + ", 0.9)"
+	                        );
+	                        $(annotations[annNum].firstChild).css(
+	                            "background",
+	                            "-webkit-linear-gradient(top, " + rgbToHex(finalcolor.red, finalcolor.green, finalcolor.blue) + ", " + rgbToHex(finalgradient.red, finalgradient.green, finalgradient.blue) + ")"
 	                        );
 	                    } 
 	                    // if it's an image change the dark border/outline leave the white one as is
@@ -187,8 +213,14 @@ Annotator.Plugin.HighlightTags.prototype.colorize = function() {
 	                    }
 	                } else {
 	                    // if the last tag was not predetermined by instrutor background should go back to default
-	                    if (anns.media !== "image") {
+	                    if (anns.media === "text") {
 	                        $(annotations[annNum]).css(
+	                            "background", 
+	                            // returns the value to the inherited value without the above
+	                            ""
+	                        );
+	                    } else if (anns.media === "video") {
+	                        $(annotations[annNum].firstChild).css(
 	                            "background", 
 	                            // returns the value to the inherited value without the above
 	                            ""
@@ -200,8 +232,10 @@ Annotator.Plugin.HighlightTags.prototype.colorize = function() {
 	        
 	    } else {
 	        // if there are no tags or predefined colors, keep the background at default
-	        if (anns.media !== "image") {
+	        if (anns.media === "text") {
 	           $(annotations[annNum]).css("background","");
+	        } else if (anns.media === "video") {
+	           $(annotations[annNum].firstChild).css("background","");
 	        }
 	    }
 	}
@@ -267,29 +301,30 @@ Annotator.Plugin.HighlightTags.prototype.updateViewer = function(field, annotati
         var tokenList = "<ul class=\"token-input-list\">";
 
         for (tagnum = 0; tagnum < annotation.tags.length; ++tagnum){
+        	var colorTags = function() {
+        		  // once again, defaults are black for text and powder blue default from token function
+                var rgbColor = "";
+                var textColor = "#000";
+
+                // if there is a color associated with the tag, it will change the background
+                // and change the text to white
+                if (typeof self.colors[annotation.tags[tagnum]] !== "undefined") {
+                    var finalcolor = self.colors[annotation.tags[tagnum]];
+                    rgbColor = "style=\"background-color:rgba(" + finalcolor.red + ", " + finalcolor.green + ", " + finalcolor.blue + ", 0.5);\"";
+                    textColor = "#fff";
+                }
+
+                // note: to change text color you need to do it in the paragrph tag not the div
+                tokenList += "<li class=\"token-input-token\"" + rgbColor + "><p style=\"color: " + textColor + ";\">"+ annotation.tags[tagnum]+"</p></span></li>";
+                nonFlagTags = false;
+        	}
             if (typeof self.annotator.plugins["Flagging"] !== 'undefined') {
                 // once again we ingore flags
                 if (annotation.tags[tagnum].indexOf("flagged-") === -1) {
-                    
-                    // once again, defaults are black for text and powder blue default from token function
-                    var rgbColor = "";
-                    var textColor = "#000";
-
-                    // if there is a color associated with the tag, it will change the background
-                    // and change the text to white
-                    if (typeof self.colors[annotation.tags[tagnum]] !== "undefined") {
-                        var finalcolor = self.colors[annotation.tags[tagnum]];
-                        rgbColor = "style=\"background-color:rgba(" + finalcolor.red + ", " + finalcolor.green + ", " + finalcolor.blue + ", 0.5);\"";
-                        textColor = "#fff";
-                    }
-
-                    // note: to change text color you need to do it in the paragrph tag not the div
-                    tokenList += "<li class=\"token-input-token\"" + rgbColor + "><p style=\"color: " + textColor + ";\">"+ annotation.tags[tagnum]+"</p></span></li>";
-                    nonFlagTags = false;
+                    colorTags();
                 }
             } else {
-                tokenList += "<li class=\"token-input-token\"><p>"+ annotation.tags[tagnum]+"</p></span></li>";
-                nonFlagTags = false;
+                colorTags();
             }
         }
 
