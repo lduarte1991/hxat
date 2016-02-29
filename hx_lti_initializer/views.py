@@ -488,7 +488,7 @@ def annotation_database_search(request):
         )
 
     response = requests.post(database_url, headers=headers, params=url_values)
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
 
 @csrf_exempt
@@ -549,7 +549,7 @@ def annotation_database_create(request):
     except:
         debug_printer("is_graded was not found in the session")
 
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
 
 @csrf_exempt
@@ -636,5 +636,5 @@ def annotation_database_update(request, annotation_id):
         headers=headers
     )
 
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
