@@ -480,7 +480,7 @@
             }
         });
 
-        if (Annotator !== undefined && Annotator.prototype.isPrototypeOf(AController.annotationCore.annotation_tool)) {
+        if (window.Annotator !== undefined && window.Annotator.prototype.isPrototypeOf(AController.annotationCore.annotation_tool)) {
             console.log('it was all defined. problem is probably not here.');
             AController.annotationCore.annotation_tool.subscribe('annotationHidden', function(annotationId) {
                 jQuery('.annotationItem.item-' + annotationId).hide();
