@@ -493,7 +493,8 @@ def annotation_database_search(request):
     url_values = request.GET.urlencode()
     database_url = str(assignment.annotation_database_url).strip() + '/search?'
     headers = {
-        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN']
+        'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
+        'content-type': 'application/json',
     }
     
     # Override the auth token for ATG when the user is a course administrator,
@@ -506,7 +507,7 @@ def annotation_database_search(request):
         )
 
     response = requests.post(database_url, headers=headers, params=url_values)
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
 
 @csrf_exempt
@@ -567,7 +568,7 @@ def annotation_database_create(request):
     except:
         debug_printer("is_graded was not found in the session")
 
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
 
 @csrf_exempt
@@ -654,5 +655,5 @@ def annotation_database_update(request, annotation_id):
         headers=headers
     )
 
-    return HttpResponse(response.content, status=response.status_code, content_type=response.headers['content-type'])
+    return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
