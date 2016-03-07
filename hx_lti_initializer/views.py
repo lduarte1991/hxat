@@ -17,7 +17,6 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.contrib.auth import login
 from django.contrib import messages
-from django.contrib import messages
 from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
@@ -74,8 +73,15 @@ def launch_lti(request):
     if lti_username is None:
         lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
         if not lti_username:
-            debug_printer('DEBUG - user_id not found in post.')
-            raise PermissionDenied()
+            try:
+                lti_profile = LTIProfile.objects.get(anon_id=str(course))
+                lti_username = lti_profile.user.username
+                roles = ['student']
+                messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
+                messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
+            except:
+                debug_printer('DEBUG - username not found in post.')
+                raise PermissionDenied()
 
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
     if lti_grade_url is not None:
@@ -156,6 +162,7 @@ def launch_lti(request):
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
             course_object = LTICourse.create_course(course, lti_profile)
+            create_new_user('preview' + str(course).replace(':', ''), str(course), ['student'])
             if get_lti_value('context_title', tool_provider) is not None:
                 course_object.course_name = get_lti_value('context_title', tool_provider)
                 course_object.save()
@@ -344,8 +351,20 @@ def access_annotation_target(
         })
 
     original.update({
-            'dashboard_hidden': assignment_target.get_dashboard_hidden()
-        })
+        'dashboard_hidden': assignment_target.get_dashboard_hidden()
+    })
+
+    original.update({
+        'transcript_hidden': assignment_target.get_transcript_hidden()
+    })
+
+    original.update({
+        'transcript_download': assignment_target.get_transcript_download()
+    })
+
+    original.update({
+        'video_download': assignment_target.get_video_download()
+    })
 
     get_paras = {}
     for k in request.GET.keys():

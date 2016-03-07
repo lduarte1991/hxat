@@ -81,6 +81,33 @@ class AssignmentTargets(models.Model):
         else:
             return options[2] if options[2] != '' else "false"
 
+    def get_transcript_hidden(self):
+        """
+        """
+        options = self.get_target_external_options_list()
+        if len(options) < 4:
+            return "false"
+        else:
+            return options[3] if options[3] != '' else "false"
+
+    def get_transcript_download(self):
+        """
+        """
+        options = self.get_target_external_options_list()
+        if len(options) < 5:
+            return "false"
+        else:
+            return options[4] if options[4] != '' else "false"
+
+    def get_video_download(self):
+        """
+        """
+        options = self.get_target_external_options_list()
+        if len(options) < 6:
+            return "false"
+        else:
+            return options[5] if options[5] != '' else "false"
+
 
 class Assignment(models.Model):
     """

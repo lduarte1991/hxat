@@ -122,10 +122,24 @@
         var offsetList = []
         for (var i = startIndex; i < endIndex; i++) {
             var annotation = annotationsList[i];
-            var item = self.formatAnnotation(annotation);
-            item.index = i+1;
-            var html = self.initOptions.TEMPLATES.annotationItem(item);
+            var annotationItem = self.formatAnnotation(annotation);
+            annotationItem.index = i+1;
+            var html = self.initOptions.TEMPLATES.annotationItem(annotationItem);
             jQuery('.annotationsHolder').append(html);
+            divObject = '.annotationItem.item-'+annotation.id.toString();
+
+            var tagHtml = "";
+            if (typeof annotationItem.tags !== "undefined") {
+                annotationItem.tags.forEach(function(tag){
+                    var style = "";
+                    if (window.AController.main.tags[tag] !== undefined) {
+                        var rgbColor = window.AController.main.tags[tag];
+                        style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\"";
+                    };
+                    tagHtml += "<div class=\"tag side\" " + style + ">" + tag + "</div>"
+                });
+            };
+            jQuery(divObject + ' .tagList').html(tagHtml);
             offsetList.push(annotation);
         };
 
@@ -161,6 +175,13 @@
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
+        } else if (item.media === "video") {
+            item.rangeTime.start= typeof vjs !== 'undefined' ?
+                vjs.formatTime(item.rangeTime.start) :
+                item.rangeTime.start;
+            item.rangeTime.end= typeof vjs !== 'undefined'?
+                vjs.formatTime(item.rangeTime.end) :
+                item.rangeTime.end;
         }
         return item;
     };
@@ -258,7 +279,7 @@
             annotationItems: [],
             show_instructor_tab: self.initOptions.show_instructor_tab,
         }));
-        
+        console.log(self.initOptions);
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
         jQuery('.resize-handle.side').on('mousedown', function(e){
             self.resizing = true;
@@ -404,6 +425,12 @@
             jQuery('.test').css('width', section.offset().left);
         };
 
+        if (self.initOptions.controller.initOptions.transcript_hidden) {
+            jQuery('#transcript').hide(10, function(){
+              jQuery('#viewer').css('height', '100%');
+            });
+        }
+
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
             if (typeof jQuery.publish !== "undefined") {
@@ -411,11 +438,57 @@
             };
             
         });
-        jQuery('.resize-handle').hover(function() {
+        jQuery('.handle-button').hover(function() {
             jQuery('.hide_label').css("visibility", "visible");
         },function() {
             jQuery('.hide_label').css("visibility", "hidden");
         });
+
+        if (AController.targetObjectController.initOptions.mediaType === "video") {
+            jQuery('#timeRangeFilter').css('display', 'block');
+        }
+
+        jQuery('#startTimeFilter').change(function() {
+            if (AController.targetObjectController.vid !== undefined) {
+                var time = jQuery('#startTimeFilter').val().split(':');
+                var timeSecs = 0;
+                if (time.length == 3) {
+                    timeSecs = parseInt(time[0], 10) * 60 * 60 + parseInt(time[1],10) * 60 + parseInt(time[2], 10);
+                } else if (time.length == 2) {
+                    timeSecs = parseInt(time[0], 10) * 60 + parseInt(time[1], 10);
+                }
+                timeSecs = AController.targetObjectController.vid.rangeslider._percent(timeSecs);
+                AController.targetObjectController.vid.annotations.rsd.setPosition(0, timeSecs);
+            } else {
+                console.log("uh oh... or not if this isn't a video");
+            }
+        });
+
+        jQuery('#endTimeFilter').change(function() {
+            if (AController.targetObjectController.vid !== undefined) {
+                var time = jQuery('#endTimeFilter').val().split(':');
+                var timeSecs = 0;
+                if (time.length == 3) {
+                    timeSecs = parseInt(time[0], 10) * 60 * 60 + parseInt(time[1],10) * 60 + parseInt(time[2], 10);
+                } else if (time.length == 2) {
+                    timeSecs = parseInt(time[0], 10) * 60 + parseInt(time[1], 10);
+                }
+                timeSecs = AController.targetObjectController.vid.rangeslider._percent(timeSecs);
+                AController.targetObjectController.vid.annotations.rsd.setPosition(1, timeSecs);
+            } else {
+                console.log("uh oh... or not if this isn't a video");
+            }
+        });
+
+        if (window.Annotator !== undefined && window.Annotator.prototype.isPrototypeOf(AController.annotationCore.annotation_tool)) {
+            console.log('it was all defined. problem is probably not here.');
+            AController.annotationCore.annotation_tool.subscribe('annotationHidden', function(annotationId) {
+                jQuery('.annotationItem.item-' + annotationId).hide();
+            });
+            AController.annotationCore.annotation_tool.subscribe('annotationShown', function(annotationId) {
+                jQuery('.annotationItem.item-' + annotationId).show();
+            });
+        }
 
         self.initOptions.controller.dashboardReady.resolve();
     };
@@ -521,6 +594,32 @@
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
             jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
+        });
+
+        jQuery('.parentAnnotation .playMediaButton ').click ( function(e) {
+            var player = AController.targetObjectController.vid;
+            player.annotator = AController.annotationCore.annotation_tool;
+            //player.annotations.showAnnotation(annotation);
+            var playFunction = function() {
+                // Fix problem with youtube videos in the first play. The plugin don't have this trigger
+                if (player.techName === 'Youtube') {
+                    var startAPI = function() {
+                        player.annotations.showAnnotation(annotation);
+                    }
+                    if (player.annotations.loaded)
+                        startAPI();
+                    else
+                        player.one('loadedRangeSlider', startAPI); // show Annotations once the RangeSlider is loaded
+                } else {
+                    player.annotations.showAnnotation(annotation);
+                }
+            };
+            if (player.paused()) {
+                player.play();
+                player.one('playing', playFunction);
+            } else {
+                playFunction();
+            }
         });
 
         jQuery('.parentAnnotation #edit').click(function (e){

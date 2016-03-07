@@ -14,12 +14,13 @@
      */
     $.TargetObjectController.prototype.init = function(){
 
-        if (this.initOptions.mediaType == "text") {
-                this.setUpTargetAsText(this.initOptions.annotationElement, this.initOptions.object_id);
-        } else if (this.initOptions.mediaType == "image") {
-                this.setUpTargetAsImage(this.initOptions.annotationElement, this.initOptions.object_id);
+        if (this.initOptions.mediaType === "text") {
+            this.setUpTargetAsText(this.initOptions.annotationElement, this.initOptions.object_id);
+        } else if (this.initOptions.mediaType === "image") {
+            this.setUpTargetAsImage(this.initOptions.annotationElement, this.initOptions.object_id);
+        } else if (this.initOptions.mediaType === "video") {
+            this.setUpTargetAsVideo(this.initOptions.annotationElement, this.initOptions.object_id);
         }
-    
     };
 
     $.TargetObjectController.prototype.setUpTargetAsText = function(element, targetObject) {
@@ -184,10 +185,8 @@
                 // if everything went great, then create an appropriate range using Annotator
                 var startNode = found[0].node;
                 var startOffset = found[0].offset;
-                console.log(startOffset);
                 var endNode = found[1].node;
                 var endOffset = found[1].offset;
-                console.log(endOffset);
                 if (endOffset !== 0) {
                     endOffset = endOffset - delimiter.length;
                 };
@@ -573,6 +572,254 @@
         };
 
         $.TargetObjectController.prototype.setUpTargetAsVideo = function(element, targetObject) {
+            var vidElement = jQuery(element).find('video')[0];
+            var d_items = [];
+            if (this.initOptions.transcript_download) {
+                d_items.push('transcript');
+            };
+            if (this.initOptions.video_download) {
+                d_items.push('video');
+            };
+            if (typeof videojs !== undefined) {
+                this.vid = videojs(vidElement, {
+                    techOrder: ['youtube', 'html5', 'flash'],
+                    playbackRates:[0.5, 1, 1.5, 2],
+                    downloadItems: d_items,
+                }, {});
+                var self = this;
+                    var options = {
+                        showTitle: false,
+                        showTrackSelector: false,
+                    };
+                    var transcript = self.vid.transcript(options);
+                    document.querySelector('#transcript').appendChild(transcript.el());
+                jQuery(document).bind('annotation_core_init', function() {
+                    self.vid.rangeslider(jQuery.extend(true, {}, {}));
+                    self.vid.annotations(jQuery.extend(true, {}, {posBigNew: "none"}));
+                    jQuery(self.vid.annotations.rsdl.el()).watch('left', function(data, i){
+                        jQuery('#startTimeFilter').val(self.vid.annotations.rsdbl.el_.firstChild.innerHTML);
+                    });
+                    jQuery(self.vid.annotations.rsdr.el()).watch('left', function(data, i){
+                        jQuery('#endTimeFilter').val(self.vid.annotations.rsdbr.el_.firstChild.innerHTML);
+                    });
+                });
+                jQuery(self.vid).on('annotationsDisplayed', function(){
+                    AController.annotationCore.annotation_tool.publish('externalCallToHighlightTags');
+                });
+            };
+            var self = this;            
+            Mousetrap.bind(['k', 'space'], function(e){
+                if (self.vid.paused()) {
+                    self.vid.play();
+                } else {
+                    self.vid.pause();
+                }
+            });
+            Mousetrap.bind('j', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepBack();
+            });
+            Mousetrap.bind('l', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepForward();
+            });
+            Mousetrap.bind('n', function(e){
+                jQuery('.vjs-new-annotation').trigger('click');
+            });
+
+            Mousetrap.bind('m', function(e){
+                self.vid.muted(!self.vid.muted());
+            });
+
+            Mousetrap.bind('a', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showDisplay();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.hideDisplay();
+                    } else {
+                        self.vid.annotations.showDisplay();
+                        self.vid.userActive(true);
+                    }
+                }
+            });
+
+            Mousetrap.bind('s', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showStatistics();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.showStatistics();
+                        self.vid.userActive(true);
+                    } else {
+                        self.vid.annotations.hideStatistics();
+                    }
+                }
+            });
+
+            Mousetrap.bind('A', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = 0.0;
+                if (secs_left > 5.0) {
+                    newleft = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+
+            Mousetrap.bind('D', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+             Mousetrap.bind('J', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = 0.0;
+                if (secs_left > 5.0) {
+                    newright = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });
+
+            Mousetrap.bind('L', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });
+
+            Mousetrap.bind('t', function(e){
+                if (jQuery('#transcript').is(":hidden")){
+                    jQuery("#transcript").show();
+                    jQuery('#viewer').css('height', '80%');
+                    var translate_editor = (jQuery(window).height() - (jQuery('#viewer').height() + 50)) * -1;
+                    AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY('+translate_editor+'px)');
+                } else {
+                    jQuery('#transcript').hide(10, function(){
+                        jQuery('#viewer').css('height', '100%');
+                    });
+                    AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY(0px)');
+                }
+            });
+
+            var iframe = jQuery(self.vid.el()).find('iframe')[0];
+            Mousetrap(iframe).bind('j', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepBack();
+            });
+            Mousetrap(iframe).bind('l', function(e){
+                self.vid.controlBar.progressControl.seekBar.stepForward();
+            });
+            Mousetrap(iframe).bind('n', function(e){
+                jQuery('.vjs-new-annotation').trigger('click');
+            });
+            Mousetrap(iframe).bind('m', function(e){
+                self.vid.muted(!self.vid.muted());
+            });
+
+            Mousetrap(iframe).bind('t', function(e){
+                if (jQuery('#transcript').is(":hidden")){
+                    jQuery("#transcript").show();
+                    jQuery('#viewer').css('height', '80%');
+                    var translate_editor = (jQuery(window).height() - (jQuery('#viewer').height() + 50)) * -1;
+                    AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY('+translate_editor+'px)');
+                } else {
+                    jQuery('#transcript').hide(10, function(){
+                        jQuery('#viewer').css('height', '100%');
+                        AController.annotationCore.annotation_tool.editor.element.css('transform', 'translateY(0px)');
+                    });
+                }
+            });
+
+            Mousetrap(iframe).bind('a', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showDisplay();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.hideDisplay();
+                    } else {
+                        self.vid.annotations.showDisplay();
+                        self.vid.userActive(true);
+                    }
+                }
+            });
+
+            Mousetrap(iframe).bind('s', function(e){
+                if (jQuery('.vjs-back-anpanel-annotation').hasClass("disable")) {
+                    self.vid.annotations.showStatistics();
+                    self.vid.userActive(true);
+                } else {
+                    if (jQuery('.vjs-anstat-annotation').hasClass('disable')) {
+                        self.vid.annotations.showStatistics();
+                        self.vid.userActive(true);
+                    } else {
+                        self.vid.annotations.hideStatistics();
+                    }
+                    
+                }
+            });
+            Mousetrap(iframe).bind('A', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = 0.0;
+                if (secs_left > 5.0) {
+                    newleft = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+
+            Mousetrap(iframe).bind('D', function(e){
+                var left = parseFloat(self.vid.annotations.rsdl.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(left);
+                
+                var newleft = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newleft);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(0, new_percentage);
+            });
+             Mousetrap(iframe).bind('J', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = 0.0;
+                if (secs_left > 5.0) {
+                    newright = secs_left - 5;
+                }
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });
+
+            Mousetrap(iframe).bind('L', function(e){
+                var right = parseFloat(self.vid.annotations.rsdr.el_.style.left) / 100.00;
+                var secs_left = self.vid.rangeslider._seconds(right);
+                
+                var newright = secs_left + 5;
+                var new_percentage = self.vid.rangeslider._percent(newright);
+                if (new_percentage > 1) {
+                    new_percentage = 1.0;
+                }
+                self.vid.annotations.rsd.setPosition(1, new_percentage);
+            });            
 
         };
 
@@ -638,6 +885,6 @@
                 }
                 jQuery('.annotations-status').toggleClass("on");
             };
-        }
+        };
 
 }(AController));

@@ -1,5 +1,6 @@
 from django.template import Library
 from django import template
+from target_object_database.models import get_extension
 
 register = Library()
 
@@ -32,9 +33,51 @@ def just_dashboard_hidden(extra_options):
         return False
     result = extra_options.split(',')
     if len(result) < 3:
-        return ""
+        return False
     else:
         if result[2].strip() == "true":
+            return True
+        else:
+            return False
+
+
+@register.filter_function
+def just_transcript_hidden(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 4:
+        return False
+    else:
+        if result[3].strip() == "true":
+            return True
+        else:
+            return False
+
+
+@register.filter_function
+def just_transcript_download(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 5:
+        return False
+    else:
+        if result[4].strip() == "true":
+            return True
+        else:
+            return False
+
+
+@register.filter_function
+def just_video_download(extra_options):
+    if extra_options is None:
+        return False
+    result = extra_options.split(',')
+    if len(result) < 6:
+        return False
+    else:
+        if result[5].strip() == "true":
             return True
         else:
             return False
@@ -49,6 +92,41 @@ def do_captureas(parser, token):
     nodelist = parser.parse(('endcaptureas',))
     parser.delete_first_token()
     return CaptureasNode(nodelist, args)
+
+
+@register.filter_function
+def just_the_youtube_vid_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    if len(result) < 3:
+        if get_extension(result[0]) == "video/youtube":
+            return result[0]
+        else:
+            return ""
+    if len(result) == 3:
+        return result[0]
+
+@register.filter_function
+def just_the_html5_vid_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    if len(result) < 3:
+        if get_extension(result[0]) != "video/youtube":
+            return result[0]
+        else:
+            return ""
+    if len(result) == 3:
+        return result[1]
+
+
+@register.filter_function
+def just_the_transcript_link(content):
+    if content is None:
+        return ""
+    result = content.split(';')
+    return result[len(result) - 1]
 
 
 class CaptureasNode(template.Node):

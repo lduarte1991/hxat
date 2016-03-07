@@ -1,5 +1,17 @@
 from django.db import models
 from hx_lti_initializer.models import LTIProfile, LTICourse
+from urlparse import urlparse
+from os.path import splitext, basename
+
+
+def get_extension(srcurl):
+    """get the extension of a given url """
+    if 'youtu' in srcurl:
+        return 'video/youtube'
+    else:
+        disassembled = urlparse(srcurl)
+        file_ext = splitext(basename(disassembled.path))[1]
+        return 'video/' + file_ext.replace('.', '')
 
 
 class LTI_TodApi(models.Model):
@@ -70,3 +82,18 @@ class TargetObject(LTI_TodApi):
 
     def get_target_content_as_list(self):
         return self.target_content.split(';')
+
+    def get_target_content_for_video(self):
+        target_content = self.target_content
+        if target_content is None:
+            return ""
+        result = target_content.split(';')
+        if len(result) == 1:
+            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />"
+        if len(result) == 2:
+            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />" + \
+                   "<track kind='captions' src='" + result[1] + "' srclang='en' label='English' default />"
+        if len(result) == 3:
+            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />" + \
+                   "<source src=\"" + result[1] + "\" type='" + get_extension(result[1]) + "' />" + \
+                   "<track kind='captions' src='" + result[2] + "' srclang='en' label='English' default />"

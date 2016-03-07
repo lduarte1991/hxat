@@ -45,6 +45,18 @@
 					annotation.media = "text";
 				}
 			});
+		} else if(mediaType === "video") {
+			this.annotation_tool = jQuery(this.element).annotator(annotatorOptions).data('annotator');
+			this.setUpPlugins();
+
+			// need to make sure that the media is defaulted to text (even if the "reply" plugin is not instantiated)
+			this.annotation_tool.subscribe("annotationEditorSubmit", function(editor, annotation){
+				if (annotation.parent === "0" || annotation.parent === 0 || typeof Annotator.Plugin["Reply"] !== 'function') {
+					annotation.media = "video";
+				}
+			});
+
+			jQuery(document).trigger('annotation_core_init');
 		}
 	};
 
