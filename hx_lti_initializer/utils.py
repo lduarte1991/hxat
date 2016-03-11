@@ -86,37 +86,36 @@ def initialize_lti_tool_provider(req):
 
     return provider
 
+def create_new_user(user_id=None, roles=None, username=None, **kwargs):
+    debug_printer('DEBUG - Creating User and LTIPRofile for anon_id=%s and roles=%s' % (anon_id, roles))
+    if user_id is None or roles is None:
+        raise Exception("Missing required user_id and/or roles to create new user")
 
-def create_new_user(username, user_id, roles):
-    # now create the user and LTIProfile with the above information
-    # Max 30 length for person's name, do we want to change this? It's valid for HX but not ATG/FAS
-    try:
-        user = User.objects.create_user(username, user_id)
-    except IntegrityError:
-        # TODO: modify db to make student name not the primary key
-        # a temporary workaround for key integrity errors, until we can make the username not the primary key.
-        return create_new_user(username + " ", user_id, roles)
-    user.set_unusable_password()
-    user.is_superuser = False
-    user.is_staff = False
-
-    for admin_role in settings.ADMIN_ROLES:
-        for user_role in roles:
-            if admin_role.lower() == user_role.lower():
-                user.is_superuser = True
-                user.is_staff = True
-    user.save()
-    debug_printer('DEBUG - User was just created')
-
-    # pull the profile automatically created once the user was above
-    lti_profile = LTIProfile.objects.get(user=user)
-
-    lti_profile.anon_id = user_id
-    lti_profile.roles = (",").join(roles)
+    lti_profile = LTIProfile(anon_id=user_id)
+    lti_profile.roles = ",".join(roles)
     lti_profile.save()
 
-    return user, lti_profile
+    if username is None:
+        username = 'profile:{id}'.format(id=lti_profile.id)
 
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        user = User.objects.create_user(username)
+
+    user.email = kwargs.get('email', None)
+    user.first_name = kwargs.get('first_name', None)
+    user.last_name = kwargs.get('last_name', None)
+    user.is_superuser = False
+    user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
+    user.set_unusable_password()
+    user.save()
+    
+    lti_profile.user = user
+    lti_profile.save()
+    
+    debug_printer('DEBUG - User:%s was just created with LTIProfile:%s' % (user.id, lti_profile.id))
+    return user, lti_profile
 
 def save_session(request, **kwargs):
     session_key_for = {

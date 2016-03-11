@@ -96,9 +96,8 @@ def launch_lti(request):
             debug_printer('DEBUG - LTI Profile was found via anonymous id.')
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
-            debug_printer('DEBUG - LTI Profile not found. New User to be created.')
-            debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
-            user, lti_profile = create_new_user(lti_username, user_id, roles)
+            debug_printer('DEBUG - LTI Profile NOT found. New User to be created.')
+            user, lti_profile = create_new_user(user_id=user_id, roles=roles)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
@@ -162,7 +161,7 @@ def launch_lti(request):
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
             course_object = LTICourse.create_course(course, lti_profile)
-            create_new_user('preview' + str(course).replace(':', ''), str(course), ['student'])
+            create_new_user(username='preview' + str(course).replace(':', ''), user_id=str(course), roles=['student'])
             if get_lti_value('context_title', tool_provider) is not None:
                 course_object.course_name = get_lti_value('context_title', tool_provider)
                 course_object.save()
