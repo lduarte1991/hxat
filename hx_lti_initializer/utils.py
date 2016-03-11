@@ -87,7 +87,7 @@ def initialize_lti_tool_provider(req):
     return provider
 
 def create_new_user(user_id=None, roles=None, username=None, **kwargs):
-    debug_printer('DEBUG - Creating User and LTIPRofile for anon_id=%s and roles=%s' % (anon_id, roles))
+    debug_printer('DEBUG - Creating User and LTIPRofile for anon_id=%s and roles=%s' % (user_id, roles))
     if user_id is None or roles is None:
         raise Exception("Missing required user_id and/or roles to create new user")
 
@@ -103,16 +103,16 @@ def create_new_user(user_id=None, roles=None, username=None, **kwargs):
     except User.DoesNotExist:
         user = User.objects.create_user(username)
 
-    user.email = kwargs.get('email', None)
-    user.first_name = kwargs.get('first_name', None)
-    user.last_name = kwargs.get('last_name', None)
+    user.email = kwargs.get('email', '')
+    user.first_name = kwargs.get('first_name', '')
+    user.last_name = kwargs.get('last_name', '')
     user.is_superuser = False
     user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
     user.set_unusable_password()
     user.save()
     
     lti_profile.user = user
-    lti_profile.save()
+    lti_profile.save(update_fields=['user'])
     
     debug_printer('DEBUG - User:%s was just created with LTIProfile:%s' % (user.id, lti_profile.id))
     return user, lti_profile

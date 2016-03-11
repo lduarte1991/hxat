@@ -52,21 +52,6 @@ class LTIProfile(models.Model):
         return anon_id
 
 
-def user_post_save(sender, instance, created, **kwargs):
-    """
-    This function will create an LTIProfile object.
-    Then save the user object to it so that they are interconnected.
-    """
-
-    if created is True:
-        p = LTIProfile()
-        p.user = instance
-        p.save()
-
-# this function will then connect the function created above so that a
-# matching LTIProfile object is created after any User object is created.
-post_save.connect(user_post_save, sender=User)
-
 
 class LTICourse(models.Model):
     """
