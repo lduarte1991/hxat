@@ -72,7 +72,7 @@ def launch_lti(request):
     else:
         tool_consumer_instance_guid = get_lti_value('tool_consumer_instance_guid', tool_provider)
         if tool_consumer_instance_guid:
-            user_scope = "domain:%s" % tool_consumer_instance_guid
+            user_scope = "consumer:%s" % tool_consumer_instance_guid
     debug_printer("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
