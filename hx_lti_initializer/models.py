@@ -25,6 +25,7 @@ class LTIProfile(models.Model):
         related_name='annotations_user_profile',
         null=True,
     )
+
     # saves the list of roles attached to that user
     roles = models.CharField(
         max_length=255,
@@ -38,9 +39,13 @@ class LTIProfile(models.Model):
         max_length=255, blank=True, null=True
     )
 
+    name = models.CharField(
+        max_length=255, blank=True, null=True
+    )
+
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
-        return self.user.username
+        return self.name or self.user.username
 
     class Meta:
         """ The name of this section within the admin site """

@@ -69,19 +69,21 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    lti_username = get_lti_value('lis_person_name_full', tool_provider)
-    if lti_username is None:
-        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-        if not lti_username:
-            try:
-                lti_profile = LTIProfile.objects.get(anon_id=str(course))
-                lti_username = lti_profile.user.username
-                roles = ['student']
-                messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
-                messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
-            except:
-                debug_printer('DEBUG - username not found in post.')
-                raise PermissionDenied()
+    display_user_name = get_lti_value('lis_person_name_full', tool_provider)
+    if not display_user_name:
+        display_user_name = get_lti_value('lis_person_sourcedid', tool_provider)
+
+    lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
+    if not lti_username:
+        try:
+            lti_profile = LTIProfile.objects.get(anon_id=str(course))
+            lti_username = lti_profile.user.username
+            roles = ['student']
+            messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
+            messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
+        except:
+            debug_printer('DEBUG - username not found in post.')
+            raise PermissionDenied()
 
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
     if lti_grade_url is not None:
@@ -97,14 +99,14 @@ def launch_lti(request):
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             debug_printer('DEBUG - LTI Profile NOT found. New User to be created.')
-            user, lti_profile = create_new_user(user_id=user_id, roles=roles)
+            user, lti_profile = create_new_user(user_id=user_id, name=display_user_name, roles=roles)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
         save_session(
             request,
             user_id=user_id,
-            user_name=lti_username,
+            user_name=display_user_name,
             context_id=course,
             roles=roles,
             is_staff=True
@@ -126,7 +128,7 @@ def launch_lti(request):
         save_session(
             request,
             user_id=user_id,
-            user_name=lti_username,
+            user_name=display_user_name,
             context_id=course,
             roles=roles,
             is_staff=False

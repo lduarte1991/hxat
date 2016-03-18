@@ -86,26 +86,18 @@ def initialize_lti_tool_provider(req):
 
     return provider
 
-def create_new_user(user_id=None, roles=None, username=None, **kwargs):
-    debug_printer('DEBUG - Creating User and LTIPRofile for anon_id=%s and roles=%s' % (user_id, roles))
-    if user_id is None or roles is None:
-        raise Exception("Missing required user_id and/or roles to create new user")
+def create_new_user(user_id=None, name=None, roles=None):
+    debug_printer('DEBUG - Creating new user user_id=%s, name=%s, roles=%s' % (user_id, name, roles))
+    if user_id is None or name is None or roles is None:
+        raise Exception("Missing required parameters: user_id, name, roles")
 
     lti_profile = LTIProfile(anon_id=user_id)
+    lti_profile.name = name
     lti_profile.roles = ",".join(roles)
     lti_profile.save()
 
-    if username is None:
-        username = 'profile:{id}'.format(id=lti_profile.id)
-
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        user = User.objects.create_user(username)
-
-    user.email = kwargs.get('email', '')
-    user.first_name = kwargs.get('first_name', '')
-    user.last_name = kwargs.get('last_name', '')
+    username = 'profile:{id}'.format(id=lti_profile.id)
+    user = User.objects.create_user(username)
     user.is_superuser = False
     user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
     user.set_unusable_password()
@@ -114,7 +106,7 @@ def create_new_user(user_id=None, roles=None, username=None, **kwargs):
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
     
-    debug_printer('DEBUG - User:%s was just created with LTIProfile:%s' % (user.id, lti_profile.id))
+    debug_printer('DEBUG - User=%s associated with LTIProfile=%s' % (user.id, lti_profile.id))
     return user, lti_profile
 
 def save_session(request, **kwargs):
