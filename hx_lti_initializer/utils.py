@@ -110,6 +110,8 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
         user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
         user.set_unusable_password()
         user.save()
+    except User.MultipleObjectsReturned:
+        user = User.objects.filter(username=username).order_by('id')[0]
     
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
