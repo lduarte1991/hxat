@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 from hx_lti_initializer.models import LTICourse, LTIProfile
 from hx_lti_assignment.models import Assignment
 
@@ -11,10 +12,10 @@ class CourseForm(forms.ModelForm):
         self.fields['course_admins'].queryset = self.get_course_admins()
 
     def get_course_admins(self):
-        filters = {}
+        queryset = LTIProfile.objects.all()
         if self._user_scope:
-            filters['scope'] = self._user_scope
-        return LTIProfile.objects.filter(**filters).select_related('user').order_by('name', 'user__username')
+            queryset = queryset.filter(Q(scope=self._user_scope)|Q(scope__isnull=True))
+        return queryset.select_related('user').order_by('name', 'user__username')
 
     class Meta:
         model = LTICourse
