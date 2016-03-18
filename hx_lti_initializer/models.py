@@ -20,7 +20,8 @@ class LTIProfile(models.Model):
     """
 
     # uses the Django default user to store username and user id information
-    user = models.OneToOneField(
+    # Many profiles can be associated with a single user object.
+    user = models.ForeignKey(
         User,
         related_name='annotations_user_profile',
         null=True,
@@ -39,8 +40,14 @@ class LTIProfile(models.Model):
         max_length=255, blank=True, null=True
     )
 
+    # saves the name for display purposes
     name = models.CharField(
         max_length=255, blank=True, null=True
+    )
+    
+    # saves the scope where this profile is valid (i.e. domain instance for canvas, course instance for edx)
+    scope = models.CharField(
+        max_length=1024, blank=True, null=True
     )
 
     def __unicode__(self):
@@ -134,24 +141,36 @@ class LTICourse(models.Model):
         return LTICourse.objects.get(course_id=course_id)
 
     @staticmethod
-    def create_course(course_id, lti_profile):
+    def create_course(course_id, lti_profile, **kwargs):
         """
         Given a course_id and a profile, it creates a new LTICourse object
         and adds the LTIProfile as a course_admin.
         """
         course_object = LTICourse(course_id=course_id)
+        course_name = kwargs.get('name', None)
+        if course_name:
+            course_object.course_name = course_name
         course_object.save()
-        course_object.course_admins.add(lti_profile)
+        course_object.add_admin(lti_profile)
         return course_object
-        
+    
+    def add_admin(self, lti_profile):
+        """
+        Given an lti_profile, adds a user to the course_admins of an LTICourse if not already there
+        """
+        current_profiles = self.course_admins.all()
+        if lti_profile and lti_profile not in current_profiles:
+            self.course_admins.add(lti_profile)
+            self.save()
+        return self
+    
     def add_user(self, lti_profile):
         """
         Given an lti_profile, adds a user to the course_users of an LTICourse if not already there
         """
-        # Get current course_users
         current_profiles = self.course_users.all()
-        if lti_profile not in current_profiles:
-            # Add user to course_users if not found
+        if lti_profile and lti_profile not in current_profiles:
             self.course_users.add(lti_profile)
             self.save()
+        return self
         

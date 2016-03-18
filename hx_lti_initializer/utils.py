@@ -5,6 +5,7 @@ helpful elsewhere.
 import django.shortcuts
 from urlparse import urlparse
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from abstract_base_classes.target_object_database_api import *
 from models import *
 from django.conf import settings
@@ -86,33 +87,41 @@ def initialize_lti_tool_provider(req):
 
     return provider
 
-def create_new_user(user_id=None, name=None, roles=None):
-    debug_printer('DEBUG - Creating new user user_id=%s, name=%s, roles=%s' % (user_id, name, roles))
-    if user_id is None or name is None or roles is None:
-        raise Exception("Missing required parameters: user_id, name, roles")
+@transaction.atomic
+def create_new_user(anon_id=None, username=None, display_name=None, roles=None, scope=None):
+    debug_printer('DEBUG - Creating new user with parameters: anon_id=%s, username=%s, display_name=%s, roles=%s' % (anon_id, username, display_name, roles))
+    if anon_id is None or display_name is None or roles is None:
+        raise Exception("Missing required parameters: anon_id, display_name, roles")
 
-    lti_profile = LTIProfile(anon_id=user_id)
-    lti_profile.name = name
+    lti_profile = LTIProfile(anon_id=anon_id)
+    lti_profile.name = display_name
     lti_profile.roles = ",".join(roles)
+    lti_profile.scope = scope
     lti_profile.save()
 
-    username = 'profile:{id}'.format(id=lti_profile.id)
-    user = User.objects.create_user(username)
-    user.is_superuser = False
-    user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
-    user.set_unusable_password()
-    user.save()
+    if not username:
+        username = 'profile:{id}'.format(id=lti_profile.id)
+
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        user = User.objects.create_user(username)
+        user.is_superuser = False
+        user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
+        user.set_unusable_password()
+        user.save()
     
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
     
-    debug_printer('DEBUG - User=%s associated with LTIProfile=%s' % (user.id, lti_profile.id))
+    debug_printer('DEBUG - Created LTIProfile.%s associated with User.%s' % (lti_profile.id, user.id))
     return user, lti_profile
 
 def save_session(request, **kwargs):
     session_key_for = {
         "user_id": ["hx_user_id", None],
         "user_name": ["hx_user_name", None],
+        "user_scope": ["hx_user_scope", None],
         "context_id": ["hx_context_id", None],
         "course_id": ["hx_lti_course_id", None],
         "course_name": ["course_name", None],

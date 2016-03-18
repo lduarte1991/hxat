@@ -60,6 +60,21 @@ def launch_lti(request):
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
+    # This is where we identify the "scope" of the LTI user_id (anon_id), meaning
+    # the scope in which the identifier is unique. In canvas this is the domain instance,
+    # where as in edX this is the course instance.
+    #
+    # The idea is that the combination of the LTI user_id (anon_id) and scope should be
+    # globally unique.
+    user_scope = None
+    if settings.ORGANIZATION == "HARVARDX":
+        user_scope = "course:%s" % course
+    else:
+        tool_consumer_instance_guid = get_lti_value('tool_consumer_instance_guid', tool_provider)
+        if tool_consumer_instance_guid:
+            user_scope = "domain:%s" % tool_consumer_instance_guid
+    debug_printer("DEBUG - user scope is: %s" % user_scope)
+
     # default to student
     request.session['is_instructor'] = False
 
@@ -69,16 +84,23 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    display_user_name = get_lti_value('lis_person_name_full', tool_provider)
-    if not display_user_name:
-        display_user_name = get_lti_value('lis_person_sourcedid', tool_provider)
 
-    lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-    if not lti_username:
+    # This is the name that we will show on the UI
+    display_name = get_lti_value('lis_person_name_full', tool_provider)
+    if not display_name:
+        display_name = get_lti_value('lis_person_sourcedid', tool_provider)
+    debug_printer("DEBUG - user name: " + display_name)
+
+    # This is the unique identifier for the person in the source system
+    # In canvas this would be the SIS user id, in edX the registered username
+    external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
+    
+    # This handles the rare case in which we have neither display name nor external user id
+    if not display_name and not external_user_id:
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
-            lti_username = lti_profile.user.username
             roles = ['student']
+            display_name = lti_profile.user.username
             messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
             messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
         except:
@@ -99,14 +121,15 @@ def launch_lti(request):
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             debug_printer('DEBUG - LTI Profile NOT found. New User to be created.')
-            user, lti_profile = create_new_user(user_id=user_id, name=display_user_name, roles=roles)
+            user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
         save_session(
             request,
             user_id=user_id,
-            user_name=display_user_name,
+            user_name=display_name,
+            user_scope=user_scope,
             context_id=course,
             roles=roles,
             is_staff=True
@@ -128,7 +151,8 @@ def launch_lti(request):
         save_session(
             request,
             user_id=user_id,
-            user_name=display_user_name,
+            user_name=display_name,
+            user_scope=user_scope,
             context_id=course,
             roles=roles,
             is_staff=False
@@ -162,11 +186,11 @@ def launch_lti(request):
             messages.warning(request, message_error)
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
-            course_object = LTICourse.create_course(course, lti_profile)
-            create_new_user(username='preview' + str(course).replace(':', ''), user_id=str(course), roles=['student'])
+            context_title = None
             if get_lti_value('context_title', tool_provider) is not None:
-                course_object.course_name = get_lti_value('context_title', tool_provider)
-                course_object.save()
+                context_title = get_lti_value('context_title', tool_provider)
+            course_object = LTICourse.create_course(course, lti_profile, name=context_title)
+            create_new_user(anon_id=str(course), username='preview:%s' % course_object.id, display_name="Preview %s" % str(course_object), roles=['student'], scope=user_scope)
 
             # save the course name to the session so it auto-populate later.
             save_session(
@@ -202,6 +226,7 @@ def launch_lti(request):
 @login_required
 def edit_course(request, id):
     course = get_object_or_404(LTICourse, pk=id)
+    user_scope = request.session.get('hx_user_scope', None)
     if request.method == "POST":
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
@@ -216,7 +241,7 @@ def edit_course(request, id):
         else:
             raise PermissionDenied()
     else:
-        form = CourseForm(instance=course)
+        form = CourseForm(instance=course, user_scope=user_scope)
     return render(
         request,
         'hx_lti_initializer/edit_course.html',

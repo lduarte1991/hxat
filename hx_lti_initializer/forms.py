@@ -6,11 +6,15 @@ from hx_lti_assignment.models import Assignment
 class CourseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
+        self._user_scope = kwargs.pop('user_scope', None)
         super(CourseForm, self).__init__(*args, **kwargs)
         self.fields['course_admins'].queryset = self.get_course_admins()
 
     def get_course_admins(self):
-        return LTIProfile.objects.select_related('user').order_by('user__first_name', 'user__last_name', 'user__username')
+        filters = {}
+        if self._user_scope:
+            filters['scope'] = self._user_scope
+        return LTIProfile.objects.filter(**filters).select_related('user').order_by('name', 'user__username')
 
     class Meta:
         model = LTICourse

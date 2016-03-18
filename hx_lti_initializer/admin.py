@@ -10,7 +10,8 @@ from hx_lti_initializer.models import LTIProfile, LTICourse
 
 
 class LTIProfileAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'user', 'scope', 'anon_id', 'name', 'roles')
+    ordering = ('user', 'scope', 'anon_id', 'name', 'roles')
 
 
 class LTICourseAdmin(admin.ModelAdmin):
