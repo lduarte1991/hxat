@@ -13,8 +13,11 @@ from hx_lti_initializer.utils import debug_printer
 def get_course_id(request):
 	return request.session['hx_lti_course_id']
 
+def get_lti_profile(request):
+    return LTIProfile.objects.get(anon_id=request.session['hx_user_id'])
+
 def get_lti_profile_id(request):
-    lti_profile = LTIProfile.objects.get(user=request.user)
+    lti_profile = get_lti_profile(request)
     return lti_profile.id
 
 def open_target_object(request, collection_id, target_obj_id):
