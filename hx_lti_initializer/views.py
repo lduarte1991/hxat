@@ -20,7 +20,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse, User
+from hx_lti_initializer.models import LTIProfile, LTICourse, User, LTICourseAdmin
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
@@ -213,12 +213,33 @@ def launch_lti(request):
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         course_id = str(course)
         if set(roles) & set(settings.ADMIN_ROLES):
+            try:
+                userfound = LTICourseAdmin.objects.get(
+                    admin_unique_identifier=lti_profile.user.username,
+                    new_admin_course_id=course
+                )
+                course_object.add_admin(lti_profile)
+                debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+                userfound.delete()
+            except:
+                debug_printer("DEBUG - Not waiting to be added as admin")
             return course_admin_hub(request)
         else:
             debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
             return access_annotation_target(request, course_id, assignment_id, object_id)
     except:
         debug_printer("DEBUG - User wants the index")
+
+    try:
+        userfound = LTICourseAdmin.objects.get(
+            admin_unique_identifier=lti_profile.user.username,
+            new_admin_course_id=course
+        )
+        course_object.add_admin(lti_profile)
+        debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+        userfound.delete()
+    except:
+        debug_printer("DEBUG - Not waiting to be added as admin")
 
     return course_admin_hub(request)
 
@@ -232,6 +253,31 @@ def edit_course(request, id):
         if form.is_valid():
             course = form.save()
             course.save()
+            # this removes an administrator if they were checked off the list
+            admins = course.course_admins.all()
+            selected_list = request.POST.getlist('select_existing_user') + request.POST['new_admin_list'].split(',')
+            for admin in admins:
+                if admin.user.username not in selected_list:
+                    course.course_admins.remove(admin)
+                else:
+                    selected_list.remove(admin.user.username)
+            course.save()
+
+            # this will create an item in the database so when the user
+            # that was just added as an admin logs in, they get added
+            # to the list of admins in the course.
+            if len(selected_list) > 0:
+                for name in selected_list:
+                    if str(name.strip()) != "":
+                        try:
+                            new_course_admin = LTICourseAdmin(
+                                admin_unique_identifier=name,
+                                new_admin_course_id=course.course_id
+                            )
+                            new_course_admin.save()
+                        except:
+                            # admin already pending
+                            debug_printer("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
             request.session['course_name'] = course.course_name
@@ -242,12 +288,19 @@ def edit_course(request, id):
             raise PermissionDenied()
     else:
         form = CourseForm(instance=course, user_scope=user_scope)
+
+    try:
+        pending_admins = LTICourseAdmin.objects.filter(new_admin_course_id=course.course_id)
+    except:
+        pending_admins = None
+
     return render(
         request,
         'hx_lti_initializer/edit_course.html',
         {
             'form': form,
             'user': request.user,
+            'pending': pending_admins,
         }
     )
 
