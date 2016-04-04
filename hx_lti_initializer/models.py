@@ -173,4 +173,28 @@ class LTICourse(models.Model):
             self.course_users.add(lti_profile)
             self.save()
         return self
-        
+
+
+class LTICourseAdmin(models.Model):
+
+    admin_unique_identifier = models.CharField(
+        max_length=255
+    )
+
+    new_admin_course_id = models.CharField(
+        max_length=255
+    )
+
+    class Meta:
+        verbose_name = _("Pending Admin")
+        unique_together = ("admin_unique_identifier", "new_admin_course_id")
+
+    def __unicode__(self):
+        """
+        """
+        return u"%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)
+
+    def __str__(self):
+        """
+        """
+        return "%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)

@@ -11,3 +11,4 @@ secure.py
 http_static
 production.py
 reports
+*-annotation-list.json
