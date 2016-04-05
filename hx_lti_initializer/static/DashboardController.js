@@ -82,6 +82,7 @@
 				controller: self,
 				default_tab: self.initOptions.default_tab,
 				show_instructor_tab: self.initOptions.show_instructor_tab,
+				is_instructor: self.initOptions.is_instructor === "True",
 			});
 		});
 

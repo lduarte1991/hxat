@@ -111,7 +111,9 @@
     };
 
     $.DashboardView.prototype.addPrintButton = function() {
-        jQuery('.handleAnnotations').show();
+        if (this.initOptions.is_instructor) {
+            jQuery('.handleAnnotations').show();
+        }
     };
 
     $.DashboardView.prototype.removePrintButton = function() {
