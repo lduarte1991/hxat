@@ -61,16 +61,16 @@ Annotation Tool | Text | {{ target_object.target_title }}
           	</div>
         	<section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">{{instructions | safe}}</section>
         </div>
-        <h1>{{ target_object.target_title | safe }}</h1>
+        <h3>{{ target_object.target_title | safe }}</h3>
 	    {% if target_object.target_author != "None" %}
-		    <h3>by {{ target_object.target_author | safe }}</h3>
+		    <h4>by {{ target_object.target_author | safe }}</h4>
 	    {% endif %}
 	    <div class="content">
 		    {{ target_object.target_content | safe }}
 	    </div>
     
 	    <section id="make_annotations_panel" class="hidden" role="region" aria-label="Make annotations using keyboard input">
-	    	<h2>Make Annotations using Keyboard input</h2>
+	    	<h3>Make Annotations using Keyboard input</h3>
       		<div aria-label="Read instructions on making annotation:">To make an annotation, click the "Make an Annotation" button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the "Save Highlights" button. Warning: this will turn off selection using the mouse to make annotations.</div>
       		<div class="hidden" id="annotation-maker">
         		<label for="id_annotation_text_screen_reader">Enter annotation for highlighted section:
