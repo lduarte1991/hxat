@@ -169,7 +169,14 @@
 
         jQuery('.annotationModal #importarea').click( function(e) {
             var content = JSON.parse(jQuery('.annotationModal #importItems').val());
+            // gets endpoint for image annotations
             var endpoint = self.initOptions.endpoint.endpoint;
+
+            // below checks to see if it's supposed to come from annotator instead
+            if (endpoint === undefined) {
+                var endpoint = self.initOptions.endpoint.annotator.options;
+                endpoint.userid = endpoint.user_id;
+            }
             jQuery.each(content, function(index, value) {
                 value.id = undefined;
                 value.collectionId = endpoint.collection_id;
@@ -177,8 +184,13 @@
                 if (value.user.name === endpoint.username) {
                     value.user.id = endpoint.userid;
                 }
+                if (endpoint.createCatchAnnotation !== undefined) {
+                    endpoint.createCatchAnnotation(value);
+                } else {
+                    self.initOptions.endpoint.annotator.setupAnnotation(value);
+                    self.initOptions.endpoint.annotator.publish('annotationCreated', [value]);
+                }
                 
-                endpoint.createCatchAnnotation(value);
             });
             jQuery('.annotationModal #closeModal').trigger('click');
             jQuery('.mirador-osd-refresh-mode').trigger('click');
