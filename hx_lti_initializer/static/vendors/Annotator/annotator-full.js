@@ -2215,7 +2215,7 @@
         return;
       }
       if (this.annotator.plugins.Auth) {
-        return this.annotator.plugins.Auth.withToken(this._getAnnotations);
+        return this.annotator.plugins.Auth.withToken();
       } else {
         return this._getAnnotations();
       }
