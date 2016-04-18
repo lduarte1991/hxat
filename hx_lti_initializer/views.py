@@ -89,14 +89,13 @@ def launch_lti(request):
     display_name = get_lti_value('lis_person_name_full', tool_provider)
     if not display_name:
         display_name = get_lti_value('lis_person_sourcedid', tool_provider)
-    debug_printer("DEBUG - user name: " + display_name)
 
     # This is the unique identifier for the person in the source system
     # In canvas this would be the SIS user id, in edX the registered username
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
-    
+
     # This handles the rare case in which we have neither display name nor external user id
-    if not display_name and not external_user_id:
+    if not display_name or not external_user_id:
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
             roles = ['student']
@@ -106,7 +105,7 @@ def launch_lti(request):
         except:
             debug_printer('DEBUG - username not found in post.')
             raise PermissionDenied()
-
+    debug_printer("DEBUG - user name: " + display_name)
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
     if lti_grade_url is not None:
         save_session(request, is_graded=True)
