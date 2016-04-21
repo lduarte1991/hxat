@@ -177,6 +177,7 @@
                 var endpoint = self.initOptions.endpoint.annotator.options;
                 endpoint.userid = endpoint.user_id;
             }
+            var time= 500;
             jQuery.each(content, function(index, value) {
                 value.id = undefined;
                 value.collectionId = endpoint.collection_id;
@@ -185,10 +186,16 @@
                     value.user.id = endpoint.userid;
                 }
                 if (endpoint.createCatchAnnotation !== undefined) {
-                    endpoint.createCatchAnnotation(value);
+                    setTimeout(function(){
+                        endpoint.createCatchAnnotation(value);
+                    }, time);
+                    time +=500;
                 } else {
-                    self.initOptions.endpoint.annotator.setupAnnotation(value);
-                    self.initOptions.endpoint.annotator.publish('annotationCreated', [value]);
+                    setTimeout(function(){
+                        self.initOptions.endpoint.annotator.setupAnnotation(value);
+                        self.initOptions.endpoint.annotator.publish('annotationCreated', [value]);
+                    }, time);
+                    time +=500; 
                 }
                 
             });
