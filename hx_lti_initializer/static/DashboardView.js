@@ -489,7 +489,16 @@
             window.dispatchEvent(new Event('resize'));
         });
         jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
-        window.dispatchEvent(new Event('resize'));
+        var evt;
+        try {
+            console.log("new Event works");
+            evt = new Event('resize');
+        } catch(e) {
+            console.log("new Event doesn't work");
+            var evt = window.document.createEvent('UIEvents');
+            evt.initUIEvent('resize', true, false, window, 0);
+        }
+        window.dispatchEvent(evt);
         if (typeof jQuery.subscribe === 'function') {
             jQuery.subscribe('focusUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;
