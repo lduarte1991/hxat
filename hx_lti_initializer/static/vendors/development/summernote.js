@@ -2373,13 +2373,13 @@
       styleTags: ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
       // default fontName
-      defaultFontName: 'Helvetica Neue',
+      defaultFontName: 'Open Sans',
 
       // fontName
       fontNames: [
         'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
         'Helvetica Neue', 'Helvetica', 'Impact', 'Lucida Grande',
-        'Tahoma', 'Times New Roman', 'Verdana'
+        'Tahoma', 'Times New Roman', 'Verdana', 'Open Sans'
       ],
       fontNamesIgnoreCheck: [],
 

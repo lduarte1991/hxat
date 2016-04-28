@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load possible_admins %}
 {% load bootstrap3 %}
 
 {# Load CSS and JavaScript #}
@@ -12,18 +13,43 @@
 	<h3>Edit Course</h3>
 	<form method="POST" class="post-form">{% csrf_token %}
 		{{ form.non_field_errors }}
+		{{ form.errors }}
 		<div class="form-group">
 			<label for="id_course_name">Course name:</label> 
 			<input id="id_course_name" maxlength="255" name="course_name" class="form-control" type="text" value="{{form.course_name.value}}">
 		</div>
 		<div class="form-group">
+			<label for="id_select_existing_user">Add a new admin from existing user:</label>
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_select_existing_user" name="select_existing_user">
+				{% for selected, name in form.course_admins.value|list_of_possible_admins %}
+					<option value="{{name}}" {% if selected %} selected {% endif %}> {{name}} </option>
+				{% endfor %}
+			</select>
+			<label for="id_new_admin_list">Add new admins via unique id (edX = username, canvas = HUID):</label>
+			<input type="text" maxlength="255" name="new_admin_list" class="form-control" id="id_new_admin_list">
+			<p class="help">If adding multiple users, separate them with commas, not spaces.</p>
+			<label for="pending_admins">Pending Admins (will be added as course admins next time they log in):</label> {% if pending %}
+			{% for ad in pending %}
+				{{ad.admin_unique_identifier}},
+			{% endfor %}
+			{% else %} None {% endif %}
+		</div>
+		 <div class="form-group hidden">
+			<label for="id_course_admins">Course admins:</label> 
+			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins">
+				{% for id,choice in form.fields.course_admins.choices %}
+				<option value="{{ id }}" {% if id in form.course_admins.value %} selected {% endif %}>{{ choice }}</option>
+				{% endfor %}
+			</select> 
+		</div>
+		<!-- <div class="form-group">
 			<label for="id_course_admins">Course admins:</label> 
 			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins" role="listbox">
 				{% for id,choice in form.fields.course_admins.choices %}
 				<option value="{{ id }}" aria-checked={% if id in form.course_admins.value %}"true" selected {% else %}"false"{% endif %} role="option">{{ choice }}</option>
 				{% endfor %}
 			</select> 
-		</div>
+		</div> -->
 		<!-- TODO: Add example of how to use-->
 		<div class="form-group">
 			<label for="id_course_external_css_default">External CSS Default:</label> 

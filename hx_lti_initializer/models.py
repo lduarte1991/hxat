@@ -20,11 +20,13 @@ class LTIProfile(models.Model):
     """
 
     # uses the Django default user to store username and user id information
-    user = models.OneToOneField(
+    # Many profiles can be associated with a single user object.
+    user = models.ForeignKey(
         User,
         related_name='annotations_user_profile',
         null=True,
     )
+
     # saves the list of roles attached to that user
     roles = models.CharField(
         max_length=255,
@@ -38,9 +40,19 @@ class LTIProfile(models.Model):
         max_length=255, blank=True, null=True
     )
 
+    # saves the name for display purposes
+    name = models.CharField(
+        max_length=255, blank=True, null=True
+    )
+    
+    # saves the scope where this profile is valid (i.e. domain instance for canvas, course instance for edx)
+    scope = models.CharField(
+        max_length=1024, blank=True, null=True
+    )
+
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
-        return self.user.username
+        return self.name or self.user.username
 
     class Meta:
         """ The name of this section within the admin site """
@@ -51,21 +63,6 @@ class LTIProfile(models.Model):
         anon_id = self.anon_id
         return anon_id
 
-
-def user_post_save(sender, instance, created, **kwargs):
-    """
-    This function will create an LTIProfile object.
-    Then save the user object to it so that they are interconnected.
-    """
-
-    if created is True:
-        p = LTIProfile()
-        p.user = instance
-        p.save()
-
-# this function will then connect the function created above so that a
-# matching LTIProfile object is created after any User object is created.
-post_save.connect(user_post_save, sender=User)
 
 
 class LTICourse(models.Model):
@@ -144,24 +141,60 @@ class LTICourse(models.Model):
         return LTICourse.objects.get(course_id=course_id)
 
     @staticmethod
-    def create_course(course_id, lti_profile):
+    def create_course(course_id, lti_profile, **kwargs):
         """
         Given a course_id and a profile, it creates a new LTICourse object
         and adds the LTIProfile as a course_admin.
         """
         course_object = LTICourse(course_id=course_id)
+        course_name = kwargs.get('name', None)
+        if course_name:
+            course_object.course_name = course_name
         course_object.save()
-        course_object.course_admins.add(lti_profile)
+        course_object.add_admin(lti_profile)
         return course_object
-        
+    
+    def add_admin(self, lti_profile):
+        """
+        Given an lti_profile, adds a user to the course_admins of an LTICourse if not already there
+        """
+        current_profiles = self.course_admins.all()
+        if lti_profile and lti_profile not in current_profiles:
+            self.course_admins.add(lti_profile)
+            self.save()
+        return self
+    
     def add_user(self, lti_profile):
         """
         Given an lti_profile, adds a user to the course_users of an LTICourse if not already there
         """
-        # Get current course_users
         current_profiles = self.course_users.all()
-        if lti_profile not in current_profiles:
-            # Add user to course_users if not found
+        if lti_profile and lti_profile not in current_profiles:
             self.course_users.add(lti_profile)
             self.save()
-        
+        return self
+
+
+class LTICourseAdmin(models.Model):
+
+    admin_unique_identifier = models.CharField(
+        max_length=255
+    )
+
+    new_admin_course_id = models.CharField(
+        max_length=255
+    )
+
+    class Meta:
+        verbose_name = _("Pending Admin")
+        unique_together = ("admin_unique_identifier", "new_admin_course_id")
+
+    def __unicode__(self):
+        """
+        """
+        return u"%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)
+
+    def __str__(self):
+        """
+        """
+        return "%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)

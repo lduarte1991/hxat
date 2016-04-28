@@ -20,7 +20,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse, User
+from hx_lti_initializer.models import LTIProfile, LTICourse, User, LTICourseAdmin
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
@@ -60,6 +60,21 @@ def launch_lti(request):
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
+    # This is where we identify the "scope" of the LTI user_id (anon_id), meaning
+    # the scope in which the identifier is unique. In canvas this is the domain instance,
+    # where as in edX this is the course instance.
+    #
+    # The idea is that the combination of the LTI user_id (anon_id) and scope should be
+    # globally unique.
+    user_scope = None
+    if settings.ORGANIZATION == "HARVARDX":
+        user_scope = "course:%s" % course
+    else:
+        tool_consumer_instance_guid = get_lti_value('tool_consumer_instance_guid', tool_provider)
+        if tool_consumer_instance_guid:
+            user_scope = "consumer:%s" % tool_consumer_instance_guid
+    debug_printer("DEBUG - user scope is: %s" % user_scope)
+
     # default to student
     request.session['is_instructor'] = False
 
@@ -69,20 +84,28 @@ def launch_lti(request):
     roles = get_lti_value(settings.LTI_ROLES, tool_provider)
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
-    lti_username = get_lti_value('lis_person_name_full', tool_provider)
-    if lti_username is None:
-        lti_username = get_lti_value('lis_person_sourcedid', tool_provider)
-        if not lti_username:
-            try:
-                lti_profile = LTIProfile.objects.get(anon_id=str(course))
-                lti_username = lti_profile.user.username
-                roles = ['student']
-                messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
-                messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
-            except:
-                debug_printer('DEBUG - username not found in post.')
-                raise PermissionDenied()
 
+    # This is the name that we will show on the UI
+    display_name = get_lti_value('lis_person_name_full', tool_provider)
+    if not display_name:
+        display_name = get_lti_value('lis_person_sourcedid', tool_provider)
+
+    # This is the unique identifier for the person in the source system
+    # In canvas this would be the SIS user id, in edX the registered username
+    external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
+
+    # This handles the rare case in which we have neither display name nor external user id
+    if not display_name or not external_user_id:
+        try:
+            lti_profile = LTIProfile.objects.get(anon_id=str(course))
+            roles = ['student']
+            display_name = lti_profile.user.username
+            messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
+            messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
+        except:
+            debug_printer('DEBUG - username not found in post.')
+            raise PermissionDenied()
+    debug_printer("DEBUG - user name: " + display_name)
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
     if lti_grade_url is not None:
         save_session(request, is_graded=True)
@@ -96,16 +119,16 @@ def launch_lti(request):
             debug_printer('DEBUG - LTI Profile was found via anonymous id.')
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
-            debug_printer('DEBUG - LTI Profile not found. New User to be created.')
-            debug_printer("DEBUG - Creating a user with role(s): " + str(roles))
-            user, lti_profile = create_new_user(lti_username, user_id, roles)
+            debug_printer('DEBUG - LTI Profile NOT found. New User to be created.')
+            user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
         save_session(
             request,
             user_id=user_id,
-            user_name=lti_username,
+            user_name=display_name,
+            user_scope=user_scope,
             context_id=course,
             roles=roles,
             is_staff=True
@@ -127,7 +150,8 @@ def launch_lti(request):
         save_session(
             request,
             user_id=user_id,
-            user_name=lti_username,
+            user_name=display_name,
+            user_scope=user_scope,
             context_id=course,
             roles=roles,
             is_staff=False
@@ -161,11 +185,11 @@ def launch_lti(request):
             messages.warning(request, message_error)
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
-            course_object = LTICourse.create_course(course, lti_profile)
-            create_new_user('preview' + str(course).replace(':', ''), str(course), ['student'])
+            context_title = None
             if get_lti_value('context_title', tool_provider) is not None:
-                course_object.course_name = get_lti_value('context_title', tool_provider)
-                course_object.save()
+                context_title = get_lti_value('context_title', tool_provider)
+            course_object = LTICourse.create_course(course, lti_profile, name=context_title)
+            create_new_user(anon_id=str(course), username='preview:%s' % course_object.id, display_name="Preview %s" % str(course_object), roles=['student'], scope=user_scope)
 
             # save the course name to the session so it auto-populate later.
             save_session(
@@ -188,6 +212,16 @@ def launch_lti(request):
         object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
         course_id = str(course)
         if set(roles) & set(settings.ADMIN_ROLES):
+            try:
+                userfound = LTICourseAdmin.objects.get(
+                    admin_unique_identifier=lti_profile.user.username,
+                    new_admin_course_id=course
+                )
+                course_object.add_admin(lti_profile)
+                debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+                userfound.delete()
+            except:
+                debug_printer("DEBUG - Not waiting to be added as admin")
             return course_admin_hub(request)
         else:
             debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
@@ -195,17 +229,54 @@ def launch_lti(request):
     except:
         debug_printer("DEBUG - User wants the index")
 
+    try:
+        userfound = LTICourseAdmin.objects.get(
+            admin_unique_identifier=lti_profile.user.username,
+            new_admin_course_id=course
+        )
+        course_object.add_admin(lti_profile)
+        debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+        userfound.delete()
+    except:
+        debug_printer("DEBUG - Not waiting to be added as admin")
+
     return course_admin_hub(request)
 
 
 @login_required
 def edit_course(request, id):
     course = get_object_or_404(LTICourse, pk=id)
+    user_scope = request.session.get('hx_user_scope', None)
     if request.method == "POST":
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
             course = form.save()
             course.save()
+            # this removes an administrator if they were checked off the list
+            admins = course.course_admins.all()
+            selected_list = request.POST.getlist('select_existing_user') + request.POST['new_admin_list'].split(',')
+            for admin in admins:
+                if admin.user.username not in selected_list:
+                    course.course_admins.remove(admin)
+                else:
+                    selected_list.remove(admin.user.username)
+            course.save()
+
+            # this will create an item in the database so when the user
+            # that was just added as an admin logs in, they get added
+            # to the list of admins in the course.
+            if len(selected_list) > 0:
+                for name in selected_list:
+                    if str(name.strip()) != "":
+                        try:
+                            new_course_admin = LTICourseAdmin(
+                                admin_unique_identifier=name,
+                                new_admin_course_id=course.course_id
+                            )
+                            new_course_admin.save()
+                        except:
+                            # admin already pending
+                            debug_printer("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
             request.session['course_name'] = course.course_name
@@ -215,13 +286,20 @@ def edit_course(request, id):
         else:
             raise PermissionDenied()
     else:
-        form = CourseForm(instance=course)
+        form = CourseForm(instance=course, user_scope=user_scope)
+
+    try:
+        pending_admins = LTICourseAdmin.objects.filter(new_admin_course_id=course.course_id)
+    except:
+        pending_admins = None
+
     return render(
         request,
         'hx_lti_initializer/edit_course.html',
         {
             'form': form,
             'user': request.user,
+            'pending': pending_admins,
         }
     )
 
