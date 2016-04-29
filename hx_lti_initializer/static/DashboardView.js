@@ -219,6 +219,9 @@
             var annotation = annotationsList[i];
             var annotationItem = self.formatAnnotation(annotation);
             annotationItem.index = i+1;
+            if (annotationItem.text === undefined) {
+                annotationItem.text = "";
+            }
             var html = self.initOptions.TEMPLATES.annotationItem(annotationItem);
             jQuery('.annotationsHolder').append(html);
             divObject = '.annotationItem.item-'+annotation.id.toString();
