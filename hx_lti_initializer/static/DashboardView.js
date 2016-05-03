@@ -376,6 +376,8 @@
         el.html(self.initOptions.TEMPLATES.annotationSection({
             annotationItems: [],
             show_instructor_tab: self.initOptions.show_instructor_tab,
+            show_mynotes_tab: self.initOptions.show_mynotes_tab,
+            show_public_tab: self.initOptions.show_public_tab
         }));
         console.log(self.initOptions);
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
