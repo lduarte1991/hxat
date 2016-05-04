@@ -100,6 +100,9 @@ Annotation Tool | Video | {{ target_object.target_title }}
       {% if assignment.allow_highlights %}
       'highlightTags_options': "{{ assignment.highlights_options }}",
       {% endif %}
+      {% if not assignment.include_mynotes_tab %}
+      'readOnly': true,
+      {% endif %}
     },
   };
 {% endblock %}

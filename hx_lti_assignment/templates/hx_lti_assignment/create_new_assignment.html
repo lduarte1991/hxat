@@ -35,6 +35,42 @@
 				jQuery('#id_default_tab').find('option').first().removeClass('hidden');
 			} else {
 				jQuery('#id_default_tab').find('option').first().addClass('hidden');
+				if (jQuery('#id_default_tab').val() === "Instructor" ) {
+					var nonHiddenOptions = jQuery('#id_default_tab').find('option:not(.hidden)');
+					if (nonHiddenOptions.length !== 0) {
+						jQuery('#id_default_tab').selectpicker('val', nonHiddenOptions.first().val());
+					}
+				}
+			}
+			
+			jQuery('#id_default_tab').selectpicker('refresh');            
+        });
+        jQuery('#id_include_mynotes_tab').change(function(event){
+			if (jQuery('#id_include_mynotes_tab').is(':checked')) {
+				jQuery(jQuery('#id_default_tab').find('option').get(1)).removeClass('hidden');
+			} else {
+				jQuery(jQuery('#id_default_tab').find('option').get(1)).addClass('hidden');
+				if (jQuery('#id_default_tab').val() === "MyNotes" ) {
+					var nonHiddenOptions = jQuery('#id_default_tab').find('option:not(.hidden)');
+					if (nonHiddenOptions.length !== 0) {
+						jQuery('#id_default_tab').selectpicker('val', nonHiddenOptions.first().val());
+					}
+				}
+			}
+			
+			jQuery('#id_default_tab').selectpicker('refresh');            
+        });
+        jQuery('#id_include_public_tab').change(function(event){
+			if (jQuery('#id_include_public_tab').is(':checked')) {
+				jQuery('#id_default_tab').find('option').last().removeClass('hidden');
+			} else {
+				jQuery('#id_default_tab').find('option').last().addClass('hidden');
+				if (jQuery('#id_default_tab').val() === "Public" ) {
+					var nonHiddenOptions = jQuery('#id_default_tab').find('option:not(.hidden)');
+					if (nonHiddenOptions.length !== 0) {
+						jQuery('#id_default_tab').selectpicker('val', nonHiddenOptions.first().val());
+					}
+				}
 			}
 			
 			jQuery('#id_default_tab').selectpicker('refresh');            
