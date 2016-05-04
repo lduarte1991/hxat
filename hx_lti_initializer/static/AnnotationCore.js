@@ -195,6 +195,38 @@
 		    
 		    this.annotation_tool.addPlugin(pluginName, options);
 	    } 
+	};
+	$.AnnotationCore.prototype.alert = function(error) {
+		var overlaybckg = document.createElement('div');
+        var overlaydialog = document.createElement('div');
+        jQuery(overlaybckg).css({
+            "background-color": "rgba(33, 33, 33, 0.3)",
+            "width": "100%",
+            "height": "100%",
+            "position": "fixed",
+            "top": "0",
+            "left": "0",
+            "z-index": "999"
+        });
+        jQuery(overlaydialog).css({
+            "background-color": "white",
+            "width": "500px",
+            "height": "420px",
+            "margin-left": "-250px",
+            "margin-top": "-200px",
+            "top": "50%",
+            "left": "50%",
+            "position": "fixed",
+            "z-index": "9999",
+            "border": "4px solid black",
+            "border-radius": "10px",
+        });
+        jQuery(overlaydialog).html("<h3 style='padding-left: 50px; padding-top:10px;'>Uh oh!</h3><p style='padding: 0px 50px;'>Something went wrong with the annotation database. Unfortunately, this means that we are not able to save your annotations or show you the annotations of instructors and other learners. The most common reason is if you were inactive in this page for a while. We recommend refreshing the page or changing browsers.</p> <button role='button' class='btn btn-success' style='margin:5px 50px;width:400px;' id='takemethere' onclick='window.open(\"/troubleshooting/\", \"_blank\");'>Visit troubleshooting page</button><button role='button' class='btn btn-danger' style='margin: 10px 50px;width:400px;' id='ignorewarning'>Proceed without annotations</button> <p style='padding: 10px 50px; text-align:center;'>(Clicking \"Proceed without annotations\" will allow you to view the assignment you are trying to annotate. Unfortunately your annotations will not be saved and you will not see instructor or other leareners' annotations.)</p>");
+        jQuery(overlaybckg).append(overlaydialog);
+        jQuery("body").append(overlaybckg);
+        jQuery('#ignorewarning').click(function(){
+            jQuery(overlaybckg).remove();
+        })
 	}
 
 }(AController));

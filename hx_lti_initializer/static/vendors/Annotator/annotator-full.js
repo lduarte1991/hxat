@@ -2415,25 +2415,26 @@
 
     Store.prototype._onError = function(xhr) {
       var action, message;
-      action = xhr._action;
-      message = Annotator._t("Sorry we could not ") + action + Annotator._t(" this annotation");
-      if (xhr._action === 'search') {
-        message = Annotator._t("Sorry we could not search the store for annotations");
-      } else if (xhr._action === 'read' && !xhr._id) {
-        message = Annotator._t("Sorry we could not ") + action + Annotator._t(" the annotations from the store");
-      }
-      switch (xhr.status) {
-        case 401:
-          message = Annotator._t("Sorry you are not allowed to ") + action + Annotator._t(" this annotation");
-          break;
-        case 404:
-          message = Annotator._t("Sorry we could not connect to the annotations store");
-          break;
-        case 500:
-          message = Annotator._t("Sorry something went wrong with the annotation store");
-      }
-      Annotator.showNotification(message, Annotator.Notification.ERROR);
-      return console.error(Annotator._t("API request failed:") + (" '" + xhr.status + "'"));
+      AController.annotationCore.alert(xhr);
+      // action = xhr._action;
+      // message = Annotator._t("Sorry we could not ") + action + Annotator._t(" this annotation");
+      // if (xhr._action === 'search') {
+      //   message = Annotator._t("Sorry we could not search the store for annotations");
+      // } else if (xhr._action === 'read' && !xhr._id) {
+      //   message = Annotator._t("Sorry we could not ") + action + Annotator._t(" the annotations from the store");
+      // }
+      // switch (xhr.status) {
+      //   case 401:
+      //     message = Annotator._t("Sorry you are not allowed to ") + action + Annotator._t(" this annotation");
+      //     break;
+      //   case 404:
+      //     message = Annotator._t("Sorry we could not connect to the annotations store");
+      //     break;
+      //   case 500:
+      //     message = Annotator._t("Sorry something went wrong with the annotation store");
+      // }
+      // Annotator.showNotification(message, Annotator.Notification.ERROR);
+      // return console.error(Annotator._t("API request failed:") + (" '" + xhr.status + "'"));
     };
 
     return Store;
