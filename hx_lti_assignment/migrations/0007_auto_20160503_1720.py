@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assignment',
             name='include_public_tab',
-            field=models.BooleanField(default=False, help_text=b"Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations."),
+            field=models.BooleanField(default=True, help_text=b"Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations."),
             preserve_default=True,
         ),
     ]
