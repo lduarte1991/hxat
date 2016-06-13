@@ -1,122 +1,155 @@
 {% extends 'hx_lti_initializer/base.html' %}
 
-{% load bootstrap3 %}
-
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
-
 {% block title %} Annotation Tool | Admin Hub {% endblock %}
 
 {% block content %}
-<script>
-    jQuery(document).ready(function(){
-        jQuery('#assignments .clickable').click(function(event){
-            $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+    <script>
+        jQuery(document).ready(function(){
+            jQuery('#assignments .clickable').click(function(event){
+                $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+            });
+            jQuery('.clickable').keypress(function(e){
+                if (e.which === 13) {
+                    jQuery(this).click();
+                };
+            })
         });
-        jQuery('.clickable').keypress(function(e){
-            if (e.which === 13) {
-                jQuery(this).click();
-            };
-        })
-    });
-    var printHelp = function(course_id, collection_id, object_id){
-        var el = '#copypaste-' + course_id;
-        jQuery(el).html("\
-            <p>\
-                In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
-            </p>\
-            <input style='width:100%' type=\"text\" value=\"collection_id="+collection_id+"\">\
-            </input><br/>\
-            <input style='width:100%' type=\"text\" value=\"object_id="+object_id+"\">\
-            </input>\
-        ");
-        jQuery(el).addClass('copypaste');
-        jQuery(el).find('input').first().select();
-    
-    }
-</script>
-<div class="section-header">
-    Courses
-</div>
-{% for course in courses %}
-<div class="course-name">
-    {{ course.course_name }}
-</div>
-{% if is_instructor %}
-<a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}">Change Course Settings</a>
-{% endif %}
-<div id="copypaste-{{course.id}}"></div>
-<table class="table table-striped" id="assignments" role="grid">
-    <tbody>
-        {% for assignment in course.assignment_set.all %}
-        <tr tabindex="0" role="button" data-toggle="collapse" data-target="#target-objects-{{ assignment.id }}" class="clickable collapsed" aria-expanded="false">
-            <td>
-                {% if is_instructor %}
-                <a class="settingslink leftfloat" href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}">Edit</a>
-                {% endif %}
-                {{ assignment.assignment_name }}
-                <span class="expandicon glyphicon glyphicon-chevron-down"></span>
-            </td>
-        </tr>
-        <tr role="row">
-            <td>
-            	<div class="assignment-table-row collapse" id="target-objects-{{ assignment.id }}" role="gridcell">
-	                <table class="table table-striped" >
-	                    <thead>
-	                        <tr>
-	                            <th>
-	                                Title
-	                            </th>
-	                            <th>
-	                                Author
-	                            </th>
-	                            <th>
-	                                Date Created
-	                            </th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                        {% load order_by %}
-	                        {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
-	                        <tr>
-	                            <td>
-	                                {% if is_instructor %}
-	                                <a class="settingslink leftfloat" href="{% url 'target_object_database:edit_source' id=file.pk%}">Edit</a>
-	                                {% endif %}
-	                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{ file.target_title }}</a><br />
-                                    {% if org == 'HARVARDX' %}
-	                                (<a href="#" onclick="printHelp('{{ course.id }}', '{{ assignment.assignment_id }}', '{{ file.id }}'); return false;">Setup Info</a>)
-                                    {% endif %}
-	                            </td>
-	                            <td>
-	                                {{ file.target_author }}
-	                            </td>
-	                            <td title="{{ file.target_created }}">
-	                                {{ file.target_created | timesince }} ago
-	                            </td>
-	                        </tr>
-	                        {% endfor %}
-	                    </tbody>
-	                </table>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
+        var printHelp = function(course_id, collection_id, object_id) {
+            var el = '#copypaste-' + course_id;
+            jQuery(el).html("\
+                <p>\
+                    In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
+                </p>\
+                <input style='width:100%' type=\"text\" value=\"collection_id="+collection_id+"\">\
+                </input><br/>\
+                <input style='width:100%' type=\"text\" value=\"object_id="+object_id+"\">\
+                </input>\
+            ");
+            jQuery(el).addClass('copypaste');
+            jQuery(el).find('input').first().select();
+        };
+    </script>
+    <div class="section-header">
+        Annotation tool course name:
+    </div>
+    {% for course in courses %}
+        <div class="course-name">
+            {{ course.course_name }}
+        </div>
         {% if is_instructor %}
-        <tr>
-            <td style="text-align:center;">
-                <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" class="btn btn-primary" role="button">
-                {% bootstrap_icon "star" %} Create New Assignment
-                </a>
-            </td>
-        </tr>
+            <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}"><i class='fa fa-pencil' style='margin-right:4px'></i>Edit course settings</a>
         {% endif %}
-    </tbody>
-</table>
-{% endfor %}
 
+        <div class='assignment-header'>Assignments</div>
+
+        {% if course.assignment_set.all|length == 0 %}
+            <div class='assignment-item empty-assignment'>You have no annotation assignments in this course.</div>
+        {% else %}
+
+            {% for assignment in course.assignment_set.all %}
+                <div class='assignment-item item-{{forloop.counter0}}'>
+                    <div class='first-row'>
+                        <i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='assignment-title'>{{assignment.assignment_name}}</span>
+                        <div class='edit-assignment-button' onclick='location.href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}"'>Edit assignment</div>
+                    </div>
+                    <div class='target-object-list item-{{forloop.counter0}}' style='display:none'>
+                        <div class='table-header table-row'>Source title</div>
+                        {% load order_by %}
+                        {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
+                            <div class='table-row'><a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{file.target_title}}</a><a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}"><i class='fa fa-cog' style='margin-right:4px'></i>Setup info</a></div>
+                        {% endfor %}
+                        <div class='table-footer table-row' id='{{assignment.pk}}'><i class='fa fa-trash'></i> Delete assignment</div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+        <div id="new-assignment-section" style='top:25px; position: relative;'>
+            <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" id="new-assignment-button" role="button">
+                Create new assignment
+            </a>
+           <!--  or <a href="https://google.com" style='margin-left: 10px;'>import from another course</a> -->
+        </div>
+    {% endfor %}
+    <script>
+        jQuery('.assignment-item .first-row').click(function(event) {
+            if (event.target.className !== 'edit-assignment-button') {
+                var assignment_item = jQuery(this.parentElement);
+                var assignment_item_arrow = assignment_item.find('.fa-lg');
+                var to_list = assignment_item.find('.target-object-list');
+
+                if (assignment_item.hasClass('open')) {
+                    assignment_item_arrow.addClass('fa-caret-right');
+                    assignment_item_arrow.removeClass('fa-caret-down');
+                    to_list.hide();
+                    assignment_item.removeClass('open');
+                } else {
+                    assignment_item_arrow.addClass('fa-caret-down');
+                    assignment_item_arrow.removeClass('fa-caret-right');
+                    to_list.show();
+                    assignment_item.addClass('open');
+                }
+            }
+        });
+
+        jQuery('.edit-assignment-button').click(function(event){
+            // do whatever edit assignment ends up doing;
+        });
+
+        jQuery('.table-footer.table-row').click(function(event){
+            var $this = jQuery(this);
+            var assignment_pk = $this.prop('id');
+            var assignment_title = $this.parent().parent().find('.assignment-title').html();
+            var url = "/lti_init/launch_lti/assignment/" + assignment_pk + "/delete/";
+            
+            var html='<div class="delete-popup-overlay"><div class="delete-popup-background"><h3>Delete this Assignment</h3><p>Are you sure you want to delete the assignment: <em>&quot;'+ assignment_title +'&quot;</em></p><p>Deleting this assignment will remove it from the course, and you will lose access to any annotations and instructions that were created.</p><p><input type="checkbox" id="delete-check"><label for="delete-check">I understand that deleting this assignment cannot be undone.</label></p><form action="'+url+'" method="post">'+"{% csrf_token %}"+'<div id="delete-popup-confirm" class="disabled" type="submit" role="button">Delete assignment</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';
+            jQuery('body').append(html);
+            jQuery('#delete-check').change(function(){
+                var isChecked = jQuery(this).prop('checked');
+                var deleteButton = jQuery('#delete-popup-confirm');
+                if (isChecked) {
+                    deleteButton.removeClass('disabled');
+                } else {
+                    deleteButton.addClass('disabled');
+                }
+            });
+            jQuery('#delete-popup-cancel').click(function() {
+                jQuery('.delete-popup-overlay').remove();
+            });
+            jQuery('#delete-popup-confirm').click(function() {
+                if (jQuery('#delete-check').prop('checked')) {
+                    jQuery(this).parent('form').first().submit();
+                };
+            })
+        });
+
+        jQuery('.table-row .setupButton').click(function(event){
+            var $this = jQuery(this);
+            var assignment_id = $this.data('assignment-id');
+            var object_id = $this.data('object-id');
+            var object_name = $this.data('object-name');
+            
+            var html='<div class="delete-popup-overlay"><div class="source-material-setup-popup-background"><h3>Source Materials Setup Information</h3><p>These are the parameters for the source object: <em>'+ object_name +'</em></p><p>Make sure to add these values as "custom parameters" when setting up the LTI tool. This means this object will be shown to students when they view the tool. You only need to add the first item they will encounter, after that they can navigate through the rest of the assignment using the toolbar.</p><input class="hx-textfield readonlyfield" readonly value="collection_id='+ assignment_id +'"><input class="hx-textfield readonlyfield" readonly value="object_id='+object_id+'"><div id="delete-popup-cancel">Back to the assignments list</div></form></div></div>';
+            jQuery('body').append(html);
+            jQuery('#delete-check').change(function(){
+                var isChecked = jQuery(this).prop('checked');
+                var deleteButton = jQuery('#delete-popup-confirm');
+                if (isChecked) {
+                    deleteButton.removeClass('disabled');
+                } else {
+                    deleteButton.addClass('disabled');
+                }
+            });
+            jQuery('#delete-popup-cancel').click(function() {
+                jQuery('.delete-popup-overlay').remove();
+            });
+            jQuery('#delete-popup-confirm').click(function() {
+                if (jQuery('#delete-check').prop('checked')) {
+                    jQuery(this).parent('form').first().submit();
+                };
+            })
+        });
+
+    </script>
 {% endblock %}

@@ -7,6 +7,7 @@ from serializers import *
 from forms import SourceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from rest_framework import generics
 from hx_lti_initializer.utils import debug_printer
 
@@ -54,6 +55,8 @@ def create_new_source(request):
         {
             'form': form,
             'username': request.session['hx_user_name'],
+            'org': settings.ORGANIZATION,
+            'is_instructor': request.session["is_staff"],
         }
     )
 
@@ -83,6 +86,8 @@ def edit_source(request, id):
             'username': request.session['hx_user_name'],
             'creator': get_lti_profile_id(request),
             'course': get_course_id(request),
+            'org': settings.ORGANIZATION,
+            'is_instructor': request.session["is_staff"],
         }
     )
 
@@ -96,7 +101,7 @@ def handlePopAdd(request, addForm, field):
             except forms.ValidationError, error:
                 newObject = None
             if newObject:
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject)))  # noqa
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s", "%s", "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject.target_title), escape(newObject.target_author), escape(newObject.target_created), escape(newObject.target_type)))  # noqa
     else:
         form = addForm()
     pageContext = {
@@ -105,6 +110,8 @@ def handlePopAdd(request, addForm, field):
         'username': request.session['hx_user_name'],
         'creator': get_lti_profile_id(request),
         'course': get_course_id(request),
+        'org': settings.ORGANIZATION,
+        'is_instructor': request.session["is_staff"],
     }
     return render_to_response(
         "target_object_database/source_form.html",

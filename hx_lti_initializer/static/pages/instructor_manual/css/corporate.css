@@ -272,3 +272,75 @@ th {
 thead th {
   vertical-align: bottom;
 }
+
+.header {
+    width: 100%;
+    min-width: 800px;
+    background-color: black;
+    vertical-align: middle;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header .site-title {
+	display: inline-block;
+	position: relative;
+    font-size: 1.25em;
+    color: white;
+    font-family: arial, sans-serif;
+
+}
+
+.header .site-title a {
+	color: white;
+	text-decoration: none;
+}
+
+.header .site-title a:hover{
+    text-decoration: none;
+}
+
+.header .logo {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.header #banner-logo-left {
+	position: relative;
+	left: 10%;
+	display: inline-block;
+	padding: 5px 0px;
+}
+
+.navigation {
+    font-size: 1em;
+    position: relative;
+    display: inline-block;
+    margin-right: 10%;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-family: Arial;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.navigation a {
+    color: rgb(134, 213, 244);
+    margin-left: 10px;
+    margin-right: 30px;
+    vertical-align: middle;
+    text-decoration: none;
+    padding-bottom: 14px;
+    border-bottom: 4px solid rgb(134, 231, 244);
+    font-weight: bold;
+}
+
+.navigation a.selected {
+	color: rgb(154, 154, 154);
+	border-bottom: 4px solid rgb(154, 154, 154);
+}
+
+.navigation a:hover {
+    color: #fff;
+    text-decoration: none;
+}

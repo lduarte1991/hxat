@@ -12,6 +12,7 @@
   <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0" />
   
   <link href="css/corporate.css" media="screen" rel="stylesheet" type="text/css" /><!-- main CSS for structure and style-->
+  <link rel="stylesheet" href="/static/vendors/development/css/font-awesome.css">
   <link href="css/prettyPhoto.css" media="screen" rel="stylesheet" type="text/css" charset="utf-8" />
   <script src="js/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
@@ -28,6 +29,27 @@
 
 <body>
   <div id="wrapper">
+  	<header class="header" role="banner">
+            <div id="banner-logo-left">
+                
+                    <div class="logo" aria-label="HarvardX Logo">
+                        <img src="/static/css/images/hx_inv.png" style="height:40px;">
+                    </div>
+                
+                <div class="site-title">
+                    <a href="/lti_init/admin_hub/">The HarvardX Annotation Tool</a>
+                </div>
+            </div>
+            <!-- Broken off into two sections, information on the left and content on the right -->
+            <nav class="navigation" role="navigation" aria-label="Main Menu">
+                <a href="/lti_init/admin_hub/"><i class="fa fa-home"></i>  Home</a>
+                
+                    
+                    <a target="_self" href="/static/pages/instructor_manual/hxat-instructor-manual.html" class="selected">Manual</a>
+                    <a role="button" href="/lti_init/x/instructor_dashboard_view">Dashboard</a>
+                
+            </nav>
+        </header>
   	<div id="header-row">
   		<div id="header-left">
         <div id="header-left-content">

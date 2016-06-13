@@ -18,14 +18,14 @@
 }
 
 .sidebar-top #user-label {
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     font-size: 18px;
     font-weight: bold;
 }
 
 .sidebar a {
     color:#66ccff;
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     text-decoration:none;
     font-size: 13px;
 }
@@ -48,7 +48,7 @@
 .sidebar .label {
     color: #bbbbbb;
     text-transform: uppercase;
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     font-size: 10px;
 }
 
@@ -64,8 +64,9 @@
 .header .site-title {
 	display: inline-block;
 	position: relative;
-    font-size: 1.25em;
+    font-size: 1em;
     color: white;
+    font-family: Verdana, sans-serif;
 
 }
 
@@ -81,6 +82,8 @@
 .header .logo {
 	display: inline-block;
 	vertical-align: middle;
+	width: 70px;
+	height: 40px;
 }
 
 .header #banner-logo-left {
@@ -97,35 +100,40 @@
 }
 
 .section-header{
-    color: #767676;
-    text-transform: uppercase;
-    font-family: "arial", sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    border-bottom:1px solid #999999;
-    margin-bottom: 10px;
+    color: #595959;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    margin-bottom: 2px;
     margin-top: 30px;
 }
 
 .course-name {
     color: black;
-    text-transform: uppercase;
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
     font-size: 22px;
-    margin-bottom: 10px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.assignment-header {
+	color: rgb(86, 86, 86);
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 18px;
+	margin-top: 40px;
+	font-weight: bold;
 }
 
 td {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
 }
 
 th {
     padding-top: 5px;
     padding-bottom: 5px;
-    font-family: "arial", sans-serif;
+    font-family: Verdana, Arial, sans-serif;
 }
 
 .settingslink {
@@ -201,21 +209,21 @@ li {
 	color: #aaaaaa;
 }
 .navigation {
-    font-size: 1em;
+    font-size: 0.8em;
     position: relative;
     display: inline-block;
     margin-right: 10%;
     margin-top: auto;
     margin-bottom: auto;
-    font-family: Arial;
+    font-family: Verdana;
     padding-top: 15px;
     padding-bottom: 15px;
 }
 
 .navigation a {
-    color: rgb(134, 213, 244);
-    margin-left: 10px;
-    margin-right: 30px;
+    color: #88ddff;
+    margin-left: 5px;
+    margin-right: 15px;
     vertical-align: middle;
     text-decoration: none;
     padding-bottom: 14px;
@@ -224,17 +232,26 @@ li {
 }
 
 .navigation a.selected {
-	color: rgb(154, 154, 154);
+	color: #999999;
+	border-bottom: 4px solid rgb(154, 154, 154);
+}
+
+.navigation a.selected:hover {
+	color: #999999;
 	border-bottom: 4px solid rgb(154, 154, 154);
 }
 
 .navigation a:hover {
-    color: #fff;
+    color: #ccffff;
     text-decoration: none;
 }
 
+.container {
+	margin: 20px 10%;
+}
+
 .container table#assignments {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 td a:not([role="button"]){
@@ -274,8 +291,143 @@ footer {
          -ms-transform-origin:50% 58%; /* IE 9 */
 }
 
+.assignment-item, .source-item {
+	display: block;
+	padding: 20px 30px;
+	border: 2px solid lightgray;
+	border-radius: 10px;
+	margin-top: 15px;
+	background-color: white;
+}
+
+.assignment-item .first-row, .source-item .first-row {
+	cursor: pointer;
+}
+
+.assignment-item .assignment-title, .source-item .source-title {
+	font-weight: bold;
+}
+
+.assignment-item .edit-assignment-button {
+	padding: 5px 20px;
+	border: 2px solid rgb(55, 124, 182);
+	border-radius: 5px;
+	float: right;
+	margin-top: -5px;
+}
+
+.assignment-item .edit-assignment-button:hover {
+	border: 2px solid black;
+	background-color: rgb(55, 124, 182);
+	color: white;
+}
+
+.table-header {
+	margin-top: 20px;
+	color: rgb(86, 86, 86);
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.table-row:nth-child(odd) {
+	background-color: white;
+}
+
+.table-row:nth-child(even) {
+	background-color: rgb(238, 238, 238);
+}
+
+.table-row:last-child {
+	background-color: white;
+	cursor: pointer;
+}
+
+.table-row {
+	padding: 5px 50px;
+	margin-left: -30px;
+	margin-right: -30px;
+}
+
+.table-row a {
+	color: #0871b0;
+}
+
+.table-footer {
+	margin-top: 10px;
+	color: #b60000;
+}
+
+#new-assignment-button {
+	border: 1px solid black;
+	background-color: #005d92;
+	color: white;
+	text-decoration: none;
+	padding: 5px 40px;
+	border-radius: 5px;
+	position: relative;
+	font-family: Verdana, arial, sans-serif;
+	display: inline-block;
+	margin-right: 10px;
+}
+
+#new-assignment-section {
+	top: 25px;
+	position: relative;
+	font-family: Verdana, arial, sans-serif;
+}
+
+.hx-textfield, .bootstrap-select > .dropdown-toggle {
+	display: block;
+	height: 34px;
+	padding: 0px 12px;
+	font-size: 10pt;
+	width: 84%;
+	border: 2px solid lightgray;
+	margin-bottom: 15px;
+	margin-top: 10px;
+	border-radius: 0px!important;
+	background-color: white;
+	color: black!important;
+}
+
+.dropdown-toggle[data-id^="mirador-view-type"], .dropdown-toggle[data-id="default-tab"] {
+	width: 100%;
+}
+
+.full-width {
+	width: 100%;
+}
+
+.hx-textfield {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box; 
+}
+
+.hx-textfield:focus, .bootstrap-select > .dropdown-toggle:focus, .bootstrap-select > .dropdown-toggle:focus:before, .open > .bs-searchbox:focus, .source-detail .instructions:focus {
+	border-color: darkgray;
+    outline: 0!important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(211,211,211,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(211,211,211,.6);
+}
+
+.form-group label {
+	font-size: 11pt;
+	color: black;
+	font-weight: bold;
+}
+
+.form-group label.course_name, .edit_course_subheading, .subheading {
+	font-size: 11pt;
+	color: rgb(107, 107, 107);
+	font-weight:normal;
+}
+
 body {
 	margin: 0;
+	font-family: Verdana, Arial, sans-serif;
+	padding-bottom: 50px;
+	position:relative;
 }
 
 @-moz-keyframes spin {
@@ -303,4 +455,628 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Replacing bootstrap-select css.*/
+.bootstrap-select > .dropdown-toggle, .readonlyfield {
+	padding-top: 6px;
+}
+
+.bootstrap-select > .dropdown-toggle {
+	cursor:pointer;
+}
+
+.open.bootstrap-select > .dropdown-toggle {
+	background-color: rgb(238, 238, 238);
+	border-bottom: none;
+}
+
+.bootstrap-select > .dropdown-toggle:before {
+	content: '\f0d7';
+	font-family: FontAwesome;
+	color: black;
+	margin-top: -8px;
+    position: absolute;
+    left: 75.5%;
+    left: calc(77.3% - 31px);
+    font-size: 18pt;
+    padding: 2px 6px 4px 7px;
+    border: 2px solid lightgray;
+}
+
+.bootstrap-select > .dropdown-toggle[data-id^="mirador-view-type"]:before{
+	left: calc(90% - 110px);
+}
+
+.bootstrap-select > .dropdown-toggle[data-id^="default-tab"]:before {
+	left: calc(90% - 30px);
+}
+
+.dropdown-menu {
+	left: 10%;
+	position:absolute;
+	display: none;
+	float: left;
+	list-style: none;
+	background-color: white;
+	border: 2px solid lightgray;
+}
+
+.dropdown-toggle[data-id^="id_select_existing_user"] + .dropdown-menu, .dropdown-toggle[data-id^="id_target_type"] + .dropdown-menu {
+	min-width: 68%!important;
+	min-width: calc(68% - 9px)!important;
+}
+
+.dropdown-toggle[data-id^="mirador-view-type"] + .dropdown-menu {
+	left: calc(10% + 79px);
+	min-width: calc(80% - 158px)!important;
+    width: calc(80% - 158px);
+}
+
+.dropdown-toggle[data-id^="viewtype"] + .dropdown-menu, .dropdown-toggle[data-id^="assignment_object_choices"] + .dropdown-menu {
+	left: calc(10% + 3px);
+	min-width: calc(77% - 11px);
+	width: calc(77% - 11px);
+}
+
+.dropdown-toggle[data-id^="assignment_object_choices"] + .dropdown-menu li a span.text {
+	display: inline;
+}
+
+.dropdown-toggle[data-id^="default-tab"] + .dropdown-menu {
+	left: 10%;
+	min-width: 80% !important;
+    width: 80%;
+}
+
+.open > .dropdown-menu {
+	display: block;
+	border-top: none;
+	margin-top: -16px;
+}
+
+.open > .dropdown-menu > li:not(.no-results) {
+	padding: 5px;
+    padding-left: 20px;
+    padding-right: 30px;
+    font-size: 10pt;
+    cursor: pointer;
+}
+
+.open > .dropdown-menu > li:not(.no-results):hover {
+	background-color: lightgray;
+}
+
+
+.open > .dropdown-menu > li:not(.no-results)::before {
+	content: '\f096';
+	font-family: FontAwesome;
+	color: darkgray;
+	margin-top: -3px;
+    font-size: 14pt;
+    margin-right: 11px;
+}
+
+.open > .dropdown-menu > li.selected:not(.no-results)::before {
+	content: '\f046';
+	font-family: FontAwesome;
+	color: black;
+	margin-top: -3px;
+    font-size: 14pt;
+    margin-right: 11px;
+}
+
+.no-results {
+	margin-top: 5px !important;
+	margin-bottom: 5px !important;
+	background: white !important;
+	margin: 0 12px !important;
+	padding: 8px !important;
+}
+
+.open > .bs-searchbox {
+	background-color: rgb(238, 238, 238);
+	padding-bottom: 10px;
+	border-bottom: 1px solid rgb(170, 170, 170);
+}
+
+.open > .bs-searchbox input.form-control {
+	margin-left: 0.5%;
+	width: 97%;
+	padding: 5px;
+}
+
+.readonlyfield {
+	background-color: rgb(236, 236, 236);
+	display: inline-block;
+}
+
+.editing {
+	display:none;
+}
+
+#add-remove-button {
+	font-size: 9pt;
+	color: rgb(76, 138, 190);
+	display: inline-block;
+}
+
+p.help {
+    font-size: 9pt;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.save {
+	padding: 5px 25px;
+	text-align: center;
+	border-radius: 7px;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 9pt;
+	cursor: pointer;
+}
+
+.save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button {
+	color: white;
+	background-color: rgb(55, 124, 182);
+}
+
+.save#save-button:hover, .save#annotation-settings-save-button:hover, .save#database-settings-cancel-button:hover, .save#source-save-button:hover {
+	background-color: rgb(65, 134, 192);
+}
+
+.save#cancel-button, .save#annotation-settings-cancel-button, .save#source-cancel-button {
+	color: black;
+	background-color: rgb(174, 203, 226);
+}
+
+.save#cancel-button:hover, .save#annotation-settings-cancel-button:hover, .save#source-cancel-button:hover {
+	background-color: rgb(184, 213, 236);
+}
+
+.button-collection {
+	margin-top: 25px;
+}
+
+.delete-popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(50, 50, 50, 0.4);
+}
+
+.delete-popup-background {
+	position: relative;
+	width: 600px;
+	min-width: 600px;
+	height: 300px;
+	min-height: 300px;
+	top: 200px;
+	top: calc(50% - 150px);
+	left: 100px;
+	left: calc(50% - 300px);
+	background-color: white;
+	border-radius: 10px;
+	color: black;
+	-webkit-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+	-moz-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+	box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+}
+
+.delete-popup-background h3, .source-material-setup-popup-background h3 {
+	padding-top: 28px;
+	padding-left: 30px;
+	font-size: 14pt;
+}
+
+.delete-popup-background p, .source-material-setup-popup-background p {
+	margin-top: 5px;
+	padding-left: 30px;
+	font-size: 11pt;
+	margin-bottom: 25px;
+}
+
+.delete-popup-background p em, .source-material-setup-popup-background p em{
+	font-weight: bold;
+	display: block;
+}
+
+#delete-popup-confirm, #add-source-popup-confirm {
+	padding: 5px 25px;
+	background-color:rgb(202, 8, 20);
+	color: white;
+	border-radius: 5px;
+	display:inline-block;
+	margin-left: 30px;
+	margin-right: 15px;
+	cursor: pointer;
+}
+
+.disabled#delete-popup-confirm {
+	background-color: lightgray;
+	color: black;
+	cursor: default;
+}
+
+#delete-popup-cancel {
+	padding: 5px 25px;
+	background-color:rgb(158, 186, 208);
+	color: black;
+	border-radius: 5px;
+	display:inline-block;
+	cursor: pointer;
+}
+
+.hidden {
+	display: none;
+}
+
+.advanced-options {
+	margin-top: 25px;
+}
+
+.advanced-options .inline-label{
+	font-size: 11pt;
+	color: rgb(107, 107, 107);
+}
+
+.advanced-options a {
+	font-size: 11pt;
+}
+
+.source-materials {
+	background-color: #eee;
+    border: 2px solid darkgray;
+    border-radius: 15px;
+    padding: 25px 25px;
+    margin-top: 40px;
+}
+
+.source-materials h4 {
+	margin-top: 0px;
+}
+
+.source-materials p {
+	margin-top: 20px;
+	bottom: 20px;
+}
+
+#add-source-button {
+	color: black;
+    background-color: white;
+    border: 2px solid rgb(55, 124, 182);
+    font-size: 11pt;
+    margin-right: 10px;
+}
+
+#create-new-source-button {
+	margin-left: 10px;
+}
+
+.source-detail {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.source-detail .detail-metadata {
+	margin-top: 5px;
+	margin-bottom: 15px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.source-detail .author{
+	display: inline-block;
+    font-size: 9pt;
+    margin-right: 40px;
+}
+
+.source-detail .date-created {
+	display: inline-block;
+    font-size: 9pt;
+}
+
+.source-detail .instructions {
+	resize: vertical;
+	display: block;
+	padding: 0px 12px;
+	font-size: 10pt;
+	width: 100%;
+	border: 2px solid lightgray;
+	margin-bottom: 15px;
+	margin-top: 15px;
+	border-radius: 0px!important;
+	background-color: white;
+	height: 100px;
+	color: black!important;
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box; 
+}
+
+.source-detail .button-collection {
+	font-size: 10pt;
+	display: flex;
+	justify-content: space-between;
+}
+
+.source-detail .button-collection a {
+	margin-right: 7%;
+}
+
+.source-detail .button-collection a i{
+	margin-right: 3px;
+}
+
+.source-materials {
+	min-width: 510px;
+}
+
+div#reorder-list-button {
+    color: black;
+    background-color: white;
+    border: 2px solid rgb(55, 124, 182);
+    padding: 4px 15px;
+    float: right;
+    margin-top: -40px;
+}
+
+.source-detail > a {
+	color:#66ccff;
+}
+
+.advanced-settings {
+	margin-top: 25px;
+}
+
+#add-tags-button {
+	color: black;
+	background-color: white;
+	border: 2px solid rgb(55, 124, 182);
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.tag-list-header {
+    font-size: 10pt;
+    color: darkgray;
+    display: inline-block;
+    margin-right: 87px;
+    margin-top: 20px;
+}
+
+.custom-tag-name {
+	padding: 5px;
+	border: 2px solid lightgray;
+	margin-right: 30px;
+	margin-top: 10px;
+	font-size: 11pt;
+}
+
+.color-selection {
+	display:inline-block;
+}
+
+.custom-tag-color, .custom-tag-color-chosen {
+  width: 25px;
+  height: 25px;
+  border: solid 1px black;
+  display:inline-block;
+  position: relative;
+  top: 5px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.remove-tag {
+	margin-right: 10px;
+	font-size: 9pt;
+}
+
+.remove-tag i {
+	margin-right: 5px;
+}
+
+.add-another-tag {
+	margin-right: 10px;
+	font-size: 9pt;
+	display: none;
+}
+
+.add-another-tag i {
+	margin-right: 5px;
+}
+
+.trow:last-child .add-another-tag {
+	display: inline-block;
+}
+
+.trow {
+	margin-left: 30px;
+}
+
+.visible-tabs-collection {
+	margin-bottom: 15px;
+}
+
+.visible-tabs-collection div {
+	display: inline-block;
+	margin-right: 15px;
+}
+
+.dropdown-inner {
+	margin-top: 5px;
+}
+
+.dropdown-inner li {
+	font-weight: bold;
+	list-style: none;
+	margin-left: -30px;
+	padding-right: 40px;
+	cursor: pointer;
+	width: 165px;
+}
+
+.dropdown-inner li:hover {
+	color: rgb(55, 124, 182);
+}
+.dropdown-inner li:hover .custom-tag-color {
+	border-color: rgb(55, 124, 182);
+}
+
+.dropdown li .custom-tag-color {
+	margin-right: 5px;
+}
+
+.custom-tag-color-menu {
+	border: 1px solid lightgray;
+	-webkit-box-shadow: 10px 10px 19px -2px rgba(0,0,0,0.75);
+	-moz-box-shadow: 10px 10px 19px -2px rgba(0,0,0,0.75);
+	box-shadow: 10px 10px 19px -2px rgba(0,0,0,0.75);
+	display: none;
+	position: absolute;
+	background-color: white;
+	z-index: 999;
+	margin-left: -10px;
+	margin-top:3px;
+	height: 180px;
+	overflow: scroll;
+}
+
+#custom-color {
+	width: 110px;
+}
+
+.database-settings-page p em {
+	font-weight: bold;
+	display: block;
+	font-style: normal;
+	margin-top:10px;
+	margin-bottom: 10px;
+}
+
+.database-settings-page p .warning {
+	color: red;
+}
+
+#example-holder {
+	display: flex;
+	margin-bottom: 50px;
+}
+
+#example-holder p {
+	display: inline-block;
+}
+
+#example-image {
+	margin-right: 50px;
+}
+
+textarea#id_target_content {
+    width: 100%;
+}
+
+.add-source-popup-background {
+    position: relative;
+    width: 600px;
+    min-width: 600px;
+    padding-left: 70px;
+    padding-top: 20px;
+    height: 450px;
+    min-height: 300px;
+    top: 200px;
+    top: calc(50% - 225px);
+    left: 100px;
+    left: calc(50% - 300px);
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    -webkit-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+    -moz-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+    box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+}
+
+.hx-textfield.popup button:before {
+    left: 84%;
+    left: calc(84% - 19px);
+}
+
+.popup#delete-popup-confirm {
+	margin-left: 0px;
+    margin-top: 20px;
+}
+
+textarea#id_target_content {
+	padding-top: 7px;
+}
+
+#edit_course_form h4 {
+    margin-bottom: 0px!important;
+    margin-top: 0px;
+}
+
+#edit_course_form .form-group {
+	margin-bottom: 25px!important;
+}
+
+#edit_course_form .form-group.editing {
+	margin-top: 20px;
+}
+
+#edit_course_form .form-group.editing p {
+	margin-top: -10px;
+	margin-bottom: 20px;
+}
+
+#edit_course_form #ro-to-remove {
+	margin-bottom: 10px;
+}
+
+#edit_course_form .form-control div {
+	margin-bottom: 15px;
+}
+
+.source-material-setup-popup-background {
+	position: relative;
+    width: 600px;
+    min-width: 600px;
+    height: 410px;
+    min-height: 300px;
+    top: 200px;
+    top: calc(50% - 150px);
+    left: 100px;
+    left: calc(50% - 300px);
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    -webkit-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+    -moz-box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+    box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
+}
+
+.source-material-setup-popup-background .hx-textfield {
+	margin-left: 30px;
+}
+
+.source-material-setup-popup-background #delete-popup-cancel {
+	margin-top: 20px;
+	margin-left: 30px;
+}
+
+input.ordernum {
+    width: 30px;
+    height: 25px;
+    text-align: center;
+    padding-left: 10px;
+    font-size: 12pt;
+    margin-right: 5px;
+}
+
+.order-div {
+	float: right;
+	margin-top: -3px;
+	width: 91px;
 }

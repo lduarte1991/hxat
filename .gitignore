@@ -13,3 +13,4 @@ production.py
 reports
 *-annotation-list.json
 *-old.json
+*.srt

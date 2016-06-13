@@ -4,13 +4,14 @@
     <head>
     {% load staticfiles %}
     {% load hx_lti_initializer_extras %}
-    <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
-    <script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
     <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
-    {% block javascript %}{% endblock %}
-
     <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/bootstrap-select.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}">
+    <script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
+    <script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
+    {% block css_file %}{% endblock %}
+    {% block javascript %}{% endblock %}
+
     <title>{% block title %}HarvardX Annotation Tool{% endblock %}</title>
     </head>
     <body>
@@ -19,7 +20,7 @@
             <div id='banner-logo-left'>
                 {% if org == "HARVARDX" %}
                     <div class="logo" aria-label="HarvardX Logo">
-                        <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" />
+                        <img src="{% static "css/images/hx_inv.png" %}" aria-label='HarvardX Logo' style="height:40px;" />
                     </div>
                 {% endif %}
                 <div class="site-title">
@@ -32,7 +33,7 @@
                 {% if is_instructor %}
                     {% get_annotation_manual  default_url="pages/instructor_manual/hxat-instructor-manual.html" default_target="_self" as annotation_manual %}
                     <a target="{{ annotation_manual.target }}" href="{{ annotation_manual.url }}">Manual</a>
-                    <a role="button" href="instructor_dashboard_view">Instructor Dashboard</a>
+                    <a role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}">Dashboard</a>
                 {% endif %}
             </nav>
         </header>
@@ -47,8 +48,8 @@
             {% endif %}
         </main>
 
-        <footer role="contentinfo">
+        <!-- <footer role="contentinfo">
             <p style="text-align:center;">&copy; 2015 HarvardX</p>
-        </footer>
+        </footer> -->
     </body>
 </html>

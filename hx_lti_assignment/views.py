@@ -1,4 +1,4 @@
-from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet  # noqa
+from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet, DeleteAssignmentForm  # noqa
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
 from hx_lti_initializer.models import LTICourse
@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect, re
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 import uuid
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
@@ -50,7 +51,7 @@ def create_new_assignment(request):
                 debug_printer(form.errors)
                 return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment.html',
+                    'hx_lti_assignment/create_new_assignment2.html',
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -58,6 +59,10 @@ def create_new_assignment(request):
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
+                        'is_instructor': request.session['is_staff'],
+                        'org': settings.ORGANIZATION,
+                        'context_id': request.session['hx_context_id'],
+
                     }
                 )
         else:
@@ -92,7 +97,7 @@ def create_new_assignment(request):
         
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment.html',
+        'hx_lti_assignment/create_new_assignment2.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -100,6 +105,9 @@ def create_new_assignment(request):
             'number_of_targets': target_num,
             'debug': debug,
             'course_id': get_course_id(request),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'context_id': request.session['hx_context_id'],
         }
     )
 
@@ -148,7 +156,7 @@ def edit_assignment(request, id):
         else:
             return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment.html',
+                    'hx_lti_assignment/create_new_assignment2.html',
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -156,6 +164,10 @@ def edit_assignment(request, id):
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
+                        'is_instructor': request.session['is_staff'],
+                        'org': settings.ORGANIZATION,
+                        'context_id': request.session['hx_context_id'],
+                        'tag_list': assignment.array_of_tags(),
                     }
                 )
     else:
@@ -166,10 +178,10 @@ def edit_assignment(request, id):
         course_name = request.session['course_name']
     except:
         course_name = None
-    
+
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment.html',
+        'hx_lti_assignment/create_new_assignment2.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -178,5 +190,24 @@ def edit_assignment(request, id):
             'debug': debug,
             'assignment_id': assignment.assignment_id,
             'course_id': get_course_id(request),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'context_id': request.session['hx_context_id'],
+            'tag_list': assignment.array_of_tags(),
+
         }
     )
+
+
+@login_required
+def delete_assignment(request, id):
+    assignment = get_object_or_404(Assignment, pk=id)
+
+    if request.method == 'POST':
+        form = DeleteAssignmentForm(request.POST, instance=assignment)
+        if form.is_valid():
+            assignment.delete()
+            url = reverse('hx_lti_initializer:course_admin_hub')
+            return redirect(url)
+
+    raise PermissionDenied()

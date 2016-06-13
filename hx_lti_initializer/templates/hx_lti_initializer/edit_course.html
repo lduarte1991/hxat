@@ -1,40 +1,47 @@
 {% extends 'hx_lti_initializer/base.html' %}
 {% load possible_admins %}
-{% load bootstrap3 %}
-
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
-
 {% block content %}
-	<h3>Edit Course</h3>
-	<form method="POST" class="post-form">{% csrf_token %}
+		{% load bootstrap3 %}
+
+        {# Load CSS and JavaScript #}
+        {# bootstrap_css #}
+        {% bootstrap_javascript %}
+
+	<h3>Course Settings</h3>
+	<form method="POST" class="post-form" id='edit_course_form'>{% csrf_token %}
 		{{ form.non_field_errors }}
 		{{ form.errors }}
 		<div class="form-group">
-			<label for="id_course_name">Course name:</label> 
-			<input id="id_course_name" maxlength="255" name="course_name" class="form-control" type="text" value="{{form.course_name.value}}">
+			<label for="id_course_name" class='course_name'>Course name:</label><br>
+			<input id="id_course_name" maxlength="255" name="course_name" class="form-control hx-textfield" type="text" value="{{form.course_name.value}}">
 		</div>
-		<div class="form-group">
+		<h4 class='edit_course_subheading'>Course administrators:</h4>
+	    <div id='ro-to-remove'>
+			<div class='hx-textfield readonlyfield' id='ro-course-admins'>Loading...</div>
+			<a href='#' id='add-remove-button' onclick='jQuery("#ro-to-remove").hide(); jQuery(".editing").show();'> <i class='fa fa-pencil' style='margin-right:4px;'></i>Add/Remove</a>
+		</div>
+		<div class='editing'>
+		<div class="form-group editing">
 			<label for="id_select_existing_user">Add a new admin from existing user:</label>
 			<select class="form-control selectpicker" data-live-search="true" multiple id="id_select_existing_user" name="select_existing_user">
 				{% for selected, name in form.course_admins.value|list_of_possible_admins %}
 					<option value="{{name}}" {% if selected %} selected {% endif %}> {{name}} </option>
 				{% endfor %}
 			</select>
+			
 			<label for="id_new_admin_list">Add new admins via unique id (edX = username, canvas = HUID):</label>
-			<input type="text" maxlength="255" name="new_admin_list" class="form-control" id="id_new_admin_list">
+			<input type="text" maxlength="255" name="new_admin_list" class="form-control hx-textfield" id="id_new_admin_list">
 			<p class="help">If adding multiple users, separate them with commas, not spaces.</p>
-			<label for="pending_admins">Pending Admins (will be added as course admins next time they log in):</label> {% if pending %}
+			<label for="pending_admins">Pending Admins (will be added as course admins next time they log in):</label> 
+			<div class='hx-textfield readonlyfield'>
+			{% if pending %}
 			{% for ad in pending %}
-				{{ad.admin_unique_identifier}},
+				{{ad.admin_unique_identifier}}{% if not forloop.last %}, {% endif %}
 			{% endfor %}
 			{% else %} None {% endif %}
+			</div>
 		</div>
-		 <div class="form-group hidden">
+		 <div class="form-group hidden" style='display:none;'>
 			<label for="id_course_admins">Course admins:</label> 
 			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins">
 				{% for id,choice in form.fields.course_admins.choices %}
@@ -42,28 +49,20 @@
 				{% endfor %}
 			</select> 
 		</div>
-		<!-- <div class="form-group">
-			<label for="id_course_admins">Course admins:</label> 
-			<select class="form-control selectpicker" data-live-search="true" multiple id="id_course_admins" name="course_admins" role="listbox">
-				{% for id,choice in form.fields.course_admins.choices %}
-				<option value="{{ id }}" aria-checked={% if id in form.course_admins.value %}"true" selected {% else %}"false"{% endif %} role="option">{{ choice }}</option>
-				{% endfor %}
-			</select> 
-		</div> -->
-		<!-- TODO: Add example of how to use-->
-		<div class="form-group">
-			<label for="id_course_external_css_default">External CSS Default:</label> 
-			
-			<input id="id_course_external_css_default" maxlength="255" name="course_external_css_default" class="form-control" type="text" value="{{form.course_external_css_default.value}}">
 		</div>
-		{% buttons %}
-		<button type="submit" class="save btn btn-primary" role="button">
-		{% bootstrap_icon "star" %} Save
-		</button>
-		<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" role="button" class="save btn btn-danger">
-		{% bootstrap_icon "remove" %} Cancel
-		</a>
-		{% endbuttons %}
+		<!-- TODO: Add example of how to use-->
+		<h4 class='edit_course_subheading'>External CSS Default:</h4>
+		<div class="form-group">
+			<input id="id_course_external_css_default" maxlength="255" name="course_external_css_default" class="form-control hx-textfield" type="text" value="{{form.course_external_css_default.value}}">
+		</div>
+		<div class='button-collection'>
+			<div type="submit" class="save" id='save-button' role="button" onclick="javascript:jQuery('#edit_course_form').submit();">
+			Save
+			</div>
+			<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+			Cancel
+			</div>
+		</div>
 	</form>
 	<script>
 
@@ -73,7 +72,14 @@
 				jQuery('.bs-searchbox input').on('keyup', function (e){ if (e.which === 40){jQuery('.dropdown-menu li:first-child a').focus();} });
 				jQuery('.dropdown-menu li').on('keyup', function (e){ if (e.which === 32 || e.which === 13){jQuery(e.currentTarget).find('a').click();} });
 				jQuery('.dropdown-menu li').attr('role', 'menuitem');
+				jQuery('.dropdown-toggle[data-id="id_select_existing_user"] span').bind("DOMSubtreeModified",function(){
+				  var oldValue = jQuery(this).html();
+				  jQuery('#ro-course-admins').html(oldValue);
+				});
+				jQuery('#ro-course-admins').html(jQuery('.dropdown-toggle[data-id="id_select_existing_user"] span').html());
 			}, 1000);
+
+			
 		});
 	</script>
 {% endblock %}
