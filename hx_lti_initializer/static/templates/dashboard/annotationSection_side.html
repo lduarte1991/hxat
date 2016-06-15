@@ -9,11 +9,15 @@
         <div class="hide_label" id="sidebar-hide-sidebar-instructions">Click to hide/show sidebar</div>
     <div class="group-wrap">
         <div class="annotation-filter-buttons btn-group">
+            <% if (show_mynotes_tab === "True") {%>
         	<button type="button" class="btn user-filter" id='mynotes' aria-label="View only my annotations" role="button">My Notes</button>
+            <% } %>
             <% if (show_instructor_tab === "True") {%>
             	<button type="button" class="btn user-filter" id='instructor' aria-label="View only instructor annotations" role="button">Instructor</button>
             <% } %>
+            <% if (show_public_tab === "True") {%>
         	<button type="button" class="btn user-filter" id='public' aria-label="View everybody's annotations" role="button">Public</button>
+            <% } %>
         </div>
     </div>
     <div class="separator-solid side"></div>

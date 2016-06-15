@@ -219,6 +219,9 @@
             var annotation = annotationsList[i];
             var annotationItem = self.formatAnnotation(annotation);
             annotationItem.index = i+1;
+            if (annotationItem.text === undefined) {
+                annotationItem.text = "";
+            }
             var html = self.initOptions.TEMPLATES.annotationItem(annotationItem);
             jQuery('.annotationsHolder').append(html);
             divObject = '.annotationItem.item-'+annotation.id.toString();
@@ -373,6 +376,8 @@
         el.html(self.initOptions.TEMPLATES.annotationSection({
             annotationItems: [],
             show_instructor_tab: self.initOptions.show_instructor_tab,
+            show_mynotes_tab: self.initOptions.show_mynotes_tab,
+            show_public_tab: self.initOptions.show_public_tab
         }));
         console.log(self.initOptions);
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
@@ -489,7 +494,16 @@
             window.dispatchEvent(new Event('resize'));
         });
         jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
-        window.dispatchEvent(new Event('resize'));
+        var evt;
+        try {
+            console.log("new Event works");
+            evt = new Event('resize');
+        } catch(e) {
+            console.log("new Event doesn't work");
+            var evt = window.document.createEvent('UIEvents');
+            evt.initUIEvent('resize', true, false, window, 0);
+        }
+        window.dispatchEvent(evt);
         if (typeof jQuery.subscribe === 'function') {
             jQuery.subscribe('focusUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;

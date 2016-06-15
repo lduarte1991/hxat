@@ -81,7 +81,11 @@ var mir = Mirador({
         "canvasID" : "{{ canvas_id }}",
       {% endif %}
       "annotationLayer" : true,
-      "annotationCreation" : true,
+      {% if not assignment.include_mynotes_tab %}
+      "annotationCreation" : false,
+      {% else %}
+      "annotationCreation": true,
+      {% endif %}
   	  "sidePanel" : false,
       "fullScreen" : false,
       "displayLayout": false,

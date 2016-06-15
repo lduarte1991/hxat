@@ -136,6 +136,14 @@ class Assignment(models.Model):
         help_text="Include a tab for instructor annotations.",
         default=False
     )
+    include_mynotes_tab = models.BooleanField(
+        help_text="Include a tab for user's annotations. Warning: Turning this off will not allow students to make annotations.",
+        default=True
+    )
+    include_public_tab = models.BooleanField(
+        help_text="Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations.",
+        default=True
+    )
     allow_highlights = models.BooleanField(
         help_text="Allow predetermined tags with colors.",
         default=False

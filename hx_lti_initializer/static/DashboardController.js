@@ -82,6 +82,8 @@
 				controller: self,
 				default_tab: self.initOptions.default_tab,
 				show_instructor_tab: self.initOptions.show_instructor_tab,
+				show_mynotes_tab: self.initOptions.show_mynotes_tab,
+				show_public_tab: self.initOptions.show_public_tab,
 				is_instructor: self.initOptions.is_instructor === "True",
 			});
 		});

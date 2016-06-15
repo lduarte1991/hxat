@@ -33,6 +33,9 @@ class AssignmentForm(forms.ModelForm):
                 Tab(
                     'Annotation Table Settings',
                     'include_instructor_tab',
+                    'include_mynotes_tab',
+                    'include_public_tab',
+                    HTML("<p><em>Note:</em> Turning off all three will turn on Zen mode where only the object is shown. Annotations cannot be made.</p>"),
                     Field('default_tab', css_class="selectpicker"),
                     'pagination_limit',
                 ),
