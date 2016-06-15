@@ -100,3 +100,13 @@ class NoFormTagCrispyFormMixin(object):
             self._helper = FormHelper()
             self._helper.form_tag = False
         return self._helper
+
+
+class DeleteAssignmentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteAssignmentForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Assignment
+        fields = []

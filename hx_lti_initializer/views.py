@@ -300,6 +300,8 @@ def edit_course(request, id):
             'form': form,
             'user': request.user,
             'pending': pending_admins,
+            'org': settings.ORGANIZATION,
+            'is_instructor': request.session["is_staff"],
         }
     )
 

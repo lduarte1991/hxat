@@ -810,9 +810,9 @@
         }
       });
 
-      this.$menu.on('click', 'li a', function (e) {
+      this.$menu.on('click', 'li a, li', function (e) {
         var $this = $(this),
-            clickedIndex = $this.parent().data('originalIndex'),
+            clickedIndex = $this.parent().data('originalIndex') || $this.data('originalIndex'),
             prevValue = that.$element.val(),
             prevIndex = that.$element.prop('selectedIndex');
 

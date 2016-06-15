@@ -2,6 +2,7 @@ from django.db import models
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse
 import uuid
+import sys
 
 
 class AssignmentTargets(models.Model):
@@ -223,3 +224,50 @@ class Assignment(models.Model):
             except:
                 return None
         return None
+
+    def array_of_tags(self):
+        def getColorValues(color):
+            values = ''
+            if '#' in color:
+                # hex
+                new_color = color[1:]
+                if len(new_color) == 3:
+                    values = 'rgba(' + str(int(new_color[0] + new_color[0], 16)) + ',' + str(int(new_color[1] + new_color[1], 16)) + ',' + str(int(new_color[2] + new_color[2], 16)) + ',0.3)'
+                else:
+                    values = 'rgba(' + str(int(new_color[0] + new_color[1], 16)) + ',' + str(int(new_color[2] + new_color[3], 16)) + ',' + str(int(new_color[4] + new_color[5], 16)) + ',0.3)'
+            elif 'rgb(' in color:
+                values = color.replace('rgb(', 'rgba(').replace(')', ',0.3)')
+            elif 'rgba(' in color:
+                values = color
+            else:
+                stdCol = {
+                    "acqua": '#0ff',
+                    "teal": '#008080',
+                    "blue": '#00f',
+                    "navy": '#000080',
+                    "yellow": '#ff0',
+                    "olive": '#808000',
+                    "lime": '#0f0',
+                    "green": '#008000',
+                    "fuchsia": '#f0f',
+                    "purple": '#800080',
+                    "red": '#f00',
+                    "maroon": '#800000',
+                    "white": '#fff',
+                    "gray": '#808080',
+                    "silver": '#c0c0c0',
+                    "black": '#000'
+                }
+                if color in stdCol:
+                    values = getColorValues(stdCol[color])
+            return values
+
+        if len(self.highlights_options) == 0:
+            return []
+        else:
+            collection = self.highlights_options.split(',')
+            result = []
+            for col in collection:
+                res = col.split(':')
+                result.append((res[0], getColorValues(res[1])))
+            return result
