@@ -7,11 +7,12 @@
 {% bootstrap_javascript %}
 <script src="{% static "vendors/development/underscore.js" %}"></script>
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
-<div class='main_page'>
+<script src="{% static "vendors/development/AssignmentEditor.js" %}"></script>
+<div class='main-page'>
 	<h2>Assignment Editor</h2>
 
 	<label for='assignment-name-input' class='subheading'>Assignment name:</label>
-	<input class='hx-textfield' type='text' id='assignment-name-input' placeholder="Untitled" value='{{form.instance.assignment_name}}'>
+	<input class='hx-textfield' type='text' id='assignment-name-input' placeholder="Untitled" value='{{form.instance.assignment_name}}' data-course-id="{{course_id}}">
 
 	<div class='advanced-options'>
 		<span class='inline-label'>Advanced options:</span> 
@@ -28,7 +29,7 @@
 			{% for source in targets_form %}
 				{% for choice in form.fields.assignment_objects.queryset %}
 					{% if source.target_object.value == choice.id %}
-						<div class='source-item' id='item-{{forloop.parentloop.counter0}}' data-order='{{source.order.value}}' data-id='{{source.target_object.value}}'>
+						<div class='source-item' id='item-{{forloop.parentloop.counter0}}' data-order='{{source.order.value}}' data-id='{{source.target_object.value}}' data-aTarget="{{source.id.value}}" data-media="{{source.target_type.value}}">
 							<div class='first-row'>
 								<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{choice.target_title}}</span>
 								<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.order.value}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
@@ -77,17 +78,17 @@
 			                    		<label for='canvas-id-{{forloop.parentloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
 								 		<input maxlength="255" id="canvas-id-{{forloop.parentloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
 			                    	{% endif %}
-			                    	<input id="dashboard_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="form-control" value=""></input>
+			                    	<input id="dashboard_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if item.target_external_options.value|just_dashboard_hidden %} checked {% endif %}></input>
 							 		<label for="dashboard_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
 							 		{% if choice.target_type == 'vd' %}
 								 		<br>
-								 		<input id="transcript_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option form-control" value=""></input>
+								 		<input id="transcript_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" value=""></input>
 								 		<label for="transcript_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Transcript on Load (when applicable)</label>
 								 		<br>
-										<input id="allow_transcript_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option"></input>
+										<input id="allow_transcript_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option transcript-download"></input>
 										<label for="allow_transcript_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download transcript (when applicable)</label>
 										<br>
-										<input id="allow_video_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option"></input>
+										<input id="allow_video_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option video-download"></input>
 										<label for="allow_video_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download video (when applicable)</label>
 									{% endif %}
 			                    </div>
@@ -104,7 +105,7 @@
 	</div>
 
 	<div class='button-collection'>
-		<div type="submit" class="save" id='save-button' role="button" onclick='window.assignment_editor.saveForm();'>
+		<div type="submit" class="save" id='save-button' role="button" onclick='window.assignment_editor.save_form();'>
 			Save
 		</div>
 		<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
@@ -143,16 +144,17 @@
 		{% endfor %}
 	</select>
 
-	<label class='subheading' for='pagination-limit'>Pagination limit( # of annotations shown when you use the "More" button):</label>
+	<label class='subheading' for='pagination-limit'>Pagination limit (# of annotations shown when you use the "More" button):</label>
 	<input class='hx-textfield full-width' type='number' id='pagination-limit' value='{{form.pagination_limit.value}}'>
 
 	<h3>Optional plug-ins</h3>
-	<input type='checkbox' {% if form.allow_highlights %}checked{% endif %} id='enable-tags'>
-	<label for='enable-tags'>Enable highlight tagging</label>
-	<div class='save' id='add-tags-button' {% if not form.allow_highlights or tag_list|length > 0 %}style='display:none;'{% endif %}>Add custom highlight tags</div>
 
-	<div class='tag-list-holder' {% if not form.allow_highlights or tag_list|length == 0 %}style='display:none;'{% endif %}>
-	    <div class='trow'>
+	<input type='checkbox' {% if form.allow_highlights.value == "True" %}checked{% endif %} id='enable-tags'>
+	<label for='enable-tags'>Enable highlight tagging</label>
+
+	<div class='save' id='add-tags-button' {% if not form.allow_highlights.value or tag_list|length > 0 %}style='display:none;'{% endif %}>Add custom highlight tags</div>
+	<div class='tag-list-holder' {% if not form.allow_highlights.value or tag_list|length < 1 %}style='display:none;'{% endif %}>
+	    <div class='trow theader'>
 		<div class='tag-list-header'>Custom tagname:</div>
 		<div class='tag-list-header'>Color</div>
 		</div>
@@ -203,7 +205,7 @@
 		{% endfor %}
 	</div>
 	<div class='button-collection'>
-		<div type="submit" class="save" id='annotation-settings-save-button' role="button">
+		<div type="submit" class="save" id='annotation-settings-save-button' role="button" onclick="window.assignment_editor.save_annotation_settings();">
 			Save
 		</div>
 		<div class="save" id='annotation-settings-cancel-button' role='button'>
@@ -230,410 +232,74 @@
 		</div>
 	</div>
 </div>
-<form method="POST" class="post-form">{% csrf_token %}
+<div class='object_options' style='display:none'>
+	{% for obj in form.fields.assignment_objects.queryset %}
+        <option value="{{obj.id}}" data-type="{{obj.target_type}}" data-author="{{obj.target_author}}" data-date="{{obj.target_created}}">{{obj.target_title}}</option>
+    {% endfor %}
+</div>
+<form method="POST" class="post-form" style='display:none;'>{% csrf_token %}
+{{form}}
+{% for item in targets_form %}
+	{% if forloop.counter0 < number_of_targets %}
+	<tr id="row{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
+						<td class="field-target_object" >
+							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
+								{% for id,choice in form.fields.assignment_objects.choices %}
+								<option value="{{ id }}" {% if id|slugify == item.target_object.value|slugify %} selected {% endif %}>{{ choice }}</option>
+								{% endfor %}
+							</select>
+							<div class="collapse" id="assignment-target-object-settings-{{forloop.counter0}}">
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions">Instructions:</label> 
 
+			<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions" name="assignmenttargets_set-{{forloop.counter0}}-target_instructions" class="form-control">{{ item.target_instructions.value }}</textarea>
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label> 
+			<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
+								{% for choice in form.fields.assignment_objects.queryset %}
+								 {% if choice.id == item.target_object.value %} 
+								 	{% if choice.target_type == "ig" %}
+								 		<label>Mirador View Type:</label>
+								 		<select class="selectpicker form-control mirador_option" data-counter="{{forloop.parentloop.counter0}}" id="{{forloop.parentloop.counter0}}-target_options_view_type">
+								 			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
+								 			<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
+								 			Single Image View
+								 			</option>
+								 			<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
+								 			Thumbnails View
+								 			</option>
+								 			<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
+								 			Scroll View
+								 			</option>
+								 			<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
+								 			Book View
+								 			</option>
+								 		</select>
+								 		<label>Open to Page (Canvas ID):</label>
+								 		<input maxlength="255" id="{{forloop.parentloop.counter0}}-target_options_canvas_id" data-counter="{{forloop.parentloop.counter0}}" type="text" class="mirador_option form-control" value="{{item.target_external_options.value|just_the_canvas_id}}"></input>
+										
+								 	{% endif %} 
+								 {% endif %}
+								{% endfor %}
+								<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.counter0}}-target_external_options" class="form-control">{{ item.target_external_options.value }}</textarea>
+							</div>
+						</td>
+						<td>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
+						</td>
+						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
+						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}" role="button">{% bootstrap_icon "cog" %}</td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" data-id="{{item.target_object.value}}" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}
+						{% if item.id.value %}
+						<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
+						{% endif %}
+						</td>
+					</tr>
+					{% endif %}
+{% endfor %}
+{%for f in targets_form.management_form%}
+    {{f}}
+{%endfor%}
 </form>
 
-<script>
-	var options = {
-		url: "{% static 'templates/add_tag_template.html' %}",
-		success: function(data) {
-			window.add_tag_template = _.template(data);
-		},
-		async: true,
-	};
-	jQuery.ajax(options);
-	options = {
-		url: "{% static 'templates/add_source_row.html' %}",
-		success: function(data) {
-			window.add_source_row = _.template(data);
-		},
-		async: true,
-	};
-	jQuery.ajax(options)
-	
-	jQuery('.source-materials').on('click', '.source-item .first-row', function(event) {
-		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-        var source_item = jQuery(this.parentElement);
-        var source_item_arrow = source_item.find('.fa-lg');
-        var to_list = source_item.find('.source-detail');
 
-        if (source_item.hasClass('open')) {
-            source_item_arrow.addClass('fa-caret-right');
-            source_item_arrow.removeClass('fa-caret-down');
-            to_list.hide();
-            source_item.removeClass('open');
-        } else {
-            source_item_arrow.addClass('fa-caret-down');
-            source_item_arrow.removeClass('fa-caret-right');
-            to_list.show();
-            source_item.addClass('open');
-        }
-    });
-    jQuery('.source-materials').on("click", '.show-settings', function(event) {
-    	event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-    	var settings_link = window.test = jQuery(this);
-    	var source_item = settings_link.closest('.source-item'); 
-    	var advanced_list = source_item.find('.advanced-settings');
-
-    	if (source_item.hasClass('open') && settings_link.hasClass('open')) {
-    		settings_link.html(settings_link.html().replace('Hide', 'Show'));
-    		settings_link.removeClass('open');
-    		advanced_list.hide();
-    	} else if (source_item.hasClass('open')){
-    		settings_link.html(settings_link.html().replace('Show', 'Hide'));
-    		settings_link.addClass('open');
-    		advanced_list.show();
-    	}
-    });
-    jQuery('.source-materials').on('click', '.remove', function(event){
-        var $this = jQuery(this);
-        var source_item = $this.closest('.source-item');
-        var object_pk = source_item.attr('data-id');
-        var object_title = source_item.find('.source-title').html();
-        var assignment_title = jQuery('#assignment-name-input').val();
-        var url = "/lti_init/launch_lti/targetobject/" + object_pk + "/delete/";
-        
-        var html='<div class="delete-popup-overlay"><div class="delete-popup-background"><h3>Delete this Assignment</h3><p>Are you sure you want to remove the annotation source: <em>&quot;'+ object_title +'&quot;</em> from the assignment: <em>&quot;' + assignment_title + '&quot</em></p><p>This action will only remove the source object from this individual assignment, and will not affect any other assignments or courses where it is used.</p><div id="delete-popup-confirm" type="submit" role="button">Remove source</div><div id="delete-popup-cancel">Cancel</div></div></div>';
-        jQuery('body').append(html);
-        jQuery('#delete-popup-cancel').click(function() {
-            jQuery('.delete-popup-overlay').remove();
-        });
-        jQuery('#delete-popup-confirm').click(function() {
-            source_item.remove();
-            jQuery('.delete-popup-overlay').remove();
-        });
-    });
-
-    jQuery('#annotation-settings-button').click(function(event) {
-    	jQuery('.main_page').hide();
-    	jQuery('.annotation-settings-page').show();
-    });
-
-    jQuery('#database-settings-button').click(function(event) {
-    	jQuery('.main_page').hide();
-    	jQuery('.database-settings-page').show();
-    });
-
-    jQuery('#annotation-settings-cancel-button').click(function(event) {
-    	jQuery('.main_page').show();
-    	jQuery('.annotation-settings-page').hide();
-    });
-
-    jQuery('#database-settings-cancel-button').click(function(event) {
-    	jQuery('.main_page').show();
-    	jQuery('.database-settings-page').hide();
-    });
-
-    jQuery('#enable-tags').change(function(event) {
-    	if (jQuery(this).prop('checked')) {
-    		if (jQuery('.tag-list-holder trow').length == 1) {
-    			jQuery('#add-tags-button').show();
-    		}
-    		jQuery('.tag-list-holder').show();
-    	} else {
-    		jQuery('#add-tags-button').hide();
-    		jQuery('.tag-list-holder').hide();
-    	}
-    });
-
-    jQuery('#add-tags-button').click(function(event) {
-    	jQuery(this).hide();
-    	jQuery('.tag-list-holder').show();
-    	window.addTag();
-    })
-
-    jQuery('.tag-list-holder').on('click', '.remove-tag', function(event) {
-    	event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-    	jQuery(this).closest('.trow').remove();
-    	if (jQuery('.tag-list-holder .trow').length == 1) {
-    		jQuery('.tag-list-holder').hide();
-    		jQuery('#add-tags-button').show();
-    	}
-    });
-
-    jQuery('.source-materials').on('click', '#add-source-button', function(event){
-        var $this = jQuery(this);        
-        var html='<div class="delete-popup-overlay"><div class="add-source-popup-background"><h3>Add Source to Assignment</h3>\
-        <select class="hx-textfield form-control popup" id="assignment_object_choices">\
-			{% for obj in form.fields.assignment_objects.queryset %}\
-			<option value="{{obj.id}}" data-type="{{obj.target_type}}" data-author="{{obj.target_author}}" data-date="{{obj.target_created}}">{{obj.target_title}}</option>\
-			{% endfor %}\
-		</select>\
-		<label for="viewtype">View type:</label>\
-		<select class="hx-textfield form-control popup" id="viewtype">\
-			<option value="ImageView" selected>Single Image View</option>\
-			<option value="ThumbnailsView">Thumbnails View</option>\
-			<option value="ScrollView">Scroll View</option>\
-			<option value="BookView">Book View</option>\
-		</select>\
-		<label for="assignment-css">Assignment CSS:</label>\
-		<input class="hx-textfield form-control popup" id="assignment-css" type="text">\
-		<label for="assignment-open-to-page">Open to page (Canvas ID):</label>\
-		<input class="hx-textfield form-control popup" id="assignment-open-to-page" type="text">\
-		<div><input type="checkbox" id="hide_dash"><label for="hide_dash">Hide dashboard on load</label></div>\
-        <div id="add-source-popup-confirm" class="popup" type="submit" role="button">Add Source</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';
-        jQuery('body').append(html);
-        jQuery('#assignment_object_choices').selectpicker({
-        	liveSearch: true,
-        });
-        jQuery('#viewtype').selectpicker();
-        jQuery('#delete-popup-cancel').click(function() {
-            jQuery('.delete-popup-overlay').remove();
-        });
-        jQuery('#add-source-popup-confirm').click(function() {
-        	var title = jQuery('.add-source-popup-background .dropdown-toggle[data-id^="assignment_object_choices"]').text();
-        	var id_selected = jQuery('.add-source-popup-background #assignment_object_choices').val();
-        	var option_selected = jQuery('.add-source-popup-background option[value="'+id_selected+'"]');
-        	var count = jQuery('.source-item').length;
-        	var is_ordering = jQuery('#reorder-list-button').text() === "Invert order";
-            var context = {
-            	"count": count,
-            	"order_value": jQuery('.source-item').length + 1,
-            	"id": id_selected,
-            	"target_title": title,
-            	"target_author": option_selected.data('author'),
-            	"target_created": option_selected.data('date'),
-            	"target_type": option_selected.data('type'),
-            	"should_show_order": is_ordering,
-            };
-            jQuery('.source-materials .source-item:last').after(window.add_source_row(context));
-            jQuery('#mirador-view-type-' + count).selectpicker();
-            console.log(jQuery('#mirador-view-type-' + count));
-            console.log(jQuery('#viewtype').val());
-            jQuery('#mirador-view-type-' + count).selectpicker('val', jQuery('#viewtype').val());
-            jQuery('#assignment-css-' + count).val(jQuery('#assignment-css').val());
-            jQuery('#canvas-id-' + count).val(jQuery('#assignment-open-to-page').val());
-            jQuery('#dashboard_hidden-' + count).prop("checked", jQuery("#hide_dash").prop("checked"));
-            jQuery('.delete-popup-overlay').remove();
-        });
-    });
-
-    window.addTag = function(event) {
-    	if (event) {
-    		event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-    	}
-    	
-    	var count = jQuery('.tag-list-holder .trow').length;
-    	jQuery('.tag-list-holder').append(window.add_tag_template({"count": count}));
-    };
-
-    jQuery('.tag-list-holder').on('click', '.add-another-tag', window.addTag);
-
-    jQuery(window).click(function() {
-    	if (jQuery('.color-selection.open').length > 0) {
-    		jQuery('.color-selection.open .custom-tag-color-menu').hide();
-    		jQuery('.color-selection.open').removeClass('open');
-    	}
-    });
-
-    jQuery('.tag-list-holder').on('click', '.color-selection .custom-tag-color-chosen', function(event) {
-    	event.preventDefault ? event.preventDefault() : (event.returnValue = false);
-    	event.stopPropagation();
-    	var resultcolor = jQuery(this);
-    	var toggle = resultcolor.parent();
-
-    	if (toggle.hasClass('open')) {
-    		toggle.removeClass('open');
-    		toggle.find('.custom-tag-color-menu').hide();
-    	} else {
-    		toggle.addClass('open');
-	    	toggle.find('.custom-tag-color-menu').show();
-	    }
-    });
-
-    jQuery('.tag-list-holder').on('click', '.color-selection', function(event) {
-    	event.stopPropagation();
-    });
-
-    jQuery('.tag-list-holder').on('click', '.dropdown-inner li', function(event) {
-    	event.stopPropagation();
-    	var choice = jQuery(this);
-    	var chosenColor = choice.find('.custom-tag-color').css('background-color');
-    	var selector = choice.closest('.color-selection');
-    	if (choice.text().trim() === "Custom") {
-    		choice.html('<div class="custom-tag-color" role="button" style="background-color:rgba(255, 255, 255, 0.3);"></div><input type="text" id="custom-color">');
-    	} else if(choice.text().trim() !== "") {
-    		selector.find('.custom-tag-color-chosen').first().css('background-color', chosenColor);
-	    	selector.find('.custom-tag-color-menu').hide();
-	    	selector.removeClass('open');
-	    }
-    });
-
-    jQuery('.tag-list-holder').on('keyup', '#custom-color', function(event) {
-    	if (event.keyCode == 13) {
-    		var chosenColor = jQuery(event.currentTarget).parent().find('.custom-tag-color').css('background-color');
-    		var selector = jQuery(event.currentTarget).closest('.color-selection');
-    		selector.find('.custom-tag-color-chosen').first().css('background-color', chosenColor);
-	    	selector.find('.custom-tag-color-menu').hide();
-	    	selector.removeClass('open');
-    	}
-    	var input = event.currentTarget.value;
-    	var result = window.getColorValues(input);
-    	var color = "rgba(" + result.red + ',' + result.green + ',' + result.blue + ',' + result.alpha + ')'; 
-    	jQuery(event.currentTarget).parent().find('.custom-tag-color').css('background-color', color);
-
-    });
-
-    window.getColorValues = function( color ){
-	    var values = { red:null, green:null, blue:null, alpha:null };
-	    if( typeof color == 'string' ){
-	        /* hex */
-	        if( color.indexOf('#') === 0 ){
-	            color = color.substr(1)
-	            if( color.length == 3 ){
-	                values = {
-	                    red:   parseInt( color[0]+color[0], 16 ),
-	                    green: parseInt( color[1]+color[1], 16 ),
-	                    blue:  parseInt( color[2]+color[2], 16 ),
-	                    alpha: .3
-	                }
-	            }
-	            else if (color.length == 6) {
-	                values = {
-	                    red:   parseInt( color.substr(0,2), 16 ),
-	                    green: parseInt( color.substr(2,2), 16 ),
-	                    blue:  parseInt( color.substr(4,2), 16 ),
-	                    alpha: .3
-	                }
-	            }
-	        /* rgb */
-	        }else if( color.indexOf('rgb(') === 0 ){
-	            var pars = color.indexOf(',');
-	            values = {
-	                red:   parseInt(color.substr(4,pars)),
-	                green: parseInt(color.substr(pars+1,color.indexOf(',',pars))),
-	                blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(')'))),
-	                alpha: .3
-	            }
-	        /* rgba */
-	        }else if( color.indexOf('rgba(') === 0 ){
-	            var pars = color.indexOf(','),
-	                repars = color.indexOf(',',pars+1);
-	            values = {
-	                red:   parseInt(color.substr(5,pars)),
-	                green: parseInt(color.substr(pars+1,repars)),
-	                blue:  parseInt(color.substr(color.indexOf(',',pars+1)+1,color.indexOf(',',repars))),
-	                alpha: parseFloat(color.substr(color.indexOf(',',repars+1)+1,color.indexOf(')')))
-	            }
-	        /* verbous */
-	        }else{
-	            var stdCol = { acqua:'#0ff',   teal:'#008080',   blue:'#00f',      navy:'#000080',
-	                           yellow:'#ff0',  olive:'#808000',  lime:'#0f0',      green:'#008000',
-	                           fuchsia:'#f0f', purple:'#800080', red:'#f00',       maroon:'#800000',
-	                           white:'#fff',   gray:'#808080',   silver:'#c0c0c0', black:'#000' };
-	            if( stdCol[color]!==undefined )
-	                values = getColorValues(stdCol[color]);
-	        }
-	    }
-	    return values;
-	};
-
-	jQuery('.visible-tabs-collection input').change(function() {
-		var inst_tab = jQuery('#instructor-tab-visible').prop('checked');
-		var student_tab = jQuery('#student-tab-visible').prop('checked');
-		var public_tab = jQuery('#public-tab-visible').prop('checked');
-
-		if (inst_tab) {
-			if (student_tab) {
-				if (public_tab) {
-					jQuery('#visible-tabs-explanation').html("<p>This is the default option. <br>Example use case: Allow students to view each other's annotations, filter their own annotations, and view their instructor's annotations.</p>");
-				} else {
-					jQuery('#visible-tabs-explanation').html("<p>Option to guide users through assignment.<br>Example use case: Allows users to make their own annotations and view instructor annotations but they will not be able to see other users' annotations.</p>");
-				}
-			} else {
-				if (public_tab) {
-					jQuery('#visible-tabs-explanation').html("<p>Not recommended for regular use. Read Only.<br>Example use case: This would allow users to view instructor and students' annotations but not be able to filter their own. Probably helpful when opening up an old version of a course/tool.</p>");
-				} else {
-					jQuery('#visible-tabs-explanation').html("<p>Instructor only.<br>Example use case: Instructors have something they would like to guide learners through without them adding their own annotations.</p>");
-				}
-			}
-		} else {
-			if (student_tab) {
-				if (public_tab) {
-					jQuery('#visible-tabs-explanation').html("<p>Annotations without instructor guidance.<br>Example use case: Allow students to view each other's annotations and filter their own without the instructor adding their own annotations to guide them through the source.</p>");
-				} else {
-					jQuery('#visible-tabs-explanation').html("<p>Private Notes. <br>Example use case: Allow users to make their own annotations on a source for personal reasons without instructor guidence or having other people view their own.</p>");
-				}
-			} else {
-				if (public_tab) {
-					jQuery('#visible-tabs-explanation').html("<p>Not recommended for regular use. <br>Example use case: Since this shuts off 'My Notes', students will not be able to make annotations but only view a collection of learner annotations. They will not be able to filter and see only instructor annotations.</p>");
-				} else {
-					jQuery('#visible-tabs-explanation').html("<p>Zen mode. <br>Example use case: Usually only helpful for images since it basically turns on Mirador without an annotation mode, but may extended to the other media types. Turns off all annotations and leaves just the source materials.</p>");
-				}
-			}
-		}
-	});
-
-	jQuery('.source-materials').on('click', '.ordernum', function(event) {
-    	event.stopPropagation();
-    });
-
-    jQuery('.source-materials').on('click', '#reorder-list-button', function(event) {
-    	var $this = jQuery(this);
-    	if ($this.html() === "Reorder list") {
-    		jQuery('.ordernum').show();
-	    	jQuery(this).html("Invert order");
-	    	window.originalOrder = jQuery('.source-materials').html();
-    	} else {
-    		var before1 = jQuery('.source-materials h4').get();
-    		var before2 = jQuery('.source-materials #reorder-list-button').get();
-    		var list = jQuery('.source-item').get().reverse();
-    		var after = jQuery('.source-materials .add-source-collection').get();
-
-    		jQuery('.source-materials').empty();
-    		jQuery('.source-materials').append(before1, before2);
-    		jQuery.each(list, function(index, value) {
-    			jQuery('.source-materials').append(value);
-    		});
-    		jQuery('.source-materials').append(after);
-    	}
-    	reorderList();
-    });
-
-    jQuery('.source-materials').on('change', '.ordernum', function(event) {
-    	jQuery(this).parent().find('.order-change-button:not(:visible)').show();
-    });
-
-    var reorderList = function() {
-    	var list = jQuery('.source-item');
-    	jQuery.each(list, function(index, value) {
-    		jQuery(value).data('order', index+1);
-    		jQuery(value).find('.ordernum').val(index+1);
-    	});
-    }
-
-    jQuery('.source-materials').on('click', '.order-change-button', function(event) {
-    	event.stopPropagation();
-    	var $this = jQuery(this);
-    	var new_order = $this.parent().find('.ordernum').val();
-    	var source_involved = $this.closest('.source-item');
-    	if (new_order <= 1) {
-    		//user wants to put it first
-    		source_involved.detach();
-    		source_involved.insertBefore('.source-item:first');
-
-
-    	} else if(new_order >= jQuery('.source-item').length) {
-    		//user wants to put it last
-			source_involved.detach();
-    		source_involved.insertAfter('.source-item:last');
-
-    	} else {
-    		//add before whatever number they put in. 
-    		var old_order = source_involved.data('order');
-    		if (new_order < old_order) {
-    			source_involved.detach();
-    			source_involved.insertBefore('.source-item:eq(' + (new_order - 1) +')');
-    		} else if (new_order > old_order) {
-    			source_involved.detach();
-    			source_involved.insertBefore('.source-item:eq(' + (new_order - 1) + ')');
-    		}
-    	}
-    	reorderList();
-    	$this.hide();
-    });
-
-
-</script>
 {% endblock %}

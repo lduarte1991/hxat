@@ -1,0 +1,42 @@
+<tr id="row<%= count %>" class="ui-state-default assignment-targets-table-row">
+	<td class="field-target_object" >
+		<select id="id_assignmenttargets_set-<%= count %>-target_object" name="assignmenttargets_set-<%= count %>-target_object" class="selectpicker form-control" data-live-search="true">
+			<%= choices %>
+		</select>
+		<div class="collapse" id="assignment-target-object-settings-<%= count %>">
+			<label for="id_assignmenttargets_set-<%= count %>-target_instructions">Instructions:</label> 
+
+<textarea id="id_assignmenttargets_set-<%= count %>-target_instructions" name="assignmenttargets_set-<%= count %>-target_instructions" class="form-control"></textarea>
+			<label for="id_assignmenttargets_set-<%= count %>-target_external_css">Assignment CSS:</label> 
+<input id="id_assignmenttargets_set-<%= count %>-target_external_css" maxlength="255" name="assignmenttargets_set-<%= count %>-target_external_css" class="form-control" type="text">
+			 	<% if (target_type == 'ig') { %>
+			 		<label>Mirador View Type:</label>
+			 		<select class="selectpicker form-control mirador_option" id="<%= count %>-target_options_view_type">
+			 			<option value="ImageView" selected>
+			 			Single Image View
+			 			</option>
+			 			<option value="ThumbnailsView">
+			 			Thumbnails View
+			 			</option>
+			 			<option value="ScrollView">
+			 			Scroll View
+			 			</option>
+			 			<option value="BookView">
+			 			Book View
+			 			</option>
+			 		</select>
+			 		<label>Open to Page (Canvas ID):</label>
+			 		<input maxlength="255" id="<%= count %>-target_options_canvas_id" type="text" class="mirador_option form-control"></input>
+					
+			 	<% } %> 
+			<textarea id="id_assignmenttargets_set-<%= count %>-target_external_options" name="assignmenttargets_set-<%= count %>-target_external_options" class="form-control"></textarea>
+		</div>
+	</td>
+	<td class="field-order hidden"><input id="id_assignmenttargets_set-<%= count %>-order" name="assignmenttargets_set-<%= count %>-order"></td>
+	<td class="field-delete"><input class="hidden" data-id="<%= id %>" id="id_assignmenttargets_set-<%= count %>-DELETE" name="assignmenttargets_set-<%= count %>-DELETE" type="checkbox" /></td>
+	<td class="field-reorder">
+	<% if (aTarget !== undefined) { %>
+	<input class="hidden erase" id="id_assignmenttargets_set-<%= count %>-id" name="assignmenttargets_set-<%= count %>-id" value='<%= aTarget %>'>
+	<% } %>
+	</td>
+</tr>

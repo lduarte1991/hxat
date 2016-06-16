@@ -62,7 +62,7 @@ def create_new_assignment(request):
                         'is_instructor': request.session['is_staff'],
                         'org': settings.ORGANIZATION,
                         'context_id': request.session['hx_context_id'],
-
+                        'tag_list': [],
                     }
                 )
         else:
@@ -108,6 +108,8 @@ def create_new_assignment(request):
             'is_instructor': request.session['is_staff'],
             'org': settings.ORGANIZATION,
             'context_id': request.session['hx_context_id'],
+            'tag_list': [],
+
         }
     )
 
