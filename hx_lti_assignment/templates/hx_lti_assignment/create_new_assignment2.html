@@ -23,6 +23,7 @@
 	<div class='source-materials'>
 		<h4>Source Materials in this Assignment</h4>
 		{% if number_of_targets == 0 %}
+			<div class='save' id='reorder-list-button' style='display:none;'>Reorder list</div>
 			<p>You'll need some source materials to create an annotation assignment!</p>
 		{% else %}
 			<div class='save' id='reorder-list-button'>Reorder list</div>
@@ -61,7 +62,7 @@
 			                    	{% if choice.target_type == "ig" %}
 			                    		<label for='mirador-view-type-{{forloop.parentloop.counter0}}' class='subheading'>Default Mirador view type:</label>
 			                    		<select class='form-control selectpicker mirador-view-type' id='mirador-view-type-{{forloop.parentloop.counter0}}' name='view-type'>
-			                    			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
+			                    			{% captureas selected_view %}{{ source.target_external_options.value|just_the_view_type }}{% endcaptureas %}
 			                    			<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
 								 			Single Image View
 								 			</option>
@@ -78,17 +79,17 @@
 			                    		<label for='canvas-id-{{forloop.parentloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
 								 		<input maxlength="255" id="canvas-id-{{forloop.parentloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
 			                    	{% endif %}
-			                    	<input id="dashboard_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if item.target_external_options.value|just_dashboard_hidden %} checked {% endif %}></input>
+			                    	<input id="dashboard_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.target_external_options.value|just_dashboard_hidden %} checked {% endif %}></input>
 							 		<label for="dashboard_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
 							 		{% if choice.target_type == 'vd' %}
 								 		<br>
-								 		<input id="transcript_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" value=""></input>
+								 		<input id="transcript_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.target_external_options.value|just_transcript_hidden %} checked {% endif %}></input>
 								 		<label for="transcript_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Transcript on Load (when applicable)</label>
 								 		<br>
-										<input id="allow_transcript_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option transcript-download"></input>
+										<input id="allow_transcript_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option transcript-download" {% if source.target_external_options.value|just_transcript_download %} checked {% endif %}></input>
 										<label for="allow_transcript_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download transcript (when applicable)</label>
 										<br>
-										<input id="allow_video_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option video-download"></input>
+										<input id="allow_video_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option video-download" {% if source.target_external_options.value|just_video_download %} checked {% endif %}></input>
 										<label for="allow_video_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download video (when applicable)</label>
 									{% endif %}
 			                    </div>

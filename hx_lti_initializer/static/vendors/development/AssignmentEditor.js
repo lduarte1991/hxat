@@ -271,6 +271,9 @@ AssignmentEditor.prototype = {
                 jQuery('#dashboard_hidden-' + count).prop("checked", jQuery("#hide_dash").prop("checked"));
                 jQuery('.delete-popup-overlay').remove();
                 jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr('value', count + 1);
+                if (!jQuery('#reorder-list-button').is(":visible")) {
+                    jQuery('#reorder-list-button').show();
+                }
             });
         });
 
