@@ -511,6 +511,11 @@ body {
 	min-width: calc(68% - 9px)!important;
 }
 
+.dropdown-toggle[data-id="import-course-chosen"] + .dropdown-menu {
+	min-width: 68%!important;
+	min-width: calc(68% - 12px)!important;
+}
+
 .dropdown-toggle[data-id^="mirador-view-type"] + .dropdown-menu {
 	left: calc(10% + 79px);
 	min-width: calc(80% - 158px)!important;
@@ -621,21 +626,21 @@ p.help {
 	cursor: pointer;
 }
 
-.save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button {
+.save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button, .save#import-button {
 	color: white;
 	background-color: rgb(55, 124, 182);
 }
 
-.save#save-button:hover, .save#annotation-settings-save-button:hover, .save#database-settings-cancel-button:hover, .save#source-save-button:hover {
+.save#save-button:hover, .save#annotation-settings-save-button:hover, .save#database-settings-cancel-button:hover, .save#source-save-button:hover, .save#import-button:hover {
 	background-color: rgb(65, 134, 192);
 }
 
-.save#cancel-button, .save#annotation-settings-cancel-button, .save#source-cancel-button {
+.save#cancel-button, .save#annotation-settings-cancel-button, .save#source-cancel-button, .save#import-cancel {
 	color: black;
 	background-color: rgb(174, 203, 226);
 }
 
-.save#cancel-button:hover, .save#annotation-settings-cancel-button:hover, .save#source-cancel-button:hover {
+.save#cancel-button:hover, .save#annotation-settings-cancel-button:hover, .save#source-cancel-button:hover, .save#import-cancel:hover {
 	background-color: rgb(184, 213, 236);
 }
 
@@ -1085,4 +1090,59 @@ input.ordernum {
 	float: right;
 	margin-top: -3px;
 	width: 91px;
+}
+
+input[type=checkbox], input[type=radio] { 
+	display:none;
+} /* to hide the checkbox itself */
+
+input[type=checkbox] + label:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  color: black;
+  content: "\f096"; /* unchecked icon */
+  letter-spacing: 10px; 
+} /* space between checkbox and label */
+
+input[type=checkbox]:checked + label:before { 
+	content: "\f046"; /* checked icon */
+	letter-spacing: 8px; 
+} /* allow space for check mark */
+
+input[type=radio] + label:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  color: black;
+  content: "\f10c"; /* unchecked icon */
+  letter-spacing: 10px; 
+} /* space between checkbox and label */
+
+input[type=radio]:checked + label:before { 
+	content: "\f192"; /* checked icon */
+	letter-spacing: 10px; 
+} /* allow space for check mark */
+
+input[type=radio] + label { 
+	margin-right: 20px;
+}
+
+.assignment {
+	font-size: 12pt;
+	margin-top: 10px;
+}
+
+.assignment label {
+	color: rgb(91, 150, 198);
+}
+
+.assignment-choices .subheading {
+	margin-top: 15px;
+}
+
+.assignment-choices .import-choices {
+	margin-top: 10px;
+}
+
+.check-uncheck {
+	font-size: 9pt;
 }

@@ -17,4 +17,14 @@ urlpatterns = patterns(
         'hx_lti_assignment.views.delete_assignment',
         name="delete_assignment",
     ),
+    url(
+        r'^import_assignment/$',
+        'hx_lti_assignment.views.import_assignment',
+        name="import_assignment",
+    ),
+    url(
+        r'^(?P<id>[0-9]+)/get_assignments/',
+        'hx_lti_assignment.views.assignments_from_course',
+        name="assignments_from_course",
+    ),
 )

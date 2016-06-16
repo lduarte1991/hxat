@@ -1,0 +1,62 @@
+{% extends 'hx_lti_initializer/base.html' %}
+
+{% block content %}
+{% load bootstrap3 %}
+{% bootstrap_javascript %}
+<h2>Import Assignments from Another Course</h2>
+
+<label class='subheading' for='import-course-chosen'>Course:</label>
+<select class='selectpicker form-control' id='import-course-chosen'>
+	<option value="">-----------</option>
+{% for course in courses %}
+	{% if course.id != current_course_id %}
+	<option value="{{course.id}}" data-url="{% url 'hx_lti_assignment:assignments_from_course' id=course.id %}">{{course.course_name}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+
+<div class='assignment-choices'  style='display:none;'>
+	<div class='subheading'>Assignments</div>
+	<div class='check-uncheck'><a href='#' onclick='jQuery("input[type=checkbox]").prop("checked", "checked")'>check all</a> / <a href='#' onclick='jQuery("input[type=checkbox]").prop("checked", false)'>uncheck all</a> 
+	</div>
+	<div class='assignment-list'>
+	</div>
+	<div class='subheading'>Import annotations</div>
+	<div class='import-choices'>
+		<input type='radio' class='form-control' name='import-choice' value='inst' id='inst' checked><label for='inst'>Instructor only</label>
+		<input type='radio' class='form-control' name='import-choice' value='all' id='all'><label for='all'>All</label>
+		<input type='radio' class='form-control' name='import-choice' value='none' id='none'><label for='none'>None</label>
+	</div>
+</div>
+<div class='button-collection'>
+	<div type="submit" class="save" id='import-button' role="button" style='display:none;'>
+		Import
+	</div>
+	<div class="save" id='import-cancel' role='button' onclick='window.location="{% url "hx_lti_initializer:course_admin_hub" %}"'>
+		Cancel
+	</div>
+</div>
+
+<script>
+	jQuery('#import-course-chosen').change(function(event) {
+		var url = jQuery(this).find('option:selected').data('url');
+		jQuery('.assignment-list').html('');
+		var options = {
+			url: url,
+			success: function(data) {
+				jQuery.each(data, function(index, assignment){
+					var html = "<div class='assignment'><input class='form-control' type='checkbox' id='assignment-" + index + "' checked>";
+					html += "<label for='assignment-" + index +"'>";
+					html += assignment.fields.assignment_name;
+					html += "</label></div>";
+					jQuery('.assignment-list').append(html);
+				});
+				jQuery('.assignment-choices').show();
+				jQuery('#import-button').show();
+			},
+			async: true,
+		}
+		jQuery.ajax(options);
+	});
+</script>
+{% endblock %}

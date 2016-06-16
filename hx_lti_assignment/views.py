@@ -3,12 +3,13 @@ from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
 from hx_lti_initializer.models import LTICourse
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.core import serializers
 import uuid
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
@@ -213,3 +214,24 @@ def delete_assignment(request, id):
             return redirect(url)
 
     raise PermissionDenied()
+
+
+@login_required
+def import_assignment(request):
+    return render(
+        request,
+        'hx_lti_assignment/import_assignment.html',
+        {
+            'courses': LTICourse.objects.all(),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'current_course_id': get_course_id(request),
+        }
+    )
+
+@login_required
+def assignments_from_course(request, id):
+    course = get_object_or_404(LTICourse, pk=id)
+    result = course.assignment_set.all()
+    data = serializers.serialize("json", result)
+    return HttpResponse(data, content_type='application/json')
