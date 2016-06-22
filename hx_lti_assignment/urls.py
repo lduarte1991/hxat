@@ -23,8 +23,13 @@ urlpatterns = patterns(
         name="import_assignment",
     ),
     url(
-        r'^(?P<id>[0-9]+)/get_assignments/',
+        r'^(?P<id>[0-9]+)/get_assignments',
         'hx_lti_assignment.views.assignments_from_course',
         name="assignments_from_course",
+    ),
+    url(
+        r'^(?P<old_course_id>[0-9]+)/(?P<new_course_id>[0-9]+)/(?P<assignment_id>[0-9]+)/import',
+        'hx_lti_assignment.views.moving_assignment',
+        name="moving_assignment",
     ),
 )

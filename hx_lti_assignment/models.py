@@ -179,6 +179,9 @@ class Assignment(models.Model):
     course = models.ForeignKey(LTICourse)
     hidden = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return self.assignment_name
 
@@ -269,5 +272,7 @@ class Assignment(models.Model):
             result = []
             for col in collection:
                 res = col.split(':')
+                if len(res) %2 == 1:
+                    res = col.split(';')
                 result.append((res[0], getColorValues(res[1])))
             return result

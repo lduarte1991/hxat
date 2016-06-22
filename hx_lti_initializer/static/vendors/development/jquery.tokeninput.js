@@ -29,7 +29,7 @@ var DEFAULT_SETTINGS = {
 
     // Tokenization settings
     tokenLimit: null,
-    tokenDelimiter: " ",
+    tokenDelimiter: ",",
     preventDuplicates: true,
 
     // Output settings

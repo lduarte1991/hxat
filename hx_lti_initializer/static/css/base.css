@@ -83,7 +83,7 @@
 	display: inline-block;
 	vertical-align: middle;
 	width: 70px;
-	height: 40px;
+	height: 35px;
 }
 
 .header #banner-logo-left {
@@ -359,7 +359,7 @@ footer {
 
 #new-assignment-button {
 	border: 1px solid black;
-	background-color: #005d92;
+	background-color: #337ab7;
 	color: white;
 	text-decoration: none;
 	padding: 5px 40px;
@@ -390,7 +390,7 @@ footer {
 	color: black!important;
 }
 
-.dropdown-toggle[data-id^="mirador-view-type"], .dropdown-toggle[data-id="default-tab"] {
+.dropdown-toggle[data-id^="mirador-view-type"], .dropdown-toggle[data-id="default-tab"], .dropdown-toggle[data-id^="import"] {
 	width: 100%;
 }
 
@@ -464,6 +464,7 @@ body {
 
 .bootstrap-select > .dropdown-toggle {
 	cursor:pointer;
+	background-color: transparent;
 }
 
 .open.bootstrap-select > .dropdown-toggle {
@@ -471,47 +472,43 @@ body {
 	border-bottom: none;
 }
 
-.bootstrap-select > .dropdown-toggle:before {
+.bootstrap-select.form-control {
+	position: relative;
+}
+
+.bootstrap-select.form-control:before {
 	content: '\f0d7';
-	font-family: FontAwesome;
-	color: black;
-	margin-top: -7px;
+    font-family: FontAwesome;
+    color: black;
     position: absolute;
-    left: 75.5%;
-    left: calc(77.3% - 32px);
-    font-size: 20pt;
+    right: 16%;
+    margin-top: 10px;
+    font-size: 18pt;
     padding: 2px 6px 4px 7px;
     border: 2px solid lightgray;
+    cursor: pointer;
+    pointer-events: none;
 }
 
-.bootstrap-select > .dropdown-toggle[data-id^="mirador-view-type"]:before{
-	left: calc(90% - 107px);
-	margin-top: -7px;
-	font-size: 19pt;
-}
-
-.bootstrap-select > .dropdown-toggle[data-id^="default-tab"]:before {
-	left: calc(90% - 30px);
-	font-size: 20pt;
-	margin-top: -8px;
+.bootstrap-select.mirador-view-type:before, .bootstrap-select.full-width:before{
+	right: 0;
 }
 
 .dropdown-menu {
-	left: 10%;
 	position:absolute;
 	display: none;
 	float: left;
 	list-style: none;
 	background-color: white;
 	border: 2px solid lightgray;
+	margin-top:-17px;
 }
 
 .dropdown-toggle[data-id^="id_select_existing_user"] + .dropdown-menu, .dropdown-toggle[data-id^="id_target_type"] + .dropdown-menu {
-	min-width: 68%!important;
-	min-width: calc(68% - 9px)!important;
+	min-width: 84%;
 }
 
-.dropdown-toggle[data-id="import-course-chosen"] + .dropdown-menu {
+/*.dropdown-toggle[data-id="import-course-chosen"] + .dropdown-menu {
 	min-width: 68%!important;
 	min-width: calc(68% - 12px)!important;
 }
@@ -526,17 +523,17 @@ body {
 	left: calc(10% + 3px);
 	min-width: calc(77% - 11px);
 	width: calc(77% - 11px);
-}
+}*/
 
 .dropdown-toggle[data-id^="assignment_object_choices"] + .dropdown-menu li a span.text {
 	display: inline;
 }
 
-.dropdown-toggle[data-id^="default-tab"] + .dropdown-menu {
+/*.dropdown-toggle[data-id^="default-tab"] + .dropdown-menu {
 	left: 10%;
 	min-width: 80% !important;
     width: 80%;
-}
+}*/
 
 .open > .dropdown-menu {
 	display: block;
@@ -622,7 +619,7 @@ p.help {
 	border-radius: 7px;
 	text-decoration: none;
 	display: inline-block;
-	font-size: 9pt;
+	font-size: 11pt;
 	cursor: pointer;
 }
 
@@ -1145,4 +1142,66 @@ input[type=radio] + label {
 
 .check-uncheck {
 	font-size: 9pt;
+}
+
+a {
+	color: #337ab7;
+}
+
+.progress-bar {
+	margin-top: 50px;
+	border: 2px solid #5b96c6;
+	border-radius: 10px;
+	padding: 20px;
+}
+
+progress[value] {
+	-webkit-appearance: none;
+    appearance: none;
+
+  	width: 100%;
+  	height: 20px;
+}
+
+progress[value]::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+progress[value]::-webkit-progress-value {
+  background-image:
+	   -webkit-linear-gradient(-45deg, 
+	                           transparent 33%, rgba(0, 0, 0, .1) 33%, 
+	                           rgba(0,0, 0, .1) 66%, transparent 66%),
+	   -webkit-linear-gradient(top, 
+	                           rgba(255, 255, 255, .25), 
+	                           rgba(0, 0, 0, .25)),
+	   -webkit-linear-gradient(left, #09c, #f44);
+
+    border-radius: 2px; 
+    background-size: 35px 20px, 100% 100%, 100% 100%;
+    -webkit-animation: animate-stripes 5s linear infinite;
+    animation: animate-stripes 5s linear infinite;
+}
+
+@-webkit-keyframes animate-stripes {
+   100% { background-position: -100px 0px; }
+}
+
+@keyframes animate-stripes {
+   100% { background-position: -100px 0px; }
+}
+
+.current-progress: {
+	margin: 15px 20px;
+}
+
+.errors {
+	width: 100%;
+    background-color: rgba(255, 0, 0 ,0.3);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-align: center;
 }

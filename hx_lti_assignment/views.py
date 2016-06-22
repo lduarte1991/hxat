@@ -11,6 +11,8 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core import serializers
 import uuid
+import json
+import sys
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
 def get_course_id(request):
@@ -209,6 +211,9 @@ def delete_assignment(request, id):
     if request.method == 'POST':
         form = DeleteAssignmentForm(request.POST, instance=assignment)
         if form.is_valid():
+            aTargets = AssignmentTargets.objects.filter(assignment=assignment)
+            for at in aTargets:
+                at.delete()
             assignment.delete()
             url = reverse('hx_lti_initializer:course_admin_hub')
             return redirect(url)
@@ -229,9 +234,50 @@ def import_assignment(request):
         }
     )
 
+
 @login_required
 def assignments_from_course(request, id):
     course = get_object_or_404(LTICourse, pk=id)
     result = course.assignment_set.all()
     data = serializers.serialize("json", result)
     return HttpResponse(data, content_type='application/json')
+
+
+@login_required
+def moving_assignment(request, old_course_id, new_course_id, assignment_id):
+    old_course = LTICourse.objects.get(pk=old_course_id)
+    new_course = LTICourse.objects.get(pk=new_course_id)
+
+    try:
+        result = dict()
+        result.update({'old_course_id': str(old_course.course_id)})
+        result.update({'new_course_id': str(new_course.course_id)})
+
+        assignment = Assignment.objects.get(pk=assignment_id)
+        aTargets = AssignmentTargets.objects.filter(assignment=assignment)
+        assignment.course = new_course
+        assignment.pk = None
+
+        result.update({'old_assignment_id': str(assignment.assignment_id)})
+        assignment.assignment_id = uuid.uuid4()
+        assignment.save()
+        result.update({'new_assignment_id': str(assignment.assignment_id)})
+        result.update({'assignment_name': unicode(assignment.assignment_name)})
+        
+        pks = []
+        for at in aTargets:
+            at.pk = None
+            at.assignment = assignment
+            at.save()
+            pks.append(str(at.target_object.pk))
+        result.update({'object_ids': pks, 'result': 200})
+        data = json.dumps(result)
+        return HttpResponse(data, content_type='application/json')
+    except:
+        data = json.dumps({
+                "result": 500,
+                "message": "There was an error in importing your object.",
+                'error_message': str(sys.exc_info()[1]),
+                'assignment_id': assignment_id,
+            })
+        return HttpResponse(data, content_type='application/json')

@@ -46,6 +46,11 @@ urlpatterns = patterns(
         name="annotation_database_update",
     ),
     url(
+        r'^annotation_api/transfer_annotations/(?P<instructor_only>[0-1])$',
+        'hx_lti_initializer.views.transfer_annotations',
+        name="transfer_annotations",
+    ),
+    url(
         r'^admin_hub/$',
         'hx_lti_initializer.views.course_admin_hub',
         name="course_admin_hub",

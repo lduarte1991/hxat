@@ -277,6 +277,11 @@ AssignmentEditor.prototype = {
             });
         });
 
+        jQuery('.bootstrap-select').on('click', function(e) {
+            console.log(jQuery(this).find('button'));
+            jQuery(this).find('button').dropdown('toggle');
+        });
+
     },
     set_up_tagging_functionality: function() {
         var self = this;
@@ -543,7 +548,7 @@ AssignmentEditor.prototype = {
         var course = jQuery('#assignment-name-input').data('course-id');
         jQuery('#id_course').val(course);
         jQuery('#id_assignment_name').val(jQuery('#assignment-name-input').val());
-        //jQuery('form').submit();
+        jQuery('form').submit();
     },
     save_annotation_settings: function() {
         var self = this;
