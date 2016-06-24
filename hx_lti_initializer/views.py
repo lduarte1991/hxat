@@ -468,6 +468,7 @@ def instructor_dashboard_view(request):
         'is_instructor': request.session["is_staff"],
         'user_annotations': [],
         'fetch_annotations_time': 0,
+        'org': settings.ORGANIZATION,
         'dashboard_context_js': json.dumps({
             'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
         })
@@ -498,6 +499,7 @@ def instructor_dashboard_student_list_view(request):
         'is_instructor': request.session["is_staff"],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
+        'org': settings.ORGANIZATION,
     }
     return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 

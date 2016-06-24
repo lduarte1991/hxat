@@ -152,6 +152,15 @@ AssignmentEditor.prototype = {
             jQuery('.delete-popup-overlay').remove();
         });
 
+        setTimeout(function(){
+            if (window.navigator.platform === "Win32") {
+                jQuery('.bootstrap-select.form-control').addClass('win');
+            }
+            if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                jQuery('.bootstrap-select.form-control').addClass('firefox');
+            }
+        }, 500);
+
         body.click(function() {
             if (jQuery('.color-selection.open').length > 0) {
                 jQuery('.color-selection.open .custom-tag-color-menu').hide();
@@ -211,7 +220,14 @@ AssignmentEditor.prototype = {
             jQuery('#assignment_object_choices').selectpicker({
                 liveSearch: true,
             });
-
+            setTimeout(function(){
+                if (window.navigator.platform === "Win32") {
+                    jQuery('.bootstrap-select.form-control').addClass('win');
+                }
+                if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    jQuery('.bootstrap-select.form-control').addClass('firefox');
+                }
+            }, 500);
             jQuery('#assignment_object_choices').change(function(event) {
                 var media = jQuery(this).find('option:selected').data('type');
                 if (media == "ig" && jQuery('#viewtype').length == 0) {

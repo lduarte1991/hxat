@@ -78,7 +78,14 @@
 				});
 				jQuery('#ro-course-admins').html(jQuery('.dropdown-toggle[data-id="id_select_existing_user"] span').html());
 			}, 1000);
-
+			setTimeout(function(){
+				if (window.navigator.platform === "Win32") {
+					jQuery('.bootstrap-select.form-control').addClass('win');
+				}
+				if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+					jQuery('.bootstrap-select.form-control').addClass('firefox');
+				}
+			}, 500);
 			
 		});
 	</script>

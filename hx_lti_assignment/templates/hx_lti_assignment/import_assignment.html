@@ -46,6 +46,17 @@
 </div>
 
 <script>
+	jQuery(document).ready(function() {
+		setTimeout(function(){
+			if (window.navigator.platform === "Win32") {
+				jQuery('.bootstrap-select.form-control').addClass('win');
+			}
+			if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+				jQuery('.bootstrap-select.form-control').addClass('firefox');
+			}
+		}, 500);
+	});
+
 	jQuery('#import-course-chosen').change(function(event) {
 		var url = jQuery(this).find('option:selected').data('url');
 		jQuery('.assignment-list').html('');

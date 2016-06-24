@@ -138,6 +138,14 @@
             jQuery('#id_target_content').focus(function(){console.log("targetabouttochange");}).blur( function(){
                 console.log("Targetchanged");
             });
+			setTimeout(function(){
+				if (window.navigator.platform === "Win32") {
+					jQuery('.bootstrap-select.form-control').addClass('win');
+				}
+				if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+					jQuery('.bootstrap-select.form-control').addClass('firefox');
+				}
+			}, 500);
 		});
 	</script>
 

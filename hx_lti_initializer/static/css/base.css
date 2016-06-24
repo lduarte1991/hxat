@@ -54,10 +54,15 @@
 
 .header {
     width: 100%;
-    min-width: 800px;
+    min-width: 514px;
     background-color: black;
     vertical-align: middle;
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+	display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+	display: -ms-flexbox;      /* TWEENER - IE 10 */
+	display: -webkit-flex;
     display: flex;
+    -webkit-justify-content: space-between; 
     justify-content: space-between;
 }
 
@@ -67,12 +72,17 @@
     font-size: 1em;
     color: white;
     font-family: Verdana, sans-serif;
-
 }
 
 .header .site-title a {
 	color: white;
 	text-decoration: none;
+}
+
+@media screen and (max-width: 750px) {
+	.header .site-title {
+		display: none;
+	}
 }
 
 .header .site-title a:hover{
@@ -84,6 +94,7 @@
 	vertical-align: middle;
 	width: 70px;
 	height: 35px;
+	cursor: pointer;
 }
 
 .header #banner-logo-left {
@@ -217,7 +228,7 @@ li {
     margin-bottom: auto;
     font-family: Verdana;
     padding-top: 15px;
-    padding-bottom: 15px;
+    height: 35px;
 }
 
 .navigation a {
@@ -226,9 +237,11 @@ li {
     margin-right: 15px;
     vertical-align: middle;
     text-decoration: none;
-    padding-bottom: 14px;
     border-bottom: 4px solid rgb(134, 231, 244);
     font-weight: bold;
+    display: inline-block;
+    height: 100%;
+    height: calc(100% - 4px);
 }
 
 .navigation a.selected {
@@ -247,6 +260,7 @@ li {
 }
 
 .container {
+	display: block;
 	margin: 20px 10%;
 }
 
@@ -304,8 +318,23 @@ footer {
 	cursor: pointer;
 }
 
+.assignment-item .first-row i, .source-item .first-row i{
+	cursor: pointer;
+	vertical-align: middle;
+}
+
 .assignment-item .assignment-title, .source-item .source-title {
 	font-weight: bold;
+	word-wrap: break-word;
+	vertical-align: middle;
+	width: 66%;
+	display: inline-block;
+}
+
+@media screen and (max-width: 775px) {
+	.assignment-item .assignment-title, .source-item .source-title {
+		width: 45%;
+	}
 }
 
 .assignment-item .edit-assignment-button {
@@ -350,6 +379,17 @@ footer {
 
 .table-row a {
 	color: #0871b0;
+}
+
+.table-row a:first-child {
+	display: inline-block;
+	width: 80%;
+}
+
+@media screen and (max-width: 790px) {
+	.table-row a:first-child {
+		width: 60%;
+	}
 }
 
 .table-footer {
@@ -490,6 +530,14 @@ body {
     pointer-events: none;
 }
 
+.bootstrap-select.form-control.firefox.win:before {
+    font-size: 15pt;
+}
+
+.bootstrap-select.form-control.firefox:before {
+    font-size: 17pt;
+}
+
 .bootstrap-select.mirador-view-type:before, .bootstrap-select.full-width:before{
 	right: 0;
 }
@@ -504,8 +552,12 @@ body {
 	margin-top:-17px;
 }
 
-.dropdown-toggle[data-id^="id_select_existing_user"] + .dropdown-menu, .dropdown-toggle[data-id^="id_target_type"] + .dropdown-menu {
+.dropdown-toggle[data-id^="id_select_existing_user"] + .dropdown-menu,
+.dropdown-toggle[data-id^="id_target_type"] + .dropdown-menu,
+.dropdown-toggle[data-id^="assignment_object_choices"] + .dropdown-menu,
+.dropdown-toggle[data-id^="viewtype"] + .dropdown-menu {
 	min-width: 84%;
+	max-height: 287px!important;
 }
 
 /*.dropdown-toggle[data-id="import-course-chosen"] + .dropdown-menu {
@@ -672,6 +724,17 @@ p.help {
 	box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
 }
 
+@media screen and (max-width: 650px) {
+	.delete-popup-background {
+		min-width: 500px;
+		width: 500px;
+		left: 15px;
+		left: calc(50% - 250px);
+		height: 330px;
+		top: calc(50% - 165px);
+	}
+}
+
 .delete-popup-background h3, .source-material-setup-popup-background h3 {
 	padding-top: 28px;
 	padding-left: 30px;
@@ -681,6 +744,7 @@ p.help {
 .delete-popup-background p, .source-material-setup-popup-background p {
 	margin-top: 5px;
 	padding-left: 30px;
+	padding-right: 30px;
 	font-size: 11pt;
 	margin-bottom: 25px;
 }
@@ -1005,6 +1069,20 @@ textarea#id_target_content {
     box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
 }
 
+.add-source-popup-background h3 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.add-source-popup-background label {
+	margin-top: 15px;
+	display: block;
+}
+
+#add-source-popup-confirm {
+	margin-top: 20px;
+}
+
 .hx-textfield.popup button:before {
     left: 84%;
     left: calc(84% - 18px);
@@ -1051,10 +1129,10 @@ textarea#id_target_content {
 	position: relative;
     width: 600px;
     min-width: 600px;
-    height: 410px;
+    height: 415px;
     min-height: 300px;
     top: 200px;
-    top: calc(50% - 150px);
+    top: calc(50% - 207px);
     left: 100px;
     left: calc(50% - 300px);
     background-color: white;
@@ -1065,12 +1143,21 @@ textarea#id_target_content {
     box-shadow: 13px 15px 16px -6px rgba(0,0,0,0.42);
 }
 
+@media screen and (max-width: 650px) {
+	.source-material-setup-popup-background {
+		width: 500px;
+		min-width: 500px;
+		height: 460px;
+		top: calc(50% - 230px);
+		left: calc(50% - 250px);
+	}
+}
+
 .source-material-setup-popup-background .hx-textfield {
 	margin-left: 30px;
 }
 
 .source-material-setup-popup-background #delete-popup-cancel {
-	margin-top: 20px;
 	margin-left: 30px;
 }
 
