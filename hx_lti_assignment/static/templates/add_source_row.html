@@ -1,4 +1,4 @@
-<div class='source-item' id='item-<%= count %>' data-order='<%= order_value %>' data-id='<%= id %>'>
+<div class='source-item' id='item-<%= count %>' data-order='<%= order_value %>' data-id='<%= id %>' data-aTarget="<%= aTarget %>" data-media="<%= target_type %>">
 	<div class='first-row'>
 		<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'><%= target_title %></span>
 		<div class='order-div'><input type="number" class='ordernum' style='<% if(!should_show_order) { %>display:none; <% } %>' min="1" value="<%= order_value %>"><a href='#' style='display: none' class='order-change-button'>Move</a></div>

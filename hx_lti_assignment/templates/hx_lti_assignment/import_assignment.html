@@ -1,0 +1,124 @@
+{% extends 'hx_lti_initializer/base.html' %}
+
+{% block content %}
+{% load bootstrap3 %}
+{% bootstrap_javascript %}
+<h2>Import Assignments from Another Course</h2>
+
+<label class='subheading' for='import-course-chosen'>Course:</label>
+<select class='selectpicker form-control full-width' id='import-course-chosen'>
+	<option value="">-----------</option>
+{% for course in courses %}
+	{% if course.id != current_course_id %}
+	<option value="{{course.id}}" data-url="{% url 'hx_lti_assignment:assignments_from_course' id=course.id %}">{{course.course_name}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+
+<div class='assignment-choices'  style='display:none;'>
+	<div class='subheading'>Assignments</div>
+	<div class='check-uncheck'><a href='#' onclick='jQuery("input[type=checkbox]").prop("checked", "checked")'>check all</a> / <a href='#' onclick='jQuery("input[type=checkbox]").prop("checked", false)'>uncheck all</a> 
+	</div>
+	<div class='assignment-list'>
+	</div>
+	<div class='subheading'>Import annotations</div>
+	<div class='import-choices'>
+		<input type='radio' class='form-control' name='import-choice' value='inst' id='inst' checked><label for='inst'>Instructor only</label>
+		<input type='radio' class='form-control' name='import-choice' value='all' id='all'><label for='all'>All</label>
+		<input type='radio' class='form-control' name='import-choice' value='none' id='none'><label for='none'>None</label>
+	</div>
+</div>
+<div class='button-collection'>
+	<div type="submit" class="save" id='import-button' role="button" style='display:none;'>
+		Import
+	</div>
+	<div class="save" id='import-cancel' role='button' onclick='window.location="{% url "hx_lti_initializer:course_admin_hub" %}"'>
+		Cancel
+	</div>
+</div>
+<div class='progress-bar' style='display:none;'>
+	<div class='errors' style='display:none;'></div>
+	<label for='pBar' id='pBar-label' style='display:none;'><strong>Adding assignments:</strong><br> 0%</label>
+	<progress max="100" value="0" id='pBar' style='display:none;'>
+	</progress>
+	<div class='current-progress' style='display:none;'></div>
+	
+</div>
+
+<script>
+	jQuery(document).ready(function() {
+		setTimeout(function(){
+			if (window.navigator.platform === "Win32") {
+				jQuery('.bootstrap-select.form-control').addClass('win');
+			}
+			if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+				jQuery('.bootstrap-select.form-control').addClass('firefox');
+			}
+		}, 500);
+	});
+
+	jQuery('#import-course-chosen').change(function(event) {
+		var url = jQuery(this).find('option:selected').data('url');
+		jQuery('.assignment-list').html('');
+		var options = {
+			url: url,
+			success: function(data) {
+				jQuery.each(data, function(index, assignment){
+					var html = "<div class='assignment'><input class='form-control' data-id='"+assignment.pk +"' type='checkbox' id='assignment-" + index + "' checked>";
+					html += "<label for='assignment-" + index +"'>";
+					html += assignment.fields.assignment_name;
+					html += "</label></div>";
+					jQuery('.assignment-list').append(html);
+				});
+				jQuery('.assignment-choices').show();
+				jQuery('#import-button').show();
+			},
+			async: true,
+		};
+		jQuery.ajax(options);
+
+		jQuery('#import-button').click(function(event) {
+			jQuery('#import-button').hide();
+			jQuery('#import-cancel').html('Done');
+			jQuery('#pBar').show();
+			jQuery('.progress-bar').show();
+			jQuery('#pBar-label').show();
+			jQuery('.current-progress').show();
+			var checkedElements = jQuery('input[id^="assignment-"]:checked');
+			var progress = (100.0/checkedElements.length);
+			var url = '/lti_init/launch_lti/assignment/' +jQuery('#import-course-chosen').find('option:selected').val() + "/{{current_course_id}}/";
+			var annotationImport = jQuery('input[name="import-choice"]:checked').val();
+			console.log(annotationImport);
+			jQuery.each(checkedElements, function(index, element) {
+				var options = {
+					url: url+jQuery(element).data('id') + '/import',
+					success: function(data) {
+						var perc = jQuery('#pBar').val() + progress;
+							jQuery('#pBar').val(perc);
+							jQuery('#pBar-label').html('<strong>Adding assignments:</strong><br> ' + parseInt(perc, 10) + '%');
+						if (data['message'] !== undefined) {
+							jQuery('.errors').html("<p> <i class='fa fa-warning'></i> " + data['message'] + " Your assignments may not have been imported correctly. Note which were not imported correctly below and double check them before setting to live.</p>");
+							jQuery('.errors').show();
+						} else {
+							jQuery('.current-progress').prepend(parseInt(perc, 10) + "% . . . &quot;" + data['assignment_name'] + "&quot; -- Successfully added to current course<br>");
+							var transfer_url = '/lti_init/annotation_api/transfer_annotations/' + (annotationImport === "inst" ? "1" : "0");
+							var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': "{{ csrf_token}}"});
+							jQuery.ajax({
+								url: transfer_url, 
+								data: finaldata,
+								success: function(data) {
+									console.log(data);
+								},
+								type:"POST", 
+								dataType: 'json'
+							});
+						}
+					},
+					async: true,
+				}
+				jQuery.ajax(options);
+			});
+		});
+	});
+</script>
+{% endblock %}

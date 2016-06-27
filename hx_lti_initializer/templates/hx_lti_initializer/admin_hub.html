@@ -69,7 +69,7 @@
             <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" id="new-assignment-button" role="button">
                 Create new assignment
             </a>
-           <!--  or <a href="https://google.com" style='margin-left: 10px;'>import from another course</a> -->
+            or <a href="{% url 'hx_lti_assignment:import_assignment' %}" style='margin-left: 10px;'>import from another course</a>
         </div>
     {% endfor %}
     <script>
