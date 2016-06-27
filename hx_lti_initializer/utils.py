@@ -239,10 +239,17 @@ def get_annotation_db_credentials_by_course(context_id):
     ]
     '''
     fields = ['annotation_database_url', 'annotation_database_apikey', 'annotation_database_secret_token']
-    return Assignment.objects.filter(course__course_id=context_id) \
-        .extra({"annotation_database_url": "TRIM(annotation_database_url)"}) \
-        .values(*fields) \
-        .distinct(*fields)
+    values = Assignment.objects.filter(course__course_id=context_id).values(*fields).distinct(*fields).order_by(*fields)
+    
+    # The list of database entries might not be unique (despite the *select distinct*) if any of
+    # the URLs contain whitespace. The code below accounts for that possibility.
+    k, values_by_url = ('annotation_database_url', {})
+    for row in values:
+        row[k] = row[k].strip()
+        if row[k] and row[k] not in values_by_url:
+            values_by_url[row[k]] = row
+
+    return values_by_url.values()
 
 def fetch_annotations_by_course(context_id, user_id):
     '''
