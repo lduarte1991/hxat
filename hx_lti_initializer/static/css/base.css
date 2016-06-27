@@ -586,7 +586,6 @@ body {
 	min-width: 80% !important;
     width: 80%;
 }*/
-
 .open > .dropdown-menu {
 	display: block;
 	border-top: none;
@@ -643,6 +642,10 @@ body {
 	width: 97%;
 	padding: 5px;
 }
+
+.search-panel.open > .dropdown-menu {  margin: 0; }
+.search-panel.open > .dropdown-menu > li > a { display: inline; }
+.search-panel.open > .dropdown-menu > li > a:focus, .search-panel.open > .dropdown-menu > li > a:hover {background-color: inherit;}
 
 .readonlyfield {
 	background-color: rgb(236, 236, 236);
