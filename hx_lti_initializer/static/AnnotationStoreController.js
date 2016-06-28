@@ -125,6 +125,7 @@ AnnotatorEndpointController.prototype.updateMasterList = function(focus_id, view
 				if (annotation.id === focus) {
 					self.annotationsMasterList = [annotation];
 					self._clearAnnotator({ except: [annotation] });
+					viewer.clearDashboard();
 					viewer.updateDashboard(0, 1, [annotation], false);
 				};
 			})
@@ -333,7 +334,7 @@ AnnotatorEndpointController.prototype._clearAnnotator = function(options) {
     var store = annotator.plugins.Store;
     var annotations = store.annotations.slice();
     var except = options.except || []; // array of annotations that should *NOT* be cleared
-    var except_ids = except.map(function(anno) { return anno.id; });
+    var except_ids = jQuery.map(except, function(anno) { return anno.id; });
     
     annotations.forEach(function(ann){
         var child, h, _i, _len, _ref;
