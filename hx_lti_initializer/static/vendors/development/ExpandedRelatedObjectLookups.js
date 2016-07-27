@@ -79,19 +79,13 @@ function dismissAddAnotherPopup(win, newId, newTitle, newAuthor, newCreationDate
     var o;
     if (elem) {
         if (jQuery(elem).attr("id") === "create-new-source-button") {
-            var count = jQuery('.source-item').length;
-            var order_value = count+1;
-            var context = {
-                "count": count,
-                "order_value": order_value,
+            window.assignment_editor.add_source_row({
                 "id": newId,
                 "target_title": newTitle,
                 "target_author": newAuthor,
                 "target_created": newCreationDate,
-                "target_type": newType,
-            }
-            jQuery('.source-materials .source-item:last').after(window.add_source_row(context));
-            jQuery('#mirador-view-type-' + count).selectpicker();
+                "target_type": newType
+            });
         }
         
     } else {
