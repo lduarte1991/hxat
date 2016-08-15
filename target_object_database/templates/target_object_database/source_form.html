@@ -104,6 +104,7 @@
 					jQuery('.tx').hide();
 					jQuery('.vd').show();
 					jQuery('#id_target_content').destroy();
+					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
 					createVideoFields();
 					jQuery('label[for="id_target_content"]').text('Video Link');
 				} else if (value === "tx") {
@@ -117,6 +118,7 @@
 					jQuery('.tx').hide();
 					jQuery('.ig').show();
 					jQuery('#id_target_content').destroy();
+					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
                     jQuery('#id_target_content').blur( function() {
                         var content = jQuery('#id_target_content').val();
                         var expression = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
