@@ -1,4 +1,5 @@
 from django.template.defaulttags import register
+from django.utils.safestring import mark_safe
 from django.conf import settings
 from datetime import datetime
 from dateutil import tz
@@ -72,3 +73,28 @@ def get_annotation_manual(**kwargs):
 		target = settings.ANNOTATION_MANUAL_TARGET
 	return {'url': url, 'target': target}
 	
+@register.simple_tag
+def get_lti_frame_resize_js(**kwargs):
+	receiver = kwargs.get('receiver', 'https://canvas.harvard.edu')
+	max_height = kwargs.get('max_height', None)
+	target_type = kwargs.get('target_type', None)
+	if target_type in ('vd', 'ig') and max_height is None:
+		max_height = 900;
+	if max_height is None:
+		height_expr = 'body_height+100'
+	else:
+		height_expr = '(body_height > %d ? %d : body_height+100)' % (int(max_height), int(max_height));
+	javascript = '''
+// Sends message to parent to resize the iframe so we don't have scrolling issues
+jQuery(document).ready(function() {
+	var receiver = "%s";
+	var body_height = jQuery("body").height();
+	var message = {subject:"lti.frameResize", height: %s};
+	console.log("sending lti.frameResize message", message, receiver);
+	window.parent.postMessage(JSON.stringify(message), receiver);
+}, 1000);
+''' % (receiver, height_expr)
+	if settings.ORGANIZATION == 'ATG':
+		return mark_safe(javascript)
+	return ''
+

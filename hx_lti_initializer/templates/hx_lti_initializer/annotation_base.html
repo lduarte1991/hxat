@@ -144,18 +144,7 @@
 
         AController(options);
       
-        // Sends a message to canvas to resize the iframe so we don't have scrolling issues
-        {% if org == 'ATG' %}
-        $(document).ready(function() {
-            var receiver = "https://canvas.harvard.edu";
-            var message = {
-                subject: "lti.frameResize",
-                height: $("body").height()
-            };
-            console.log("sending message to receiver: ", message, receiver);
-            window.parent.postMessage(JSON.stringify(message), receiver);
-        }, 1000);
-        {% endif %}
+        {% get_lti_frame_resize_js target_type=target_object.target_type %}
 
         // Allows HxAT to work in fullscreen mode
         var toggleFullscreen = function () {
