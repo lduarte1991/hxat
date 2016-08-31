@@ -50,27 +50,42 @@
                 <div class='assignment-item item-{{forloop.counter0}}'>
                     <div class='first-row'>
                         <i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='assignment-title'>{{assignment.assignment_name}}</span>
-                        <div class='edit-assignment-button' onclick='location.href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}"'>Edit assignment</div>
+                        {% if is_instructor %}
+                            <div class='edit-assignment-button' onclick='location.href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}"'>Edit assignment</div>
+                        {% endif %}
                     </div>
                     <div class='target-object-list item-{{forloop.counter0}}' style='display:none'>
-                        <div class='table-header table-row'>Source title</div>
+                        {% if is_instructor %}
+                            <div class='table-header table-row'>Source title</div>
+                        {% endif %}
                         {% load order_by %}
                         {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
-                            <div class='table-row'><a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{file.target_title}}</a><a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}"><i class='fa fa-cog' style='margin-right:4px'></i>Setup info</a></div>
+                            <div class='table-row'>
+                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{file.target_title}}</a>
+                                {% if is_instructor %}
+                                <a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}">
+                                    <i class='fa fa-cog' style='margin-right:4px'></i> Setup info
+                                </a>
+                                {% endif %}
+                            </div>
                         {% endfor %}
-                        <div class='table-footer table-row' id='{{assignment.pk}}'><i class='fa fa-trash'></i> Delete assignment</div>
+                        {% if is_instructor %}
+                            <div class='table-footer table-row' id='{{assignment.pk}}'><i class='fa fa-trash'></i> Delete assignment</div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
 
         {% endif %}
 
+        {% if is_instructor %}
         <div id="new-assignment-section" style='top:25px; position: relative;'>
             <a href="{% url 'hx_lti_assignment:create_new_assignment' %}" id="new-assignment-button" role="button">
                 Create new assignment
             </a>
             or <a href="{% url 'hx_lti_assignment:import_assignment' %}" style='margin-left: 10px;'>import from another course</a>
         </div>
+        {% endif %}
     {% endfor %}
     <script>
         jQuery('.assignment-item .first-row').click(function(event) {
