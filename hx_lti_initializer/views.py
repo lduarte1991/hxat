@@ -95,7 +95,7 @@ def launch_lti(request):
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
 
     # This handles the rare case in which we have neither display name nor external user id
-    if not display_name or not external_user_id:
+    if not (display_name or external_user_id):
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
             roles = ['student']
