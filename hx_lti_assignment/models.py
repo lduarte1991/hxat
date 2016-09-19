@@ -109,7 +109,6 @@ class AssignmentTargets(models.Model):
         else:
             return options[5] if options[5] != '' else "false"
 
-
 class Assignment(models.Model):
     """
     This object will contain the objects and settings for the annotation tool
@@ -164,6 +163,10 @@ class Assignment(models.Model):
         help_text="Allow users to flag items as inappropriate/offensive.",
         default=False
     )
+    is_published = models.BooleanField(
+        help_text="Published assignments are available to students while unpublished are not.",
+        default=True
+    )
 
     TABS = (
         ('Instructor', 'Instructor'),
@@ -176,7 +179,7 @@ class Assignment(models.Model):
         default="Public",
         max_length=20
     )
-    course = models.ForeignKey(LTICourse)
+    course = models.ForeignKey(LTICourse, related_name="assignments")
     hidden = models.BooleanField(default=False)
 
     class Meta:

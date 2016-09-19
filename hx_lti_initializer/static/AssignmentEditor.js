@@ -585,6 +585,7 @@ AssignmentEditor.prototype = {
         var course = jQuery('#assignment-name-input').data('course-id');
         jQuery('#id_course').val(course);
         jQuery('#id_assignment_name').val(jQuery('#assignment-name-input').val());
+        jQuery("#id_is_published").attr("checked", jQuery("#assignment-published").is(":checked") ? true : false);
         jQuery('form').submit();
     },
     save_annotation_settings: function() {

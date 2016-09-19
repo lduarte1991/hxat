@@ -357,6 +357,9 @@ def access_annotation_target(
     except:
         is_instructor = False
 
+    if not is_instructor and not assignment.is_published:
+        raise PermissionDenied("Assignment is unpublished")
+
     save_session(
         request,
         collection_id=assignment_id,

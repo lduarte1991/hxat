@@ -787,25 +787,28 @@ p.help {
 	display: none;
 }
 
-.advanced-options {
-	margin-top: 25px;
-}
-
-.advanced-options .inline-label{
+.assignment-option-block { margin-top: 15px; }
+.assignment-option-block a { font-size: 11pt; }
+.assignment-option-block .inline-label,
+.assignment-option-block label {
 	font-size: 11pt;
 	color: rgb(107, 107, 107);
 }
-
-.advanced-options a {
-	font-size: 11pt;
+.advanced-options ul {
+  display: inline;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
-
+.advanced-options ul li { display: inline-block; }
+.advanced-options ul li:not(:first-child) { margin-left: 5px }
+.advanced-options ul li:not(:last-child):after { content: " | " }
 .source-materials {
-	background-color: #eee;
-    border: 2px solid darkgray;
-    border-radius: 15px;
-    padding: 25px 25px;
-    margin-top: 40px;
+  background-color: #eee;
+  border: 2px solid darkgray;
+  border-radius: 15px;
+  padding: 25px 25px;
+  margin-top: 20px;
 }
 
 .source-materials h4 {
