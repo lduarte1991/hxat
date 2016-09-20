@@ -343,6 +343,7 @@ footer {
 	border-radius: 5px;
 	float: right;
 	margin-top: -5px;
+  text-decoration: none;
 }
 
 .assignment-item .edit-assignment-button:hover {
