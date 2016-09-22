@@ -1,37 +1,9 @@
 {% extends 'hx_lti_initializer/base.html' %}
+{% load hx_lti_initializer_extras %}
 
 {% block title %} Annotation Tool | Admin Hub {% endblock %}
 
 {% block content %}
-    <script>
-        jQuery(document).ready(function(){
-            jQuery('#assignments .clickable').click(function(event){
-                $(event.currentTarget).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-            });
-            jQuery('.clickable').keypress(function(e){
-                if (e.which === 13) {
-                    jQuery(this).click();
-                };
-            })
-        });
-        var printHelp = function(course_id, collection_id, object_id) {
-            var el = '#copypaste-' + course_id;
-            jQuery(el).html("\
-                <p>\
-                    In order to access the chosen object via LTI, make sure to add the following as custom parameters:\
-                </p>\
-                <input style='width:100%' type=\"text\" value=\"collection_id="+collection_id+"\">\
-                </input><br/>\
-                <input style='width:100%' type=\"text\" value=\"object_id="+object_id+"\">\
-                </input>\
-            ");
-            jQuery(el).addClass('copypaste');
-            jQuery(el).find('input').first().select();
-        };
-    </script>
-    <div class="section-header">
-        Annotation tool course name:
-    </div>
     {% for course in courses %}
         <div class="course-name">
             {{ course.course_name }}
@@ -42,17 +14,22 @@
 
         <div class='assignment-header'>Assignments</div>
 
-        {% if course.assignment_set.all|length == 0 %}
+        {% if course.assignments.all|only_published:is_instructor|length == 0 %}
             <div class='assignment-item empty-assignment'>You have no annotation assignments in this course.</div>
         {% else %}
 
-            {% for assignment in course.assignment_set.all %}
+            {% for assignment in course.assignments.all|only_published:is_instructor %}
                 <div class='assignment-item item-{{forloop.counter0}}'>
                     <div class='first-row'>
-                        <i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='assignment-title'>{{assignment.assignment_name}}</span>
+                        <div style="float: left; min-width: 300px; width: 66%; margin-bottom: 10px;">
+                        <i class='assignment-toggle fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i>&nbsp;<span class='assignment-title'>{{assignment.assignment_name}}</span>
+                        {% if not assignment.is_published %}<span class="assignment-unpublished">Unpublished</span>{% endif %}
+                        </div>
+                        <div style="float: left; min-width: 170px; width: 34%;">
                         {% if is_instructor %}
-                            <div class='edit-assignment-button' onclick='location.href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}"'>Edit assignment</div>
+                            <a class='edit-assignment-button' href="{%url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}"'><i class='fa fa-pencil' style='margin-right:4px'></i> Edit assignment</a>
                         {% endif %}
+                        </div>
                     </div>
                     <div class='target-object-list item-{{forloop.counter0}}' style='display:none'>
                         {% if is_instructor %}
@@ -70,7 +47,7 @@
                             </div>
                         {% endfor %}
                         {% if is_instructor %}
-                            <div class='table-footer table-row' id='{{assignment.pk}}'><i class='fa fa-trash'></i> Delete assignment</div>
+                            <div class='table-footer table-row delete-assignment-button' id='{{assignment.pk}}'><i class='fa fa-trash'></i> Delete assignment</div>
                         {% endif %}
                     </div>
                 </div>
@@ -108,14 +85,10 @@
             }
         });
 
-        jQuery('.edit-assignment-button').click(function(event){
-            // do whatever edit assignment ends up doing;
-        });
-
-        jQuery('.table-footer.table-row').click(function(event){
+        jQuery('.delete-assignment-button').click(function(event){
             var $this = jQuery(this);
             var assignment_pk = $this.prop('id');
-            var assignment_title = $this.parent().parent().find('.assignment-title').html();
+            var assignment_title = $this.parents(".assignment-item:first").find(".assignment-title").html();
             var url = "/lti_init/launch_lti/assignment/" + assignment_pk + "/delete/";
             
             var html='<div class="delete-popup-overlay"><div class="delete-popup-background"><h3>Delete this Assignment</h3><p>Are you sure you want to delete the assignment: <em>&quot;'+ assignment_title +'&quot;</em></p><p>Deleting this assignment will remove it from the course, and you will lose access to any annotations and instructions that were created.</p><p><input type="checkbox" id="delete-check"><label for="delete-check">I understand that deleting this assignment cannot be undone.</label></p><form action="'+url+'" method="post">'+"{% csrf_token %}"+'<div id="delete-popup-confirm" class="disabled" type="submit" role="button">Delete assignment</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';

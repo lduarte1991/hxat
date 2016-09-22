@@ -304,7 +304,9 @@ footer {
          transform-origin:50% 58%;
          -ms-transform-origin:50% 58%; /* IE 9 */
 }
-
+.assignment-item {
+    overflow: auto;
+}
 .assignment-item, .source-item {
 	display: block;
 	padding: 20px 30px;
@@ -316,6 +318,7 @@ footer {
 
 .assignment-item .first-row, .source-item .first-row {
 	cursor: pointer;
+  overflow: auto;
 }
 
 .assignment-item .first-row i, .source-item .first-row i{
@@ -327,30 +330,29 @@ footer {
 	font-weight: bold;
 	word-wrap: break-word;
 	vertical-align: middle;
-	width: 66%;
-	display: inline-block;
-}
-
-@media screen and (max-width: 775px) {
-	.assignment-item .assignment-title, .source-item .source-title {
-		width: 45%;
-	}
 }
 
 .assignment-item .edit-assignment-button {
 	padding: 5px 20px;
 	border: 2px solid rgb(55, 124, 182);
 	border-radius: 5px;
-	float: right;
-	margin-top: -5px;
+  text-decoration: none;
+  float: right;
 }
-
 .assignment-item .edit-assignment-button:hover {
 	border: 2px solid black;
 	background-color: rgb(55, 124, 182);
 	color: white;
 }
-
+.assignment-item .assignment-unpublished {
+  background-color: #666;
+  border: 1px solid #666;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: normal;
+  color: #fff;
+  padding: 3px 5px;
+}
 .table-header {
 	margin-top: 20px;
 	color: rgb(86, 86, 86);
@@ -787,25 +789,28 @@ p.help {
 	display: none;
 }
 
-.advanced-options {
-	margin-top: 25px;
-}
-
-.advanced-options .inline-label{
+.assignment-option-block { margin-top: 15px; }
+.assignment-option-block a { font-size: 11pt; }
+.assignment-option-block .inline-label,
+.assignment-option-block label {
 	font-size: 11pt;
 	color: rgb(107, 107, 107);
 }
-
-.advanced-options a {
-	font-size: 11pt;
+.advanced-options ul {
+  display: inline;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
-
+.advanced-options ul li { display: inline-block; }
+.advanced-options ul li:not(:first-child) { margin-left: 5px }
+.advanced-options ul li:not(:last-child):after { content: " | " }
 .source-materials {
-	background-color: #eee;
-    border: 2px solid darkgray;
-    border-radius: 15px;
-    padding: 25px 25px;
-    margin-top: 40px;
+  background-color: #eee;
+  border: 2px solid darkgray;
+  border-radius: 15px;
+  padding: 25px 25px;
+  margin-top: 20px;
 }
 
 .source-materials h4 {

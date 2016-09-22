@@ -98,3 +98,9 @@ jQuery(document).ready(function() {
 		return mark_safe(javascript)
 	return ''
 
+@register.filter(name='only_published')
+def only_published(assignments, is_instructor):
+	if is_instructor:
+		return assignments
+	else:
+		return assignments.filter(is_published=True)
