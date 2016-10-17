@@ -43,7 +43,7 @@
 									</div>
 								</div>
 								<label for='instructions-{{forloop.parentloop.counter0}}' class='subheading'>Instructions:</label>
-								<textarea id='instructions-{{forloop.parentloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{choice.target_instructions}}</textarea>
+								<textarea id='instructions-{{forloop.parentloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{source.target_instructions.value}}</textarea>
 								<div class='button-collection'>
 									<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
 									<a href='{% url "target_object_database:edit_source" id=choice.pk%}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
