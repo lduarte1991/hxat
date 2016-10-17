@@ -6,6 +6,7 @@
         {% load list_of_ids %}
         {# Load the tag library #}
         {% load bootstrap3 %}
+        {% load hx_lti_initializer_extras %}
 
         {# Load CSS and JavaScript #}
         {% bootstrap_css %}
@@ -144,37 +145,7 @@
 
         AController(options);
       
-        // Sends a message to canvas to resize the iframe so we don't have scrolling issues
-        {% if org == 'ATG' %}
-        $(document).ready(function() {
-            var receiver = "https://canvas.harvard.edu";
-            var message = {
-                subject: "lti.frameResize",
-                height: $("body").height()
-            };
-            console.log("sending message to receiver: ", message, receiver);
-            window.parent.postMessage(JSON.stringify(message), receiver);
-        }, 1000);
-        {% endif %}
-
-        // Checks to see if the user is coming from the instructor dashboard
-        {% if focus_on_id %}
-        $(document).ready(function(){
-            setTimeout(function(){
-                //if so we make sure to add just the annotation required
-                var annotation = AController.dashboardObjectController.endpoint.getAnnotationById({{focus_on_id}});
-                if (typeof annotation.highlights === "undefined") {
-                    AController.dashboardObjectController.endpoint.loadMoreAnnotations([annotation]);
-                }
-
-                // if it's a text annotation, it should scroll down to it
-                jQuery('html, body').animate({
-                    scrollTop: jQuery(annotation.highlights[0]).offset().top + jQuery('#navigationBar').height(); },
-                    'slow'
-                );
-            }, 1000);
-          }, 1000);
-        {% endif %}
+        {% get_lti_frame_resize_js target_type=target_object.target_type %}
 
         // Allows HxAT to work in fullscreen mode
         var toggleFullscreen = function () {

@@ -124,7 +124,8 @@ AnnotatorEndpointController.prototype.updateMasterList = function(focus_id, view
 				var focus = parseInt(focus_id, 10);
 				if (annotation.id === focus) {
 					self.annotationsMasterList = [annotation];
-					self._clearAnnotator();
+					self._clearAnnotator({ except: [annotation] });
+					viewer.clearDashboard();
 					viewer.updateDashboard(0, 1, [annotation], false);
 				};
 			})
@@ -327,13 +328,19 @@ AnnotatorEndpointController.prototype.queryDatabase = function(options, paginati
 };
 
 // TODO (Move to Annotator Core)
-AnnotatorEndpointController.prototype._clearAnnotator = function() {
+AnnotatorEndpointController.prototype._clearAnnotator = function(options) {
+    options = options || {};
     var annotator = this.annotator;
     var store = annotator.plugins.Store;
     var annotations = store.annotations.slice();
+    var except = options.except || []; // array of annotations that should *NOT* be cleared
+    var except_ids = jQuery.map(except, function(anno) { return anno.id; });
     
     annotations.forEach(function(ann){
         var child, h, _i, _len, _ref;
+        if (except_ids.indexOf(ann.id) >= 0) {
+            return;
+        }
         if (ann.highlights !== undefined) {
             _ref = ann.highlights;
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {

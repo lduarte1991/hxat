@@ -255,41 +255,14 @@ AssignmentEditor.prototype = {
                 var title = jQuery('.add-source-popup-background .dropdown-toggle[data-id^="assignment_object_choices"]').text();
                 var id_selected = jQuery('.add-source-popup-background #assignment_object_choices').val();
                 var option_selected = jQuery('.add-source-popup-background option[value="'+id_selected+'"]');
-                var count = parseInt(jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr('value'), 10);
-                var is_ordering = jQuery('#reorder-list-button').text() === "Invert order";
-                var aTarget = 100000+count;
-                var context = {
-                    "count": count,
-                    "order_value": count+1,
+                self.add_source_row({
                     "id": id_selected,
                     "target_title": title,
                     "target_author": option_selected.data('author'),
                     "target_created": option_selected.data('date'),
-                    "target_type": option_selected.data('type'),
-                    "should_show_order": is_ordering,
-                    "aTarget": aTarget,
-                    "choices": jQuery('.object_options').html(),
-                };
-                if (jQuery('.source-materials .source-item:last').length > 0) {
-                    jQuery('.source-materials .source-item:last').after(self.TEMPLATES['add_source_row'](context));
-                } else {
-                    jQuery('.source-materials .add-source-collection').before(self.TEMPLATES['add_source_row'](context));
-                }
-                if (jQuery('#id_assignmenttargets_set-' + count + '-order').length == 0) {
-                    jQuery('form').append(self.TEMPLATES['add_form_row'](context));
-                } else if(jQuery('#id_assignmenttargets_set-' + count + '-id').length == 0) {
-                    jQuery('#id_assignmenttargets_set-' + count + '-order').after('<input class="hidden" id="id_assignmenttargets_set-'+count+'-id" name="assignmenttargets_set-'+count+'-id" value='+aTarget+'>')
-                }
-                jQuery('#mirador-view-type-' + count).selectpicker();
-                jQuery('#mirador-view-type-' + count).selectpicker('val', jQuery('#viewtype').val());
-                jQuery('#assignment-css-' + count).val(jQuery('#assignment-css').val());
-                jQuery('#canvas-id-' + count).val(jQuery('#assignment-open-to-page').val());
-                jQuery('#dashboard_hidden-' + count).prop("checked", jQuery("#hide_dash").prop("checked"));
+                    "target_type": option_selected.data('type')
+                });
                 jQuery('.delete-popup-overlay').remove();
-                jQuery('#id_assignmenttargets_set-TOTAL_FORMS').attr('value', count + 1);
-                if (!jQuery('#reorder-list-button').is(":visible")) {
-                    jQuery('#reorder-list-button').show();
-                }
             });
         });
 
@@ -392,6 +365,54 @@ AssignmentEditor.prototype = {
         
         var count = jQuery('.tag-list-holder .trow').length;
         jQuery('.tag-list-holder').append(self.TEMPLATES['add_tag_template']({"count": count}));
+    },
+    add_source_row: function(context) {
+        var $materials = jQuery('.source-materials');
+        var $totalForms = jQuery('#id_assignmenttargets_set-TOTAL_FORMS');
+        var $reorderButton = jQuery('#reorder-list-button');
+        var count = parseInt($totalForms.attr('value'), 10);
+        var is_ordering = $reorderButton.text() === "Invert order";
+        var aTarget = 100000+count;
+        var html = '';
+        var form_context = {};
+        
+        context.count = count;
+        context.order_value = count + 1;
+        context.aTarget = aTarget;
+        context.should_show_order = is_ordering;
+        html = this.TEMPLATES.add_source_row(context);
+
+        if ($materials.find('.source-item').length > 0) {
+            $materials.find('.source-item:last').after(html);
+        } else {
+            $materials.find('.add-source-collection').before(html);
+        }
+
+        $totalForms.attr('value', count + 1);
+        if(!$reorderButton.is(':visible')) {
+            $reorderButton.show();
+        }
+        
+        if (jQuery('.object_options option[value='+context.id+']').length === 0) {
+            jQuery('.object_options').append('<option value="'+context.id+'" data-type="'+context.target_type+'" data-author="'+context.target_author+'" data-date="'+String(new Date())+'">'+context.target_title.replace(/&"'<>/, '')+'</option>');
+        }
+        
+        form_context = jQuery.extend({}, context);
+        form_context.choices = jQuery('.object_options').clone();
+        form_context.choices.find('option[value='+context.id+']').attr('selected', 'selected');
+        form_context.choices = form_context.choices.html();
+
+        if (jQuery('#id_assignmenttargets_set-' + count + '-order').length === 0) {
+            jQuery('form').append(this.TEMPLATES.add_form_row(form_context));
+        } else if(jQuery('#id_assignmenttargets_set-' + count + '-id').length === 0) {
+            jQuery('#id_assignmenttargets_set-' + count + '-order').after('<input class="hidden" id="id_assignmenttargets_set-'+count+'-id" name="assignmenttargets_set-'+count+'-id" value='+aTarget+'>');
+        }
+
+        jQuery('#mirador-view-type-' + count).selectpicker();
+        jQuery('#mirador-view-type-' + count).selectpicker('val', jQuery('#viewtype').val());
+        jQuery('#assignment-css-' + count).val(jQuery('#assignment-css').val());
+        jQuery('#canvas-id-' + count).val(jQuery('#assignment-open-to-page').val());
+        jQuery('#dashboard_hidden-' + count).prop("checked", jQuery("#hide_dash").prop("checked"));
     },
     getColorValues: function(color) {
         var values = { red:null, green:null, blue:null, alpha:null };
@@ -564,6 +585,7 @@ AssignmentEditor.prototype = {
         var course = jQuery('#assignment-name-input').data('course-id');
         jQuery('#id_course').val(course);
         jQuery('#id_assignment_name').val(jQuery('#assignment-name-input').val());
+        jQuery("#id_is_published").attr("checked", jQuery("#assignment-published").is(":checked") ? true : false);
         jQuery('form').submit();
     },
     save_annotation_settings: function() {

@@ -48,7 +48,7 @@ def create_new_assignment(request):
                 messages.success(request, 'Assignment successfully created!')
                 return redirect('hx_lti_initializer:course_admin_hub')
             else:
-                target_num = len(assignment_targets)
+                target_num = 0 #len(assignment_targets)
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)

@@ -15,23 +15,16 @@ from secure import SECURE_SETTINGS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = SECURE_SETTINGS['django_secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = SECURE_SETTINGS.get('debug', True)
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = SECURE_SETTINGS.get('allowed_hosts', [])
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,7 +41,6 @@ INSTALLED_APPS = (
     'hx_lti_initializer',
     'hx_lti_assignment',
     'target_object_database',
-    'django_auth_lti',
     'django_app_lti',
 )
 
@@ -62,17 +54,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
-    #'django_auth_lti.middleware.LTIAuthMiddleware',
-    # 'django_auth_lti.middleware_patched.MultiLTILaunchAuthMiddleware'
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
 
 WSGI_APPLICATION = 'annotationsx.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -85,22 +71,11 @@ DATABASES = {
     }
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
@@ -113,12 +88,12 @@ MESSAGE_TAGS = {
             messages.ERROR: 'danger error'
 }
 
+# Jenkins configuration
 PROJECT_APPS = (
     'hx_lti_initializer',
     'hx_lti_assignment',
     'target_object_database',
 )
-
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_pep8',
     'django_jenkins.tasks.run_pylint',
@@ -160,7 +135,6 @@ LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
 LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
-CONSUMER_URL = SECURE_SETTINGS.get('CONSUMER_URL')
 ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
 X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES')
 X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP')
@@ -187,27 +161,28 @@ LTI_SETUP = {
     }
 }
 
-ANNOTATION_MANUAL_URL = None
-ANNOTATION_MANUAL_TARGET = None
+CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
+LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
+
+ANNOTATION_MANUAL_URL = SECURE_SETTINGS.get("annotation_manual_url", None)
+ANNOTATION_MANUAL_TARGET = SECURE_SETTINGS.get("annotation_manual_target", None)
 ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
 ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
 ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 ANNOTATION_PAGINATION_LIMIT_DEFAULT = SECURE_SETTINGS.get("annotation_pagination_limit_default", 20)
+ANNOTATION_TRANSCRIPT_LINK_DEFAULT = SECURE_SETTINGS.get("annotation_transcript_link_default", None)
+ANNOTATION_HTTPS_ONLY = SECURE_SETTINGS.get("https_only", False)
 
-if ORGANIZATION == "ATG":
-    ANNOTATION_MANUAL_URL = SECURE_SETTINGS["annotation_manual_url"]
-    ANNOTATION_MANUAL_TARGET = "_blank"
-    LTI_OAUTH_CREDENTIALS = SECURE_SETTINGS['lti_oauth_credentials']
-    CONSUMER_KEY = LTI_OAUTH_CREDENTIALS.items()[0][0]
-    LTI_SECRET = LTI_OAUTH_CREDENTIALS.items()[0][1]
-
-    CSRF_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
-    SESSION_COOKIE_SECURE = SECURE_SETTINGS.get("https_only", True)
+if ANNOTATION_HTTPS_ONLY:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
     SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    # AWS SSL settings
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Organization-specific configuration
+# Try to minimize this as much as possible in favor of configuration
+if ORGANIZATION == "ATG":
+    pass
 elif ORGANIZATION == "HARVARDX":
-    LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
-    CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
+    pass

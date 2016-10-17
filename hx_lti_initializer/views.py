@@ -76,7 +76,7 @@ def launch_lti(request):
     debug_printer("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
-    request.session['is_instructor'] = False
+    request.session['is_staff'] = False
 
     # this is where canvas will tell us what level individual is coming into
     # the tool the 'roles' field usually consists of just 'Instructor'
@@ -95,7 +95,7 @@ def launch_lti(request):
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
 
     # This handles the rare case in which we have neither display name nor external user id
-    if not display_name or not external_user_id:
+    if not (display_name or external_user_id):
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
             roles = ['student']
@@ -353,9 +353,12 @@ def access_annotation_target(
         debug_printer("DEBUG - User attempted to access a non-existant Assignment or Target Object")
         raise PermissionDenied()
     try:
-        is_instructor = request.session['is_instructor']
+        is_instructor = request.session['is_staff']
     except:
         is_instructor = False
+
+    if not is_instructor and not assignment.is_published:
+        raise PermissionDenied("Permission to access unpublished assignment is denied")
 
     save_session(
         request,

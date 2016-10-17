@@ -1,7 +1,8 @@
 #The HarvardX Annotation Tool (The HxAT)
-LTI tool used by HarvardX to provide annotations to Text and Images to be used in edX courses. 
 
-#Installation
+LTI tool used by HarvardX and HUIT Academic Technology to provide annotations to Text, Images, and Videos on the edX and Canvas platforms. 
+
+# Installation
 
 1. Download the source code
 `git clone https://github.com/lduarte1991/hx-annotations-lti`
