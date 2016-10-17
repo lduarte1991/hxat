@@ -21,76 +21,72 @@
 			<p>You'll need some source materials to create an annotation assignment!</p>
 		{% else %}
 			<div class='save' id='reorder-list-button'>Reorder list</div>
-			{% for source in targets_form %}
-				{% for choice in form.fields.assignment_objects.queryset %}
-					{% if source.target_object.value == choice.id %}
-						<div class='source-item' id='item-{{forloop.parentloop.counter0}}' data-order='{{source.order.value}}' data-id='{{source.target_object.value}}' data-aTarget="{{source.id.value}}" data-media="{{source.target_type.value}}">
-							<div class='first-row'>
-								<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{choice.target_title}}</span>
-								<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.order.value}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
+			{% for source in form.instance.assignmenttargets_set.all %}
+				<div class='source-item' id='item-{{forloop.counter0}}' data-order='{{source.order}}' data-id='{{source.target_object.pk}}' data-aTarget="{{source.id}}" data-media="{{source.target_type}}">
+					<div class='first-row'>
+						<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{source.target_object.target_title}}</span>
+						<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.order}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
+					</div>
+					<div class='source-detail' style='display:none'>
+						<div class='detail-metadata'>
+							<div class='author'>
+								{% if source.target_object.target_author != 'None' %}
+									Author: {{source.target_object.target_author}}
+								{% else %}
+									Author: None given (field will be hidden from learners).
+								{% endif %}
 							</div>
-							<div class='source-detail' style='display:none'>
-								<div class='detail-metadata'>
-									<div class='author'>
-										{% if choice.target_author != 'None' %}
-											Author: {{choice.target_author}}
-										{% else %}
-											Author: None given (field will be hidden from learners).
-										{% endif %}
-			            </div>
-			            <div class='date-created' title='{{choice.target_created}}'>
-										Created {{choice.target_created | timesince}} ago
-									</div>
-								</div>
-								<label for='instructions-{{forloop.parentloop.counter0}}' class='subheading'>Instructions:</label>
-								<textarea id='instructions-{{forloop.parentloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{source.target_instructions.value}}</textarea>
-								<div class='button-collection'>
-									<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
-									<a href='{% url "target_object_database:edit_source" id=choice.pk%}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
-									<a href='#' class='remove'><i class='fa fa-trash-o'></i>Remove</a>
-									<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=context_id assignment_id=assignment_id object_id=choice.id %}" class='preview'><i class='fa fa-eye'></i>Preview</a>
-								</div>
-								<div class='advanced-settings' style='display:none'>
-									<label for='assignment-css-{{forloop.parentloop.counter0}}' class='subheading'>Assignment CSS:</label>
-									<input id='assignment-css-{{forloop.parentloop.counter0}}' class='hx-textfield full-width assignment-css' type='text' placeholder='Should be an externally hosted file{% if org == "HARVARDX" %}, e.g. Files and Uploads in edx{% endif %}.'>
-									{% if choice.target_type == "ig" %}
-										<label for='mirador-view-type-{{forloop.parentloop.counter0}}' class='subheading'>Default Mirador view type:</label>
-										<select class='form-control selectpicker mirador-view-type' id='mirador-view-type-{{forloop.parentloop.counter0}}' name='view-type'>
-											{% captureas selected_view %}{{ source.target_external_options.value|just_the_view_type }}{% endcaptureas %}
-											<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
-											Single Image View
-											</option>
-											<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
-											Thumbnails View
-											</option>
-											<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
-											Scroll View
-											</option>
-											<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
-											Book View
-											</option>
-										</select>
-										<label for='canvas-id-{{forloop.parentloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
-										<input maxlength="255" id="canvas-id-{{forloop.parentloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
-									{% endif %}
-									<input id="dashboard_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.target_external_options.value|just_dashboard_hidden %} checked {% endif %}></input>
-									<label for="dashboard_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
-									{% if choice.target_type == 'vd' %}
-										<br>
-										<input id="transcript_hidden-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.target_external_options.value|just_transcript_hidden %} checked {% endif %}></input>
-										<label for="transcript_hidden-{{forloop.parentloop.counter0}}" class='subheading'>Hide Transcript on Load (when applicable)</label>
-										<br>
-										<input id="allow_transcript_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option transcript-download" {% if source.target_external_options.value|just_transcript_download %} checked {% endif %}></input>
-										<label for="allow_transcript_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download transcript (when applicable)</label>
-										<br>
-										<input id="allow_video_download-{{forloop.parentloop.counter0}}" type="checkbox" class="videojs_option video-download" {% if source.target_external_options.value|just_video_download %} checked {% endif %}></input>
-										<label for="allow_video_download-{{forloop.parentloop.counter0}}" class='subheading'>Allow users to download video (when applicable)</label>
-									{% endif %}
-								</div>
+							<div class='date-created' title='{{source.target_object.target_created}}'>
+								Created {{source.target_object.target_created | timesince}} ago
 							</div>
 						</div>
-					{% endif %}
-				{% endfor %}
+						<label for='instructions-{{forloop.counter0}}' class='subheading'>Instructions:</label>
+						<textarea id='instructions-{{forloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{source.target_instructions}}</textarea>
+						<div class='button-collection'>
+							<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
+							<a href='{% url "target_object_database:edit_source" id=source.target_object.pk%}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
+							<a href='#' class='remove'><i class='fa fa-trash-o'></i>Remove</a>
+							<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=context_id assignment_id=assignment_id object_id=source.target_object.id %}" class='preview'><i class='fa fa-eye'></i>Preview</a>
+						</div>
+						<div class='advanced-settings' style='display:none'>
+							<label for='assignment-css-{{forloop.counter0}}' class='subheading'>Assignment CSS:</label>
+							<input id='assignment-css-{{forloop.counter0}}' class='hx-textfield full-width assignment-css' type='text' placeholder='Should be an externally hosted file{% if org == "HARVARDX" %}, e.g. Files and Uploads in edx{% endif %}.'>
+							{% if source.target_object.target_type == "ig" %}
+								<label for='mirador-view-type-{{forloop.counter0}}' class='subheading'>Default Mirador view type:</label>
+								<select class='form-control selectpicker mirador-view-type' id='mirador-view-type-{{forloop.counter0}}' name='view-type'>
+									{% captureas selected_view %}{{ source.target_external_options|just_the_view_type }}{% endcaptureas %}
+									<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
+									Single Image View
+									</option>
+									<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
+									Thumbnails View
+									</option>
+									<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
+									Scroll View
+									</option>
+									<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
+									Book View
+									</option>
+								</select>
+								<label for='canvas-id-{{forloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
+								<input maxlength="255" id="canvas-id-{{forloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
+							{% endif %}
+							<input id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
+							<label for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
+							{% if source.target_object.target_type == 'vd' %}
+								<br>
+								<input id="transcript_hidden-{{forloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.target_external_options|just_transcript_hidden %} checked {% endif %}></input>
+								<label for="transcript_hidden-{{forloop.counter0}}" class='subheading'>Hide Transcript on Load (when applicable)</label>
+								<br>
+								<input id="allow_transcript_download-{{forloop.counter0}}" type="checkbox" class="videojs_option transcript-download" {% if source.target_external_options|just_transcript_download %} checked {% endif %}></input>
+								<label for="allow_transcript_download-{{forloop.counter0}}" class='subheading'>Allow users to download transcript (when applicable)</label>
+								<br>
+								<input id="allow_video_download-{{forloop.counter0}}" type="checkbox" class="videojs_option video-download" {% if source.target_external_options|just_video_download %} checked {% endif %}></input>
+								<label for="allow_video_download-{{forloop.counter0}}" class='subheading'>Allow users to download video (when applicable)</label>
+							{% endif %}
+						</div>
+					</div>
+				</div>
 			{% endfor %}
 		{% endif %}
 		<div class='button-collection add-source-collection'>
@@ -264,8 +260,8 @@
 								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label> 
 			<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
 								{% for choice in form.fields.assignment_objects.queryset %}
-								 {% if choice.id == item.target_object.value %} 
-								 	{% if choice.target_type == "ig" %}
+								 {% if source.target_object.id == item.target_object.value %} 
+								 	{% if source.target_object.target_type == "ig" %}
 								 		<label>Mirador View Type:</label>
 								 		<select class="selectpicker form-control mirador_option" data-counter="{{forloop.parentloop.counter0}}" id="{{forloop.parentloop.counter0}}-target_options_view_type">
 								 			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
