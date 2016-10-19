@@ -540,7 +540,9 @@ AssignmentEditor.prototype = {
           ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
     },
     save_form: function() {
-        this.empty_check();
+        if (!this.empty_check()) {
+            return;
+        }
         this.error_check();
 
         jQuery.each(jQuery('.source-item'), function(index, element) {
