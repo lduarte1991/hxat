@@ -48,7 +48,7 @@ def create_new_assignment(request):
                 messages.success(request, 'Assignment successfully created!')
                 return redirect('hx_lti_initializer:course_admin_hub')
             else:
-                target_num = 0 #len(assignment_targets)
+                target_num = 0 if assignment_targets is None else len(assignment_targets)
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
@@ -168,6 +168,7 @@ def edit_assignment(request, id):
                         'username': request.session['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
+                        'assignment_id': assignment.assignment_id,
                         'course_id': get_course_id(request),
                         'is_instructor': request.session['is_staff'],
                         'org': settings.ORGANIZATION,
