@@ -528,7 +528,7 @@ AssignmentEditor.prototype = {
     reorderList: function() {
         var list = jQuery('.source-item');
         jQuery.each(list, function(index, value) {
-            jQuery(value).data('order', index+1);
+            jQuery(value).attr('data-order', index+1);
             jQuery(value).find('.ordernum').val(index+1);
         });
     },
