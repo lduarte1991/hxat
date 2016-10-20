@@ -528,7 +528,7 @@ AssignmentEditor.prototype = {
     reorderList: function() {
         var list = jQuery('.source-item');
         jQuery.each(list, function(index, value) {
-            jQuery(value).data('order', index+1);
+            jQuery(value).attr('data-order', index+1);
             jQuery(value).find('.ordernum').val(index+1);
         });
     },
@@ -540,7 +540,9 @@ AssignmentEditor.prototype = {
           ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
     },
     save_form: function() {
-        this.empty_check();
+        if (!this.empty_check()) {
+            return;
+        }
         this.error_check();
 
         jQuery.each(jQuery('.source-item'), function(index, element) {
