@@ -1,0 +1,64 @@
+<div class='source-item' id='item-<%= count %>' data-order='<%= order_value %>' data-id='<%= id %>' data-aTarget="<%= aTarget %>" data-media="<%= target_type %>">
+	<div class='first-row'>
+		<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'><%= target_title %></span>
+		<div class='order-div'><input type="number" class='ordernum' style='<% if(!should_show_order) { %>display:none; <% } %>' min="1" value="<%= order_value %>"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
+	</div>
+	<div class='source-detail' style='display:none'>
+		<div class='detail-metadata'>
+			<div class='author'>
+			    <% if (target_author != 'None'){ %>
+                	Author: <%= target_author%>
+                <% } else { %>
+                	Author: None given (field will be hidden from learners).
+                <% } %>
+            </div>
+            <div class='date-created'>
+            	Created <%= target_created %>
+            </div>
+        </div>
+        <label for='instructions-<%= count %>' class='subheading'>Instructions:</label>
+        <textarea id='instructions-<%= count %>' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable."></textarea>
+        <div class='button-collection'>
+        	<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
+        	<a href='/lti_init/launch_lti/source/<%= id %>/edit' class='edit'><i class='fa fa-pencil'></i>Edit</a>
+        	<a href='#' class='remove'><i class='fa fa-trash-o'></i>Remove</a>
+        	<span>(Save to Preview)</span>
+        </div>
+        <div class='advanced-settings' style='display:none'>
+            <label for='assignment-css-<%= count %>' class='subheading'>Assignment CSS:</label>
+            <input id='assignment-css-<%= count %>' class='hx-textfield full-width assignment-css' type='text' placeholder='Should be an externally hosted file.'>
+        	<% if (target_type == "ig") { %>
+        		<label for='mirador-view-type-<%= count %>' class='subheading'>Default Mirador view type:</label>
+        		<select class='form-control selectpicker mirador-view-type' id='mirador-view-type-<%= count %>' name='view-type'>
+        			<option value="ImageView" selected>
+		 			Single Image View
+		 			</option>
+		 			<option value="ThumbnailsView">
+		 			Thumbnails View
+		 			</option>
+		 			<option value="ScrollView">
+		 			Scroll View
+		 			</option>
+		 			<option value="BookView">
+		 			Book View
+		 			</option>
+        		</select>
+        		<label for='canvas-id-<%= count %>' class='subheading'>Open to Page (Canvas ID):</label>
+		 		<input maxlength="255" id="canvas-id-<%= count %>" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
+        	<% } %>
+        	<input id="dashboard_hidden-<%= count %>" type="checkbox" class="form-control" value=""></input>
+	 		<label for="dashboard_hidden-<%= count %>" class='subheading'>Hide Dashboard on Load</label>
+	 		<% if (target_type == 'vd') { %>
+		 		<br>
+		 		<input id="transcript_hidden-<%= count %>" type="checkbox" class="videojs_option form-control" value=""></input>
+		 		<label for="transcript_hidden-<%= count %>" class='subheading'>Hide Transcript on Load (when applicable)</label>
+		 		<br>
+				<input id="allow_transcript_download-<%= count %>" type="checkbox" class="videojs_option"></input>
+				<label for="allow_transcript_download-<%= count %>" class='subheading'>Allow users to download transcript (when applicable)</label>
+				<br>
+				<input id="allow_video_download-<%= count %>" type="checkbox" class="videojs_option"></input>
+				<label for="allow_video_download-<%= count %>" class='subheading'>Allow users to download video (when applicable)</label>
+			<% } %>
+        </div>
+    </div>
+</div>

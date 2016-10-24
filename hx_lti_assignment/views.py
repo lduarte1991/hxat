@@ -1,14 +1,18 @@
-from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet  # noqa
+from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet, DeleteAssignmentForm  # noqa
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.utils import debug_printer
 from hx_lti_initializer.models import LTICourse
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.core import serializers
 import uuid
+import json
+import sys
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
 def get_course_id(request):
@@ -44,13 +48,13 @@ def create_new_assignment(request):
                 messages.success(request, 'Assignment successfully created!')
                 return redirect('hx_lti_initializer:course_admin_hub')
             else:
-                target_num = len(assignment_targets)
+                target_num = 0 if assignment_targets is None else len(assignment_targets)
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
                 return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment.html',
+                    'hx_lti_assignment/create_new_assignment2.html',
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -58,6 +62,10 @@ def create_new_assignment(request):
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
+                        'is_instructor': request.session['is_staff'],
+                        'org': settings.ORGANIZATION,
+                        'context_id': request.session['hx_context_id'],
+                        'tag_list': [],
                     }
                 )
         else:
@@ -92,7 +100,7 @@ def create_new_assignment(request):
         
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment.html',
+        'hx_lti_assignment/create_new_assignment2.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -100,6 +108,11 @@ def create_new_assignment(request):
             'number_of_targets': target_num,
             'debug': debug,
             'course_id': get_course_id(request),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'context_id': request.session['hx_context_id'],
+            'tag_list': [],
+
         }
     )
 
@@ -148,14 +161,19 @@ def edit_assignment(request, id):
         else:
             return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment.html',
+                    'hx_lti_assignment/create_new_assignment2.html',
                     {
                         'form': form,
                         'targets_form': targets_form,
                         'username': request.session['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
+                        'assignment_id': assignment.assignment_id,
                         'course_id': get_course_id(request),
+                        'is_instructor': request.session['is_staff'],
+                        'org': settings.ORGANIZATION,
+                        'context_id': request.session['hx_context_id'],
+                        'tag_list': assignment.array_of_tags(),
                     }
                 )
     else:
@@ -166,10 +184,10 @@ def edit_assignment(request, id):
         course_name = request.session['course_name']
     except:
         course_name = None
-    
+
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment.html',
+        'hx_lti_assignment/create_new_assignment2.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -178,5 +196,89 @@ def edit_assignment(request, id):
             'debug': debug,
             'assignment_id': assignment.assignment_id,
             'course_id': get_course_id(request),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'context_id': request.session['hx_context_id'],
+            'tag_list': assignment.array_of_tags(),
+
         }
     )
+
+
+@login_required
+def delete_assignment(request, id):
+    assignment = get_object_or_404(Assignment, pk=id)
+
+    if request.method == 'POST':
+        form = DeleteAssignmentForm(request.POST, instance=assignment)
+        if form.is_valid():
+            aTargets = AssignmentTargets.objects.filter(assignment=assignment)
+            for at in aTargets:
+                at.delete()
+            assignment.delete()
+            url = reverse('hx_lti_initializer:course_admin_hub')
+            return redirect(url)
+
+    raise PermissionDenied()
+
+
+@login_required
+def import_assignment(request):
+    return render(
+        request,
+        'hx_lti_assignment/import_assignment.html',
+        {
+            'courses': LTICourse.objects.all(),
+            'is_instructor': request.session['is_staff'],
+            'org': settings.ORGANIZATION,
+            'current_course_id': get_course_id(request),
+        }
+    )
+
+
+@login_required
+def assignments_from_course(request, id):
+    course = get_object_or_404(LTICourse, pk=id)
+    result = course.assignment_set.all()
+    data = serializers.serialize("json", result)
+    return HttpResponse(data, content_type='application/json')
+
+
+@login_required
+def moving_assignment(request, old_course_id, new_course_id, assignment_id):
+    old_course = LTICourse.objects.get(pk=old_course_id)
+    new_course = LTICourse.objects.get(pk=new_course_id)
+
+    try:
+        result = dict()
+        result.update({'old_course_id': str(old_course.course_id)})
+        result.update({'new_course_id': str(new_course.course_id)})
+
+        assignment = Assignment.objects.get(pk=assignment_id)
+        aTargets = AssignmentTargets.objects.filter(assignment=assignment)
+        assignment.course = new_course
+        assignment.pk = None
+
+        result.update({'old_assignment_id': str(assignment.assignment_id)})
+        assignment.assignment_id = uuid.uuid4()
+        assignment.save()
+        result.update({'new_assignment_id': str(assignment.assignment_id)})
+        result.update({'assignment_name': unicode(assignment.assignment_name)})
+        
+        pks = []
+        for at in aTargets:
+            at.pk = None
+            at.assignment = assignment
+            at.save()
+            pks.append(str(at.target_object.pk))
+        result.update({'object_ids': pks, 'result': 200})
+        data = json.dumps(result)
+        return HttpResponse(data, content_type='application/json')
+    except:
+        data = json.dumps({
+                "result": 500,
+                "message": "There was an error in importing your object.",
+                'error_message': str(sys.exc_info()[1]),
+                'assignment_id': assignment_id,
+            })
+        return HttpResponse(data, content_type='application/json')

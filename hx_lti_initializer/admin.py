@@ -11,10 +11,13 @@ from hx_lti_initializer.models import LTIProfile, LTICourse
 
 class LTIProfileAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'scope', 'anon_id', 'name', 'roles')
+    search_fields = ('user__username', 'anon_id', 'name')
     ordering = ('user', 'scope', 'anon_id', 'name', 'roles')
 
 
 class LTICourseAdmin(admin.ModelAdmin):
+    list_display = ('course_name', 'course_id',)
+    search_fields = ('course_name',)
     fields = [
         'course_id',
         'course_name',

@@ -76,7 +76,7 @@ def launch_lti(request):
     debug_printer("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
-    request.session['is_instructor'] = False
+    request.session['is_staff'] = False
 
     # this is where canvas will tell us what level individual is coming into
     # the tool the 'roles' field usually consists of just 'Instructor'
@@ -95,7 +95,7 @@ def launch_lti(request):
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
 
     # This handles the rare case in which we have neither display name nor external user id
-    if not display_name or not external_user_id:
+    if not (display_name or external_user_id):
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
             roles = ['student']
@@ -300,6 +300,8 @@ def edit_course(request, id):
             'form': form,
             'user': request.user,
             'pending': pending_admins,
+            'org': settings.ORGANIZATION,
+            'is_instructor': request.session["is_staff"],
         }
     )
 
@@ -351,9 +353,12 @@ def access_annotation_target(
         debug_printer("DEBUG - User attempted to access a non-existant Assignment or Target Object")
         raise PermissionDenied()
     try:
-        is_instructor = request.session['is_instructor']
+        is_instructor = request.session['is_staff']
     except:
         is_instructor = False
+
+    if not is_instructor and not assignment.is_published:
+        raise PermissionDenied("Permission to access unpublished assignment is denied")
 
     save_session(
         request,
@@ -466,6 +471,7 @@ def instructor_dashboard_view(request):
         'is_instructor': request.session["is_staff"],
         'user_annotations': [],
         'fetch_annotations_time': 0,
+        'org': settings.ORGANIZATION,
         'dashboard_context_js': json.dumps({
             'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
         })
@@ -496,6 +502,7 @@ def instructor_dashboard_student_list_view(request):
         'is_instructor': request.session["is_staff"],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
+        'org': settings.ORGANIZATION,
     }
     return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 
@@ -735,3 +742,79 @@ def annotation_database_update(request, annotation_id):
 
     return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
+
+@login_required
+def transfer_annotations(request, instructor_only):
+    session_is_staff = request.session['is_staff']
+    user_id = request.session['hx_user_id']
+
+    old_assignment_id = request.POST.get('old_assignment_id')
+    new_assignment_id = request.POST.get('new_assignment_id')
+    old_course_id = request.POST.get('old_course_id')
+    new_course_id = request.POST.get('new_course_id')
+    old_course = LTICourse.objects.get(course_id=old_course_id)
+    new_course = LTICourse.objects.get(course_id=new_course_id)
+    old_admins = []
+    new_admins = dict()
+    for ads in old_course.course_admins.all():
+        old_admins.append(ads.anon_id)
+    for ads in new_course.course_admins.all():
+        new_admins[ads.name] = ads.anon_id
+
+    assignment = Assignment.objects.get(assignment_id=old_assignment_id)
+    object_ids = request.POST.getlist('object_ids[]')
+    token = retrieve_token(
+            user_id,
+            assignment.annotation_database_apikey,
+            assignment.annotation_database_secret_token
+    )
+
+    types = {
+        "ig": "image",
+        "tx": "text",
+        "vd": "video"
+    }
+    responses = []
+    for pk in object_ids:
+        obj = TargetObject.objects.get(pk=pk)
+        uri = pk
+        target_type = types[obj.target_type]
+        if target_type == "image":
+            result = requests.get(obj.target_content)
+            uri = json.loads(result.text)["sequences"][0]["canvases"][0]["@id"]
+        search_database_url = str(assignment.annotation_database_url).strip() + '/search?'
+        create_database_url = str(assignment.annotation_database_url).strip() + '/create'
+        headers = {
+            'x-annotator-auth-token': token,
+            'content-type': 'application/json',
+        }
+
+        params = {
+            'uri': uri,
+            'contextId': old_course_id,
+            'collectionId': old_assignment_id,
+            'media': target_type,
+            'limit': -1,
+        }
+
+        if str(instructor_only) == "1":
+            params.update({'userid': old_admins})
+        url_values = urllib.urlencode(params, True)
+        response = requests.get(search_database_url, headers=headers, params=url_values)
+        annotations = json.loads(response.text)
+        for ann in annotations['rows']:
+            ann['contextId'] = unicode(new_course_id)
+            ann['collectionId'] = unicode(new_assignment_id)
+            ann['id'] = None
+            debug_printer("%s" % ann['user']['id'])
+            if ann['user']['id'] in old_admins:
+                try:
+                    if new_admins[ann['user']['name']]:
+                        ann['user']['id'] = new_admins[ann['user']['name']]
+                except:
+                    ann['user']['id'] = user_id
+            response2 = requests.post(create_database_url, headers=headers, data=json.dumps(ann))
+
+    #debug_printer("%s" % str(request.POST.getlist('assignment_inst[]')))
+    data = dict()
+    return HttpResponse(json.dumps(data), content_type='application/json')

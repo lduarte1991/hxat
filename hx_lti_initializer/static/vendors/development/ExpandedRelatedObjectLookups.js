@@ -61,33 +61,33 @@ function showAddAnotherPopup(triggeringLink) {
     } else {
         href  += '&_popup=1';
     }
-    var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+    var win = window.open(href, name, 'height=800,width=800,resizable=yes,scrollbars=yes');
     win.focus();
     return false;
 }
 
-function dismissAddAnotherPopup(win, newId, newRepr) {
+function dismissAddAnotherPopup(win, newId, newTitle, newAuthor, newCreationDate, newType) {
     // newId and newRepr are expected to have previously been escaped by
     // django.utils.html.escape.
     newId = html_unescape(newId);
-    newRepr = html_unescape(newRepr);
+    newTitle = html_unescape(newTitle);
+    newAuthor = html_unescape(newAuthor);
+    newCreationDate = html_unescape(newCreationDate);
+    newType = html_unescape(newType);
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
     var o;
     if (elem) {
-        var elemName = elem.nodeName.toUpperCase();
-        if (elemName == 'SELECT') {
-            o = new Option(newRepr, newId);
-            elem.options[elem.options.length] = o;
-            o.selected = true;
-            jQuery('.selectpicker').selectpicker('refresh');
-        } else if (elemName == 'INPUT') {
-            if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
-                elem.value += ',' + newId;
-            } else {
-                elem.value = newId;
-            }
+        if (jQuery(elem).attr("id") === "create-new-source-button") {
+            window.assignment_editor.add_source_row({
+                "id": newId,
+                "target_title": newTitle,
+                "target_author": newAuthor,
+                "target_created": newCreationDate,
+                "target_type": newType
+            });
         }
+        
     } else {
         var toId = name + "_to";
         o = new Option(newRepr, newId);

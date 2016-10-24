@@ -1,20 +1,14 @@
 {% extends 'hx_lti_initializer/base.html' %}
 {% load extra_options %}
 {% load staticfiles %}
-{% load bootstrap3 %}
-
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 
 {% block content %}
+{% load bootstrap3 %}
+{# bootstrap_css #}
+{% bootstrap_javascript %}
 <script src="{% static "vendors/development/summernote.js" %}"></script>
-<link rel="stylesheet" href="{% static "css/base.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
-<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote-bs3.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
 <script>
 	jQuery(document).ready(function(){
@@ -44,20 +38,38 @@
 		window.html5Link = "{{form.target_content.value | just_the_html5_vid_link}}";
 		window.transcript_link = "{{form.target_content.value | just_the_transcript_link}}";
 
+		{% if form.target_content.value != None and form.target_content.value != "None" %}
+		var jqxhr = $.ajax( "{{form.target_content.value}}")
+		  .done(function(html) {
+		  	var manifest = html;
+		  	var imgURL = manifest.sequences[0].canvases[0].images[0].resource["@id"];
+		  	imgURL = imgURL.replace('/full/full/0/native','/full/250,/0/native.jpg');
+		  	jQuery('#example-image').attr("src", imgURL);
+		  	console.log(imgURL);
+		  })
+		  .fail(function() {
+		  })
+		  .always(function() {
+		  });
+		  {% endif %}
+		  jQuery('form').on('click', '#source-save-button', function(event) {
+		  	jQuery(this).closest('form').submit();
+		  });
 	});
+		
 
 	var createVideoFields = function() {
 		jQuery('.vdchange').before("<div class='form-group vd'>\
 			<label for=\"id_youtube_vid_link\">Youtube Video Link:</label>\
-			<input id=\"id_youtube_vid_link\" maxlength=\"255\" name=\"youtube_vid_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.youtubeLink+"\">\
+			<input id=\"id_youtube_vid_link\" maxlength=\"255\" name=\"youtube_vid_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+window.youtubeLink+"\">\
 			<div class=\"help_text\">If you don't include an HTML5-approved video (e.g. .mp4), you must include a youtube video.</div>\
 			</div><div class='form-group vd'>\
 			<label for=\"id_html5_vid_link\">HTML5 Video Link:</label>\
-			<input id=\"id_html5_vid_link\" maxlength=\"255\" name=\"html5_vid_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.html5Link+"\">\
+			<input id=\"id_html5_vid_link\" maxlength=\"255\" name=\"html5_vid_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+window.html5Link+"\">\
 			<div class=\"help_text\">If you don't include a Youtube video (e.g. .mp4), you must include an HTML5-approved video.</div>\
 			</div><div class='form-group vd'>\
 			<label for=\"id_transcript_link\">Transcript Link:</label>\
-			<input id=\"id_transcript_link\" maxlength=\"255\" name=\"transcript_link\" class=\"form-control video_option\" type=\"text\" value=\""+window.transcript_link+"\">\
+			<input id=\"id_transcript_link\" maxlength=\"255\" name=\"transcript_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+window.transcript_link+"\">\
 			</div>");
 		jQuery('.video_option').change(function (e){
         	var youtube_vid_link = jQuery('#id_youtube_vid_link').val();
@@ -92,6 +104,7 @@
 					jQuery('.tx').hide();
 					jQuery('.vd').show();
 					jQuery('#id_target_content').destroy();
+					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
 					createVideoFields();
 					jQuery('label[for="id_target_content"]').text('Video Link');
 				} else if (value === "tx") {
@@ -105,6 +118,7 @@
 					jQuery('.tx').hide();
 					jQuery('.ig').show();
 					jQuery('#id_target_content').destroy();
+					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
                     jQuery('#id_target_content').blur( function() {
                         var content = jQuery('#id_target_content').val();
                         var expression = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
@@ -126,15 +140,25 @@
             jQuery('#id_target_content').focus(function(){console.log("targetabouttochange");}).blur( function(){
                 console.log("Targetchanged");
             });
+			setTimeout(function(){
+				if (window.navigator.platform === "Win32") {
+					jQuery('.bootstrap-select.form-control').addClass('win');
+				}
+				if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+					jQuery('.bootstrap-select.form-control').addClass('firefox');
+				}
+			}, 500);
 		});
 	</script>
 
-	<h2>Annotation Source</h2>
+	<h2>Edit Source Material</h2>
+
+	<div id='example-holder'><img id='example-image' class='ig'> <p>Be aware that any changes made below will affect all courses that use this source.</p></div>
 
 	<form method="POST" class="post-form">{% csrf_token %}
 		<div class="form-group">
 			<label for="id_target_type">Annotation Type</label> 
-			<select class="form-control selectpicker" data-live-search="true" id="id_target_type" name="target_type">
+			<select class="form-control selectpicker" data-live-search="false" id="id_target_type" name="target_type">
 				{% for id,choice in form.fields.target_type.choices %}
 				<option value="{{ id }}" {% if id == form.target_type.value %} selected {% endif %}>{{ choice }}</option>
 				{% endfor %}
@@ -143,23 +167,23 @@
 
 		<div class="form-group">
 			<label for="id_target_title">Source Title:</label> 
-			<input id="id_target_title" maxlength="255" name="target_title" class="form-control" type="text" value="{{ form.target_title.value }}">
+			<input id="id_target_title" maxlength="255" name="target_title" class="form-control hx-textfield" type="text" value="{{ form.target_title.value }}">
 		</div>
 		<div class="form-group tx">
 			<label for="id_target_author">Source Author:</label> 
-			<input id="id_target_author" maxlength="255" name="target_author" class="form-control" type="text" value="{{ form.target_author.value }}">
+			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value }}">
 		</div>
-		<div class="form-group vdchange ig tx">
+		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 
             {{form.target_content.errors}}
-			<textarea id="id_target_content" name="target_content" class="form-control">{{ form.target_content.value | safe }}</textarea>
+			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | safe }}</textarea>
 		</div>
 		<div class="form-group">
 			<label for="id_target_citation">Source Citation:</label> 
-			<textarea id="id_target_citation" name="target_citation" class="form-control">{{ form.target_citation.value | safe }}</textarea>
+			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | safe }}</textarea>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group" style='display:none;'>
 			<label for="id_target_creator">Creator</label> 
 			<select class="form-control selectpicker" data-live-search="true" id="id_target_creator" name="target_creator">
 				{% for id,choice in form.fields.target_creator.choices %}
@@ -167,7 +191,7 @@
 				{% endfor %}
 			</select> 
 		</div>
-		<div class="form-group">
+		<div class="form-group" style='display:none'>
 			<label for="id_target_courses">Courses:</label> 
 			<select class="form-control selectpicker" data-live-search="true" multiple id="id_target_courses" name="target_courses">
 				{% for id,choice in form.fields.target_courses.choices %}
@@ -179,11 +203,11 @@
 		</div>
 
 		{% buttons %}
-			<button type="submit" class="save btn btn-primary">
-			{% bootstrap_icon "star" %} Save
-			</button>
-			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save btn btn-danger">
-			{% bootstrap_icon "remove" %} Cancel
+			<div type="submit" class="save" id='source-save-button'>
+				Save
+			</div>
+			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save" id='source-cancel-button'>
+				Cancel
 			</a>
 		{% endbuttons %}
 	</form>

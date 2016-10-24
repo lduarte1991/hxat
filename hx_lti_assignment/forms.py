@@ -90,7 +90,9 @@ class AssignmentTargetsForm(forms.ModelForm):
             'target_external_css',
         ]
 
-AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True)  # noqa
+# Note: extra=0 kwargs is necessary otherwise the formset will be padded with 3 empty widgets that do not
+# have valid model instances
+AssignmentTargetsFormSet = inlineformset_factory(Assignment, AssignmentTargets, can_delete=True, extra=0)  # noqa
 
 
 class NoFormTagCrispyFormMixin(object):
@@ -100,3 +102,13 @@ class NoFormTagCrispyFormMixin(object):
             self._helper = FormHelper()
             self._helper.form_tag = False
         return self._helper
+
+
+class DeleteAssignmentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteAssignmentForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Assignment
+        fields = []

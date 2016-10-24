@@ -1,4 +1,5 @@
 from django.template import Library
+from django.conf import settings
 from django import template
 from target_object_database.models import get_extension
 
@@ -124,7 +125,10 @@ def just_the_html5_vid_link(content):
 @register.filter_function
 def just_the_transcript_link(content):
     if content is None:
-        return ""
+        if settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT:
+            return settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT
+        else:
+            return ""
     result = content.split(';')
     return result[len(result) - 1]
 

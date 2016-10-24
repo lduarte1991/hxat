@@ -1,36 +1,312 @@
 {% extends 'hx_lti_initializer/base.html' %}
-{% load extra_options %}
-{% load bootstrap3 %}
-
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 
 {% block content %}
+{% load extra_options %}
 {% load staticfiles %}
+{% load bootstrap3 %}
+{% bootstrap_javascript %}
+<script src="{% static "vendors/development/underscore.js" %}"></script>
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
-<script src="{% static "vendors/development/jquery-ui.js" %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/jquery-ui.css" %}">
-<script src="{% static "vendors/development/summernote.js" %}"></script>
-<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
-<link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
-<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
-<link rel="stylesheet" href="{% static "css/assignments.css" %}">
+<script src="{% static "AssignmentEditor.js" %}"></script>
+<div class='main-page'>
+	<h2>Assignment Editor</h2>
 
-<h2>Assignment Form</h2>
-	<form method="POST" class="post-form">{% csrf_token %}
-		{% load crispy_forms_tags %}
-		{{ form.management_form }}
-		{% crispy form %}
-	</form>
+	<label for='assignment-name-input' class='subheading'>Assignment name:</label>
+	<input class='hx-textfield' type='text' id='assignment-name-input' placeholder="Untitled" value='{{form.instance.assignment_name}}' data-course-id="{{course_id}}">
 
-	<script>
-		jQuery(document).ready(function(){
-			jQuery('#id_course').val({{context_id.id}});
-			jQuery('#id_course').trigger("change");
-		});
-	</script>
+	<div class='source-materials'>
+		<h4>Source Materials in this Assignment</h4>
+		{% if number_of_targets == 0 %}
+			<div class='save' id='reorder-list-button' style='display:none;'>Reorder list</div>
+			<p>You'll need some source materials to create an annotation assignment!</p>
+		{% else %}
+			<div class='save' id='reorder-list-button'>Reorder list</div>
+			{% for source in targets_form %}
+				<div class='source-item' id='item-{{forloop.counter0}}' data-order='{{source.instance.order}}' data-id='{{source.instance.target_object.pk}}' data-aTarget="{{source.instance.id}}" data-media="{{source.instance.target_type}}">
+					<div class='first-row'>
+						<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{source.instance.target_object.target_title}}</span>
+						<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.instance.order}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
+					</div>
+					<div class='source-detail' style='display:none'>
+						<div class='detail-metadata'>
+							<div class='author'>
+								{% if source.instance.target_object.target_author != 'None' %}
+									Author: {{source.instance.target_object.target_author}}
+								{% else %}
+									Author: None given (field will be hidden from learners).
+								{% endif %}
+							</div>
+							<div class='date-created' title='{{source.instance.target_object.target_created}}'>
+								Created {{source.instance.target_object.target_created | timesince}} ago
+							</div>
+						</div>
+						<label for='instructions-{{forloop.counter0}}' class='subheading'>Instructions:</label>
+						<textarea id='instructions-{{forloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{source.instance.target_instructions}}</textarea>
+						<div class='button-collection'>
+							<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
+							<a href='{% url "target_object_database:edit_source" id=source.instance.target_object.pk%}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
+							<a href='#' class='remove'><i class='fa fa-trash-o'></i>Remove</a>
+							{% if assignment_id %}
+								<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=context_id assignment_id=assignment_id object_id=source.instance.target_object.id %}" class='preview'><i class='fa fa-eye'></i>Preview</a>
+							{% endif %}
+						</div>
+						<div class='advanced-settings' style='display:none'>
+							<label for='assignment-css-{{forloop.counter0}}' class='subheading'>Assignment CSS:</label>
+							<input id='assignment-css-{{forloop.counter0}}' class='hx-textfield full-width assignment-css' type='text' placeholder='Should be an externally hosted file{% if org == "HARVARDX" %}, e.g. Files and Uploads in edx{% endif %}.'>
+							{% if source.instance.target_object.target_type == "ig" %}
+								<label for='mirador-view-type-{{forloop.counter0}}' class='subheading'>Default Mirador view type:</label>
+								<select class='form-control selectpicker mirador-view-type' id='mirador-view-type-{{forloop.counter0}}' name='view-type'>
+									{% captureas selected_view %}{{ source.instance.target_external_options|just_the_view_type }}{% endcaptureas %}
+									<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
+									Single Image View
+									</option>
+									<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
+									Thumbnails View
+									</option>
+									<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
+									Scroll View
+									</option>
+									<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
+									Book View
+									</option>
+								</select>
+								<label for='canvas-id-{{forloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
+								<input maxlength="255" id="canvas-id-{{forloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
+							{% endif %}
+							<input id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.instance.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
+							<label for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
+							{% if source.instance.target_object.target_type == 'vd' %}
+								<br>
+								<input id="transcript_hidden-{{forloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.instance.target_external_options|just_transcript_hidden %} checked {% endif %}></input>
+								<label for="transcript_hidden-{{forloop.counter0}}" class='subheading'>Hide Transcript on Load (when applicable)</label>
+								<br>
+								<input id="allow_transcript_download-{{forloop.counter0}}" type="checkbox" class="videojs_option transcript-download" {% if source.instance.target_external_options|just_transcript_download %} checked {% endif %}></input>
+								<label for="allow_transcript_download-{{forloop.counter0}}" class='subheading'>Allow users to download transcript (when applicable)</label>
+								<br>
+								<input id="allow_video_download-{{forloop.counter0}}" type="checkbox" class="videojs_option video-download" {% if source.instance.target_external_options|just_video_download %} checked {% endif %}></input>
+								<label for="allow_video_download-{{forloop.counter0}}" class='subheading'>Allow users to download video (when applicable)</label>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+		<div class='button-collection add-source-collection'>
+			<div class='save' id='add-source-button'>Add a source</div> or
+			<a id='create-new-source-button' href='{% url "target_object_database:popUpNewSource" %}' onclick=" return showAddAnotherPopup(this);">create a new source</a>
+		</div>
+	</div>
+
+	<div class="assignment-option-block advanced-options">
+		<span class='inline-label'>Advanced options:</span>
+		<ul>
+			<li><a href='#' id='annotation-settings-button' alt="Annotation dashboard settings">Annotation Settings</a></li>
+			<li><a href='#' id='database-settings-button' alt="Annotation database settings">Database Settings</a></li>
+		</ul>
+		<br style="clear:both">
+	</div>
+	
+	<div class="assignment-option-block publishing-options">
+		<input type="checkbox" id="assignment-published" {% if form.is_published.value %} checked {% endif %}>
+		<label for="assignment-published">Publish assignment</label>
+	</div>
+
+	<div class='button-collection'>
+		<div type="submit" class="save" id='save-button' role="button" onclick='window.assignment_editor.save_form();'>
+			Save
+		</div>
+		<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+		Cancel
+		</div>
+	</div>
+</div>
+<div class='annotation-settings-page' style='display:none;'>
+	<h2>Annotation Dashboard Settings</h2>
+	<div class='visible-tabs-collection'>
+		<div class='subheading'>Visible tabs:</div>
+		<div>
+		<input type='checkbox' id='instructor-tab-visible' {% if form.include_instructor_tab.value %} checked {% endif %}>
+		<label for='instructor-tab-visible'>Instructor</label>
+		</div>
+		<div>
+		<input type='checkbox' id='student-tab-visible' {% if form.include_mynotes_tab.value %} checked {% endif %}>
+		<label for='student-tab-visible'>Student (My Notes)</label>
+		</div>
+		<div>
+		<input type='checkbox' id='public-tab-visible' {% if form.include_public_tab.value %} checked {% endif %}>
+		<label for='public-tab-visible'>Public (All Notes)</label>
+		</div>
+		<div id='visible-tabs-explanation'>
+
+		</div>
+	</div>
+
+	<label for='default-tab' class='subheading'>Default tab:</label>
+	<select class='form-control selectpicker full-width' id='default-tab' name='default-tab'>
+
+		{% for id, choice in form.fields.default_tab.choices %}
+		<option value="{{id}}" {% if id == form.default_tab.value %}selected{% endif %}>
+		{{choice}}
+		</option>
+		{% endfor %}
+	</select>
+
+	<label class='subheading' for='pagination-limit'>Pagination limit (# of annotations shown when you use the "More" button):</label>
+	<input class='hx-textfield full-width' type='number' id='pagination-limit' value='{{form.pagination_limit.value}}'>
+
+	<h3>Optional plug-ins</h3>
+
+	<input type='checkbox' {% if form.allow_highlights.value == "True" %}checked{% endif %} id='enable-tags'>
+	<label for='enable-tags'>Enable highlight tagging</label>
+
+	<div class='save' id='add-tags-button' {% if not form.allow_highlights.value or tag_list|length > 0 %}style='display:none;'{% endif %}>Add custom highlight tags</div>
+	<div class='tag-list-holder' {% if not form.allow_highlights.value or tag_list|length < 1 %}style='display:none;'{% endif %}>
+	    <div class='trow theader'>
+		<div class='tag-list-header'>Custom tagname:</div>
+		<div class='tag-list-header'>Color</div>
+		</div>
+		
+		{% for tagname, color in tag_list %}
+		<div class='trow'>
+			<input type='text' value='{{tagname}}' class='custom-tag-name'>
+			<div class='color-selection'>
+				<div class='custom-tag-color-chosen' role='button' style='background-color:{{color}};'></div>
+				<div class='custom-tag-color-menu open'>
+					<ul class='dropdown-inner' role='menu'>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(255, 255, 0, 0.3);'></div> Yellow
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(255, 0, 0, 0.3);'></div> Red
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(255, 128, 0, 0.3);'></div> Orange
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(0, 255, 0, 0.3);'></div> Green
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(0, 0, 255, 0.3);'></div> Blue
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(160, 32, 240, 0.3);'></div> Purple
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(255, 192, 203, 0.3);'></div> Pink
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(165, 42, 42, 0.3);'></div> Brown
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(128, 128, 128, 0.3);'></div> Gray
+						</li>
+						<li>
+							<div class='custom-tag-color' role='button' style='background-color:rgba(255, 255, 255, 0.3);'></div> Custom
+						</li>
+					</ul>
+				</div>
+			</div>
+			<a class='remove-tag' href='#'><i class='fa fa-trash'></i>Remove</a>
+			<a class='add-another-tag' href='#'><i class='fa fa-plus'></i>Add another</a>
+		</div>
+		{% endfor %}
+	</div>
+	<div class='button-collection'>
+		<div type="submit" class="save" id='annotation-settings-save-button' role="button" onclick="window.assignment_editor.save_annotation_settings();">
+			Save
+		</div>
+		<div class="save" id='annotation-settings-cancel-button' role='button'>
+			Cancel
+		</div>
+	</div>
+</div>
+<div class='database-settings-page' style='display:none;'>
+	<h2>Database Settings</h2>
+	<p>These are the database values for the assignment:
+	<em>Image Annotation Tool Example</em>
+	<span class='warning'>(Do not edit these unless you fully understand the consequences.)</span>
+	</p>
+
+	<label class='subheading' for='database-url'>Annotation database URL</label>
+	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-url' value='{{form.annotation_database_url.value}}'>
+	<label class='subheading' for='database-api-key'>Annotation database API key</label>
+	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-api-key' value='{{form.annotation_database_apikey.value}}'>
+	<label class='subheading' for='database-url'>Annotation database secret token</label>
+	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-url' value='{{form.annotation_database_secret_token.value}}'>
+	<div class='button-collection'>
+		<div class="save" id='database-settings-cancel-button' role='button'>
+			Back to assignment
+		</div>
+	</div>
+</div>
+<div class='object_options' style='display:none'>
+	{% for obj in form.fields.assignment_objects.queryset %}
+        <option value="{{obj.id}}" data-type="{{obj.target_type}}" data-author="{{obj.target_author}}" data-date="{{obj.target_created}}">{{obj.target_title}}</option>
+    {% endfor %}
+</div>
+<form method="POST" class="post-form" style='display:none;'>{% csrf_token %}
+{{form}}
+{% for item in targets_form %}
+	{% if forloop.counter0 < number_of_targets %}
+	<tr id="row{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
+						<td class="field-target_object" >
+							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
+								{% for id,choice in form.fields.assignment_objects.choices %}
+								<option value="{{ id }}" {% if id|slugify == item.target_object.value|slugify %} selected {% endif %}>{{ choice }}</option>
+								{% endfor %}
+							</select>
+							<div class="collapse" id="assignment-target-object-settings-{{forloop.counter0}}">
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions">Instructions:</label> 
+
+			<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_instructions" name="assignmenttargets_set-{{forloop.counter0}}-target_instructions" class="form-control">{{ item.target_instructions.value }}</textarea>
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css">Assignment CSS:</label> 
+			<input id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_css" maxlength="255" name="assignmenttargets_set-{{forloop.counter0}}-target_external_css" class="form-control" type="text" value="{{ item.target_external_css.value }}">
+								{% for choice in form.fields.assignment_objects.queryset %}
+								 {% if source.instance.target_object.id == item.target_object.value %} 
+								 	{% if source.instance.target_object.target_type == "ig" %}
+								 		<label>Mirador View Type:</label>
+								 		<select class="selectpicker form-control mirador_option" data-counter="{{forloop.parentloop.counter0}}" id="{{forloop.parentloop.counter0}}-target_options_view_type">
+								 			{% captureas selected_view %}{{ item.target_external_options.value|just_the_view_type }}{% endcaptureas %}
+								 			<option value="ImageView" {% if selected_view == "ImageView"%} selected {% endif %}>
+								 			Single Image View
+								 			</option>
+								 			<option value="ThumbnailsView" {% if selected_view == "ThumbnailsView"%} selected {% endif %}>
+								 			Thumbnails View
+								 			</option>
+								 			<option value="ScrollView" {% if selected_view == "ScrollView"%} selected {% endif %}>
+								 			Scroll View
+								 			</option>
+								 			<option value="BookView" {% if selected_view == "BookView"%} selected {% endif %}>
+								 			Book View
+								 			</option>
+								 		</select>
+								 		<label>Open to Page (Canvas ID):</label>
+								 		<input maxlength="255" id="{{forloop.parentloop.counter0}}-target_options_canvas_id" data-counter="{{forloop.parentloop.counter0}}" type="text" class="mirador_option form-control" value="{{item.target_external_options.value|just_the_canvas_id}}"></input>
+										
+								 	{% endif %} 
+								 {% endif %}
+								{% endfor %}
+								<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.counter0}}-target_external_options" class="form-control">{{ item.target_external_options.value }}</textarea>
+							</div>
+						</td>
+						<td>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
+						</td>
+						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
+						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}" role="button">{% bootstrap_icon "cog" %}</td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" data-id="{{item.target_object.value}}" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}
+						{% if item.id.value %}
+						<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
+						{% endif %}
+						</td>
+					</tr>
+					{% endif %}
+{% endfor %}
+{%for f in targets_form.management_form%}
+    {{f}}
+{%endfor%}
+</form>
+
+
 {% endblock %}

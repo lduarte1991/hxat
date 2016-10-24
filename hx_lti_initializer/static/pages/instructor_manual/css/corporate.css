@@ -272,3 +272,84 @@ th {
 thead th {
   vertical-align: bottom;
 }
+
+.header {
+    width: 100%;
+    min-width: 800px;
+    background-color: black;
+    vertical-align: middle;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header .site-title {
+	display: inline-block;
+	position: relative;
+    font-size: 1em;
+    color: white;
+    font-family: Verdana, sans-serif;
+
+}
+
+.header .site-title a {
+	color: white;
+	text-decoration: none;
+}
+
+.header .site-title a:hover{
+    text-decoration: none;
+}
+
+.header .logo {
+	display: inline-block;
+	vertical-align: middle;
+	width: 70px;
+	height: 35px;
+}
+
+.header #banner-logo-left {
+	position: relative;
+	left: 10%;
+	display: inline-block;
+	padding: 5px 0px;
+}
+
+.navigation {
+    font-size: 0.8em;
+    position: relative;
+    display: inline-block;
+    margin-right: 10%;
+    margin-top: auto;
+    margin-bottom: auto;
+    font-family: Verdana;
+    padding-top: 15px;
+    height: 35px;
+}
+
+.navigation a {
+    color: #88ddff;
+    margin-left: 5px;
+    margin-right: 15px;
+    vertical-align: middle;
+    text-decoration: none;
+    border-bottom: 4px solid rgb(134, 231, 244);
+    font-weight: bold;
+    display: inline-block;
+    height: 100%;
+    height: calc(100% - 4px);
+}
+
+.navigation a.selected {
+	color: #999999;
+	border-bottom: 4px solid rgb(154, 154, 154);
+}
+
+.navigation a.selected:hover {
+	color: #999999;
+	border-bottom: 4px solid rgb(154, 154, 154);
+}
+
+.navigation a:hover {
+    color: #ccffff;
+    text-decoration: none;
+}
