@@ -10,6 +10,13 @@
         </div>
         {% if is_instructor %}
             <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}"><i class='fa fa-pencil' style='margin-right:4px'></i>Edit course settings</a>
+            <div class='starting-resource'><strong>Starting Resource:</strong>
+            {% if starter_object %}
+                <em>{{starter_object | safe}}</em>
+            {% else %}
+                None (Students will see an error)
+            {% endif %}
+            </div>
         {% endif %}
 
         <div class='assignment-header'>Assignments</div>
@@ -38,6 +45,15 @@
                         {% load order_by %}
                         {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                             <div class='table-row'>
+                                {% if is_instructor %}
+                                <a href='#' class='make-starting-resource' data-url="{% url 'hx_lti_initializer:change_starting_resource' assignment_id=assignment.assignment_id object_id=file.id %}" data-title='{{file.target_title}}'>
+                                    {% if assignment.assignment_id == starter_collection_id and file.id == starter_object_id %}
+                                    <i class='fa fa-check-square'></i>
+                                    {% else %}
+                                    <i class='fa fa-square-o'></i>
+                                    {% endif %}
+                                </a>
+                                {% endif %}
                                 <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{file.target_title}}</a>
                                 {% if is_instructor %}
                                 <a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}">
@@ -136,8 +152,27 @@
                 if (jQuery('#delete-check').prop('checked')) {
                     jQuery(this).parent('form').first().submit();
                 };
-            })
+            });
         });
+        {% if is_instructor %}
+        jQuery('body').on('click', '.make-starting-resource', function() {
+            var old = jQuery('.make-starting-resource .fa-check-square');
+            jQuery(this).find('.fa').addClass('fa-check-square').removeClass('fa-square-o');
+            old.removeClass('fa-check-square').addClass('fa-square-o');
 
+            var url = jQuery(this).data('url');
+            var title = jQuery(this).data('title');
+            jQuery.ajax({
+                method: 'GET',
+                url: url,
+                async: true,
+                success: function(data) {
+                    jQuery('.starting-resource').html("<strong>Starting Resource: </strong><em>" + title + "</em>");
+                    console.log(data);
+                },
+            })
+            return false;
+        });
+        {% endif %}
     </script>
 {% endblock %}

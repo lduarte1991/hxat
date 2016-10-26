@@ -383,9 +383,10 @@ footer {
 	color: #0871b0;
 }
 
-.table-row a:first-child {
+.table-row a:nth-child(2) {
 	display: inline-block;
-	width: 80%;
+	width: 75%;
+	margin-left: 5px;
 }
 
 @media screen and (max-width: 790px) {
@@ -1299,4 +1300,13 @@ progress[value]::-webkit-progress-value {
     padding-bottom: 10px;
     margin-bottom: 20px;
     text-align: center;
+}
+
+.starting-resource {
+	margin-top: 35px;
+	margin-bottom: -20px;
+}
+
+.make-starting-resource {
+	text-decoration: none;
 }

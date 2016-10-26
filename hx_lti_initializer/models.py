@@ -198,3 +198,9 @@ class LTICourseAdmin(models.Model):
         """
         """
         return "%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)
+
+
+class LTIResourceLinkConfig(models.Model):
+    resource_link_id = models.CharField(max_length=255)
+    object_id = models.CharField(max_length=255)
+    collection_id = models.CharField(max_length=255)

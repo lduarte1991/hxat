@@ -133,7 +133,8 @@ def save_session(request, **kwargs):
         "is_staff": ["is_staff", False],
         "is_instructor": ["is_instructor", False],
         "is_graded": ['is_graded', False],
-        "lti_params": ['lti_params', None]
+        "lti_params": ['lti_params', None],
+        "resource_link_id": ['resource_link_id', None]
     }
     
     for k in kwargs:

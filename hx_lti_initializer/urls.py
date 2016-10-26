@@ -68,4 +68,9 @@ urlpatterns = patterns(
         'hx_lti_initializer.views.delete_assignment',
         name="delete_assignment",
     ),
+    url(
+        r'\w/admin_hub/(?P<assignment_id>[0-9a-z\-]+)/(?P<object_id>[0-9]+)/starting_resource/$',
+        'hx_lti_initializer.views.change_starting_resource',
+        name="change_starting_resource"
+    ),
 )

@@ -20,7 +20,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse, User, LTICourseAdmin
+from hx_lti_initializer.models import LTIProfile, LTICourse, User, LTICourseAdmin, LTIResourceLinkConfig
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
@@ -59,6 +59,8 @@ def launch_lti(request):
 
     course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
     debug_printer('DEBUG - Found course being accessed: %s' % course)
+
+    resource_link_id = get_lti_value(settings.LTI_UNIQUE_RESOURCE_ID, tool_provider)
 
     # This is where we identify the "scope" of the LTI user_id (anon_id), meaning
     # the scope in which the identifier is unique. In canvas this is the domain instance,
@@ -131,7 +133,8 @@ def launch_lti(request):
             user_scope=user_scope,
             context_id=course,
             roles=roles,
-            is_staff=True
+            is_staff=True,
+            resource_link_id=resource_link_id
         )
     else:
         # For HX, students only access one object or collection, and don't
@@ -154,7 +157,8 @@ def launch_lti(request):
             user_scope=user_scope,
             context_id=course,
             roles=roles,
-            is_staff=False
+            is_staff=False,
+            resource_link_id=resource_link_id
         )
 
     # now it's time to deal with the course_id it does not associate
@@ -197,19 +201,13 @@ def launch_lti(request):
                 course_name=course_object.course_name,
                 course_id=course_object.id,
             )
-
-    # For the use case where the course head wants to display an assignment object instead
-    # of the admin_hub upon launch (i.e. for embedded use), this allows the user
-    # to be routed directly to an assignment given the correct POST parameters,
-    # as by Luis' original method of putting collection_id and object_id in the
-    # LTI tool launch params.
     try:
-        # Keeping the HX functionality whereby students are routed to specific assignment objects
-        # This is motivated by the Poetry in America Course
-
-        # If there are variables passed into the launch indicating a desired target object, render that object
-        assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-        object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+        config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
+        assignment_id = config.collection_id
+        object_id = config.object_id
+        debug_printer("Config: {config}".format(config=resource_link_id))
+        debug_printer("Config: {config}".format(config=config.collection_id))
+        debug_printer("Config: {config}".format(config=config.object_id))
         course_id = str(course)
         if set(roles) & set(settings.ADMIN_ROLES):
             try:
@@ -224,10 +222,39 @@ def launch_lti(request):
                 debug_printer("DEBUG - Not waiting to be added as admin")
             return course_admin_hub(request)
         else:
-            debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
+            debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
             return access_annotation_target(request, course_id, assignment_id, object_id)
     except:
-        debug_printer("DEBUG - User wants the index")
+        # For the use case where the course head wants to display an assignment object instead
+        # of the admin_hub upon launch (i.e. for embedded use), this allows the user
+        # to be routed directly to an assignment given the correct POST parameters,
+        # as by Luis' original method of putting collection_id and object_id in the
+        # LTI tool launch params.
+        try:
+            # Keeping the HX functionality whereby students are routed to specific assignment objects
+            # This is motivated by the Poetry in America Course
+
+            # If there are variables passed into the launch indicating a desired target object, render that object
+            assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
+            object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+            course_id = str(course)
+            if set(roles) & set(settings.ADMIN_ROLES):
+                try:
+                    userfound = LTICourseAdmin.objects.get(
+                        admin_unique_identifier=lti_profile.user.username,
+                        new_admin_course_id=course
+                    )
+                    course_object.add_admin(lti_profile)
+                    debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+                    userfound.delete()
+                except:
+                    debug_printer("DEBUG - Not waiting to be added as admin")
+                return course_admin_hub(request)
+            else:
+                debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
+                return access_annotation_target(request, course_id, assignment_id, object_id)
+        except:
+            debug_printer("DEBUG - User wants the index")
 
     try:
         userfound = LTICourseAdmin.objects.get(
@@ -315,6 +342,16 @@ def course_admin_hub(request):
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
         courses_for_user
     )
+    try:
+        config = LTIResourceLinkConfig.objects.get(resource_link_id=request.session['resource_link_id'])
+        object_id = int(config.object_id)
+        collection_id = config.collection_id
+        to = TargetObject.objects.get(pk=object_id)
+        starter_object = to.target_title
+    except:
+        starter_object = "<span style='color:red;'>None (Students will see an error).</span><br><span style='font-size: 9pt;'>Click on the checkbox next to the name of the object you'd like learners to land on.</span>"
+        object_id = None
+        collection_id = None
 
     debug = files_in_courses
     return render(
@@ -327,6 +364,9 @@ def course_admin_hub(request):
             'files': files_in_courses,
             'org': settings.ORGANIZATION,
             'debug': debug,
+            'starter_object': starter_object,
+            'starter_object_id': object_id,
+            'starter_collection_id': collection_id
         }
     )
 
@@ -817,4 +857,24 @@ def transfer_annotations(request, instructor_only):
 
     #debug_printer("%s" % str(request.POST.getlist('assignment_inst[]')))
     data = dict()
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+@login_required
+def change_starting_resource(request, assignment_id, object_id):
+    data = {'response': 'Success'}
+    resource_link_id = request.session['resource_link_id']
+    data.update({
+        'resource_link_id': resource_link_id,
+        'assignment_id': assignment_id,
+        'object_id': object_id
+    })
+    try:
+        config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
+        config.collection_id = assignment_id
+        config.object_id = object_id
+        config.save()
+    except:
+        newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
+        newConfig.save()
     return HttpResponse(json.dumps(data), content_type='application/json')
