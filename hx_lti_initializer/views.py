@@ -224,6 +224,8 @@ def launch_lti(request):
         else:
             debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
             return access_annotation_target(request, course_id, assignment_id, object_id)
+    except PermissionDenied as e:
+        raise PermissionDenied(e) # make sure to re-raise this exception since we shouldn't proceed
     except:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user

@@ -114,6 +114,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
         },
+        'django.db.backends': {
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'), # DEBUG will show SQL 
+            'handlers': ['console'],
+        },
         'hx_lti_initializer': {
             'handlers': ['console'],
             'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
