@@ -352,7 +352,7 @@ def course_admin_hub(request):
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
     except:
-        starter_object = "None"
+        starter_object = None
         object_id = None
         collection_id = None
 
