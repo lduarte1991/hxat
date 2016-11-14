@@ -11,6 +11,7 @@ from django.template import RequestContext
 
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.urlresolvers import reverse
@@ -224,6 +225,8 @@ def launch_lti(request):
         else:
             debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
             return access_annotation_target(request, course_id, assignment_id, object_id)
+    except PermissionDenied as e:
+        raise PermissionDenied(e) # make sure to re-raise this exception since we shouldn't proceed
     except:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -349,7 +352,7 @@ def course_admin_hub(request):
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
     except:
-        starter_object = "<span style='color:red;'>None (Students will see an error).</span><br><span style='font-size: 9pt;'>Click on the checkbox next to the name of the object you'd like learners to land on.</span>"
+        starter_object = None
         object_id = None
         collection_id = None
 
@@ -525,10 +528,10 @@ def instructor_dashboard_student_list_view(request):
     '''
     if not request.session['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
-    
+
     context_id = request.session['hx_context_id']
-    user_id = request.session['hx_user_id']    
-    
+    user_id = request.session['hx_user_id']
+
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
     course_annotations = fetch_annotations_by_course(context_id, annotation_database.ADMIN_GROUP_ID)
@@ -590,14 +593,14 @@ def annotation_database_search(request):
     '''
     This view is intended to be called by the annotation dashboard when searching
     the CATCH database for annotations.
-    
+
     It's essentially a proxy for annotatorJS requests, with a permission check to
     make sure the user is authorized to search the given course and collection.
-    
+
     Required GET parameters:
      - collectionId: this is the assignment model
      - contextId: this is the course identifier as defined by LTI (the "course context")
-    
+
     The optional GET parameters include those specified by the CATCH database as
     search fields.
     '''
@@ -621,7 +624,7 @@ def annotation_database_search(request):
         'x-annotator-auth-token': request.META['HTTP_X_ANNOTATOR_AUTH_TOKEN'],
         'content-type': 'application/json',
     }
-    
+
     # Override the auth token for ATG when the user is a course administrator,
     # so they can query against private annotations that have granted permission to the admin group.
     if settings.ORGANIZATION == "ATG" and session_is_staff:
@@ -649,7 +652,7 @@ def annotation_database_create(request):
     request_object_id = str(json_body['uri'])
     request_context_id = json_body['contextId']
     request_user_id = json_body['user']['id']
-    
+
     if settings.ORGANIZATION == "ATG":
         annotation_database.update_read_permissions(json_body)
 
@@ -861,6 +864,8 @@ def transfer_annotations(request, instructor_only):
 
 
 @login_required
+@csrf_exempt
+@require_http_methods(["POST", "DELETE"])
 def change_starting_resource(request, assignment_id, object_id):
     data = {'response': 'Success'}
     resource_link_id = request.session['resource_link_id']
@@ -869,12 +874,21 @@ def change_starting_resource(request, assignment_id, object_id):
         'assignment_id': assignment_id,
         'object_id': object_id
     })
-    try:
-        config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
-        config.collection_id = assignment_id
-        config.object_id = object_id
-        config.save()
-    except:
-        newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
-        newConfig.save()
+    debug_printer("change_starting_resource (%s): %s" % (request.method, data))
+
+    if request.method == 'POST':
+        try:
+            config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
+            config.collection_id = assignment_id
+            config.object_id = object_id
+            config.save()
+            data['response'] = 'Success: Updated'
+        except:
+            newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
+            newConfig.save()
+            data['response'] = 'Success: Created'
+    elif request.method == 'DELETE':
+        if LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists():
+            LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id).delete()
+        data['response'] = 'Success: Deleted'
     return HttpResponse(json.dumps(data), content_type='application/json')
