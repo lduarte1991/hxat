@@ -6,7 +6,7 @@ throughout the LTI. Even courses is only related via the target objects.
 """
 
 from django.contrib import admin
-from hx_lti_initializer.models import LTIProfile, LTICourse
+from hx_lti_initializer.models import LTIProfile, LTICourse, LTIResourceLinkConfig
 
 
 class LTIProfileAdmin(admin.ModelAdmin):
@@ -30,5 +30,10 @@ class LTICourseAdmin(admin.ModelAdmin):
     def course_id(self, instance):  # pragma: no cover
         return str(self.course_id)
 
+class LTIResourceLinkConfigAdmin(admin.ModelAdmin):
+    list_display = ('id', 'collection_id', 'object_id', 'resource_link_id')
+    search_fields = ('collection_id', )
+
 admin.site.register(LTIProfile, LTIProfileAdmin)
 admin.site.register(LTICourse, LTICourseAdmin)
+admin.site.register(LTIResourceLinkConfig, LTIResourceLinkConfigAdmin)

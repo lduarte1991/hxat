@@ -114,6 +114,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
         },
+        'django.db.backends': {
+            'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'), # DEBUG will show SQL 
+            'handlers': ['console'],
+        },
         'hx_lti_initializer': {
             'handlers': ['console'],
             'level': SECURE_SETTINGS.get('django_log_level', 'ERROR'),
@@ -136,6 +140,7 @@ LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
 LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
 ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
+LTI_UNIQUE_RESOURCE_ID = 'resource_link_id'
 X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES')
 X_FRAME_ALLOWED_SITES_MAP = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES_MAP')
 SERVER_NAME = SECURE_SETTINGS.get('SERVER_NAME')
