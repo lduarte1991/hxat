@@ -532,7 +532,7 @@
 
                         // tags are set to empty array if they are input as empty string
                         var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
-                        if (tags == ['']) {
+                        if (tags.length == 1 && tags[0].length == 0) {
                             tags = [];
                         };
 
@@ -540,14 +540,42 @@
                         var miraWindow = AController.dashboardObjectController.endpoint.window;
                         var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
                         var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
-                        var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
+                        var getImageUrl = function(image) {
+                            
+                            if (!image.images[0].resource.service) {
+                              id = image.images[0].resource['default'].service['@id'];
+                              id = id.replace(/\/$/, "");
+                              return id;
+                            }
+                            
+                            var id = image.images[0].resource.service['@id'];
+                            id = id.replace(/\/$/, "");
+
+                            return id;
+                        };
+                        var trimString = function(str) {
+                            return str.replace(/^\s+|\s+$/g, '');
+                        };
+                        var getImageIndexById = function(imagesList, id) {
+                            var imgIndex = 0;
+
+                            jQuery.each(imagesList, function(index, img) {
+                                if (trimString(img['@id']) === trimString(id)) {
+                                    imgIndex = index;
+                                }
+                            });
+
+                            return imgIndex;
+                        };
+                        
+                        var thumb = getImageUrl(miraWindow.imagesList[getImageIndexById(miraWindow.imagesList, miraWindow.canvasID)]);
                         thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
                         
                         // sets up the annotator structure to make the call to create an Annotation
                         var annotation = {
                             collectionId: miraEndpoint.collection_id,
                             contextId: miraEndpoint.context_id,
-                            uri: miraWindow.currentCanvasID,
+                            uri: miraWindow.canvasID,
                             permissions: miraEndpoint.catchOptions.permissions,
                             user: miraEndpoint.catchOptions.user,
                             archived: false,
