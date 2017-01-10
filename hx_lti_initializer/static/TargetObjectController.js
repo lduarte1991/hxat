@@ -29,7 +29,7 @@
 
         // Shows annotation toggle label only when hovered
         jQuery('.annotations-status').hover(function() {
-                jQuery('.hover-inst').toggleClass("hidden");
+            jQuery('.hover-inst').toggleClass("hidden");
         });
 
         // Actually toggles whether annotaitons are displayed or not
@@ -210,7 +210,7 @@
         
         // deals with the button that turns on keyboard annotations
         jQuery('#make_annotations_panel button').click(function(){
-            
+            AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'text'}, 'harvardx', 'hxat');
             // if person is trying to start making an annotation via keyboard
             if (jQuery(this).attr('data-toggled') == "false") {
 
@@ -468,6 +468,7 @@
         // in order to toggle on keyboard input mode. mouseup allows focus to actually move
         // screen reader users to the appropriate div.
         jQuery('#keyboard-input-button').on('mouseup', function (event){
+            AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'image'}, 'harvardx', 'hxat');
             jQuery('.keyboard-command-area').attr('aria-label', 'Click this button to turn on keyboard input. To use keyboard input, select this area. Then use "W", "A", "S", "D" to move around. "-" to zoom out, "=" to zoom in" and lowercase "m" to make an annotation.');
             jQuery('.openseadragon-canvas').attr('tabindex', '-1');
             
@@ -622,6 +623,7 @@
                 self.vid.controlBar.progressControl.seekBar.stepForward();
             });
             Mousetrap.bind('n', function(e){
+                AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'video'}, 'harvardx', 'hxat');
                 jQuery('.vjs-new-annotation').trigger('click');
             });
 
@@ -872,6 +874,7 @@
                     jQuery('.annotations-status i').addClass('fa-comments');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
+                    AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
                 } else {
                     jQuery('.annotations-status .hover-inst').html("Hide annotations");
                     jQuery('.annotations-status').attr('aria-label', "Hide annotations");
@@ -882,6 +885,7 @@
                             store.registerAnnotation(annotation);
                     });
                     annotator.publish("externalCallToHighlightTags");
+                    AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
                 }
                 jQuery('.annotations-status').toggleClass("on");
             };

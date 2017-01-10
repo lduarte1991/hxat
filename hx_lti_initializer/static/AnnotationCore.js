@@ -119,11 +119,11 @@
 	                },
 	                urls: {
 	                    // These are the default URLs.
-	                    create:  '/create',
+	                    create:  '/create?sessionId=' + this.initOptions.session,
 	                    read:    '/read/:id',
 	                    update:  '/update/:id',
 	                    destroy: '/delete/:id',
-	                    search:  '/search'
+	                    search:  '/search?sessionId=' + this.initOptions.session,
 	                },
 	                loadFromSearch:{
 	                    uri: this.initOptions.object_id,

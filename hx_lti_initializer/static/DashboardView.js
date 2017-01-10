@@ -471,6 +471,7 @@
             var section = jQuery('.annotationSection');
             var handle = jQuery('.resize-handle');
             if (parseInt(section.css('width'), 10) >= 150) {
+                AController.utils.logThatThing('toggled_sidebar', {'opening': false}, 'harvardx', 'hxat');
                 jQuery('#leftCol').attr('class', 'col-xs-11');
                 section.css('min-width', '0px');
                 section.css('width', '0px');
@@ -479,6 +480,7 @@
                 jQuery('.modal-navigation').addClass('hidden'); 
                 jQuery('.editgroup').addClass('hidden');
             } else {
+                AController.utils.logThatThing('toggled_sidebar', {'opening': true}, 'harvardx', 'hxat');
                 jQuery('#leftCol').attr('class', 'col-xs-7');
                 section.css('min-width', '150px');
                 section.css('width', '300px');
@@ -701,17 +703,23 @@
             };
             
             self.initOptions.endpoint.openEditorForReply(options);
-           });
+            AController.utils.logThatThing('trying_to_reply', {}, 'harvardx', 'hxat');
+
+        });
 
         jQuery('.parentAnnotation .quoteText').click( function(e){
             jQuery('html, body').animate({
                 scrollTop: jQuery(annotation.highlights[0]).offset().top },
                 'slow'
             );
+            AController.utils.logThatThing('quote_clicked', {"annotation": annotation}, 'harvardx', 'hxat');
+
         });
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
             jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
+            AController.utils.logThatThing('thumbnail_clicked', {'annotation': annotationItem}, 'harvardx', 'hxat');
+
         });
 
         jQuery('.parentAnnotation .playMediaButton ').click ( function(e) {
@@ -738,6 +746,8 @@
             } else {
                 playFunction();
             }
+            AController.utils.logThatThing('video_thumbnail_clicked', {'annotation': annotation}, 'harvardx', 'hxat');
+
         });
 
         jQuery('.parentAnnotation #edit').click(function (e){

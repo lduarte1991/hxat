@@ -97,6 +97,8 @@ def launch_lti(request):
     # In canvas this would be the SIS user id, in edX the registered username
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
 
+    request.session['logged_ip'] = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', '1.2.3.4')))
+
     # This handles the rare case in which we have neither display name nor external user id
     if not (display_name or external_user_id):
         try:
@@ -438,6 +440,7 @@ def access_annotation_target(
         'roles': roles,
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
+        'session': request.session.session_key,
         'org': settings.ORGANIZATION,
     }
     if not assignment.object_before(object_id) is None:
@@ -515,6 +518,7 @@ def instructor_dashboard_view(request):
         'user_annotations': [],
         'fetch_annotations_time': 0,
         'org': settings.ORGANIZATION,
+        'session': request.session.session_key,
         'dashboard_context_js': json.dumps({
             'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
         })
