@@ -119,11 +119,11 @@
 	                },
 	                urls: {
 	                    // These are the default URLs.
-	                    create:  '/create',
-	                    read:    '/read/:id',
-	                    update:  '/update/:id',
-	                    destroy: '/delete/:id',
-	                    search:  '/search'
+	                    create:  '/create?utm_source=' + this.initOptions.utm_source,
+	                    read:    '/read/:id?utm_source=' + this.initOptions.utm_source,
+	                    update:  '/update/:id?utm_source=' + this.initOptions.utm_source,
+	                    destroy: '/delete/:id?utm_source=' + this.initOptions.utm_source,
+	                    search:  '/search?utm_source=' + this.initOptions.utm_source
 	                },
 	                loadFromSearch:{
 	                    uri: this.initOptions.object_id,
@@ -226,7 +226,7 @@
         jQuery("body").append(overlaybckg);
         jQuery('#ignorewarning').click(function(){
             jQuery(overlaybckg).remove();
-        })
+        });
 	}
 
 }(AController));
