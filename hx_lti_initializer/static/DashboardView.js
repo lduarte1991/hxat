@@ -711,7 +711,8 @@
         });
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
-            jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
+            console.log(self.initOptions.endpoint.window.id);
+            mir.eventEmitter.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
         });
 
         jQuery('.parentAnnotation .playMediaButton ').click ( function(e) {

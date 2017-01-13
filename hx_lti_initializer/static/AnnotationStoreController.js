@@ -410,7 +410,7 @@ var MiradorEndpointController = function(deferredObject) {
 			};
 		});
 		self.imageLimits = {};
-		var currentId = self.window.currentCanvasID;
+		var currentId = self.window.canvasID;
 		jQuery.each(self.window.imagesList, function(index, value) {
 			if (value['@id'] == currentId) {
 				self.imageLimits['height'] = value.height;
@@ -601,7 +601,7 @@ MiradorEndpointController.prototype.openEditorForReply = function(options) {
 		var annotation = {
 			collectionId: self.endpoint.collection_id,
 			contextId: self.endpoint.context_id,
-			uri: self.window.currentCanvasID,
+			uri: self.window.canvasID,
 			permissions: self.endpoint.catchOptions.permissions,
 			user: self.endpoint.catchOptions.user,
 			archived: false,
@@ -730,7 +730,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		username: setOptions.username,
 		text: setOptions.text,
 		tag: setOptions.tag,
-		uri: self.window.currentCanvasID,
+		uri: self.window.canvasID,
 	};
 
 	var onSuccess = function(data){
