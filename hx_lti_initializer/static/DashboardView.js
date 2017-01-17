@@ -504,8 +504,8 @@
             evt.initUIEvent('resize', true, false, window, 0);
         }
         window.dispatchEvent(evt);
-        if (typeof jQuery.subscribe === 'function') {
-            jQuery.subscribe('focusUpdated', function(){
+        if (typeof mir !== "undefined" && typeof mir.eventEmitter !== "undefined" && typeof mir.eventEmitter.publish === "function") {
+            mir.eventEmitter.subscribe('focusUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;
                 var section = jQuery('.annotationSection');
                 var handle = jQuery('.resize-handle');
@@ -551,8 +551,8 @@
 
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
-            if (typeof jQuery.publish !== "undefined") {
-                jQuery.publish('resizeMirador');
+            if (typeof mir !== "undefined" && typeof mir.eventEmitter !== "undefined" && typeof mir.eventEmitter.publish !== "undefined") {
+                mir.eventEmitter.publish('resizeMirador');
             };
             
         });

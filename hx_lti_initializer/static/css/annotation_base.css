@@ -98,3 +98,8 @@ a#next_target_object {
 .vjs-control-bar {
 	z-index: 99;
 }
+
+.hud-control.hud-dropdown, .sp-replacer.sp-light {
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+}
