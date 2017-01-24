@@ -22,7 +22,10 @@
         </div>
     	<% } else if (media === 'image' && thumbnail) {%>
 	    <div class="zoomToImageBounds">
-	    	<img class="annotation-thumbnail" src="<%= thumbnail %>" />
+	    	<img class="annotation-thumbnail" src="<%= thumbnail %>" data-svg='#thumbnail-<%= id %>' />
+	    	<% if (typeof(svg) !== "undefined") { %>
+	    		<%= svg %>
+	    	<% } %>
             <span class="idAnnotation" style="display:none"><%= id %></span>
             <span class="uri" style="display:none"><%= uri %></span>
         </div>

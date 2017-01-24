@@ -382,7 +382,7 @@ var MiradorEndpointController = function(deferredObject) {
     	self.window = mir.viewer.workspace.slots[0].window;
 		self.endpoint = self.window.endpoint;
 		deferredObject.resolve();
-		mir.eventEmitter.subscribe('overlaysRendered.' + self.window.id, function() {
+		mir.eventEmitter.subscribe('annotationsRendered.' + self.window.id, function() {
 			var annotations = self.window.annotationsList;
 			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
 				window.AController.main.colorizeAnnotations(annotations);
@@ -488,8 +488,8 @@ MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer
 		var annotation = this.getAnnotationById(focus_id);
 		var self = this;
 		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
-		mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
-
+		//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
 		try{
 			mir.eventEmitter.publish('fitBounds.' + self.window.id, annotation.bounds);
 		} catch (e){
@@ -506,7 +506,8 @@ MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer
 MiradorEndpointController.prototype.updateEndpointList = function(options){
 	if (options.limit) {
 		this.window.annotationsList = this.window.annotationsList.slice(0, options.limit);
-		mir.eventEmitter.publish('annotationListLoaded.' + this.window.id);
+		//mir.eventEmitter.publish('annotationListLoaded.' + this.window.id);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: this.window.id, annotationsList: this.window.annotationsList});
 	};
 };
 
@@ -521,7 +522,8 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 		// trigger drawing here or once they're all loaded below
 		self.window.annotationsList.push(oaAnnotation);
 	});
-	mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+	//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+	mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
 	// trigger only after adding all items to annotationListCatch
 };
 
@@ -530,6 +532,15 @@ MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(anno
 		this.list_of_replies[annotation.id] = annotation;
 	} else {
 		this.annotationsMasterList.unshift(annotation);
+		var notfound = true;
+		for(ann in this.endpoint.annotationsListCatch) {
+			if (ann.id == annotation.id) {
+				notfound = false;
+			}
+		}
+		if (notfound) {
+			this.loadMoreAnnotations([annotation]);
+		}
 	}
 };
 
@@ -749,7 +760,8 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 			self.window.annotationsList.push(oaAnnotation);
 		});
 
-		mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
+		//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
 		mir.eventEmitter.publish('catchAnnotationsLoaded', annotations);
 	}
 

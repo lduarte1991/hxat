@@ -73,6 +73,10 @@ var mir = Mirador({
   { "manifestUri": "{{ i }}", "location": "Harvard University"},
   {% endfor %}
   ],
+  "availableAnnotationStylePickers": [],
+  "availableAnnotationDrawingTools": [
+      'Rectangle', 'Ellipse', 'Freehand', 'Polygon'
+  ],
   "windowObjects": [
     {
       "loadedManifest": "{{ target_object.get_target_content_as_list.0 }}",
@@ -87,9 +91,15 @@ var mir = Mirador({
       "annotationCreation": true,
       {% endif %}
   	  "sidePanel" : false,
+      "bottomPanel": false,
       "fullScreen" : false,
       "displayLayout": false,
-      "annotationState": "annoOnCreateOff",
+      "canvasControls": {
+        "annotations": {
+          "annotationState": "on",
+        }
+      },
+
       // This will eventually be put back in whenever we add layout options
       // to the admin hub
       // "layoutOptions" : 
@@ -113,7 +123,7 @@ var mir = Mirador({
       prefix: "/lti_init/annotation_api",
       userid : "{{ user_id }}",
       username : "{{ username }}",
-      roles : "{{ roles }}",
+      roles : {{ roles | safe }},
       collection_id : "{{ collection }}",
       context_id : "{{ course }}",
     }

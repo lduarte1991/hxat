@@ -103,3 +103,10 @@ a#next_target_object {
 	-webkit-box-sizing: content-box;
 	box-sizing: content-box;
 }
+
+.modal-dialog {
+	float: left;
+    margin-top: 54px;
+    width: 425px;
+    margin-left: 10px;
+}

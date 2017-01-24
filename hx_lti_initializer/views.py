@@ -420,7 +420,6 @@ def access_annotation_target(
     protocol = 'https://' if request.is_secure() else 'http://'
     abstract_db_url = protocol + get_current_site(request).domain + "/lti_init/annotation_api"
     debug_printer("DEBUG - Abstract Database URL: " + abstract_db_url)
-
     original = {
         'user_id': user_id,
         'username': user_name,
@@ -435,7 +434,7 @@ def access_annotation_target(
             assignment.annotation_database_secret_token
         ),
         'assignment': assignment,
-        'roles': roles,
+        'roles': [str(role) for role in roles],
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
         'org': settings.ORGANIZATION,

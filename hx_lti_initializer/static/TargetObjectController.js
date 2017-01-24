@@ -860,9 +860,34 @@
                         var tag = jQuery.trim(jQuery(item).html());
                         var rgbColor = window.AController.main.tags[tag];
                         if (rgbColor !== undefined) {
-                                jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
+                            jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
                         };
-                    })
+                    });
+
+                    var red = rgbColor.red.toString(16) == 0 ? "00" : rgbColor.red.toString(16);
+                    var green = rgbColor.green.toString(16) == 0 ? "00" : rgbColor.green.toString(16);
+                    var blue = rgbColor.blue.toString(16) == 0 ? "00" : rgbColor.blue.toString(16);
+                    var rgbHex = '#' + red + green + blue;
+
+                    jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
+                        if (annotationId == value.id) {
+                            var svg = value.rangePosition;
+                            if (typeof(svg) === "string") {
+                                jQuery.each(jQuery(svg).find('path'), function(index1, value1) {
+                                    jQuery.each(window.paper.projects[0].getItem()._children, function(index2, value2) {
+                                        if (value2._name === value1.id) {
+                                            value2.strokeColor = rgbHex;
+                                            setTimeout(function() {
+                                                jQuery('#thumbnail-' + annotationId).find('path').attr('stroke', rgbHex);
+                                            }, 500);
+                                        }
+                                    });
+                                });
+                            } else {
+                                setTimeout(function() {jQuery('.annotationItem.item-' + annotationId.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + rgbHex), 500});
+                            }
+                        }
+                    });
                 }, 30);
             };
         };
