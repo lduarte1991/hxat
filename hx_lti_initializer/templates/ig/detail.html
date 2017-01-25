@@ -113,7 +113,7 @@ var mir = Mirador({
       prefix: "/lti_init/annotation_api",
       userid : "{{ user_id }}",
       username : "{{ username }}",
-      roles : "{{ roles }}",
+      roles : {{ roles |safe }},
       collection_id : "{{ collection }}",
       context_id : "{{ course }}",
     }

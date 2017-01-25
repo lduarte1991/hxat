@@ -372,7 +372,7 @@ def course_admin_hub(request):
             'starter_object': starter_object,
             'starter_object_id': object_id,
             'starter_collection_id': collection_id,
-            'utm_source': request.session.session_key,
+            'utm_source': request.session.session_key if not request.session['is_staff'] else '',
         }
     )
 
@@ -438,11 +438,11 @@ def access_annotation_target(
             assignment.annotation_database_secret_token
         ),
         'assignment': assignment,
-        'roles': roles,
+        'roles': [str(role) for role in roles],
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
         'org': settings.ORGANIZATION,
-        'utm_source': request.session.session_key,
+        'utm_source': request.session.session_key if not request.session['is_staff'] else '',
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
