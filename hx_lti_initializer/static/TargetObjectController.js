@@ -495,6 +495,14 @@
                     break;
             }
         });
+
+        jQuery('body').on('click', '.mirador-osd-annotations-layer.hud-control', function() {
+            AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
+        });
+
+        jQuery('body').on('click', '.mirador-osd-close.hud-control', function() {
+            AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
+        });
         
         // when keyboard users tab away from the keyboard button it hides the qtip
         jQuery('#keyboard-input-button').on('blur', function(event){
@@ -821,8 +829,41 @@
                     new_percentage = 1.0;
                 }
                 self.vid.annotations.rsd.setPosition(1, new_percentage);
-            });            
+            });
 
+            jQuery('body').on('click', '.vjs-showannotations-annotation.vjs-control', function() {
+                var status = 'hidden';
+                if (jQuery(event.target).hasClass('active')) {
+                    status = 'shown';
+                }
+
+                AController.utils.logThatThing('toggle_annotations_display', {'status': status}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-statistics-annotation.vjs-control', function() {
+                var status = 'hidden';
+                if (jQuery(event.target).hasClass('active')) {
+                    status = 'shown';
+                }
+
+                AController.utils.logThatThing('toggle_statistics_display', {'status': status}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-selector-arrow', function() {
+
+                AController.utils.logThatThing('filter_arrow_selector', {}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-transcript-control.vjs-control', function() {
+                setTimeout(function() {
+                    var status = 'hidden';
+                    if (jQuery('#transcript').is(':visible')) {
+                        status = 'shown';
+                    }
+
+                    AController.utils.logThatThing('toggle_transcript', {'status': status}, 'harvardx', 'hxat');
+                }, 1000);
+            });
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {
