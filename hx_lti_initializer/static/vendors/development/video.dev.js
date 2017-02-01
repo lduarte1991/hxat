@@ -4278,6 +4278,9 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
   };
   this.player().playbackRate(newRate);
   this.labelEl_.innerHTML = newRate + 'x';
+  if (typeof(jQuery.publish) === "function") {
+      jQuery.publish('speed_change', [newRate]);
+  }
 };
 
 vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
@@ -4333,6 +4336,9 @@ vjs.PlaybackRateMenuItem.prototype.onClick = function(){
   vjs.MenuItem.prototype.onClick.call(this);
   this.player().playbackRate(this.rate);
   this.player().controlBar.playbackRateMenuButton.labelEl_.innerHTML = this.rate + "x";
+  if (typeof(jQuery.publish) === "function") {
+      jQuery.publish('speed_change', [this.rate]);
+  }
 };
 
 vjs.PlaybackRateMenuItem.prototype.update = function(){
@@ -4477,6 +4483,9 @@ vjs.PosterImage.prototype.createEl = function(){
 vjs.PosterImage.prototype.onClick = function(){
   // Only accept clicks when controls are enabled
   if (this.player().controls()) {
+    if (typeof(jQuery.publish) === "function") {
+      jQuery.publish('video_play_button_clicked');
+    }
     this.player_.play();
   }
 };
@@ -4540,6 +4549,9 @@ vjs.BigPlayButton.prototype.createEl = function(){
 };
 
 vjs.BigPlayButton.prototype.onClick = function(){
+  if (typeof(jQuery.publish) === "function") {
+      jQuery.publish('video_play_button_clicked');
+    }
   this.player_.play();
 };
 /**
@@ -5656,7 +5668,6 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
       i = 0,
       j = tracks.length,
       track, showTrack, kind;
-
   // Find Track with same ID
   for (;i<j;i++) {
     track = tracks[i];
@@ -6309,6 +6320,10 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
 vjs.TextTrackMenuItem.prototype.onClick = function(){
   vjs.MenuItem.prototype.onClick.call(this);
   this.player_.showTextTrack(this.track.id_, this.track.kind());
+  if (typeof(jQuery.publish) === "function") {
+      var label = this.track.label();
+      jQuery.publish('captions_toggled', [label]);
+    }
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){

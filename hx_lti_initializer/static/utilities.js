@@ -62,13 +62,11 @@ jQuery.ajaxSetup({
                 jQuery('.new-thread').remove();
             }
         }
-        console.log(event);
         if (event.origin !== this.mainOrigin) {
             return;
         }
         this.logSource = event.source;
         this.logOrigin = event.origin;
-        console.log(event);
     };
 
     // if we are in an iFrame, it sends the events via postMessage

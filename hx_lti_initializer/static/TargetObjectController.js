@@ -855,15 +855,26 @@
             });
 
             jQuery('body').on('click', '.vjs-transcript-control.vjs-control', function() {
-                setTimeout(function() {
-                    var status = 'hidden';
-                    if (jQuery('#transcript').is(':visible')) {
-                        status = 'shown';
-                    }
-
-                    AController.utils.logThatThing('toggle_transcript', {'status': status}, 'harvardx', 'hxat');
-                }, 1000);
+                AController.utils.logThatThing('toggle_transcript', {}, 'harvardx', 'hxat');
             });
+
+            jQuery('body').on('click', '.vjs-download-control.vjs-control', function() {
+                AController.utils.logThatThing('clicked_download_button', {}, 'harvardx', 'hxat');
+            });
+
+            if (typeof(jQuery.subscribe) === 'function') {
+                jQuery.subscribe('speed_change', function(_, speed) {
+                    AController.utils.logThatThing('video_speed_changed', {'speed': JSON.stringify(speed)}, 'harvardx', 'hxat');
+                });
+
+                jQuery.subscribe('video_play_button_clicked', function(_) {
+                    AController.utils.logThatThing('video_play_button_clicked', {}, 'harvardx', 'hxat');
+                });
+
+                jQuery.subscribe('captions_toggled', function(_, captions_label) {
+                    AController.utils.logThatThing('captions_toggled', {'caption': captions_label}, 'harvardx', 'hxat');
+                });
+            }
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {
