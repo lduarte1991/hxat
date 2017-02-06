@@ -121,6 +121,11 @@ var mir = Mirador({
       token: "{{ token }}",
       // The endpoint of the store on your server.
       prefix: "/lti_init/annotation_api",
+      {% if utm_source %}
+      params: "?utm_source={{ utm_source }}",
+      {% else %}
+      params: "",
+      {% endif %}
       userid : "{{ user_id }}",
       username : "{{ username }}",
       roles : {{ roles | safe }},
