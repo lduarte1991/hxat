@@ -278,24 +278,28 @@
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
-            if (item.rangePosition && typeof item.rangePosition === "string" && item.rangePosition.indexOf('svg') !== -1) {
-                var leftmargin = "-150px";
-                var widthHeight = 'width="150"';
-                var strokewidth = '20px';
-                //width will be 150 and height will be proportional
-                var width = parseFloat(item.bounds.width);
-                var height = parseFloat(item.bounds.height);
-                if (height > width) {
-                    var recalc = 150.0*(width/height);
-                    leftmargin = "-" + recalc.toString() + 'px';
-                    widthHeight = 'height="150"';
-                }
-                if (width < 150 && height < 150) {
-                    widthHeight = 'width="' + width + '" height="' + height + '" ';
-                    leftmargin = "-" + item.bounds.width + "px";
-                    strokewidth = '2px';
-                }
-                item.svg = item.rangePosition.replace('<svg xmlns', '<svg id="thumbnail-'+ item.id +'" ' + widthHeight + ' style="display: none; position: absolute; margin-left: ' + leftmargin + '" viewBox="' + item.bounds.x + ' ' + item.bounds.y + ' ' + item.bounds.width + ' ' + item.bounds.height + '" xmlns').replace(/stroke-width=\".+?"/g, 'stroke-width="' + strokewidth + '"');
+            if (item.rangePosition && jQuery.isArray(item.rangePosition) && typeof item.rangePosition === "object") {
+                item.svg = '';
+                jQuery.each(item.rangePosition, function(index, value){
+                    var svgVal = value.selector.item.value;
+                    var leftmargin = "-150px";
+                    var widthHeight = 'width="150"';
+                    var strokewidth = '20px';
+                    //width will be 150 and height will be proportional
+                    var width = parseFloat(item.bounds.width);
+                    var height = parseFloat(item.bounds.height);
+                    if (height > width) {
+                        var recalc = 150.0*(width/height);
+                        leftmargin = "-" + recalc.toString() + 'px';
+                        widthHeight = 'height="150"';
+                    }
+                    if (width < 150 && height < 150) {
+                        widthHeight = 'width="' + width + '" height="' + height + '" ';
+                        leftmargin = "-" + item.bounds.width + "px";
+                        strokewidth = '2px';
+                    }
+                    item.svg += svgVal.replace('<svg xmlns', '<svg class="thumbnail-'+ item.id +'" id="thumbnail-' + item.id + '-' + index +'" ' + widthHeight + ' style="display: none; position: absolute; margin-left: ' + leftmargin + '" viewBox="' + item.bounds.x + ' ' + item.bounds.y + ' ' + item.bounds.width + ' ' + item.bounds.height + '" xmlns').replace(/stroke-width=\".+?"/g, 'stroke-width="' + strokewidth + '"');
+                });
             }
             
         } else if (item.media === "video") {
@@ -737,7 +741,7 @@
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
             var rangeTest = annotationItem.rangePosition;
-            if (typeof(rangeTest) === "string") {
+            if (typeof(rangeTest) === "string" || jQuery.isArray(rangeTest)) {
                 rangeTest = annotationItem.bounds;
             }
             mir.eventEmitter.publish('fitBounds.' + self.initOptions.endpoint.window.id, rangeTest);

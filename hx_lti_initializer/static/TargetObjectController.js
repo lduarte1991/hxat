@@ -872,7 +872,7 @@
                     jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
                         if (annotationId == value.id) {
                             var svg = value.rangePosition;
-                            if (typeof(svg) === "string") {
+                            if (typeof(svg) === "string" || jQuery.isArray(svg)) {
                                 jQuery.each(jQuery(svg).find('path'), function(index1, value1) {
                                     jQuery.each(window.paper.projects[0].getItem()._children, function(index2, value2) {
                                         if (value2._name === value1.id) {
