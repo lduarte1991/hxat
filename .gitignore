@@ -15,3 +15,5 @@ reports
 *-annotation-list.json
 *-old.json
 *.srt
+/.vagrant
+!/vagrant/provision.sh
