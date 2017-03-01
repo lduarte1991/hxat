@@ -20,8 +20,8 @@ sudo pip install virtualenv
 sudo pip install urllib3[secure]
 
 # Setup database 
-sudo -u postgres -i psql -d postgres -c "DROP DATABASE IF EXISTS $PROJECT"
-sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
+#sudo -u postgres -i psql -d postgres -c "DROP DATABASE IF EXISTS $PROJECT"
+#sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
 sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PROJECT'"
 sudo -u postgres -i psql -d postgres -c "CREATE DATABASE $PROJECT WITH OWNER $PROJECT"
 
