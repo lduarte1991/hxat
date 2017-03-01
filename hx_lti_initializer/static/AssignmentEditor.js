@@ -550,7 +550,7 @@ AssignmentEditor.prototype = {
             var mediaType = jQuery(element).attr('data-media');
             var order = jQuery(element).attr('data-order');
             var source_id = jQuery(element).attr('data-id');
-            var form_id = jQuery('input[value='+aTarget+']').attr('id').replace('-id','-');
+            var form_id = jQuery('input[name$=-id][value='+aTarget+']').attr('id').replace('-id','-');
             
             // saves object chosen
             jQuery('#' + form_id + 'target_object').find('option[value="' + source_id + '"]').attr('selected', true);
