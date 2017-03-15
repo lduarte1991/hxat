@@ -54,6 +54,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
+    'annotationsx.middleware.CookielessSessionMiddleware',
 )
 
 ROOT_URLCONF = 'annotationsx.urls'

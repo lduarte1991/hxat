@@ -97,6 +97,8 @@ def launch_lti(request):
     # In canvas this would be the SIS user id, in edX the registered username
     external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
 
+    request.session['logged_ip'] = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', '1.2.3.4')))
+
     # This handles the rare case in which we have neither display name nor external user id
     if not (display_name or external_user_id):
         try:
@@ -369,7 +371,8 @@ def course_admin_hub(request):
             'debug': debug,
             'starter_object': starter_object,
             'starter_object_id': object_id,
-            'starter_collection_id': collection_id
+            'starter_collection_id': collection_id,
+            'utm_source': request.session.session_key if not request.session['is_staff'] else '',
         }
     )
 
@@ -435,10 +438,11 @@ def access_annotation_target(
             assignment.annotation_database_secret_token
         ),
         'assignment': assignment,
-        'roles': roles,
+        'roles': [str(role) for role in roles],
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
         'org': settings.ORGANIZATION,
+        'utm_source': request.session.session_key if not request.session['is_staff'] else '',
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)

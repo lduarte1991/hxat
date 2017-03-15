@@ -3,6 +3,7 @@
 env
 bin
 lib
+node_modules
 include
 *.DS_Store
 *.pyc
