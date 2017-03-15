@@ -105,7 +105,7 @@
 	$.AnnotationMain.prototype.colorizeAnnotation = function(annotation) {
 		var self = this;
 		if (typeof annotation["@type"] !== "undefined") {
-			var colorTag = undefined
+			var colorTag = undefined;
 			annotation.resource.forEach(function(item){
 				if (item["@type"] == "oa:Tag") {
 					if (typeof self.tags[item["chars"]] !== "undefined") {
@@ -116,8 +116,13 @@
 
 			if (typeof window.AController.targetObjectController !== "undefined" && typeof colorTag !== "undefined") {
 				window.AController.targetObjectController.colorizeAnnotation(annotation["@id"], self.tags[colorTag]);
-
-			};
+			} else {
+				window.AController.targetObjectController.colorizeAnnotation(annotation["@id"], {
+					red: 0,
+					green: 207,
+					blue: 255,
+				});
+			}
 
 		} else if (typeof annotation.tags !== "undefined" && annotation.tags.length > 0) {
 			var colorTag = undefined;
@@ -126,11 +131,10 @@
 					colorTag = tag;
 				};
 			});
-			console.log(window.AController.targetObjectController);
 			if (typeof window.AController.targetObjectController !== "undefined" && typeof colorTag !== "undefined") {
 				window.AController.targetObjectController.colorizeAnnotation(annotation, self.tags[colorTag]);
-			};
-		};
+			}
+		}
 	};
 
 	$.AnnotationMain.prototype.colorizeAnnotations = function(annotations) {

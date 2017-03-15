@@ -541,7 +541,7 @@
 
                         // tags are set to empty array if they are input as empty string
                         var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
-                        if (tags == ['']) {
+                        if (tags.length == 1 && tags[0].length == 0) {
                             tags = [];
                         };
 
@@ -549,14 +549,42 @@
                         var miraWindow = AController.dashboardObjectController.endpoint.window;
                         var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
                         var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
-                        var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
+                        var getImageUrl = function(image) {
+                            
+                            if (!image.images[0].resource.service) {
+                              id = image.images[0].resource['default'].service['@id'];
+                              id = id.replace(/\/$/, "");
+                              return id;
+                            }
+                            
+                            var id = image.images[0].resource.service['@id'];
+                            id = id.replace(/\/$/, "");
+
+                            return id;
+                        };
+                        var trimString = function(str) {
+                            return str.replace(/^\s+|\s+$/g, '');
+                        };
+                        var getImageIndexById = function(imagesList, id) {
+                            var imgIndex = 0;
+
+                            jQuery.each(imagesList, function(index, img) {
+                                if (trimString(img['@id']) === trimString(id)) {
+                                    imgIndex = index;
+                                }
+                            });
+
+                            return imgIndex;
+                        };
+                        
+                        var thumb = getImageUrl(miraWindow.imagesList[getImageIndexById(miraWindow.imagesList, miraWindow.canvasID)]);
                         thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
                         
                         // sets up the annotator structure to make the call to create an Annotation
                         var annotation = {
                             collectionId: miraEndpoint.collection_id,
                             contextId: miraEndpoint.context_id,
-                            uri: miraWindow.currentCanvasID,
+                            uri: miraWindow.canvasID,
                             permissions: miraEndpoint.catchOptions.permissions,
                             user: miraEndpoint.catchOptions.user,
                             archived: false,
@@ -886,9 +914,34 @@
                         var tag = jQuery.trim(jQuery(item).html());
                         var rgbColor = window.AController.main.tags[tag];
                         if (rgbColor !== undefined) {
-                                jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
+                            jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
                         };
-                    })
+                    });
+
+                    var red = rgbColor.red.toString(16) == 0 ? "00" : rgbColor.red.toString(16);
+                    var green = rgbColor.green.toString(16) == 0 ? "00" : rgbColor.green.toString(16);
+                    var blue = rgbColor.blue.toString(16) == 0 ? "00" : rgbColor.blue.toString(16);
+                    var rgbHex = '#' + red + green + blue;
+
+                    jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
+                        if (annotationId == value.id) {
+                            var svg = value.rangePosition;
+                            if (typeof(svg) === "string" || jQuery.isArray(svg)) {
+                                jQuery.each(jQuery(svg).find('path'), function(index1, value1) {
+                                    jQuery.each(window.paper.projects[0].getItem()._children, function(index2, value2) {
+                                        if (value2._name === value1.id) {
+                                            value2.strokeColor = rgbHex;
+                                            setTimeout(function() {
+                                                jQuery('#thumbnail-' + annotationId).find('path').attr('stroke', rgbHex);
+                                            }, 500);
+                                        }
+                                    });
+                                });
+                            } else {
+                                setTimeout(function() {jQuery('.annotationItem.item-' + annotationId.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + rgbHex), 500});
+                            }
+                        }
+                    });
                 }, 30);
             };
         };

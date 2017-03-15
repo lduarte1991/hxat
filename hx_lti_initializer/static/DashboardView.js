@@ -248,7 +248,12 @@
             };
         };
         if (typeof jQuery('img').unveil === "function") {
-            jQuery('img').unveil();
+            jQuery('img').unveil(200, function() {
+                jQuery(this).load(function() {
+                    AController.main.colorizeAnnotations(mir.viewer.workspace.slots[0].window.annotationsList);
+                    jQuery(jQuery(this).data('svg')).show();
+                });
+            });
         };
         if (annotationsList.length == 0) {
             //jQuery('.annotationsHolder').html('<div style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>');
@@ -273,6 +278,30 @@
         item.thumbnail = false;
         if (item.media === "image" && item.thumb) {
             item.thumbnail = item.thumb;
+            if (item.rangePosition && jQuery.isArray(item.rangePosition) && typeof item.rangePosition === "object") {
+                item.svg = '';
+                jQuery.each(item.rangePosition, function(index, value){
+                    var svgVal = value.selector.item.value;
+                    var leftmargin = "-150px";
+                    var widthHeight = 'width="150"';
+                    var strokewidth = '20px';
+                    //width will be 150 and height will be proportional
+                    var width = parseFloat(item.bounds.width);
+                    var height = parseFloat(item.bounds.height);
+                    if (height > width) {
+                        var recalc = 150.0*(width/height);
+                        leftmargin = "-" + recalc.toString() + 'px';
+                        widthHeight = 'height="150"';
+                    }
+                    if (width < 150 && height < 150) {
+                        widthHeight = 'width="' + width + '" height="' + height + '" ';
+                        leftmargin = "-" + item.bounds.width + "px";
+                        strokewidth = '2px';
+                    }
+                    item.svg += svgVal.replace('<svg xmlns', '<svg class="thumbnail-'+ item.id +'" id="thumbnail-' + item.id + '-' + index +'" ' + widthHeight + ' style="display: none; position: absolute; margin-left: ' + leftmargin + '" viewBox="' + item.bounds.x + ' ' + item.bounds.y + ' ' + item.bounds.width + ' ' + item.bounds.height + '" xmlns').replace(/stroke-width=\".+?"/g, 'stroke-width="' + strokewidth + '"');
+                });
+            }
+            
         } else if (item.media === "video") {
             item.rangeTime.start= typeof vjs !== 'undefined' ?
                 vjs.formatTime(item.rangeTime.start) :
@@ -294,7 +323,11 @@
         };
         jQuery(self.holders[mediaType]).prepend(html);
         if (typeof jQuery('img').unveil === "function") {
-            jQuery('img').unveil('trigger');
+            jQuery('img').unveil(200, function() {
+                jQuery(this).load(function() {
+                    jQuery(jQuery(this).data('svg')).show();
+                });
+            });
         };
         if (annotationItem.media === "comment") {
             var parentId = annotationItem.parent;
@@ -379,7 +412,6 @@
             show_mynotes_tab: self.initOptions.show_mynotes_tab,
             show_public_tab: self.initOptions.show_public_tab
         }));
-        console.log(self.initOptions);
         jQuery('.resize-handle').css('right', jQuery('.annotationSection').css('width'));
         jQuery('.resize-handle.side').on('mousedown', function(e){
             self.resizing = true;
@@ -498,16 +530,14 @@
         jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
         var evt;
         try {
-            console.log("new Event works");
             evt = new Event('resize');
         } catch(e) {
-            console.log("new Event doesn't work");
             var evt = window.document.createEvent('UIEvents');
             evt.initUIEvent('resize', true, false, window, 0);
         }
         window.dispatchEvent(evt);
-        if (typeof jQuery.subscribe === 'function') {
-            jQuery.subscribe('focusUpdated', function(){
+        if (typeof mir !== "undefined" && typeof mir.eventEmitter !== "undefined" && typeof mir.eventEmitter.publish === "function") {
+            mir.eventEmitter.subscribe('focusUpdated', function(){
                 var viewType = self.initOptions.endpoint.window.currentFocus;
                 var section = jQuery('.annotationSection');
                 var handle = jQuery('.resize-handle');
@@ -553,8 +583,8 @@
 
         jQuery(window).resize(function() {
             jQuery('.test').css('width', jQuery('.annotationSection').offset().left);
-            if (typeof jQuery.publish !== "undefined") {
-                jQuery.publish('resizeMirador');
+            if (typeof mir !== "undefined" && typeof mir.eventEmitter !== "undefined" && typeof mir.eventEmitter.publish !== "undefined") {
+                mir.eventEmitter.publish('resizeMirador');
             };
             
         });
@@ -671,7 +701,6 @@
     $.DashboardView.prototype.displayModalView = function(annotation, boundCallback) {
         var self = this;
         var annotationItem = self.formatAnnotation(annotation);
-
         var html = self.initOptions.TEMPLATES.annotationModal(annotationItem);
         var saved_section_scrolltop = jQuery('.annotationSection').scrollTop();
         jQuery('.annotationSection').append(html).scrollTop(0);
@@ -717,9 +746,12 @@
         });
 
         jQuery('.parentAnnotation .zoomToImageBounds').click( function(e){
-            jQuery.publish('fitBounds.' + self.initOptions.endpoint.window.id, annotationItem.rangePosition)
+            var rangeTest = annotationItem.rangePosition;
+            if (typeof(rangeTest) === "string" || jQuery.isArray(rangeTest)) {
+                rangeTest = annotationItem.bounds;
+            }
+            mir.eventEmitter.publish('fitBounds.' + self.initOptions.endpoint.window.id, rangeTest);
             AController.utils.logThatThing('thumbnail_clicked', {'annotation': annotationItem}, 'harvardx', 'hxat');
-
         });
 
         jQuery('.parentAnnotation .playMediaButton ').click ( function(e) {
@@ -764,6 +796,21 @@
                 }
             },
         });
+
+        jQuery('.annotationModal svg').show();
+        if (annotationItem.tags && annotationItem.tags.length > 0) {
+            var tagColor = AController.main.tags[annotationItem.tags[annotationItem.tags.length-1]];
+            var cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
+            
+            jQuery('.annotationModal svg path').attr('stroke', cssColor);
+            if (typeof(annotationItem.svg) === "undefined" ) {
+                jQuery('.annotationModal.item-modal-' + annotationItem.id.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + cssColor);
+            }
+        }else if (annotationItem.media === "image" && typeof(annotationItem.svg) === "undefined") {
+            jQuery('.annotationModal.item-modal-' + annotationItem.id.toString() + ' .zoomToImageBounds img').css('border', '3px solid #00cfff');
+        }
+
+
     };
 
     $.DashboardView.prototype.sortAnnotationsByCreated = function(annotations) {
