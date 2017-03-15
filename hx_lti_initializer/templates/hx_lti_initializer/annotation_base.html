@@ -28,6 +28,7 @@
         <script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
         {# library for tokenizing tags #}
         <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
+        <script src="{% static "vendors/development/ba-tiny-pubsub.min.js" %}"></script>
 
         {# files needed to run the HxAT #}
         <script src="{% static "AController.js" %}"></script>
@@ -37,6 +38,7 @@
         <script src="{% static "DashboardController.js" %}"></script>
         <script src="{% static "DashboardView.js" %}"></script>
         <script src="{% static "TargetObjectController.js" %}"></script>
+        <script src="{% static "utilities.js" %}"></script>
 
         {# stylesheet for icons, dashboard and instructions #}
         <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
@@ -56,13 +58,13 @@
             {% endif %}
             <div class="pagination">
                 {% if prev_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" role="button" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" role="button" onclick="AController.utils.logThatThing('clicked_previous_source_button', {}, 'harvardx', 'hxat');" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
                 {% endif %}
                 {% if prev_object or next_object %}
                     <div class="pages" aria-label="You are in document {{assignment_target.order}} out of {{assignment.assignment_objects.count}}.">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
                 {% endif %}
                 {% if next_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" onclick="AController.utils.logThatThing('clicked_next_source_button', {}, 'harvardx', 'hxat');" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
                 {% endif %}
             </div>
             
@@ -231,7 +233,8 @@
     // };
     // window.addEventListener("message", receiveMessage, false);
   </script>
-  <iframe src="/static/start.html" style="display:none" />
+
+  <iframe src="/static/start.html" style="display:none;" />
     {% block endscripts %}{% endblock %}
     </body>
 </html>

@@ -53,6 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
+    'annotationsx.middleware.CookielessSessionMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
     'annotationsx.middleware.CookielessSessionMiddleware',
 )

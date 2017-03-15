@@ -98,18 +98,21 @@
 				"user_id": undefined,
 			}, self.initOptions.pagination, self.initOptions.media);
 			self.viewer.removePrintButton();
+			AController.utils.logThatThing('selected_tab', {'tab': 'public'}, 'harvardx', 'hxat');
 		});
 		jQuery('#mynotes').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.user_id,
 			}, self.initOptions.pagination, self.initOptions.media);
 			self.viewer.addPrintButton();
+			AController.utils.logThatThing('selected_tab', {'tab': 'my notes'}, 'harvardx', 'hxat');
 		});
 		jQuery('#instructor').click(function (e){
 			self.endpoint.queryDatabase({
 				"user_id": self.initOptions.instructors,
 			}, self.initOptions.pagination, self.initOptions.media);
 			self.viewer.removePrintButton();
+			AController.utils.logThatThing('selected_tab', {'tab': 'instructor'}, 'harvardx', 'hxat');
 		});
 		
 		jQuery('button#search-submit').click(function (e) {
@@ -119,14 +122,17 @@
 				self.endpoint.queryDatabase({
 					"username": text,
 				}, self.initOptions.pagination, self.initOptions.media);
+				AController.utils.logThatThing('selected_search_filter', {'filter': 'username', 'search_term': text}, 'harvardx', 'hxat');
 			} else if (search_filter === "annotationtext-filter"){
 				self.endpoint.queryDatabase({
 					"text": text,
 				}, self.initOptions.pagination, self.initOptions.media);
+				AController.utils.logThatThing('selected_search_filter', {'filter': 'annotation text', 'search_term': text}, 'harvardx', 'hxat');
 			} else if (search_filter === "tag-filter"){
 				self.endpoint.queryDatabase({
 					"tag": text,
-				}, self.initOptions.pagination, self.initOptions.media)
+				}, self.initOptions.pagination, self.initOptions.media);
+				AController.utils.logThatThing('selected_search_filter', {'filter': 'tag', 'search_term': text}, 'harvardx', 'hxat');
 			}
 		});
 
@@ -155,6 +161,7 @@
 
 		loadFromSearch.limit = this.initOptions.pagination + numberOfAnnotations;
 		annotator.plugins.Store.loadAnnotationsFromSearch(loadFromSearch);
+		AController.utils.logThatThing('load_more_annotations', {}, 'harvardx', 'hxat');
 	};
 
 	$.DashboardController.prototype.annotationsLoaded = function (annotations) {
@@ -164,6 +171,8 @@
 			if (typeof self.initOptions.focus_on_annotation !== "undefined") {
 				self.endpoint.updateMasterList(self.initOptions.focus_on_annotation, self.viewer);
 				self.initOptions.focus_on_annotation = undefined;
+				AController.utils.logThatThing('focused_on_annotation', {}, 'harvardx', 'hxat');
+
 			} else {
 				self.endpoint.updateMasterList();
 				if (self.endpoint.getNumOfAnnotationsOnScreen() > self.initOptions.pagination) {
@@ -171,6 +180,7 @@
 				};
 				self.viewer.clearDashboard();
 				self.viewer.updateDashboard(0, self.initOptions.pagination, annotations, false);
+				AController.utils.logThatThing('loaded_annotations', {}, 'harvardx', 'hxat');
 			}
 		});
 	};
@@ -185,6 +195,8 @@
 					if (typeof annotation.id !== 'undefined') {
 						self.endpoint.addNewAnnotationToMasterList(annotation);
 						self.viewer.addCreatedAnnotation(annotation.media, annotation);
+						AController.utils.logThatThing('annotation_created', {"annotation": annotation}, 'harvardx', 'hxat');
+
 					} else {
 						attempts++;
 						isChanged();
@@ -199,6 +211,8 @@
 		//console.log("AnnotationsUpdated Triggered");
 		this.endpoint.updateAnnotationInMasterList(annotation);
 		this.viewer.updateAnnotation(annotation);
+		AController.utils.logThatThing('annotation_edited', {'annotation': annotation}, 'harvardx', 'hxat');
+
 	};
 
 	$.DashboardController.prototype.annotationDeleted = function(annotation) {
@@ -207,7 +221,8 @@
 		if (!isReply) {
 			this.viewer.deleteAnnotation(annotation);
 		};
-		
+		AController.utils.logThatThing('annotation_delted', {'annotation': annotation}, 'harvardx', 'hxat');
+
 	};
 
 	$.DashboardController.prototype.__bind = function(fn, me) { 
@@ -226,6 +241,7 @@
     	self.viewer.displayModalView(annotationClicked, addCreatedAnnotation);
     	var displayReplies = self.__bind(self.viewer.displayReplies, self.viewer);
     	self.endpoint.loadRepliesForParentAnnotation(annotation_id, displayReplies);
+    	AController.utils.logThatThing('annotation_clicked', {'id': annotation_id}, 'harvardx', 'hxat');
     };
 
     $.DashboardController.prototype.instructionsClicked = function(e) {

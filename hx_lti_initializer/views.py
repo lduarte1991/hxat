@@ -441,6 +441,7 @@ def access_annotation_target(
         'roles': [str(role) for role in roles],
         'instructions': assignment_target.target_instructions,
         'abstract_db_url': abstract_db_url,
+        'session': request.session.session_key,
         'org': settings.ORGANIZATION,
         'utm_source': request.session.session_key if not request.session['is_staff'] else '',
     }
@@ -519,6 +520,7 @@ def instructor_dashboard_view(request):
         'user_annotations': [],
         'fetch_annotations_time': 0,
         'org': settings.ORGANIZATION,
+        'session': request.session.session_key,
         'dashboard_context_js': json.dumps({
             'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
         })
