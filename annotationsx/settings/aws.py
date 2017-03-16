@@ -53,6 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
+    'annotationsx.middleware.CookielessSessionMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
 )
 
@@ -177,6 +178,7 @@ ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
 ANNOTATION_PAGINATION_LIMIT_DEFAULT = SECURE_SETTINGS.get("annotation_pagination_limit_default", 20)
 ANNOTATION_TRANSCRIPT_LINK_DEFAULT = SECURE_SETTINGS.get("annotation_transcript_link_default", None)
 ANNOTATION_HTTPS_ONLY = SECURE_SETTINGS.get("https_only", False)
+ANNOTATION_LOGGER_URL = SECURE_SETTINGS.get("annotation_logger_url", "")
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

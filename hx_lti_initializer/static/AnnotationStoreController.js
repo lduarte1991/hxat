@@ -376,22 +376,22 @@ AnnotatorEndpointController.prototype._showAnnotations = function(annotations) {
 var MiradorEndpointController = function(deferredObject) {
     AnnotationStoreController.apply(this, arguments);
     var self = this;
-    jQuery.subscribe('windowAdded', function (event, windowId, slotAddress) {
+    mir.eventEmitter.subscribe('windowAdded', function (event, windowId, slotAddress) {
     	//console.log("window was added");
     	// TODO (check id to make sure slot/window match initialized)
-    	self.window = Mirador.viewer.workspace.slots[0].window;
+    	self.window = mir.viewer.workspace.slots[0].window;
 		self.endpoint = self.window.endpoint;
 		deferredObject.resolve();
-		jQuery.subscribe('overlaysRendered.' + self.window.id, function() {
+		mir.eventEmitter.subscribe('annotationsRendered.' + self.window.id, function() {
 			var annotations = self.window.annotationsList;
 			if (annotations !== undefined && annotations !== null && annotations.length > 0) {
 				window.AController.main.colorizeAnnotations(annotations);
 			};
 		});
-		jQuery.subscribe('tooltipViewerSet.' + self.window.id, function (){
+		mir.eventEmitter.subscribe('tooltipViewerSet.' + self.window.id, function (){
 			window.AController.main.colorizeViewer();
 		});
-		jQuery.subscribe('annotationEditorAvailable.' + self.window.id, function (){
+		mir.eventEmitter.subscribe('annotationEditorAvailable.' + self.window.id, function (){
 			var tagElements = jQuery('#annotation-editor-'+self.window.id).find('.tags-editor');
 			if (typeof window.AController.main.tags !== "undefined") {
 				tagList = [];
@@ -410,14 +410,14 @@ var MiradorEndpointController = function(deferredObject) {
 			};
 		});
 		self.imageLimits = {};
-		var currentId = self.window.currentCanvasID;
+		var currentId = self.window.canvasID;
 		jQuery.each(self.window.imagesList, function(index, value) {
 			if (value['@id'] == currentId) {
 				self.imageLimits['height'] = value.height;
 				self.imageLimits['width'] = value.width;
 			};
 		});
-		jQuery.subscribe('imageRectangleUpdated', function(event, options){
+		mir.eventEmitter.subscribe('imageRectangleUpdated', function(event, options){
 			if (options.id == self.window.id) {
 				var xChecked = options.osdBounds.x;
 				var yChecked = options.osdBounds.y;
@@ -469,13 +469,13 @@ MiradorEndpointController.prototype.getNumOfAnnotationsOnScreen = function (){
 MiradorEndpointController.prototype.setUpListener = function(listener, expected_fun) {
 	var self = this;
 	if (listener === "catchAnnotationsLoaded") {
-		jQuery.subscribe(listener + '.' + self.window.id, function(event) {
+		mir.eventEmitter.subscribe(listener + '.' + self.window.id, function(event) {
 			var annotations = self.endpoint.annotationsListCatch;
 			expected_fun(annotations);
 			
 		});
 	} else {
-		jQuery.subscribe(listener + '.' + self.window.id, function(event, annotation) {
+		mir.eventEmitter.subscribe(listener + '.' + self.window.id, function(event, annotation) {
 			expected_fun(annotation);
 		});
 	}
@@ -488,13 +488,13 @@ MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer
 		var annotation = this.getAnnotationById(focus_id);
 		var self = this;
 		self.window.annotationsList = [self.endpoint.getAnnotationInOA(annotation)];
-		jQuery.publish('annotationListLoaded.' + self.window.id);
-
+		//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
 		try{
-			jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+			mir.eventEmitter.publish('fitBounds.' + self.window.id, annotation.bounds);
 		} catch (e){
-			jQuery.subscribe('osdOpen.' + self.window.id, function(){
-				jQuery.publish('fitBounds.' + self.window.id, annotation.bounds);
+			mir.eventEmitter.subscribe('osdOpen.' + self.window.id, function(){
+				mir.eventEmitter.publish('fitBounds.' + self.window.id, annotation.bounds);
 			});
 		}
 		
@@ -506,7 +506,8 @@ MiradorEndpointController.prototype.updateMasterList = function(focus_id, viewer
 MiradorEndpointController.prototype.updateEndpointList = function(options){
 	if (options.limit) {
 		this.window.annotationsList = this.window.annotationsList.slice(0, options.limit);
-		jQuery.publish('annotationListLoaded.' + this.window.id);
+		//mir.eventEmitter.publish('annotationListLoaded.' + this.window.id);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: this.window.id, annotationsList: this.window.annotationsList});
 	};
 };
 
@@ -521,7 +522,8 @@ MiradorEndpointController.prototype.loadMoreAnnotations = function(annotations) 
 		// trigger drawing here or once they're all loaded below
 		self.window.annotationsList.push(oaAnnotation);
 	});
-	jQuery.publish('annotationListLoaded.' + self.window.id);
+	//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+	mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
 	// trigger only after adding all items to annotationListCatch
 };
 
@@ -530,6 +532,15 @@ MiradorEndpointController.prototype.addNewAnnotationToMasterList = function(anno
 		this.list_of_replies[annotation.id] = annotation;
 	} else {
 		this.annotationsMasterList.unshift(annotation);
+		var notfound = true;
+		for(ann in this.endpoint.annotationsListCatch) {
+			if (ann.id == annotation.id) {
+				notfound = false;
+			}
+		}
+		if (notfound) {
+			this.loadMoreAnnotations([annotation]);
+		}
 	}
 };
 
@@ -601,7 +612,7 @@ MiradorEndpointController.prototype.openEditorForReply = function(options) {
 		var annotation = {
 			collectionId: self.endpoint.collection_id,
 			contextId: self.endpoint.context_id,
-			uri: self.window.currentCanvasID,
+			uri: self.window.canvasID,
 			permissions: self.endpoint.catchOptions.permissions,
 			user: self.endpoint.catchOptions.user,
 			archived: false,
@@ -623,7 +634,7 @@ MiradorEndpointController.prototype.openEditorForReply = function(options) {
 MiradorEndpointController.prototype.deleteAnnotation = function(annotation) {
 	// given an annotation to be deleted, publish call to remove overlay from mirador
 	// and send a signal to catch to delete
-	jQuery.publish('annotationDeleted.' + this.window.id, annotation.id.toString());
+	mir.eventEmitter.publish('annotationDeleted.' + this.window.id, annotation.id.toString());
 };
 
 MiradorEndpointController.prototype.editAnnotation = function(annotation, button) {
@@ -671,7 +682,7 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 		var annotation = self.getAnnotationById(jQuery('.parentAnnotation .idAnnotation').html());
 		annotation.text = jQuery('.parentAnnotation .body').html();
 		var oaAnnotation = self.endpoint.getAnnotationInOA(annotation);
-		jQuery.publish('annotationUpdated.'+self.window.id, oaAnnotation);
+		mir.eventEmitter.publish('annotationUpdated.'+self.window.id, oaAnnotation);
 		closeEditingMode();
 	});
 
@@ -730,7 +741,7 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 		username: setOptions.username,
 		text: setOptions.text,
 		tag: setOptions.tag,
-		uri: self.window.currentCanvasID,
+		uri: self.window.canvasID,
 	};
 
 	var onSuccess = function(data){
@@ -749,8 +760,9 @@ MiradorEndpointController.prototype.queryDatabase = function(options, pagination
 			self.window.annotationsList.push(oaAnnotation);
 		});
 
-		jQuery.publish('annotationListLoaded.' + self.window.id);
-		jQuery.publish('catchAnnotationsLoaded', annotations);
+		mir.eventEmitter.publish('ANNOTATIONS_LIST_UPDATED', {windowId: self.window.id, annotationsList: self.window.annotationsList});
+		//mir.eventEmitter.publish('annotationListLoaded.' + self.window.id);
+		mir.eventEmitter.publish('catchAnnotationsLoaded', annotations);
 	}
 
 	self.endpoint.search(newOptions, onSuccess, function(){});

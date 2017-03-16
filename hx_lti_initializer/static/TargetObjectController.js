@@ -29,7 +29,7 @@
 
         // Shows annotation toggle label only when hovered
         jQuery('.annotations-status').hover(function() {
-                jQuery('.hover-inst').toggleClass("hidden");
+            jQuery('.hover-inst').toggleClass("hidden");
         });
 
         // Actually toggles whether annotaitons are displayed or not
@@ -210,7 +210,7 @@
         
         // deals with the button that turns on keyboard annotations
         jQuery('#make_annotations_panel button').click(function(){
-            
+            AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'text'}, 'harvardx', 'hxat');
             // if person is trying to start making an annotation via keyboard
             if (jQuery(this).attr('data-toggled') == "false") {
 
@@ -468,6 +468,7 @@
         // in order to toggle on keyboard input mode. mouseup allows focus to actually move
         // screen reader users to the appropriate div.
         jQuery('#keyboard-input-button').on('mouseup', function (event){
+            AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'image'}, 'harvardx', 'hxat');
             jQuery('.keyboard-command-area').attr('aria-label', 'Click this button to turn on keyboard input. To use keyboard input, select this area. Then use "W", "A", "S", "D" to move around. "-" to zoom out, "=" to zoom in" and lowercase "m" to make an annotation.');
             jQuery('.openseadragon-canvas').attr('tabindex', '-1');
             
@@ -493,6 +494,14 @@
                     jQuery('#keyboard-input-button').css('color', '#ffff00');
                     break;
             }
+        });
+
+        jQuery('body').on('click', '.mirador-osd-annotations-layer.hud-control', function() {
+            AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
+        });
+
+        jQuery('body').on('click', '.mirador-osd-close.hud-control', function() {
+            AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
         });
         
         // when keyboard users tab away from the keyboard button it hides the qtip
@@ -532,7 +541,7 @@
 
                         // tags are set to empty array if they are input as empty string
                         var tags = jQuery('.replyItemEdit #id_tags').val().split(' ');
-                        if (tags == ['']) {
+                        if (tags.length == 1 && tags[0].length == 0) {
                             tags = [];
                         };
 
@@ -540,14 +549,42 @@
                         var miraWindow = AController.dashboardObjectController.endpoint.window;
                         var miraEndpoint = AController.dashboardObjectController.endpoint.endpoint;
                         var bounds = AController.dashboardObjectController.endpoint.currentImageBounds;
-                        var thumb = Mirador.Iiif.getImageUrl(miraWindow.imagesList[Mirador.getImageIndexById(miraWindow.imagesList, miraWindow.currentCanvasID)]);
+                        var getImageUrl = function(image) {
+                            
+                            if (!image.images[0].resource.service) {
+                              id = image.images[0].resource['default'].service['@id'];
+                              id = id.replace(/\/$/, "");
+                              return id;
+                            }
+                            
+                            var id = image.images[0].resource.service['@id'];
+                            id = id.replace(/\/$/, "");
+
+                            return id;
+                        };
+                        var trimString = function(str) {
+                            return str.replace(/^\s+|\s+$/g, '');
+                        };
+                        var getImageIndexById = function(imagesList, id) {
+                            var imgIndex = 0;
+
+                            jQuery.each(imagesList, function(index, img) {
+                                if (trimString(img['@id']) === trimString(id)) {
+                                    imgIndex = index;
+                                }
+                            });
+
+                            return imgIndex;
+                        };
+                        
+                        var thumb = getImageUrl(miraWindow.imagesList[getImageIndexById(miraWindow.imagesList, miraWindow.canvasID)]);
                         thumb = thumb + "/" + bounds.x + "," + bounds.y + "," + bounds.width + "," + bounds.height + "/full/0/native.jpg";
                         
                         // sets up the annotator structure to make the call to create an Annotation
                         var annotation = {
                             collectionId: miraEndpoint.collection_id,
                             contextId: miraEndpoint.context_id,
-                            uri: miraWindow.currentCanvasID,
+                            uri: miraWindow.canvasID,
                             permissions: miraEndpoint.catchOptions.permissions,
                             user: miraEndpoint.catchOptions.user,
                             archived: false,
@@ -622,6 +659,7 @@
                 self.vid.controlBar.progressControl.seekBar.stepForward();
             });
             Mousetrap.bind('n', function(e){
+                AController.utils.logThatThing('clicked_keyboard_input_button', {'media': 'video'}, 'harvardx', 'hxat');
                 jQuery('.vjs-new-annotation').trigger('click');
             });
 
@@ -819,8 +857,52 @@
                     new_percentage = 1.0;
                 }
                 self.vid.annotations.rsd.setPosition(1, new_percentage);
-            });            
+            });
 
+            jQuery('body').on('click', '.vjs-showannotations-annotation.vjs-control', function() {
+                var status = 'hidden';
+                if (jQuery(event.target).hasClass('active')) {
+                    status = 'shown';
+                }
+
+                AController.utils.logThatThing('toggle_annotations_display', {'status': status}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-statistics-annotation.vjs-control', function() {
+                var status = 'hidden';
+                if (jQuery(event.target).hasClass('active')) {
+                    status = 'shown';
+                }
+
+                AController.utils.logThatThing('toggle_statistics_display', {'status': status}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-selector-arrow', function() {
+
+                AController.utils.logThatThing('filter_arrow_selector', {}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-transcript-control.vjs-control', function() {
+                AController.utils.logThatThing('toggle_transcript', {}, 'harvardx', 'hxat');
+            });
+
+            jQuery('body').on('click', '.vjs-download-control.vjs-control', function() {
+                AController.utils.logThatThing('clicked_download_button', {}, 'harvardx', 'hxat');
+            });
+
+            if (typeof(jQuery.subscribe) === 'function') {
+                jQuery.subscribe('speed_change', function(_, speed) {
+                    AController.utils.logThatThing('video_speed_changed', {'speed': JSON.stringify(speed)}, 'harvardx', 'hxat');
+                });
+
+                jQuery.subscribe('video_play_button_clicked', function(_) {
+                    AController.utils.logThatThing('video_play_button_clicked', {}, 'harvardx', 'hxat');
+                });
+
+                jQuery.subscribe('captions_toggled', function(_, captions_label) {
+                    AController.utils.logThatThing('captions_toggled', {'caption': captions_label}, 'harvardx', 'hxat');
+                });
+            }
         };
 
         $.TargetObjectController.prototype.colorizeAnnotation = function(annotationId, rgbColor) {
@@ -832,9 +914,34 @@
                         var tag = jQuery.trim(jQuery(item).html());
                         var rgbColor = window.AController.main.tags[tag];
                         if (rgbColor !== undefined) {
-                                jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
+                            jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
                         };
-                    })
+                    });
+
+                    var red = rgbColor.red.toString(16) == 0 ? "00" : rgbColor.red.toString(16);
+                    var green = rgbColor.green.toString(16) == 0 ? "00" : rgbColor.green.toString(16);
+                    var blue = rgbColor.blue.toString(16) == 0 ? "00" : rgbColor.blue.toString(16);
+                    var rgbHex = '#' + red + green + blue;
+
+                    jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
+                        if (annotationId == value.id) {
+                            var svg = value.rangePosition;
+                            if (typeof(svg) === "string" || jQuery.isArray(svg)) {
+                                jQuery.each(jQuery(svg).find('path'), function(index1, value1) {
+                                    jQuery.each(window.paper.projects[0].getItem()._children, function(index2, value2) {
+                                        if (value2._name === value1.id) {
+                                            value2.strokeColor = rgbHex;
+                                            setTimeout(function() {
+                                                jQuery('#thumbnail-' + annotationId).find('path').attr('stroke', rgbHex);
+                                            }, 500);
+                                        }
+                                    });
+                                });
+                            } else {
+                                setTimeout(function() {jQuery('.annotationItem.item-' + annotationId.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + rgbHex), 500});
+                            }
+                        }
+                    });
                 }, 30);
             };
         };
@@ -872,6 +979,7 @@
                     jQuery('.annotations-status i').addClass('fa-comments');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
+                    AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
                 } else {
                     jQuery('.annotations-status .hover-inst').html("Hide annotations");
                     jQuery('.annotations-status').attr('aria-label', "Hide annotations");
@@ -882,6 +990,7 @@
                             store.registerAnnotation(annotation);
                     });
                     annotator.publish("externalCallToHighlightTags");
+                    AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
                 }
                 jQuery('.annotations-status').toggleClass("on");
             };

@@ -28,6 +28,7 @@
         <script src="{% static "vendors/development/bootstrap-confirmation.js" %}"></script>
         {# library for tokenizing tags #}
         <script src="{% static "vendors/development/jquery.tokeninput.js" %}"></script>
+        <script src="{% static "vendors/development/ba-tiny-pubsub.min.js" %}"></script>
 
         {# files needed to run the HxAT #}
         <script src="{% static "AController.js" %}"></script>
@@ -37,6 +38,7 @@
         <script src="{% static "DashboardController.js" %}"></script>
         <script src="{% static "DashboardView.js" %}"></script>
         <script src="{% static "TargetObjectController.js" %}"></script>
+        <script src="{% static "utilities.js" %}"></script>
 
         {# stylesheet for icons, dashboard and instructions #}
         <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
@@ -56,13 +58,13 @@
             {% endif %}
             <div class="pagination">
                 {% if prev_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}" class="btn btn-default" role="button" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" role="button" onclick="AController.utils.logThatThing('clicked_previous_source_button', {}, 'harvardx', 'hxat');" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
                 {% endif %}
                 {% if prev_object or next_object %}
                     <div class="pages" aria-label="You are in document {{assignment_target.order}} out of {{assignment.assignment_objects.count}}.">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
                 {% endif %}
                 {% if next_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}" class="btn btn-default" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}" class="btn btn-default" onclick="AController.utils.logThatThing('clicked_next_source_button', {}, 'harvardx', 'hxat');" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
                 {% endif %}
             </div>
             
@@ -99,6 +101,8 @@
                 user_id: "{{ user_id }}",
                 is_instructor: "{{ is_instructor }}",
                 pagination: {{ assignment.pagination_limit }},
+                logger_url: "{{ logger_url }}",
+                utm_source: "{{ utm_source }}"
             },
 
             // this should handle the colorization of the target
@@ -191,46 +195,47 @@
         jQuery('.annotation-fullscreen').click(toggleFullscreen);
     </script>
     <script>
-    var receiveMessage = function (evt) {
-      if (evt.data === 'MM:3PCunsupported') {
-        console.log('third party cookies are not supported');
-        var overlaybckg = document.createElement('div');
-        var overlaydialog = document.createElement('div');
-        jQuery(overlaybckg).css({
-            "background-color": "rgba(33, 33, 33, 0.3)",
-            "width": "100%",
-            "height": "100%",
-            "position": "fixed",
-            "top": "0",
-            "left": "0",
-            "z-index": "999"
-        });
-        jQuery(overlaydialog).css({
-            "background-color": "white",
-            "width": "500px",
-            "height": "400px",
-            "margin-left": "-250px",
-            "margin-top": "-200px",
-            "top": "50%",
-            "left": "50%",
-            "position": "fixed",
-            "z-index": "9999",
-            "border": "4px solid black",
-            "border-radius": "10px",
-        });
-        jQuery(overlaydialog).html("<h3 style='padding-left: 50px; padding-top:10px;'>Uh oh!</h3><p style='padding: 0px 50px;'>You seem to have third-party cookies and data turned off. Unfortunately, this means that we are not able to save your annotations or show you the annotations of instructors and other learners, since we will not be able to get information about who you are.</p> <button role='button' class='btn btn-success' style='margin:5px 50px;width:400px;' id='takemethere' onclick='window.open(\"/troubleshooting/\", \"_blank\");'>Visit troubleshooting page</button><button role='button' class='btn btn-danger' style='margin: 10px 50px;width:400px;' id='ignorewarning'>Proceed without annotations</button> <p style='padding: 10px 50px; text-align:center;'>(Clicking \"Proceed without annotations\" will allow you to view the assignment you are trying to annotate. Unfortunately your annotations will not be saved and you will not see instructor or other leareners' annotations.)</p>");
-        jQuery(overlaybckg).append(overlaydialog);
-        jQuery("body").append(overlaybckg);
-        jQuery('#ignorewarning').click(function(){
-            jQuery(overlaybckg).remove();
-        })
-      } else if (evt.data === 'MM:3PCsupported') {
-        console.log('third party cookies are supported');
-      }
-    };
-    window.addEventListener("message", receiveMessage, false);
+    // var receiveMessage = function (evt) {
+    //   if (evt.data === 'MM:3PCunsupported') {
+    //     console.log('third party cookies are not supported');
+    //     var overlaybckg = document.createElement('div');
+    //     var overlaydialog = document.createElement('div');
+    //     jQuery(overlaybckg).css({
+    //         "background-color": "rgba(33, 33, 33, 0.3)",
+    //         "width": "100%",
+    //         "height": "100%",
+    //         "position": "fixed",
+    //         "top": "0",
+    //         "left": "0",
+    //         "z-index": "999"
+    //     });
+    //     jQuery(overlaydialog).css({
+    //         "background-color": "white",
+    //         "width": "500px",
+    //         "height": "400px",
+    //         "margin-left": "-250px",
+    //         "margin-top": "-200px",
+    //         "top": "50%",
+    //         "left": "50%",
+    //         "position": "fixed",
+    //         "z-index": "9999",
+    //         "border": "4px solid black",
+    //         "border-radius": "10px",
+    //     });
+    //     jQuery(overlaydialog).html("<h3 style='padding-left: 50px; padding-top:10px;'>Uh oh!</h3><p style='padding: 0px 50px;'>You seem to have third-party cookies and data turned off. Unfortunately, this means that we are not able to save your annotations or show you the annotations of instructors and other learners, since we will not be able to get information about who you are.</p> <button role='button' class='btn btn-success' style='margin:5px 50px;width:400px;' id='takemethere' onclick='window.open(\"/troubleshooting/\", \"_blank\");'>Visit troubleshooting page</button><button role='button' class='btn btn-danger' style='margin: 10px 50px;width:400px;' id='ignorewarning'>Proceed without annotations</button> <p style='padding: 10px 50px; text-align:center;'>(Clicking \"Proceed without annotations\" will allow you to view the assignment you are trying to annotate. Unfortunately your annotations will not be saved and you will not see instructor or other leareners' annotations.)</p>");
+    //     jQuery(overlaybckg).append(overlaydialog);
+    //     jQuery("body").append(overlaybckg);
+    //     jQuery('#ignorewarning').click(function(){
+    //         jQuery(overlaybckg).remove();
+    //     })
+    //   } else if (evt.data === 'MM:3PCsupported') {
+    //     console.log('third party cookies are supported');
+    //   }
+    // };
+    // window.addEventListener("message", receiveMessage, false);
   </script>
-  <iframe src="/static/start.html" style="display:none" />
+
+  <iframe src="/static/start.html" style="display:none;" />
     {% block endscripts %}{% endblock %}
     </body>
 </html>
