@@ -141,9 +141,11 @@ class CookielessSessionMiddleware(object):
     def __init__(self):
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
-        print "STarting engine"
+        print "Starting engine"
 
     def process_request(self, request):
+        # note: 'utm_source' is an objuscated term that in actuality contains
+        # the session id injected into URL when the user does not allow cookies
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, request.GET.get('utm_source'))
         request.session = self.SessionStore(session_key)
         if not request.session.exists(request.session.session_key):

@@ -442,6 +442,7 @@ def access_annotation_target(
         'abstract_db_url': abstract_db_url,
         'session': request.session.session_key,
         'org': settings.ORGANIZATION,
+        'logger_url': settings.ANNOTATION_LOGGER_URL,
         'utm_source': request.session.session_key if not request.session['is_staff'] else '',
     }
     if not assignment.object_before(object_id) is None:

@@ -21,5 +21,5 @@ window.AController = window.AController || function(options) {
 		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo, AController.dashboardView);
 	}
 	AController.main = new AController.AnnotationMain(options);
-	AController.utils = new AController.Utils('https://edge.edx.org');
+	AController.utils = new AController.Utils(options.commonInfo.logger_url);
 }

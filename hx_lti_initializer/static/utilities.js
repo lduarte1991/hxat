@@ -87,9 +87,9 @@ jQuery.ajaxSetup({
             Logger.log(source + '.' + object + '.' + action, JSON.stringify(thing));
         } else {
             // for debug
-            console.log("Could not find logger.");
-            console.log("Here's what I would have logged: " + source + '.' + object + '.' + action);
-            console.log(JSON.stringify(thing));
+            // console.log("Could not find logger.");
+            // console.log("Here's what I would have logged: " + source + '.' + object + '.' + action);
+            // console.log(JSON.stringify(thing));
         }
     };
 
