@@ -448,7 +448,7 @@
                     at: 'bottom center',
                     target: jQuery('#keyboard-input-button'),
                     // Also use first steps position target...
-                    viewport: $(window) // ...and make sure it stays on-screen if possible
+                    viewport: jQuery(window) // ...and make sure it stays on-screen if possible
                 },
                 show: {
                     event: false,
