@@ -21,7 +21,6 @@ window.AController = window.AController || function(options) {
 		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo, AController.dashboardView);
 	}
 	AController.main = new AController.AnnotationMain(options);
-	console.log(options);
 	var logger_url = options.commonInfo.logger_url || "";
 	AController.utils = new AController.Utils(logger_url);
 }

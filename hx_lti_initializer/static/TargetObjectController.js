@@ -923,20 +923,38 @@
                     var blue = rgbColor.blue.toString(16) == 0 ? "00" : rgbColor.blue.toString(16);
                     var rgbHex = '#' + red + green + blue;
 
+                    var checkDrawnOutlines = function(svgElement) {
+                        jQuery.each(jQuery(svgElement).find('path'), function(_, pathElement) {
+                            jQuery.each(window.paper.projects[0].getItem()._children, function(_, outline) {
+                                if (outline._name === pathElement.id) {
+                                    outline.strokeColor = rgbHex;
+                                    setTimeout(function() {
+                                        jQuery('svg[id^="thumbnail-' + annotationId + '"]').find('path').attr('stroke', rgbHex);
+                                    }, 500);
+                                }
+                            });
+                        });
+                    }
+
                     jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
                         if (annotationId == value.id) {
                             var svg = value.rangePosition;
-                            if (typeof(svg) === "string" || jQuery.isArray(svg)) {
-                                jQuery.each(jQuery(svg).find('path'), function(index1, value1) {
-                                    jQuery.each(window.paper.projects[0].getItem()._children, function(index2, value2) {
-                                        if (value2._name === value1.id) {
-                                            value2.strokeColor = rgbHex;
-                                            setTimeout(function() {
-                                                jQuery('#thumbnail-' + annotationId).find('path').attr('stroke', rgbHex);
-                                            }, 500);
+                            if (typeof(svg) === "string") {
+                                checkDrawnOutlines(svg)
+                            } else if (jQuery.isArray(svg)) {
+                                jQuery.each(svg, function(index1, value1) {
+                                    if ( typeof(value1.selector.items) !== "undefined") {
+                                        jQuery.each(value1.selector.items, function(index2, value2) {
+                                            if (value2['@type'] === "oa:SvgSelector") {
+                                                checkDrawnOutlines(value2['value']);
+                                            }
+                                        });
+                                    } else {
+                                        if (value1.selector.item['@type'] === "oa:SvgSelector") {
+                                            checkDrawnOutlines(value1.selector.item['value']);
                                         }
-                                    });
-                                });
+                                    }
+                                })
                             } else {
                                 setTimeout(function() {jQuery('.annotationItem.item-' + annotationId.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + rgbHex), 500});
                             }
