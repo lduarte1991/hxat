@@ -51,15 +51,15 @@
 		</div>
 		</div>
 		<!-- TODO: Add example of how to use-->
-		<h4 class='edit_course_subheading'>External CSS Default:</h4>
 		<div class="form-group">
+			<label for="id_course_external_css_default" class="edit_course_subheading">External CSS Default:</label>
 			<input id="id_course_external_css_default" maxlength="255" name="course_external_css_default" class="form-control hx-textfield" type="text" value="{{form.course_external_css_default.value}}">
 		</div>
 		<div class='button-collection'>
-			<div type="submit" class="save" id='save-button' role="button" onclick="javascript:jQuery('#edit_course_form').submit();">
+			<div type="submit" class="save" id='save-button' tabindex="0" role="button" onclick="javascript:jQuery('#edit_course_form').submit();">
 			Save
 			</div>
-			<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+			<div class="save" id='cancel-button' role='button' tabindex="0" onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
 			Cancel
 			</div>
 		</div>
@@ -77,6 +77,9 @@
 				  jQuery('#ro-course-admins').html(oldValue);
 				});
 				jQuery('#ro-course-admins').html(jQuery('.dropdown-toggle[data-id="id_select_existing_user"] span').html());
+				jQuery('.save').on('keyup', function (e){ if (e.which === 32 || e.which === 13){
+					jQuery(e.currentTarget).click();} 
+				});
 			}, 1000);
 			setTimeout(function(){
 				if (window.navigator.platform === "Win32") {
