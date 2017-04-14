@@ -21,7 +21,7 @@
             <div id='banner-logo-left'>
                 {% if org == "HARVARDX" %}
                     <div class="logo" aria-label="HarvardX Logo" onclick="window.location='{% url "hx_lti_initializer:course_admin_hub" %}?resource_link_id={{ resource_link_id }}'">
-                        <img src="{% static "css/images/hx_inv.png" %}" aria-label='HarvardX Logo' style="height:40px;" />
+                        <img src="{% static "css/images/hx_inv.png" %}" alt='HarvardX Logo' style="height:40px;" />
                     </div>
                 {% endif %}
                 <div class="site-title">
