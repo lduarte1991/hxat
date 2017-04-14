@@ -1309,4 +1309,5 @@ progress[value]::-webkit-progress-value {
 
 .make-starting-resource {
 	text-decoration: none;
+	cursor: pointer;
 }

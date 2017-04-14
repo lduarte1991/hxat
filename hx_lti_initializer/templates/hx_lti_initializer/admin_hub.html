@@ -53,13 +53,13 @@
                         {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                             <div class='table-row'>
                                 {% if is_instructor %}
-                                <a href='#' class='make-starting-resource' data-url="{% url 'hx_lti_initializer:change_starting_resource' assignment_id=assignment.assignment_id object_id=file.id %}" data-title='{{file.target_title}}'>
+                                <span href='#' class='make-starting-resource' data-url="{% url 'hx_lti_initializer:change_starting_resource' assignment_id=assignment.assignment_id object_id=file.id %}" data-title='{{file.target_title}}'>
                                     {% if assignment.assignment_id == starter_collection_id and file.id == starter_object_id %}
                                     <i class='fa fa-check-square'></i>
                                     {% else %}
                                     <i class='fa fa-square-o'></i>
                                     {% endif %}
-                                </a>
+                                </span>
                                 {% endif %}
                                 <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}">{{file.target_title}}</a>
                                 {% if is_instructor %}
