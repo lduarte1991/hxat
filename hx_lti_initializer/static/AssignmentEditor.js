@@ -80,7 +80,8 @@ AssignmentEditor.prototype = {
     set_up_source_expanding: function() {
         var self = this;
         // toggles source tailed view from clicking on the row with the name
-        this.source_list.on('click', '.source-item .first-row', function(event) {
+
+        var expand_from_first_row = function(event) {
             event.preventDefault ? event.preventDefault() : (event.returnValue = false);
             var source_item = jQuery(this.parentElement);
             var source_item_arrow = source_item.find('.fa-lg');
@@ -97,7 +98,14 @@ AssignmentEditor.prototype = {
                 to_list.show();
                 source_item.addClass('open');
             }
+        };
+
+        this.source_list.on('click', '.source-item .first-row', expand_from_first_row);
+        this.keyPressOn('.source-materials', '.source-item .first-row', {
+            'SPACE': expand_from_first_row,
+            'ENTER': expand_from_first_row
         });
+
 
         // toggles the advanced settings of each source
         this.source_list.on("click", '.show-settings', function(event) {
@@ -639,7 +647,35 @@ AssignmentEditor.prototype = {
     error_check: function(){
         console.log('Checking to see if there are any errors in the form');  
     },
-    
+
+    keyPressOn: function(parent, child, codesAndFuncs) {
+        var self = this;
+        jQuery(parent).on('keypress', child, function(event) {
+            var key = event.keyCode ? event.keyCode : event.which;
+            jQuery.each(codesAndFuncs, function(keyCode, value) {
+                if (key == self.keyCodeValue(keyCode)) {
+                    value();
+                }
+            });
+            return false;
+        });
+    },
+
+    keyCodeValue: function(keyCode) {
+        switch(keyCode.toUpperCase()) {
+            case 'SPACE':
+            case 'SPACEBAR':
+            case 'SPACE BAR':
+                return 32;
+                break;
+            case 'ENTER':
+            case 'ENT':
+                return 13;
+                break;
+            default:
+                return parseInt(keyCode, 10);
+        }
+    }
 };
 
 jQuery(document).ready(function() {

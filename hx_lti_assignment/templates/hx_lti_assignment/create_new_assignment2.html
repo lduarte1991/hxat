@@ -9,7 +9,7 @@
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
 <script src="{% static "AssignmentEditor.js" %}"></script>
 <div class='main-page'>
-	<h2>Assignment Editor</h2>
+	<h3>Assignment Editor</h3>
 
 	<label for='assignment-name-input' class='subheading'>Assignment name:</label>
 	<input class='hx-textfield' type='text' id='assignment-name-input' placeholder="Untitled" value='{{form.instance.assignment_name}}' data-course-id="{{course_id}}">
@@ -22,10 +22,10 @@
 		{% else %}
 			<div class='save' id='reorder-list-button'>Reorder list</div>
 			{% for source in targets_form %}
-				<div class='source-item' id='item-{{forloop.counter0}}' data-order='{{source.instance.order}}' data-id='{{source.instance.target_object.pk}}' data-aTarget="{{source.instance.id}}" data-media="{{source.instance.target_type}}">
+				<div class='source-item' id='item-{{forloop.counter0}}' tabindex="0" data-order='{{source.instance.order}}' data-id='{{source.instance.target_object.pk}}' data-aTarget="{{source.instance.id}}" data-media="{{source.instance.target_type}}">
 					<div class='first-row'>
 						<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{source.instance.target_object.target_title}}</span>
-						<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.instance.order}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
+						<div class='order-div'><label for="order-div-{{source.instance.order}}" style="display:none;">Order input</label><input type="number" id="order-div-{{source.instance.order}}" class='ordernum' style='display:none;' min="1" value="{{source.instance.order}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
 					</div>
 					<div class='source-detail' style='display:none'>
 						<div class='detail-metadata'>
@@ -112,10 +112,10 @@
 	</div>
 
 	<div class='button-collection'>
-		<div type="submit" class="save" id='save-button' role="button" onclick='window.assignment_editor.save_form();'>
+		<div type="submit" class="save" id='save-button' tabindex="0" role="button" onclick='window.assignment_editor.save_form();'>
 			Save
 		</div>
-		<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+		<div class="save" id='cancel-button' role='button' tabindex="0" onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
 		Cancel
 		</div>
 	</div>
@@ -168,7 +168,8 @@
 		
 		{% for tagname, color in tag_list %}
 		<div class='trow'>
-			<input type='text' value='{{tagname}}' class='custom-tag-name'>
+			<label style='display:none' for="tag-{{tagname}}">Tag name</label> 
+			<input type='text' value='{{tagname}}' id="tag-{{tagname}}" class='custom-tag-name'>
 			<div class='color-selection'>
 				<div class='custom-tag-color-chosen' role='button' style='background-color:{{color}};'></div>
 				<div class='custom-tag-color-menu open'>
@@ -212,10 +213,10 @@
 		{% endfor %}
 	</div>
 	<div class='button-collection'>
-		<div type="submit" class="save" id='annotation-settings-save-button' role="button" onclick="window.assignment_editor.save_annotation_settings();">
+		<div type="submit" class="save" id='annotation-settings-save-button' tabindex="0" role="button" onclick="window.assignment_editor.save_annotation_settings();">
 			Save
 		</div>
-		<div class="save" id='annotation-settings-cancel-button' role='button'>
+		<div class="save" id='annotation-settings-cancel-button' tabindex="0" role='button'>
 			Cancel
 		</div>
 	</div>
@@ -231,10 +232,10 @@
 	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-url' value='{{form.annotation_database_url.value}}'>
 	<label class='subheading' for='database-api-key'>Annotation database API key</label>
 	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-api-key' value='{{form.annotation_database_apikey.value}}'>
-	<label class='subheading' for='database-url'>Annotation database secret token</label>
-	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-url' value='{{form.annotation_database_secret_token.value}}'>
+	<label class='subheading' for='database-secret-token'>Annotation database secret token</label>
+	<input class='hx-textfield full-width readonlyfield' readonly type='text' id='database-secret-token' value='{{form.annotation_database_secret_token.value}}'>
 	<div class='button-collection'>
-		<div class="save" id='database-settings-cancel-button' role='button'>
+		<div class="save" id='database-settings-cancel-button' role='button' tabindex="0">
 			Back to assignment
 		</div>
 	</div>
@@ -250,7 +251,8 @@
 	{% if forloop.counter0 < number_of_targets %}
 	<tr id="row{{forloop.counter}}" class="ui-state-default assignment-targets-table-row">
 						<td class="field-target_object" >
-							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control" data-live-search="true">
+							<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_object">Sources</label>
+							<select id="id_assignmenttargets_set-{{forloop.counter0}}-target_object" name="assignmenttargets_set-{{forloop.counter0}}-target_object" class="selectpicker form-control">
 								{% for id,choice in form.fields.assignment_objects.choices %}
 								<option value="{{ id }}" {% if id|slugify == item.target_object.value|slugify %} selected {% endif %}>{{ choice }}</option>
 								{% endfor %}
@@ -286,17 +288,20 @@
 								 	{% endif %} 
 								 {% endif %}
 								{% endfor %}
+								<label for="id_assignmenttargets_set-{{forloop.counter0}}-target_external_options" style="display:none;">External Options (advanced user only)</label>
 								<textarea id="id_assignmenttargets_set-{{forloop.counter0}}-target_external_options" name="assignmenttargets_set-{{forloop.counter0}}-target_external_options" class="form-control">{{ item.target_external_options.value }}</textarea>
 							</div>
 						</td>
 						<td>
-							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
+							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %} Create New</a>
 						</td>
+						<label for="id_assignmenttargets_set-{{forloop.counter0}}-order" style="display: none;">Order (advanced use only)</label>
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
 						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}" role="button">{% bootstrap_icon "cog" %}</td>
-						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %}</a>{% if item.instance.pk and targets_form.can_delete%} <input class="hidden" data-id="{{item.target_object.value}}" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
+						<td class="field-delete"><a href='#' onclick="deleterow(this)" title="Remove Source Material from Assignment">{% bootstrap_icon "trash" %} Delete</a>{% if item.instance.pk and targets_form.can_delete%}<label for="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" style="display:none;">Delete item (advanced use only)</label> <input class="hidden" data-id="{{item.target_object.value}}" id="id_assignmenttargets_set-{{forloop.counter0}}-DELETE" name="assignmenttargets_set-{{forloop.counter0}}-DELETE" type="checkbox" />{% endif %}</td>
 						<td class="field-reorder">{% bootstrap_icon "option-vertical" %}
 						{% if item.id.value %}
+						<label for="id_assignmenttargets_set-{{forloop.counter0}}-id" style="dislpay:none;">Value (advanced use only)</label>
 						<input class="hidden" id="id_assignmenttargets_set-{{forloop.counter0}}-id" name="assignmenttargets_set-{{forloop.counter0}}-id" value='{{item.id.value}}'>
 						{% endif %}
 						</td>
