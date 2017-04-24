@@ -16,7 +16,7 @@
         </div>
     <% } else if (media === 'image' && thumbnail) {%>
         <div class="zoomToImageBounds" style='position:relative;'>
-            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';" data-svg=".thumbnail-<%= id %>"/>
+            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';" data-svg=".thumbnail-<%= id %>" alt="Thumbnail Preview"/>
             <% if (typeof(svg) !== "undefined") { %>
                 <%= svg %>
             <% } %>

@@ -30999,11 +30999,14 @@ this._cbs.ontext(data)}};Tokenizer.prototype.reset=function(){Tokenizer.call(thi
     getAnnotationInEndpoint: function(oaAnnotation) {
       var _this = this,
       uris = [];
-      oaAnnotation.on.forEach(function(value) {
-        if (jQuery.inArray(value.full, uris) === -1) {
-          uris.push(value.full);
-        }
-      });
+
+      if (jQuery.isArray(oaAnnotation.on)) {
+	      oaAnnotation.on.forEach(function(value) {
+	        if (jQuery.inArray(value.full, uris) === -1) {
+	          uris.push(value.full);
+	        }
+	      });
+	  }
       var annotations = [];
 
       uris.forEach(function(uri) {

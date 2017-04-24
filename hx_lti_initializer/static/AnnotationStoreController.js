@@ -673,7 +673,7 @@ MiradorEndpointController.prototype.editAnnotation = function(annotation, button
 		if (jQuery('.parentAnnotation .body').summernote !== undefined) {
 			jQuery('.parentAnnotation .body').destroy();
 		} else if(tinymce !== undefined){
-			tinymce.remote();
+			tinymce.remove();
 		}
 	};
 
