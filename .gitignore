@@ -18,3 +18,4 @@ reports
 *.srt
 /.vagrant
 !/vagrant/provision.sh
+/.idea
