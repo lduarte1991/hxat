@@ -4,8 +4,8 @@ USER=vagrant
 HOME=/home/vagrant
 
 # Update packages
-sudo apt-get update
-sudo apt-get -y autoremove
+#sudo apt-get update
+#sudo apt-get -y autoremove
 
 # Install system packages
 sudo apt-get -y install build-essential libffi-dev
@@ -24,8 +24,6 @@ sudo pip install urllib3[secure]
 #sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
 sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PROJECT'"
 sudo -u postgres -i psql -d postgres -c "CREATE DATABASE $PROJECT WITH OWNER $PROJECT"
-
-sudo -u $USER -s bash
 
 # Ensure github.com ssh public key is in $HOME/.ssh/known_hosts file
 chmod 700 $HOME/.ssh

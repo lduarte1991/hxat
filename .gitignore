@@ -17,5 +17,5 @@ reports
 *-old.json
 *.srt
 /.vagrant
-!/vagrant/provision.sh
+!/vagrant/*.sh
 /.idea
