@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'ims_lti_py',
     'hx_lti_initializer',
+    'annotation_store',
     'hx_lti_assignment',
     'target_object_database',
     'django_app_lti',
