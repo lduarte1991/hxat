@@ -153,6 +153,6 @@ class CookielessSessionMiddleware(object):
 
         try:
             if (request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', '1.2.3.4'))) != request.session['logged_ip']):
-                request.session = None
+                request.session.flush()
         except:
             pass
