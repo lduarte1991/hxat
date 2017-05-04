@@ -9,7 +9,7 @@ Download and install [virtualbox](https://www.virtualbox.org/) and [vagrant](htt
 	```
 	$ vagrant up                          # start and provision virtual box (see Vagrantfile)
 	$ vagrant ssh                         # ssh into virtual box
-	$ cd ~/annotationsx                   # change to shared directory with code
+	$ cd /vagrant                         # change to shared directory with code
 	$ ./manage.py migrate                 # initialize database by running django migrations
 	$ ./manage.py runserver 0.0.0.0:8000  # run server on port 8000 (forwarded by virtual box)
 	```
