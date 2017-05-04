@@ -1,116 +1,82 @@
-#The HarvardX Annotation Tool (The HxAT)
+# The HarvardX Annotation Tool (The HxAT)
 
-LTI tool used by HarvardX and HUIT Academic Technology to provide annotations to Text, Images, and Videos on the edX and Canvas platforms. 
+LTI tool developed by HarvardX in collaboration with HUIT Academic Technology to provide annotations to Text, Images, and Videos on the edX and Canvas platforms.
 
-# Installation
+## Quickstart
 
-1. Download the source code
-`git clone https://github.com/lduarte1991/hx-annotations-lti`
+Download and install [virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/). Run the following commands to provision your virtual box:
 
-2. Add a file named 'secure.py' to your settings directory. (See 'secure.py example' at the bottom)
-`/annotationsx/settings/secure.py`
+	```
+	$ vagrant up                          # start and provision virtual box (see Vagrantfile)
+	$ vagrant ssh                         # ssh into virtual box
+	$ cd ~/annotationsx                   # change to shared directory with code
+	$ ./manage.py migrate                 # initialize database by running django migrations
+	$ ./manage.py runserver 0.0.0.0:8000  # run server on port 8000 (forwarded by virtual box)
+	```
 
-3. Install requirements 
-	`sudo pip install -r requirements.txt`
-	
-4. Setup postgres
-	* OSX Installation
-		* Download the postgres App [here](http://postgresapp.com/)
-			* (We're using the app version and porting it to the command line, because it makes it very easy to stop & start Postgres, but if you want the command line version, setup is very similar to the Linux instructions below)
-		* Execute the following command to modify your bash PATH so you can access the postgres command-line tools
-			` echo "export PATH='/Applications/Postgres.app/Contents/Versions/9.4/bin:$PATH'" >> ~/.bash_profile `
-		* You'll have to open a new terminal to reload the bash profile.
-		* Make sure the Postgres App is running.
-		* Create the annotationsx database and user, prompting for a password and granting DB creation purposes (for `./manage.py test`).
-			`createdb annotationsx`
-			`createuser --pwprompt --createdb annotationsx`
-	* Linux installation
-		* Start the postgres daemon
-			`sudo service postgresql start`
-		* Login as the postgres superuser
-			`sudo su - postgres`
-		* Create the annotationsx database and user, prompting for a password and granting DB creation purposes (so executing the test suite doesn't fail).
-			`createdb annotationsx`
-			`createuser --pwprompt --createdb annotationsx`
-		* If the above commands didn't work for you, alternativly login to the "psql" interactive terminal and run these commands:
-			`CREATE USER annotationsx WITH PASSWORD 'annotationsx';`
-			`CREATE DATABASE annotationsx;`
-			`GRANT ALL PRIVILEGES ON DATABASE annotationsx to annotationsx;`
-5. Setup the database
-	`./manage.py migrate && ./manage.py syncdb`
-	
-6. Run the server
-	`./manage.py runserver`
+Note: see `vagrant/provision.sh` script for details on provisioning the server.
 
-7. Go to [lti/config](http://localhost:8000/lti/config) and copy the XML that shows up
+## LTI Installation
 
-8. In your Canvas course, click
->Settings -> Apps -> View App Configurations -> Add App
+### Canvas
 
+1. Go to [lti/config](http://localhost:8000/lti/config) and copy the XML output.
+2. In your Canvas course, click `Settings -> Apps -> View App Configurations -> Add App` and then:
 	* Select 'Paste XML'
 	* Paste XML
 	* Name your App
 	* Enter your key and secret
 	* Save
+3. If the installation worked, the tool should appear in your left navigation.
 
-9. The AnnotationX Tool will be in the sidebar of your course
+### EdX
 
-10. **Party**
+TODO
 
-<br/>
-Party Favor - secure.py example:
-```
-SECURE_SETTINGS = {
-	'debug' : True,
-	'https_only': False,
-	'django_secret_key': 'secretKey',
-	'lti_oauth_credentials' : {'key':'secret'},
-	'db_default_name' : 'annotationsx',
-	'db_default_user': 'annotationsx',
-	'db_default_password' : 'password',
-	'X_FRAME_ALLOWED_SITES': {
-		'tlt.harvard.edu',
-		'edx.org',
-		'harvardx.harvard.edu'
-	},
-	'X_FRAME_ALLOWED_SITES_MAP': {
-		'tlt.harvard.edu':'canvas.harvard.edu',
-		'edx.org':'edx.org',
-		'harvardx.harvard.edu':'harvardx.harvard.edu'
-	},
-	'ADMIN_ROLES': {
-		'Administrator', 'Instructor', 'TeachingAssistant',
-		'urn:lti:role:ims/lis/Administrator',
-		'urn:lti:role:ims/lis/Instructor',
-		'urn:lti:role:ims/lis/TeachingAssistant',
-	},
-	'annotation_database_url': 'https://something/catch/annotator',
-	'annotation_db_api_key': 'fake90210-123',
-	'annotation_db_secret_token': 'fake123-1231',
+## LTI Compatibility
 
-}
-```
+This tool is LTI-compatible with [Edx](https://www.edx.org/) and [Canvas](https://www.canvaslms.com/).
 
-#Differences from hx-annotations-lti
-Below is an overview of the differences between HarvardX and ATG (though they are both working from the same branch, there is an `ORG` variable set up in `secure.py` which allows for the small set of differences):
-### Major Changes
-* Installation: The tool is now integrated with [django-app-lti](https://github.com/Harvard-ATG/django-app-lti), so setup is now via XML configuration. As a result, the tool is launched from the left hand nav of Canvas as opposed to a module. Note that the functionality of adding the tool as a module is still available if needed.
-* Authentication: Students are routed to a modified version of `admin_hub` with restricted privileges as opposed to an assignment page upon application launch
+There are some differences in how the tool is used on these platforms. The tool may be configured for each platform as needed in `annotationsx/settings/aws.py`.
 
-## Launch
-The location/workflow of the tool within canvas has been altered for ATG/FAS.
-Instead of creating a module, the tool is now located at the left navigation bar of its course.
+Note that older versions of the tool used a global `ORG` variable to encode these differences, but this has been deprecated in favor of more fine-grained settings. Some vestiges of the `ORG` variable are still around.
 
-![Left Nav](http://i.imgur.com/T3ko1kR.png)
+### Authentication
 
-In addition, instead of copying and pasting specific launch details into the Canvas App configuration, those details are now inferred from the code and context. 
-To facilitate that, we had to give students an index view by routing them to a modified version of `admin_hub`, from which they can choose an assignment/object to annotate. Whether a user is directed to the fully-featured `admin_hub` or stripped down version is determined by whether the user has a role defined within `ADMIN_ROLES` (`secure.py`).
+As much as possible, the tool tries to avoid storing student information, and in cases where it must identify students (i.e. annotations), it uses the anonymous `user_id` that is provided by the LTI consumer. Instructor information is, however, stored in the tool database.
 
-## Instructor Dashboard
-The instructor dashboard enables anyone with a role defined in `ADMIN_ROLES` from `secure.py` (e.g. an Instructor or TF) to view annotations on a per-student basis. Given that the user has an admin role, the instructor dashboard can be accessed by clicking on the Instructor Dashboard button on the homepage of the tool. 
+Although the `user_id` uniquely identifies students, it should be noted that the scope of uniqueness differs between edX and Canvas:
 
-![Instructor Dashboard](http://i.imgur.com/LbxYAsq.png)
+- In edX, the opaque `user_id` is only unique within the scope of a course. For example, given an email registered with edX that uniquely and globally identifies a user on the edX platform, a different user ID is passed to each course. 
+- In Canvas, the opaque `user_id` is unique within the scope of the university-wide hosted instance. For example, given an SIS ID for a student, the same opaque user ID will be transmitted to the tool for each course on the hosted instance. 
 
-The instructor dashboard displays an alphabetically sorted list of members of the course who have launched the tool at least once. Clicking on the name of any user expands the panel to show a table of annotations that the user has made. Each table row includes the date, assignment name, target object, line, annotation text and tags for each annotation. Clicking on a link under the Object column will lead the user to the Target Object on which a given annotation was made.
+### Launching the tool 
 
-An instructor can filter through the users of the course by entering search text in the Filter users box at the top of the page. The instructor can toggle whether to filter users by name or content. Content refers to any text contained within the panel body for a given user, so that includes date, assignment name target object, line, annotation text and tags. All searches automatically show and expand matching panels and are case insensitive.
+When the tool launches, there are two possible ways to launch:
+
+1. Launch to a TARGET annotation assignment. This is exactly what it sounds like: the tool is passed parameters so it knows exactly which target object and annotation assignment should be rendered. This is most often used to embed an annotation assignment in edX or in a Canvas module.
+2. Launch to an INDEX or HUB that lists all the annotation assignments in the course. This is most often used to make all assignments available to students and teaching staff alike in Canvas when it is added to the left-navigation of the course.
+
+### Instructor Dashboard
+
+The instructor dashboard is a tool designed specifically for Canvas instructors to get a listing of all student annotations. Due to issues with scaling/load, it is not currently used for edX courses.
+
+## Technical Information
+
+This section may include technical notes.
+
+### Project Structure
+
+TODO
+
+### Secure Settings
+
+All secure settings and configuration options are stored in `annotations/settings/secure.py`. This file is not included in source control since it will likely contain sensitive/secure values.
+
+### Sessions: Cookieless Sessions and Multiple Sessions
+
+TODO
+
+### Iframes: Setting X-Frame-Options
+
+TODO
