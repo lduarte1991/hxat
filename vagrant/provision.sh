@@ -23,6 +23,7 @@ sudo pip install urllib3[secure]
 #sudo -u postgres -i psql -d postgres -c "DROP DATABASE IF EXISTS $PROJECT"
 #sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
 sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PROJECT'"
+sudo -u postgres -i psql -d postgres -c "ALTER USER $PROJECT CREATEDB"
 sudo -u postgres -i psql -d postgres -c "CREATE DATABASE $PROJECT WITH OWNER $PROJECT"
 
 # Ensure github.com ssh public key is in $HOME/.ssh/known_hosts file

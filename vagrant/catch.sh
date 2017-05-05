@@ -8,6 +8,8 @@
 MYSQL_ROOT_PASSWORD=devrootpass
 CATCH_RELEASE_URL=https://github.com/annotationsatharvard/catcha/releases/download/v0.5.12/catch.war
 
+sudo apt-get update
+
 # Install system packages
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_ROOT_PASSWORD"
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD"
