@@ -19,3 +19,4 @@ reports
 /.vagrant
 !/vagrant/*.sh
 /.idea
+/*.log

@@ -11,7 +11,7 @@ HOME=/home/vagrant
 sudo apt-get -y install build-essential libffi-dev
 sudo apt-get -y install libxslt1-dev libxml2 libxml2-dev
 sudo apt-get -y install openssl libcurl4-openssl-dev
-sudo apt-get -y install git curl wget unzip
+sudo apt-get -y install git curl wget unzip inotify-tools
 sudo apt-get -y install python-dev python-pip python-setuptools redis-server
 sudo apt-get -y install postgresql postgresql-contrib libpq-dev
 

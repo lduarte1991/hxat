@@ -91,7 +91,7 @@ def initialize_lti_tool_provider(req):
 def create_new_user(anon_id=None, username=None, display_name=None, roles=None, scope=None):
     debug_printer('DEBUG - Creating new user with parameters: anon_id=%s, username=%s, display_name=%s, roles=%s' % (anon_id, username, display_name, roles))
     if anon_id is None or display_name is None or roles is None:
-        raise Exception("Missing required parameters: anon_id, display_name, roles")
+        raise Exception("Missing required parameters to create new user: anon_id, display_name, roles")
 
     lti_profile = LTIProfile(anon_id=anon_id)
     lti_profile.name = display_name
@@ -161,16 +161,15 @@ def get_lti_value(key, tool_provider):
             debug_printer("%s not found in LTI tool_provider" % key)
             return None
 
+    debug_printer(lti_value)
+
     return lti_value
 
 
 def debug_printer(debug_text):
-    """
-    Prints text passed in to stderr (Terminal on Mac) for debugging purposes.
-    """
+    """Logs debug information to the logging system"""
     if settings.LTI_DEBUG:
-        print >> sys.stderr, debug_text
-
+        logger.debug(str(debug_text))
 
 def retrieve_token(userid, apikey, secret):
     '''

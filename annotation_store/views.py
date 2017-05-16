@@ -3,46 +3,46 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from ims_lti_py.tool_provider import DjangoToolProvider
 
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse 
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.utils import (debug_printer, retrieve_token)
+from hx_lti_initializer.utils import retrieve_token
 from hx_lti_initializer import annotation_database
 from store import AnnotationStore
 
 import json
 import requests
-from urlparse import urlparse
-import urllib2
 import urllib
-
 import logging
-logging.basicConfig()
 
+logger = logging.getLogger(__name__)
+
+@require_http_methods(["GET"])
 def api_root(request):
-    return AnnotationStore(request).root()
+    return AnnotationStore.from_settings(request).root()
 
+@require_http_methods(["GET"])
 def search(request):
-    return AnnotationStore(request).search()
+    return AnnotationStore.from_settings(request).search()
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def create(request):
-    return AnnotationStore(request).create()
+    return AnnotationStore.from_settings(request).create()
 
 @csrf_exempt
-def delete(request, annotation_id):
-    return AnnotationStore(request).delete(annotation_id)
-
-@csrf_exempt
+@require_http_methods(["PUT"])
 def update(request, annotation_id):
-    return AnnotationStore(request).update(annotation_id)
+    return AnnotationStore.from_settings(request).update(annotation_id)
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete(request, annotation_id):
+    return AnnotationStore.from_settings(request).delete(annotation_id)
 
 @login_required
 def transfer(request, instructor_only):
-    session_is_staff = request.session['is_staff']
     user_id = request.session['hx_user_id']
 
     old_assignment_id = request.POST.get('old_assignment_id')
@@ -103,7 +103,7 @@ def transfer(request, instructor_only):
             ann['contextId'] = unicode(new_course_id)
             ann['collectionId'] = unicode(new_assignment_id)
             ann['id'] = None
-            debug_printer("%s" % ann['user']['id'])
+            logger.info("annotation user_id: %s" % ann['user']['id'])
             if ann['user']['id'] in old_admins:
                 try:
                     if new_admins[ann['user']['name']]:
@@ -112,6 +112,6 @@ def transfer(request, instructor_only):
                     ann['user']['id'] = user_id
             response2 = requests.post(create_database_url, headers=headers, data=json.dumps(ann))
 
-    #debug_printer("%s" % str(request.POST.getlist('assignment_inst[]')))
+    #logger.debug("%s" % str(request.POST.getlist('assignment_inst[]')))
     data = dict()
     return HttpResponse(json.dumps(data), content_type='application/json')

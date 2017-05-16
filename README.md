@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx)
+
 # The HarvardX Annotation Tool (The HxAT)
 
 LTI tool developed by HarvardX in collaboration with HUIT Academic Technology to provide annotations to Text, Images, and Videos on the edX and Canvas platforms.
@@ -11,6 +13,7 @@ Download and install [virtualbox](https://www.virtualbox.org/) and [vagrant](htt
 	$ vagrant ssh                         # ssh into virtual box
 	$ cd /vagrant                         # change to shared directory with code
 	$ ./manage.py migrate                 # initialize database by running django migrations
+	$ ./manage.py createsuperuser         # (Optional) so you can login to the admin interface
 	$ ./manage.py runserver 0.0.0.0:8000  # run server on port 8000 (forwarded by virtual box)
 	```
 
@@ -73,10 +76,9 @@ TODO
 
 All secure settings and configuration options are stored in `annotations/settings/secure.py`. This file is not included in source control since it will likely contain sensitive/secure values.
 
+See the example to get started: `annotationsx/settings/secure.py.example`.
+
 ### Sessions: Cookieless Sessions and Multiple Sessions
 
 TODO
 
-### Iframes: Setting X-Frame-Options
-
-TODO

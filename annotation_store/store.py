@@ -6,16 +6,20 @@ from django.db import transaction
 from django.db.models import F, Q
 from ims_lti_py.tool_provider import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.utils import (debug_printer, retrieve_token)
+from hx_lti_initializer.utils import retrieve_token
 
-from utils import (update_read_permissions, ADMIN_GROUP_ID)
 from models import Annotation, AnnotationTags, UserStats
 
 import json
 import requests
 import datetime
+import logging
 
+logger = logging.getLogger(__name__)
+
+CONSUMER_KEY, LTI_SECRET = settings.CONSUMER_KEY, settings.LTI_SECRET
 ANNOTATION_STORE_SETTINGS = getattr(settings, 'ANNOTATION_STORE', {})
+
 
 class AnnotationStore(object):
     '''
@@ -42,23 +46,29 @@ class AnnotationStore(object):
     }
 
     '''
-    def __init__(self, request):
+    SETTINGS = dict(ANNOTATION_STORE_SETTINGS)
+
+    def __init__(self, request, backend_instance=None, gather_statistics=False):
         self.request = request
-        self.gather_statistics = ANNOTATION_STORE_SETTINGS.get('gather_statistics', False)
-        self.backend_type = ANNOTATION_STORE_SETTINGS.get('backend', 'catch')
-        self.backend = self._get_backend_instance(request, self.backend_type)
+        self.backend = backend_instance
+        self.gather_statistics = gather_statistics
+        assert self.backend is not None
+        assert isinstance(self.gather_statistics, bool)
+        logger.info("Initialized %s with backend=%s gather_statistics=%s" % (self.__class__.__name__, self.backend.__class__.__name__, self.gather_statistics))
 
-    def _get_backend_types(self):
-        return {
-            'app': AppStoreBackend,
-            'catch': CatchStoreBackend,
-        }
+    @classmethod
+    def from_settings(cls, request):
+        gather_statistics = cls.SETTINGS.get('gather_statistics', False)
+        backend_type = cls.SETTINGS.get('backend', 'catch')
+        backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend}
+        assert backend_type in backend_types
+        backend_instance = backend_types[backend_type](request)
+        return cls(request, backend_instance=backend_instance, gather_statistics=gather_statistics)
 
-    def _get_backend_instance(self, request, backend_type):
-        backend_types = self._get_backend_types()
-        if backend_type not in backend_types:
-            raise Exception('Invalid backend type: %s. Must be one of: %s' % (', '.join(backend_types.keys())))
-        return backend_types[backend_type](request)
+    @classmethod
+    def update_settings(cls, settings_dict):
+        cls.SETTINGS = settings_dict
+        return cls
 
     def root(self):
         return self.backend.root()
@@ -67,6 +77,7 @@ class AnnotationStore(object):
         raise NotImplementedError
 
     def search(self):
+        logger.debug(u"Search: %s" % self.request.GET)
         self._verify_course(self.request.GET.get('contextId', None))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
@@ -74,6 +85,7 @@ class AnnotationStore(object):
 
     def create(self):
         body = json.loads(self.request.body)
+        logger.debug(u"Create: %s" % body)
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -94,6 +106,7 @@ class AnnotationStore(object):
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
+        logger.debug(u"Update %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -109,6 +122,7 @@ class AnnotationStore(object):
 
     def delete(self, annotation_id):
         body = json.loads(self.request.body)
+        logger.debug(u"Delete %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -147,20 +161,18 @@ class AnnotationStore(object):
         return result
 
     def _lti_grade_passback(self, is_graded=False, status_code=None, result_score=1):
-        debug_printer("LTI Grade Passback: is_graded=%s status_code=%s" % (is_graded, status_code))
+        logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
         if not (is_graded and status_code == 200):
             return
         try:
-            consumer_key = settings.CONSUMER_KEY
-            secret = settings.LTI_SECRET
             params = self.request.session['lti_params']
-            tool_provider = DjangoToolProvider(consumer_key, secret, params)
+            tool_provider = DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
             outcome = tool_provider.post_replace_result(result_score)
-            debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
+            logger.debug(u"LTI grade request was {successful}. Description is {description}".format(
                 successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
             ))
         except Exception as e:
-            debug_printer("Error submitting grade outcome after annotation created: %s" % str(e))
+            logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
 
     def _update_stats(self, action, response):
         if not self.gather_statistics:
@@ -198,21 +210,93 @@ class AnnotationStore(object):
 ###########################################################
 # Backend Classes
 
+
 class StoreBackend(object):
+    BACKEND_NAME = None
+    ADMIN_GROUP_ID = '__admin__'
+    ADMIN_GROUP_ENABLED = True if settings.ORGANIZATION == 'ATG' else False
+
     def __init__(self, request):
         self.request = request
 
+    def root(self):
+        return HttpResponse(json.dumps(dict(name=self.BACKEND_NAME)), content_type='application/json')
+
+    def search(self):
+        raise NotImplementedError
+
+    def create(self):
+        raise NotImplementedError
+
+    def read(self, annotation_id):
+        raise NotImplementedError
+
+    def update(self, annotation_id):
+        raise NotImplementedError
+
+    def delete(self, annotation_id):
+        raise NotImplementedError
+
     def _get_assignment(self, assignment_id):
-        debug_printer("assignment_id: %s" % assignment_id)
         return get_object_or_404(Assignment, assignment_id=assignment_id)
 
     def _get_request_body(self):
         body = json.loads(self.request.body)
-        if settings.ORGANIZATION == "ATG":
-            update_read_permissions(body)
+        if self.ADMIN_GROUP_ENABLED:
+            return self._modify_permissions(body)
         return body
 
+    def _modify_permissions(self, data):
+        '''
+        Given an annotation data object, update the "read" permissions so that
+        course admins can view private annotations.
+
+        Instead of adding the specific user IDs of course admins, a group identifier is used
+        so that the IDs aren't hard-coded, which would require updating if the list of admins
+        changes in the tool. It's expected that when the tool searchs the annotation database on
+        behalf of a course admin, it will use the admin group identifier.
+
+        Possible read permissions:
+           - permissions.read = []                        # world-readable (public)
+           - permissions.read = [user_id]                 # private (user only)
+           - permissions.read = [user_id, ADMIN_GROUP_ID] # semi-private (user + admins only)
+
+        '''
+        permissions = {"read": [], "admin": [], "update": [], "delete": []}
+        permissions.update(data.get('permissions', {}))
+        logger.debug("_modify_permissions() before: %s" % str(permissions))
+
+        # No change required when the annotation is world-readable
+        if len(permissions['read']) == 0:
+            return data
+
+        has_parent = ('parent' in data and data['parent'] != '' and data['parent'] != '0')
+        if has_parent:
+            # Ensure that when a reply is created, it remains visible to the author of the parent
+            # annotation, even if the reply has unchecked "Allow anyone to view this annotation" in
+            # the annotator editor. Ideally, the annotator UI field should either be removed from the
+            # annotator editor for replies, or work as expected. That is, when checked, only the annotation
+            # author, reply author, and thread participants have read permission.
+            permissions['read'] = []
+        else:
+            # Ensure that the annotation author's user_id is present in the read permissions.
+            # This might not be the case if an admin changes a public annotation to private,
+            # since annotator will set the admin's user_id, and not the author's user_id.
+            if data['user']['id'] not in permissions['read']:
+                permissions['read'].insert(0, data['user']['id'])
+
+            # Ensure the annotation is readable by course admins.
+            if self.ADMIN_GROUP_ID not in permissions['read']:
+                permissions['read'].append(self.ADMIN_GROUP_ID)
+
+        logger.debug("_modify_permissions() after: %s" % str(permissions))
+
+        data['permissions'] = permissions
+        return data
+
 class CatchStoreBackend(StoreBackend):
+    BACKEND_NAME = 'catch'
+
     def __init__(self, request):
         super(CatchStoreBackend, self).__init__(request)
         self.headers = {
@@ -224,22 +308,19 @@ class CatchStoreBackend(StoreBackend):
         base_url = str(assignment.annotation_database_url).strip()
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
-    def root(self):
-        data = dict(name="CatchStore")
-        return HttpResponse(json.dumps(data), content_type='application/json')
+    def _retrieve_annotator_token(self, user_id, assignment):
+        return retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token)
 
     def before_search(self):
-        # Override the auth token for ATG when the user is a course administrator,
-        # so they can query against private annotations that have granted permission to the admin group.
-        # Note: this only works if private annotations included the "__admin__" group ID in the "read" permissions
-        # for the annotation.
-        is_staff = self.request.session['is_staff']
-        if settings.ORGANIZATION == "ATG" and is_staff:
+        # Override the auth token when the user is a course administrator, so they can query annotations
+        # that have set their read permissions to private (i.e. read: self-only).
+        # Note: this only works if the "__admin__" group ID was added to the annotation read permissions
+        # prior to saving it, otherwise this will have no effect.
+        if self.ADMIN_GROUP_ENABLED and self.request.session['is_staff']:
             assignment = self._get_assignment(self.request.GET.get('collectionId', None))
-            self.headers['x-annotator-auth-token'] = retrieve_token(
-                ADMIN_GROUP_ID,
-                assignment.annotation_database_apikey,
-                assignment.annotation_database_secret_token
+            self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(
+                assignment=assignment,
+                user_id=self.ADMIN_GROUP_ID
             )
 
     def search(self):
@@ -272,13 +353,12 @@ class CatchStoreBackend(StoreBackend):
 
 
 class AppStoreBackend(StoreBackend):
+    BACKEND_NAME = 'app'
+
     def __init__(self, request):
         super(AppStoreBackend, self).__init__(request)
         self.date_format = '%Y-%m-%dT%H:%M:%S %Z'
-
-    def root(self):
-        data = dict(name="AppStore")
-        return HttpResponse(json.dumps(data), content_type='application/json')
+        self.max_limit = 1000
 
     def read(self, annotation_id):
         anno = get_object_or_404(Annotation, pk=annotation_id)
@@ -304,6 +384,7 @@ class AppStoreBackend(StoreBackend):
             'dateCreatedOnOrBefore':'created_at__lte',
         }
 
+        # Setup filters based on the search query
         filters = {}
         for param, filter_key in query_map.iteritems():
             if param not in self.request.GET or self.request.GET[param] == '':
@@ -318,20 +399,29 @@ class AppStoreBackend(StoreBackend):
         if not is_staff:
             filter_conds.append(Q(is_private=False) | (Q(is_private=True) & Q(user_id=user_id)))
 
+        # Create the queryset with the filters applied and get a count of the total size
+        queryset = Annotation.objects.filter(*filter_conds, **filters)
+        total = queryset.count()
+
+        # Examine the user's requested limit and offset and check constraints
         limit = -1
         if 'limit' in self.request.GET and self.request.GET['limit'].isdigit():
-            limit = int(self.request.GET['limit'])
+            requested_limit = int(self.request.GET['limit'])
+            limit = requested_limit if requested_limit <= self.max_limit else self.max_limit
+        else:
+            limit = self.max_limit
 
         offset = 0
         if 'offset' in self.request.GET and self.request.GET['offset'].isdigit():
-            offset = int(self.request.GET['offset'])
+            requested_offset = int(self.request.GET['offset'])
+            offset = requested_offset if requested_offset < total else total
 
-        queryset = Annotation.objects.filter(*filter_conds, **filters)
-        total = queryset.count()
+        # Slice the queryset and return the selected rows
+        start, end = (offset, offset + limit if offset + limit < total else total)
         if limit < 0:
-            queryset = queryset[offset:]
+            queryset = queryset[start:]
         else:
-            queryset = queryset[offset:limit]
+            queryset = queryset[start:end]
 
         rows = [self._serialize_annotation(anno) for anno in queryset]
         result = {
