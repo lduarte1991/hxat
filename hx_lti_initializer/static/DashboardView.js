@@ -165,6 +165,7 @@
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
+            jQuery('.annotationSection').focus();
         });
 
         jQuery('.annotationModal #importarea').click( function(e) {
@@ -716,6 +717,7 @@
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
+            jQuery('.item-' + annotationItem.id + ' .totalreplies').focus();
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
@@ -800,8 +802,10 @@
         jQuery('.annotationModal svg').show();
         if (annotationItem.tags && annotationItem.tags.length > 0) {
             var tagColor = AController.main.tags[annotationItem.tags[annotationItem.tags.length-1]];
-            var cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
-            
+            var cssColor = "";
+            if (typeof tagColor !== "undefined") {
+                cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
+            }
             jQuery('.annotationModal svg path').attr('stroke', cssColor);
             if (typeof(annotationItem.svg) === "undefined" ) {
                 jQuery('.annotationModal.item-modal-' + annotationItem.id.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + cssColor);
@@ -860,6 +864,7 @@
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
+            jQuery('.annotation-instructions').focus();
         });
     };
 

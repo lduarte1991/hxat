@@ -30,7 +30,7 @@
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
 	    <% } else if (media === "video") {%>
-        <div class="playMediaButton" style="text-align:center;">
+        <div class="playMediaButton clicking_allowed" tabindex="0" style="text-align:center;">
             <div class="btn btn-default" role="button" style="text-align:center;margin-top:20px">
                 Play Segment <%= rangeTime.start %> - <%= rangeTime.end %>
             </div>
