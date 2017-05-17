@@ -21,7 +21,7 @@
             <span class="uri" style="display:none"><%= uri %></span>
         </div>
     	<% } else if (media === 'image' && thumbnail) {%>
-	    <div class="zoomToImageBounds">
+	    <div class="zoomToImageBounds clicking_allowed" tabindex="0">
 	    	<img class="annotation-thumbnail" src="<%= thumbnail %>" data-svg='.thumbnail-<%= id %>' alt="Thumbnail Preview"/>
 	    	<% if (typeof(svg) !== "undefined") { %>
 	    		<%= svg %>
