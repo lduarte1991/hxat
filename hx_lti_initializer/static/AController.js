@@ -23,4 +23,7 @@ window.AController = window.AController || function(options) {
 	AController.main = new AController.AnnotationMain(options);
 	var logger_url = options.commonInfo.logger_url || "";
 	AController.utils = new AController.Utils(logger_url);
+	AController.accessibility = new AController.Accessibility({
+		"triggerClicks": ['.clicking_allowed']
+	});
 }
