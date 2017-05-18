@@ -64,18 +64,16 @@ class TOD_ImplementationTests(TestCase):
         user.is_superuser = False
         user.is_staff = False
         user.save()
-        return user
+        lti_profile = LTIProfile.objects.create(user=user)
+        return user, lti_profile
 
     def setUp(self):
         """
         """
         self.sampleImplementation = TOD_Implementation()
-        self.ltiprofile1 = LTIProfile.objects.get(
-            user=self.createFakeUser("fakeusername1", "fakeuserid1")
-        )
-        self.ltiprofile2 = LTIProfile.objects.get(
-            user=self.createFakeUser("fakeusername2", "fakeuserid2")
-        )
+        self.user1, self.ltiprofile1 = self.createFakeUser("fakeusername1", "fakeuserid1")
+        self.user2, self.ltiprofile2 = self.createFakeUser("fakeusername2", "fakeuserid2")
+
         self.samplecourse = LTICourse.create_course(
             "fake_course",
             self.ltiprofile1

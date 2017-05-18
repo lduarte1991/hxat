@@ -29,6 +29,7 @@ ipaddress==1.0.7
 logilab-common==0.63.2
 lxml==3.4.1
 markdown2==2.3.0
+mock==2.0.0
 oauth2==1.5.211
 pep8==1.6.2
 psycopg2==2.6.1

@@ -21,8 +21,7 @@ class TODViewsTests(TestCase):
 
         user = User(username="Luis", email="dfslkjfijeflkj")
         user.save()
-
-        lti_profile = LTIProfile.objects.get(user=user)
+        lti_profile = LTIProfile.objects.create(user=user)
 
         course = LTICourse(
             course_name="Fake Course",
