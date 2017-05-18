@@ -8,14 +8,14 @@ LTI tool developed by HarvardX in collaboration with HUIT Academic Technology to
 
 Download and install [virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/). Run the following commands to provision your virtual box:
 
-	```
-	$ vagrant up                          # start and provision virtual box (see Vagrantfile)
-	$ vagrant ssh                         # ssh into virtual box
-	$ cd /vagrant                         # change to shared directory with code
-	$ ./manage.py migrate                 # initialize database by running django migrations
-	$ ./manage.py createsuperuser         # (Optional) so you can login to the admin interface
-	$ ./manage.py runserver 0.0.0.0:8000  # run server on port 8000 (forwarded by virtual box)
-	```
+```
+$ vagrant up                          # start and provision virtual box (see Vagrantfile)
+$ vagrant ssh                         # ssh into virtual box
+$ cd /vagrant                         # change to shared directory with code
+$ ./manage.py migrate                 # initialize database by running django migrations
+$ ./manage.py createsuperuser         # (Optional) so you can login to the admin interface
+$ ./manage.py runserver 0.0.0.0:8000  # run server on port 8000 (forwarded by virtual box)
+```
 
 Note: see `vagrant/provision.sh` script for details on provisioning the server.
 
