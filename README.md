@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx)
-
+| [lduarte1991](https://github.com/lduarte1991/hxat) | ![Open PRs](https://img.shields.io/github/issues-pr/lduarte1991/hxat.svg) [![Build Status](https://travis-ci.org/lduarte1991/hxat.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) | [harvard-atg](https://github.com/Harvard-ATG/annotationsx) | ![Open PRs](https://img.shields.io/github/issues-pr/harvard-atg/annotationsx.svg) [![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) |
+|----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 # The HarvardX Annotation Tool (The HxAT)
 
 LTI tool developed by HarvardX in collaboration with HUIT Academic Technology to provide annotations to Text, Images, and Videos on the edX and Canvas platforms.
