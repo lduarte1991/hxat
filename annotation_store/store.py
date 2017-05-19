@@ -52,6 +52,7 @@ class AnnotationStore(object):
         self.request = request
         self.backend = backend_instance
         self.gather_statistics = gather_statistics
+        self.grade_passback_outcome = None
         assert self.backend is not None
         assert isinstance(self.gather_statistics, bool)
         logger.info("Initialized %s with backend=%s gather_statistics=%s" % (self.__class__.__name__, self.backend.__class__.__name__, self.gather_statistics))
@@ -103,6 +104,9 @@ class AnnotationStore(object):
 
     def read(self, annotation_id):
         raise NotImplementedError
+
+    def after_read(self, response):
+        self._update_stats('read', response)
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
@@ -160,19 +164,26 @@ class AnnotationStore(object):
             raise PermissionDenied
         return result
 
+    def _get_tool_provider(self):
+        params = self.request.session['lti_params']
+        tool_provider = DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
+        return tool_provider
+
     def _lti_grade_passback(self, is_graded=False, status_code=None, result_score=1):
         logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
         if not (is_graded and status_code == 200):
             return
         try:
-            params = self.request.session['lti_params']
-            tool_provider = DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
-            outcome = tool_provider.post_replace_result(result_score)
-            logger.debug(u"LTI grade request was {successful}. Description is {description}".format(
-                successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
-            ))
+            outcome = self._get_tool_provider().post_replace_result(result_score)
+            self.grade_passback_outcome = outcome
+            msg = {
+                "status":      "successful" if outcome.is_success() else "unsuccessful",
+                "description": outcome.description,
+            }
+            logger.debug(u"LTI grade request was {status}. Description is {description}".format(**msg))
         except Exception as e:
             logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
+        return self.grade_passback_outcome
 
     def _update_stats(self, action, response):
         if not self.gather_statistics:

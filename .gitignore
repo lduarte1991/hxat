@@ -8,6 +8,7 @@ include
 *.DS_Store
 *.pyc
 *.sh
+*.log
 htmlcov
 secure.py
 http_static
@@ -19,4 +20,4 @@ reports
 /.vagrant
 !/vagrant/*.sh
 /.idea
-/*.log
+/pycharm-debug.egg
