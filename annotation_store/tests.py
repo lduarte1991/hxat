@@ -12,7 +12,7 @@ from store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SESSION_DATA = {
+TEST_SESSION_NOT_STAFF = {
     'hx_context_id': '2a8b2d3fa55b7866a9',
     'hx_collection_id': '123',
     'hx_object_id': '7',
@@ -20,6 +20,8 @@ DEFAULT_SESSION_DATA = {
     'is_staff': False,
     'is_graded': False,
 }
+TEST_SESSION_IS_STAFF = dict(TEST_SESSION_NOT_STAFF)
+TEST_SESSION_IS_STAFF['is_staff'] = True
 
 def object_params_from_session(session):
     return {
@@ -33,7 +35,7 @@ def search_params_from_session(session):
     return {'contextId': session['hx_context_id']}
 
 def create_request(method='get', **kwargs):
-    session = kwargs.pop('session', DEFAULT_SESSION_DATA)
+    session = kwargs.pop('session', TEST_SESSION_NOT_STAFF)
     params = kwargs.pop('params', {})
     body = kwargs.pop('data', {})
     url = kwargs.pop('url', '/foo')
@@ -51,9 +53,6 @@ def create_request(method='get', **kwargs):
     request.session = session
     return request
 
-def create_store(session, request):
-    params = search_params_from_session(session)
-    return AnnotationStore(request, backend_instance=DummyStoreBackend(request))
 
 class DummyStoreBackend(StoreBackend):
     BACKEND_NAME = 'dummy'
@@ -72,13 +71,8 @@ class DummyStoreBackend(StoreBackend):
 class AnnotationStoreTest(TestCase):
     def setUp(self):
         AnnotationStore.update_settings({})
-        self.default_session = dict(DEFAULT_SESSION_DATA)
-
-        self.nonstaff_session = dict(DEFAULT_SESSION_DATA)
-        self.nonstaff_session['is_staff'] = False
-
-        self.staff_session = dict(DEFAULT_SESSION_DATA)
-        self.staff_session['is_staff'] = True
+        self.not_staff_session = dict(TEST_SESSION_NOT_STAFF)
+        self.staff_session = dict(TEST_SESSION_IS_STAFF)
         self.request_factory = RequestFactory()
 
     def test_from_settings(self):
@@ -105,7 +99,7 @@ class AnnotationStoreTest(TestCase):
             store = AnnotationStore.from_settings(request=request)
 
     def test_search(self):
-        session = self.nonstaff_session
+        session = self.not_staff_session
         params = search_params_from_session(session)
         request = create_request(method="get", session=session, params=params)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
@@ -113,7 +107,7 @@ class AnnotationStoreTest(TestCase):
         self.assertIsInstance(response, HttpResponse, 'Search should return an HttpResponse')
 
     def test_create(self):
-        session = self.nonstaff_session
+        session = self.not_staff_session
         data = object_params_from_session(session)
         request = create_request(method="post", session=session, data=data)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
@@ -148,7 +142,7 @@ class AnnotationStoreTest(TestCase):
         ]
 
         for test in tests:
-            session = self.nonstaff_session
+            session = self.not_staff_session
             data = object_params_from_session(session)
             invalid_data = test['invalidate'](data)
             request = create_request(method=test['method'], session=session, data=invalid_data)
@@ -158,7 +152,7 @@ class AnnotationStoreTest(TestCase):
                 response = action() if test.get('annotation_id', None) is None else action(test['annotation_id'])
 
     def test_lti_passback_triggered_after_create(self):
-        session = self.nonstaff_session
+        session = self.not_staff_session
         data = object_params_from_session(session)
         request = create_request(method="post", session=session, data=data)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
@@ -168,11 +162,11 @@ class AnnotationStoreTest(TestCase):
 
 class StoreBackendTest(TestCase):
     def setUp(self):
-        self.nonstaff_session = dict(DEFAULT_SESSION_DATA)
+        self.not_staff_session = dict(TEST_SESSION_NOT_STAFF)
         self.request_factory = RequestFactory()
 
     def test_modify_permissions(self):
-        session = self.nonstaff_session
+        session = self.not_staff_session
         anno = object_params_from_session(session)
 
         tests = [
@@ -223,3 +217,5 @@ class StoreBackendTest(TestCase):
                     self.assertTrue(backend.ADMIN_GROUP_ID in result['permissions']['read'])
                 else:
                     self.assertEqual(0, len(result['permissions']['read']))
+
+
