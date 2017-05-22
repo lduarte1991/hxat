@@ -29,13 +29,16 @@ def object_params_from_session(session):
         'collectionId': session['hx_collection_id'],
         'uri': session['hx_object_id'],
         'user': {"id": session['hx_user_id']},
+        'media': 'text',
     }
 
 def search_params_from_session(session):
     return {'contextId': session['hx_context_id']}
 
 def create_request(method='get', **kwargs):
-    session = kwargs.pop('session', TEST_SESSION_NOT_STAFF)
+    resource_link_id = kwargs.pop('resource_link_id', "2a8b2d3fa51ea413d19e480fb6c2eb085b7866a9")
+    session = {"LTI_LAUNCH": {}}
+    session['LTI_LAUNCH'][resource_link_id] = kwargs.pop('session', TEST_SESSION_NOT_STAFF)
     params = kwargs.pop('params', {})
     body = kwargs.pop('data', {})
     url = kwargs.pop('url', '/foo')
@@ -51,6 +54,7 @@ def create_request(method='get', **kwargs):
     else:
         raise Exception("invalid method: %s" % method)
     request.session = session
+    setattr(request, 'LTI', session.get('LTI_LAUNCH', {}).get(resource_link_id))
     return request
 
 
@@ -149,7 +153,10 @@ class AnnotationStoreTest(TestCase):
             store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
             with self.assertRaises(PermissionDenied):
                 action = getattr(store, test['action'])
-                response = action() if test.get('annotation_id', None) is None else action(test['annotation_id'])
+                if 'annotation_id' in test:
+                    action(test['annotation_id'])
+                else:
+                    action()
 
     def test_lti_passback_triggered_after_create(self):
         session = self.not_staff_session

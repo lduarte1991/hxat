@@ -10,7 +10,7 @@
 	<option value="">-----------</option>
 {% for course in courses %}
 	{% if course.id != current_course_id %}
-	<option value="{{course.id}}" data-url="{% url 'hx_lti_assignment:assignments_from_course' id=course.id %}">{{course.course_name}}</option>
+	<option value="{{course.id}}" data-assignments-url="{% url 'hx_lti_assignment:assignments_from_course' course_id=course.id %}?resource_link_id={{ resource_link_id }}">{{course.course_name}}</option>
 	{% endif %}
 {% endfor %}
 </select>
@@ -32,7 +32,7 @@
 	<div type="submit" class="save" id='import-button' role="button" style='display:none;'>
 		Import
 	</div>
-	<div class="save" id='import-cancel' role='button' onclick='window.location="{% url "hx_lti_initializer:course_admin_hub" %}"'>
+	<div class="save" id='import-cancel' role='button' onclick='window.location="{% url "hx_lti_initializer:course_admin_hub" %}?resource_link_id={{ resource_link_id }}"'>
 		Cancel
 	</div>
 </div>
@@ -46,22 +46,30 @@
 </div>
 
 <script>
-	jQuery(document).ready(function() {
-		setTimeout(function(){
-			if (window.navigator.platform === "Win32") {
-				jQuery('.bootstrap-select.form-control').addClass('win');
-			}
-			if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-				jQuery('.bootstrap-select.form-control').addClass('firefox');
-			}
-		}, 500);
-	});
-
+var base_transfer_annotations_url = "{% url 'annotation_store:api_transfer_annotations' %}";
+var current_course_id = "{{current_course_id}}";
+var csrfmiddlewaretoken = "{{ csrf_token}}";
+var resource_link_id = "{{ resource_link_id }}"
+    
+jQuery(document).ready(function() {
+	setTimeout(function(){
+		if (window.navigator.platform === "Win32") {
+			jQuery('.bootstrap-select.form-control').addClass('win');
+		}
+		if (window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+			jQuery('.bootstrap-select.form-control').addClass('firefox');
+		}
+	}, 500);
+    
 	jQuery('#import-course-chosen').change(function(event) {
-		var url = jQuery(this).find('option:selected').data('url');
+		var selected_option = jQuery(this).find('option:selected');
+		var course_id = selected_option.val();
+		var assignments_url = selected_option.data('assignments-url');
+		console.log("Import course ID: ", course_id);
+
 		jQuery('.assignment-list').html('');
 		var options = {
-			url: url,
+			url: assignments_url,
 			success: function(data) {
 				jQuery.each(data, function(index, assignment){
 					var html = "<div class='assignment'><input class='form-control' data-id='"+assignment.pk +"' type='checkbox' id='assignment-" + index + "' checked>";
@@ -73,52 +81,70 @@
 				jQuery('.assignment-choices').show();
 				jQuery('#import-button').show();
 			},
-			async: true,
+			error: function(jqXhr, textStatus) {
+				console.log("Error getting assignments from course: " , textStatus);
+			},
+			async: true
 		};
 		jQuery.ajax(options);
+	});
+	
+	jQuery('#import-button').click(function(event) {
+		jQuery('#import-button').hide();
+		jQuery('#import-cancel').html('Done');
+		jQuery('#pBar').show();
+		jQuery('.progress-bar').show();
+		jQuery('#pBar-label').show();
+		jQuery('.current-progress').show();
 
-		jQuery('#import-button').click(function(event) {
-			jQuery('#import-button').hide();
-			jQuery('#import-cancel').html('Done');
-			jQuery('#pBar').show();
-			jQuery('.progress-bar').show();
-			jQuery('#pBar-label').show();
-			jQuery('.current-progress').show();
-			var checkedElements = jQuery('input[id^="assignment-"]:checked');
-			var progress = (100.0/checkedElements.length);
-			var url = '/lti_init/launch_lti/assignment/' +jQuery('#import-course-chosen').find('option:selected').val() + "/{{current_course_id}}/";
-			var annotationImport = jQuery('input[name="import-choice"]:checked').val();
-			console.log(annotationImport);
-			jQuery.each(checkedElements, function(index, element) {
-				var options = {
-					url: url+jQuery(element).data('id') + '/import',
-					success: function(data) {
-						var perc = jQuery('#pBar').val() + progress;
-							jQuery('#pBar').val(perc);
-							jQuery('#pBar-label').html('<strong>Adding assignments:</strong><br> ' + parseInt(perc, 10) + '%');
-						if (data['message'] !== undefined) {
-							jQuery('.errors').html("<p> <i class='fa fa-warning'></i> " + data['message'] + " Your assignments may not have been imported correctly. Note which were not imported correctly below and double check them before setting to live.</p>");
-							jQuery('.errors').show();
-						} else {
-							jQuery('.current-progress').prepend(parseInt(perc, 10) + "% . . . &quot;" + data['assignment_name'] + "&quot; -- Successfully added to current course<br>");
-							var transfer_url = '/lti_init/annotation_api/transfer_annotations/' + (annotationImport === "inst" ? "1" : "0");
-							var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': "{{ csrf_token}}"});
+		var checked_elements = jQuery('input[id^="assignment-"]:checked');
+		var progress = (100.0/checked_elements.length);
+		var import_from_course_id = jQuery('#import-course-chosen').find('option:selected').val();
+		var import_annotations = jQuery('input[name="import-choice"]:checked').val();
+		console.log("Starting import. Import annotations choice: ", import_annotations);
+		
+		jQuery.each(checked_elements, function(index, element) {
+			var assignment_id = jQuery(element).data('id');
+			var assignment_import_url = '/lti_init/launch_lti/assignment/' + import_from_course_id + '/' + current_course_id + '/' + assignment_id + '/import';
+			console.log("Importing assignment ID: ", assignment_id, "URL:", assignment_import_url);
+
+			var options = {
+				url: assignment_import_url,
+				success: function(data) {
+					console.log("Successfully imported assignment ID: ", assignment_id, "Data: ", data);
+					var perc = jQuery('#pBar').val() + progress;
+						jQuery('#pBar').val(perc);
+						jQuery('#pBar-label').html('<strong>Adding assignments:</strong><br> ' + parseInt(perc, 10) + '%');
+					if (data['message'] !== undefined) {
+						jQuery('.errors').html("<p> <i class='fa fa-warning'></i> " + data['message'] + " Your assignments may not have been imported correctly. Note which were not imported correctly below and double check them before setting to live.</p>");
+						jQuery('.errors').show();
+					} else {
+						jQuery('.current-progress').prepend(parseInt(perc, 10) + "% . . . &quot;" + data['assignment_name'] + "&quot; -- Successfully added to current course<br>");
+						if(import_annotations != "none") {
+							var instructor_only = (import_annotations === "inst" ? "1" : "0");
+							var transfer_annotations_url = base_transfer_annotations_url + instructor_only + "?resource_link_id=" + resource_link_id;
+							var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': csrfmiddlewaretoken});
+							console.log("Starting import of annotations for assignment ID: ", assignment_id);
 							jQuery.ajax({
-								url: transfer_url, 
+								url: transfer_annotations_url,
 								data: finaldata,
-								success: function(data) {
-									console.log(data);
+								success: function (data) {
+										console.log("Successfully imported annotations for assignment ID: ", assignment_id, "Data: ", data);
 								},
-								type:"POST", 
+								error: function(jqXhr, textStatus, errorThrown) {
+										console.log("Error transferring annotations: ", textStatus);
+								},
+								type: "POST",
 								dataType: 'json'
 							});
 						}
-					},
-					async: true,
-				}
-				jQuery.ajax(options);
-			});
+					}
+				},
+				async: true
+			};
+			jQuery.ajax(options);
 		});
 	});
+});
 </script>
 {% endblock %}

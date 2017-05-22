@@ -42,8 +42,8 @@ def delete(request, annotation_id):
     return AnnotationStore.from_settings(request).delete(annotation_id)
 
 @login_required
-def transfer(request, instructor_only):
-    user_id = request.session['hx_user_id']
+def transfer(request, instructor_only="1"):
+    user_id = request.LTI['hx_user_id']
 
     old_assignment_id = request.POST.get('old_assignment_id')
     new_assignment_id = request.POST.get('new_assignment_id')
@@ -98,19 +98,20 @@ def transfer(request, instructor_only):
             params.update({'userid': old_admins})
         url_values = urllib.urlencode(params, True)
         response = requests.get(search_database_url, headers=headers, params=url_values)
-        annotations = json.loads(response.text)
-        for ann in annotations['rows']:
-            ann['contextId'] = unicode(new_course_id)
-            ann['collectionId'] = unicode(new_assignment_id)
-            ann['id'] = None
-            logger.info("annotation user_id: %s" % ann['user']['id'])
-            if ann['user']['id'] in old_admins:
-                try:
-                    if new_admins[ann['user']['name']]:
-                        ann['user']['id'] = new_admins[ann['user']['name']]
-                except:
-                    ann['user']['id'] = user_id
-            response2 = requests.post(create_database_url, headers=headers, data=json.dumps(ann))
+        if response.status_code == 200:
+            annotations = json.loads(response.text)
+            for ann in annotations['rows']:
+                ann['contextId'] = unicode(new_course_id)
+                ann['collectionId'] = unicode(new_assignment_id)
+                ann['id'] = None
+                logger.info("annotation user_id: %s" % ann['user']['id'])
+                if ann['user']['id'] in old_admins:
+                    try:
+                        if new_admins[ann['user']['name']]:
+                            ann['user']['id'] = new_admins[ann['user']['name']]
+                    except:
+                        ann['user']['id'] = user_id
+                response2 = requests.post(create_database_url, headers=headers, data=json.dumps(ann))
 
     #logger.debug("%s" % str(request.POST.getlist('assignment_inst[]')))
     data = dict()

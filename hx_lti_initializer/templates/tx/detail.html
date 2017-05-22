@@ -51,7 +51,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
 		<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 		{% if org = 'ATG' %}
       		<div class="navigation">
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}">Home</a>
           	</div>
         {% endif %}
         <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
@@ -112,7 +112,11 @@ Annotation Tool | Text | {{ target_object.target_title }}
         //'Accessibility',
         //'Touch',
       ],
-      'database_url': "{%  url 'annotation_store:api_root' %}",
+      'database_url': "{% url 'annotation_store:api_root' %}",
+      'database_params': {
+        "resource_link_id": "{{ resource_link_id }}",
+        "utm_source": "{{ utm_source }}"
+      },
       'citation': "{{ target_object.target_citation | escapejs }}",
       {% if assignment.allow_highlights %}
       'highlightTags_options': "{{ assignment.highlights_options }}",

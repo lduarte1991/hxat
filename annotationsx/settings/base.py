@@ -56,6 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
     'annotationsx.middleware.CookielessSessionMiddleware',
+    'annotationsx.middleware.MultiLTILaunchMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
 )
 
@@ -84,6 +85,18 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "annotationsx.context_processors.resource_link_id_processor",
+    "annotationsx.context_processors.utm_source_processor",
+)
 
 MESSAGE_TAGS = {
             messages.SUCCESS: 'success success',
@@ -169,6 +182,11 @@ LOGGING = {
             'propagate': False,
         },
         'annotation_store': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
+        'annotationsx.middleware': {
             'level': _DEFAULT_LOG_LEVEL,
             'handlers': ['default', 'console'],
             'propagate': False,

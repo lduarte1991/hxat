@@ -6,26 +6,21 @@ It will set up the tool provider, create/retrive the user and pass along any
 other information that will be rendered to the access/init screen to the user.
 """
 
-from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext
-
+from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.urlresolvers import reverse
-from django.http import Http404
 from django.contrib.auth import login
 from django.contrib import messages
-from django.db import IntegrityError
 
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse, User, LTICourseAdmin, LTIResourceLinkConfig
+from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import (debug_printer, get_lti_value, retrieve_token, save_session,create_new_user, initialize_lti_tool_provider,
-    validate_request, fetch_annotations_by_course, get_admin_ids, DashboardAnnotations)
+from hx_lti_initializer.utils import (debug_printer, retrieve_token, save_session, create_new_user, fetch_annotations_by_course, DashboardAnnotations)
 from hx_lti_initializer import annotation_database
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
@@ -33,35 +28,31 @@ from django.contrib.sites.models import get_current_site
 from ims_lti_py.tool_provider import DjangoToolProvider
 
 from urlparse import urlparse
-import urllib2
-import urllib
 import json
-import sys
-import requests
 import time
-
+import os.path
 import logging
-logging.basicConfig()
 
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def launch_lti(request):
     """
     Gets a request from an LTI consumer.
     Passes along information to render a welcome screen to the user.
+
+    Assumptions: LTI launch request has already been validated by middleware
     """
-    validate_request(request)
-    tool_provider = initialize_lti_tool_provider(request)
 
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
-    user_id = get_lti_value('user_id', tool_provider)
+    user_id = request.LTI['launch_params']['user_id']
     debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
 
-    course = get_lti_value(settings.LTI_COURSE_ID, tool_provider)
+    course = request.LTI['launch_params'][settings.LTI_COURSE_ID]
     debug_printer('DEBUG - Found course being accessed: %s' % course)
 
-    resource_link_id = get_lti_value(settings.LTI_UNIQUE_RESOURCE_ID, tool_provider)
+    resource_link_id = request.LTI['launch_params']['resource_link_id']
 
     # This is where we identify the "scope" of the LTI user_id (anon_id), meaning
     # the scope in which the identifier is unique. In canvas this is the domain instance,
@@ -73,31 +64,29 @@ def launch_lti(request):
     if settings.ORGANIZATION == "HARVARDX":
         user_scope = "course:%s" % course
     else:
-        tool_consumer_instance_guid = get_lti_value('tool_consumer_instance_guid', tool_provider)
+        tool_consumer_instance_guid = request.LTI['launch_params']['tool_consumer_instance_guid']
         if tool_consumer_instance_guid:
             user_scope = "consumer:%s" % tool_consumer_instance_guid
     debug_printer("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
-    request.session['is_staff'] = False
+    save_session(request, is_staff=False)
 
     # this is where canvas will tell us what level individual is coming into
     # the tool the 'roles' field usually consists of just 'Instructor'
     # or 'Learner'
-    roles = get_lti_value(settings.LTI_ROLES, tool_provider)
+    roles = request.LTI['launch_params'][settings.LTI_ROLES]
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
 
     # This is the name that we will show on the UI
-    display_name = get_lti_value('lis_person_name_full', tool_provider)
+    display_name = request.LTI['launch_params']['lis_person_name_full']
     if not display_name:
-        display_name = get_lti_value('lis_person_sourcedid', tool_provider)
+        display_name = request.LTI['launch_params'].get('lis_person_sourcedid', '')
 
     # This is the unique identifier for the person in the source system
     # In canvas this would be the SIS user id, in edX the registered username
-    external_user_id = get_lti_value('lis_person_sourcedid', tool_provider)
-
-    request.session['logged_ip'] = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', '1.2.3.4')))
+    external_user_id = request.LTI['launch_params'].get('lis_person_sourcedid', '')
 
     # This handles the rare case in which we have neither display name nor external user id
     if not (display_name or external_user_id):
@@ -111,10 +100,10 @@ def launch_lti(request):
             debug_printer('DEBUG - username not found in post.')
             raise PermissionDenied()
     debug_printer("DEBUG - user name: " + display_name)
-    lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
+
+    lti_grade_url = request.LTI['launch_params'].get('lis_outcome_service_url')
     if lti_grade_url is not None:
         save_session(request, is_graded=True)
-    save_session(request, lti_params=request.POST)
 
     # Check whether user is a admin, instructor or teaching assistant
     if set(roles) & set(settings.ADMIN_ROLES):
@@ -145,14 +134,8 @@ def launch_lti(request):
         # For ATG, students have the index  to choose where to go, so
         # collection_id and object_id are probably blank for their session
         # right now.
-        collection_id = get_lti_value(
-            settings.LTI_COLLECTION_ID,
-            tool_provider
-        )
-        object_id = get_lti_value(
-            settings.LTI_OBJECT_ID,
-            tool_provider
-        )
+        collection_id = request.LTI['launch_params'].get(settings.LTI_COLLECTION_ID)
+        object_id = request.LTI['launch_params'].get(settings.LTI_OBJECT_ID)
         save_session(
             request,
             user_id=user_id,
@@ -193,8 +176,8 @@ def launch_lti(request):
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
             context_title = None
-            if get_lti_value('context_title', tool_provider) is not None:
-                context_title = get_lti_value('context_title', tool_provider)
+            if request.LTI['launch_params']['context_title'] is not None:
+                context_title = request.LTI['launch_params']['context_title']
             course_object = LTICourse.create_course(course, lti_profile, name=context_title)
             create_new_user(anon_id=str(course), username='preview:%s' % course_object.id, display_name="Preview %s" % str(course_object), roles=['student'], scope=user_scope)
 
@@ -204,6 +187,8 @@ def launch_lti(request):
                 course_name=course_object.course_name,
                 course_id=course_object.id,
             )
+        else:
+            debug_printer('Course not created because user does not have an admin role')
     try:
         config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
         assignment_id = config.collection_id
@@ -240,8 +225,8 @@ def launch_lti(request):
             # This is motivated by the Poetry in America Course
 
             # If there are variables passed into the launch indicating a desired target object, render that object
-            assignment_id = get_lti_value(settings.LTI_COLLECTION_ID, tool_provider)
-            object_id = get_lti_value(settings.LTI_OBJECT_ID, tool_provider)
+            assignment_id = request.LTI['launch_params'][settings.LTI_COLLECTION_ID]
+            object_id = request.LTI['launch_params'][settings.LTI_OBJECT_ID]
             course_id = str(course)
             if set(roles) & set(settings.ADMIN_ROLES):
                 try:
@@ -278,7 +263,7 @@ def launch_lti(request):
 @login_required
 def edit_course(request, id):
     course = get_object_or_404(LTICourse, pk=id)
-    user_scope = request.session.get('hx_user_scope', None)
+    user_scope = request.LTI.get('hx_user_scope', None)
     if request.method == "POST":
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
@@ -311,10 +296,11 @@ def edit_course(request, id):
                             debug_printer("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
-            request.session['course_name'] = course.course_name
+            save_session(request, course_name=course.course_name)
 
             messages.success(request, 'Course was successfully edited!')
-            return redirect('hx_lti_initializer:course_admin_hub')
+            url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+            return redirect(url)
         else:
             raise PermissionDenied()
     else:
@@ -333,7 +319,7 @@ def edit_course(request, id):
             'user': request.user,
             'pending': pending_admins,
             'org': settings.ORGANIZATION,
-            'is_instructor': request.session["is_staff"],
+            'is_instructor': request.LTI['is_staff'],
         }
     )
 
@@ -343,28 +329,33 @@ def course_admin_hub(request):
     The index view for both students and instructors. Without the 'is_instructor' flag,
     students are directed to a version of admin_hub with reduced privileges
     """
-    courses_for_user = LTICourse.objects.filter(course_id=request.session['hx_context_id'])
-    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
-        courses_for_user
-    )
+    is_instructor = request.LTI['is_staff']
+    courses_for_user = LTICourse.objects.filter(course_id=request.LTI['hx_context_id'])
+    files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(courses_for_user)
+
+    logger.debug("course_admin_hub view")
     try:
-        config = LTIResourceLinkConfig.objects.get(resource_link_id=request.session['resource_link_id'])
+        config = LTIResourceLinkConfig.objects.get(resource_link_id=request.LTI['resource_link_id'])
         object_id = int(config.object_id)
         collection_id = config.collection_id
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
+
     except:
-        starter_object = None
         object_id = None
         collection_id = None
+        to = None
+        starter_object = None
+
+    logger.debug("resource_link_config object_id=%s collection_id=%s target_object=%s" % (object_id, collection_id, to))
 
     debug = files_in_courses
     return render(
         request,
         'hx_lti_initializer/admin_hub.html',
         {
-            'username': request.session['hx_user_name'],
-            'is_instructor': request.session["is_staff"],
+            'username': request.LTI['hx_user_name'],
+            'is_instructor': request.LTI['is_staff'],
             'courses': courses_for_user,
             'files': files_in_courses,
             'org': settings.ORGANIZATION,
@@ -372,7 +363,6 @@ def course_admin_hub(request):
             'starter_object': starter_object,
             'starter_object_id': object_id,
             'starter_collection_id': collection_id,
-            'utm_source': request.session.session_key if not request.session['is_staff'] else '',
         }
     )
 
@@ -384,9 +374,9 @@ def access_annotation_target(
     Renders an assignment page
     """
     if user_id is None:
-        user_name = request.session["hx_user_name"]
-        user_id = request.session["hx_user_id"]
-        roles = request.session["hx_roles"]
+        user_name = request.LTI['hx_user_name']
+        user_id = request.LTI['hx_user_id']
+        roles = request.LTI['hx_roles']
     try:
         assignment = Assignment.objects.get(assignment_id=assignment_id)
         targ_obj = TargetObject.objects.get(pk=object_id)
@@ -394,28 +384,20 @@ def access_annotation_target(
             assignment=assignment,
             target_object=targ_obj
         )
+        object_uri = targ_obj.get_target_content_uri()
         course_obj = LTICourse.objects.get(course_id=course_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         debug_printer("DEBUG - User attempted to access a non-existant Assignment or Target Object")
         raise PermissionDenied()
     try:
-        is_instructor = request.session['is_staff']
+        is_instructor = request.LTI['is_staff']
     except:
         is_instructor = False
 
     if not is_instructor and not assignment.is_published:
         raise PermissionDenied("Permission to access unpublished assignment is denied")
 
-    save_session(
-        request,
-        collection_id=assignment_id,
-        object_id=object_id,
-        context_id=course_id,
-    )
-    for item in request.session.keys():
-        debug_printer(
-            u'DEBUG SESSION - %s: %s \r' % (item, request.session[item])
-        )
+    save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
 
     # Dynamically pass in the address that the detail view will use to fetch annotations.
     # there's definitely a more elegant way (or a library function) to do this.
@@ -426,7 +408,7 @@ def access_annotation_target(
     original = {
         'user_id': user_id,
         'username': user_name,
-        'is_instructor': request.session["is_staff"],
+        'is_instructor': request.LTI['is_staff'],
         'collection': assignment_id,
         'course': course_id,
         'object': object_id,
@@ -443,7 +425,6 @@ def access_annotation_target(
         'session': request.session.session_key,
         'org': settings.ORGANIZATION,
         'logger_url': settings.ANNOTATION_LOGGER_URL,
-        'utm_source': request.session.session_key if not request.session['is_staff'] else '',
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -459,7 +440,7 @@ def access_annotation_target(
             typeSource = 'video/youtube'
         else:
             disassembled = urlparse(srcurl)
-            file_ext = splitext(basename(disassembled.path))[1]
+            file_ext = os.path.splitext(os.path.basename(disassembled.path))[1]
             typeSource = 'video/' + file_ext.replace('.', '')
         original.update({'typeSource': typeSource})
     elif targ_obj.target_type == 'ig':
@@ -509,14 +490,14 @@ def instructor_dashboard_view(request):
     '''
         Renders the instructor dashboard (without annotations).
     '''
-    if not request.session['is_staff']:
+    if not request.LTI['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
-    context_id = request.session['hx_context_id']
-    user_id = request.session['hx_user_id']
+    context_id = request.LTI['hx_context_id']
+    user_id = request.LTI['hx_user_id']
     context = {
-        'username': request.session['hx_user_name'],
-        'is_instructor': request.session["is_staff"],
+        'username': request.LTI['hx_user_name'],
+        'is_instructor': request.LTI['is_staff'],
         'user_annotations': [],
         'fetch_annotations_time': 0,
         'org': settings.ORGANIZATION,
@@ -532,11 +513,11 @@ def instructor_dashboard_student_list_view(request):
     Renders the student annotations for the instructor dashboard.
     Intended to be called via AJAX.
     '''
-    if not request.session['is_staff']:
+    if not request.LTI['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
-    context_id = request.session['hx_context_id']
-    user_id = request.session['hx_user_id']
+    context_id = request.LTI['hx_context_id']
+    user_id = request.LTI['hx_user_id']
 
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
@@ -547,8 +528,8 @@ def instructor_dashboard_student_list_view(request):
     # Transform the raw annotation results into something useful for the dashboard
     user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
     context = {
-        'username': request.session['hx_user_name'],
-        'is_instructor': request.session["is_staff"],
+        'username': request.LTI['hx_user_name'],
+        'is_instructor': request.LTI['is_staff'],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
         'org': settings.ORGANIZATION,
@@ -582,7 +563,8 @@ def delete_assignment(request):
     except:
         return error_view(request, "The assignment deletion may have failed")
 
-    return redirect('hx_lti_initializer:course_admin_hub')
+    url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+    return redirect(url)
 
 
 
@@ -592,7 +574,7 @@ def delete_assignment(request):
 @require_http_methods(["POST", "DELETE"])
 def change_starting_resource(request, assignment_id, object_id):
     data = {'response': 'Success'}
-    resource_link_id = request.session['resource_link_id']
+    resource_link_id = request.LTI['resource_link_id']
     data.update({
         'resource_link_id': resource_link_id,
         'assignment_id': assignment_id,
