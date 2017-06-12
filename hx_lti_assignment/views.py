@@ -239,7 +239,7 @@ def import_assignment(request):
 @login_required
 def assignments_from_course(request, id):
     course = get_object_or_404(LTICourse, pk=id)
-    result = course.assignment_set.all()
+    result = course.assignments.all()
     data = serializers.serialize("json", result)
     return HttpResponse(data, content_type='application/json')
 
