@@ -46,6 +46,8 @@
 </div>
 
 <script>
+	var base_transfer_annotations_url = "{% url 'annotation_store:api_transfer_annotations' %}";
+
 	jQuery(document).ready(function() {
 		setTimeout(function(){
 			if (window.navigator.platform === "Win32") {
@@ -86,12 +88,15 @@
 			jQuery('.current-progress').show();
 			var checkedElements = jQuery('input[id^="assignment-"]:checked');
 			var progress = (100.0/checkedElements.length);
-			var url = '/lti_init/launch_lti/assignment/' +jQuery('#import-course-chosen').find('option:selected').val() + "/{{current_course_id}}/";
+			var base_import_url = '/lti_init/launch_lti/assignment/' +jQuery('#import-course-chosen').find('option:selected').val() + "/{{current_course_id}}/";
 			var annotationImport = jQuery('input[name="import-choice"]:checked').val();
-			console.log(annotationImport);
+			console.log("Import choice: ", annotationImport);
 			jQuery.each(checkedElements, function(index, element) {
+				var assignment_id = jQuery(element).data('id');
+				var assignment_import_url = base_import_url + assignment_id + '/import';
+				console.log("Importing assignment ID: ", assignment_id);
 				var options = {
-					url: url+jQuery(element).data('id') + '/import',
+					url: assignment_import_url,
 					success: function(data) {
 						var perc = jQuery('#pBar').val() + progress;
 							jQuery('#pBar').val(perc);
@@ -101,17 +106,24 @@
 							jQuery('.errors').show();
 						} else {
 							jQuery('.current-progress').prepend(parseInt(perc, 10) + "% . . . &quot;" + data['assignment_name'] + "&quot; -- Successfully added to current course<br>");
-							var transfer_url = '/lti_init/annotation_api/transfer_annotations/' + (annotationImport === "inst" ? "1" : "0");
-							var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': "{{ csrf_token}}"});
-							jQuery.ajax({
-								url: transfer_url, 
-								data: finaldata,
-								success: function(data) {
-									console.log(data);
-								},
-								type:"POST", 
-								dataType: 'json'
-							});
+							if(annotationImport != "none") {
+									var instructor_only = (annotationImport === "inst" ? "1" : "0");
+									var transfer_annotations_url = base_transfer_annotations_url + instructor_only;
+									var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': "{{ csrf_token}}"});
+									console.log("Initiating transfer of annotations for assignment. Data: ", data);
+									jQuery.ajax({
+										url: transfer_annotations_url,
+										data: finaldata,
+										success: function (data) {
+												console.log("Successfully transferred annotations. Data:", data);
+										},
+										error: function(jqXhr, textStatus, errorThrown) {
+												console.log("Error transferring annotations. Status: ", textStatus);
+										},
+										type: "POST",
+										dataType: 'json'
+									});
+							}
 						}
 					},
 					async: true,

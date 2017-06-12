@@ -204,6 +204,8 @@ def launch_lti(request):
                 course_name=course_object.course_name,
                 course_id=course_object.id,
             )
+        else:
+            debug_printer('Course not created because user does not have an admin role')
     try:
         config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
         assignment_id = config.collection_id
