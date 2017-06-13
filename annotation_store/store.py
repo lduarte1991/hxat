@@ -55,7 +55,7 @@ class AnnotationStore(object):
         self.grade_passback_outcome = None
         assert self.backend is not None
         assert isinstance(self.gather_statistics, bool)
-        logger.info("Initialized %s with backend=%s gather_statistics=%s" % (self.__class__.__name__, self.backend.__class__.__name__, self.gather_statistics))
+        logger.debug("Initialized %s with backend=%s gather_statistics=%s" % (self.__class__.__name__, self.backend.__class__.__name__, self.gather_statistics))
 
     @classmethod
     def from_settings(cls, request):
@@ -86,7 +86,7 @@ class AnnotationStore(object):
 
     def create(self):
         body = json.loads(self.request.body)
-        logger.debug(u"Create: %s" % body)
+        logger.debug(u"Create annotation: %s" % body)
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -110,7 +110,7 @@ class AnnotationStore(object):
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.debug(u"Update %s: %s" % (annotation_id, body))
+        logger.debug(u"Update annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -126,7 +126,7 @@ class AnnotationStore(object):
 
     def delete(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.debug(u"Delete %s: %s" % (annotation_id, body))
+        logger.debug(u"Delete annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(body.get('uri', None))
@@ -142,24 +142,32 @@ class AnnotationStore(object):
 
     def _verify_course(self, context_id, raise_exception=True):
         result = (context_id == self.request.session['hx_context_id'])
+        if not result:
+            logger.info("Course verification failed: %s" % context_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_assignment(self, assignment_id, raise_exception=True):
         result = (assignment_id == self.request.session['hx_collection_id'])
+        if not result:
+            logger.info("Assignment verification failed: %s" % assignment_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_object(self, object_id, raise_exception=True):
         result = (str(object_id) == str(self.request.session['hx_object_id']))
+        if not result:
+            logger.info("Object verification failed: %s" % object_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_user(self, user_id, raise_exception=True):
         result = (user_id == self.request.session['hx_user_id'] or self.request.session['is_staff'])
+        if not result:
+            logger.info("User verification failed: %s" % user_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -171,7 +179,10 @@ class AnnotationStore(object):
 
     def _lti_grade_passback(self, is_graded=False, status_code=None, result_score=1):
         logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
-        if not (is_graded and status_code == 200):
+        if not is_graded:
+            return
+        if status_code != 200:
+            logger.info("LTI Grade Passback aborted because status_code=%s" % status_code)
             return
         try:
             outcome = self._get_tool_provider().post_replace_result(result_score)
@@ -180,7 +191,7 @@ class AnnotationStore(object):
                 "status":      "successful" if outcome.is_success() else "unsuccessful",
                 "description": outcome.description,
             }
-            logger.debug(u"LTI grade request was {status}. Description is {description}".format(**msg))
+            logger.info(u"LTI grade request was {status}. Description is {description}".format(**msg))
         except Exception as e:
             logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
         return self.grade_passback_outcome
@@ -191,6 +202,7 @@ class AnnotationStore(object):
         if action not in ('create', 'update', 'delete'):
             return
 
+        logger.info("Updating stats action=%s" % action)
         body = json.loads(response.content)
         attrs = {
             'context_id':body['contextId'],
