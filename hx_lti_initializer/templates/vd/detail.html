@@ -61,7 +61,7 @@ Annotation Tool | Video | {{ target_object.target_title }}
 {% endblock %}
 
 {% block mainapplication %}
-<section role="application" aria-label="Annotation Tool Video Content" style="height: 100%">
+<section role="main" aria-label="Annotation Tool Video Content" style="height: 100%">
 	<div  id="viewer" class="test" style="padding-top:50px; height:80%;" class="fit-to-canvas">
 		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:80%;">
       {{ target_object.get_target_content_for_video | safe }}
