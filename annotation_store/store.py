@@ -179,7 +179,7 @@ class AnnotationStore(object):
         return result
 
     def _get_tool_provider(self):
-        params = self.request.LTI['lti_params']
+        params = self.request.LTI['launch_params']
         tool_provider = DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
         return tool_provider
 
@@ -192,12 +192,11 @@ class AnnotationStore(object):
             return
         try:
             outcome = self._get_tool_provider().post_replace_result(result_score)
+            if outcome.is_success():
+                logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
+            else:
+                logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
             self.grade_passback_outcome = outcome
-            msg = {
-                "status":      "successful" if outcome.is_success() else "unsuccessful",
-                "description": outcome.description,
-            }
-            logger.info(u"LTI grade request was {status}. Description is {description}".format(**msg))
         except Exception as e:
             logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
         return self.grade_passback_outcome
