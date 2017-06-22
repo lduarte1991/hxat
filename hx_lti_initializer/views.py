@@ -493,6 +493,7 @@ def instructor_dashboard_view(request):
     if not request.LTI['is_staff']:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
+    resource_link_id = request.LTI['resource_link_id']
     context_id = request.LTI['hx_context_id']
     user_id = request.LTI['hx_user_id']
     context = {
@@ -503,7 +504,7 @@ def instructor_dashboard_view(request):
         'org': settings.ORGANIZATION,
         'session': request.session.session_key,
         'dashboard_context_js': json.dumps({
-            'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view'),
+            'student_list_view_url': reverse('hx_lti_initializer:instructor_dashboard_student_list_view') + '?resource_link_id=%s' % resource_link_id,
         })
     }
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
