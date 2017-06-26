@@ -120,7 +120,6 @@
                     showPublicPrivateSelectors: true,
                     showMediaSelector: false,
                     flags: false,
-                    imageRootUrl: "{% static "vendors/catch/img"%}",
                     instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
                     default_tab: "{{ assignment.default_tab }}",
                     show_instructor_tab: "{{assignment.include_instructor_tab}}",
