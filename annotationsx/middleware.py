@@ -109,6 +109,7 @@ class CookielessSessionMiddleware(object):
 
         request.session = self.SessionStore(session_key)
         if not request.session.exists(request.session.session_key):
+            logger.debug("Created new session")
             request.session.create()
 
         # Mitigate security risks by ensuring the requesting user's IP matches the logged IP
