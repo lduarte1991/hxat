@@ -39,10 +39,10 @@
 
         jQuery('#annotations-text-size-plus').click(function() {
             console.log("toggle text size");
-            self.toggleTextSize(20);
+            self.toggleTextSize(1);
         });
        jQuery('#annotations-text-size-minus').click(function() {
-            self.toggleTextSize(-20);
+            self.toggleTextSize(-1);
         });
 
         // helper function to turn off keyboard-input mode
@@ -1004,14 +1004,34 @@
 
         $.TargetObjectController.prototype.toggleTextSize = function(step) {
             var $content = jQuery("#viewer .content");
-            var fontsize = parseInt($content.data("textsize"), 10);
-            step = step || 0;
+            var nodes = [], curnode, stylesize, styleunit;
 
-            if(!fontsize) {
-                fontsize = 100;
+            step = step || 1;
+            if(typeof this.targetFontSize === "undefined") {
+                this.targetFontSize = 14;
             }
-            fontsize = (fontsize + step) + "%";
-            $content.data('textsize', fontsize).css("font-size", fontsize);
+            if(this.targetFontSize > 0) {
+                this.targetFontSize += step;
+            }
+
+            // set the font size on the content container
+            $content.css('fontSize', String(this.targetFontSize) + "px");
+
+            // walk the dom and find custom fontStyle declarations and adust as necessary
+            nodes.push($content[0]);
+            while(nodes.length > 0) {
+                curnode = nodes.pop();
+                stylesize = parseInt(curnode.style.fontSize);
+                if(!isNaN(stylesize) && stylesize > 0) {
+                    styleunit = curnode.style.fontSize.replace(stylesize, '');
+                    if(styleunit === "px" || styleunit === "pt") {
+                        curnode.style.fontSize = stylesize + step + styleunit;
+                    }
+                }
+                for(var i = curnode.children.length; i > 0; i--) {
+                    nodes.push(curnode.children[i-1]);
+                }
+            }
         };
 
 }(AController));
