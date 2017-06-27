@@ -48,12 +48,23 @@ Annotation Tool | Text | {{ target_object.target_title }}
 {% block mainapplication %}
 <section role="application" aria-label="Annotation Tool Text Content">
 	<div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
-		<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
-		{% if org = 'ATG' %}
-      		<div class="navigation">
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}">Home</a>
-          	</div>
-        {% endif %}
+        <div class="btn-toolbar target-object-controls" role="toolbar" aria-label="Annotation toolbar controls">
+            <div class="btn-group" role="group" aria-label="Hide or Show Annotations">
+                <button id="annotations-status" type="button" class="btn btn-default on" aria-label="Hide Annotations">
+                    <i class="fa fa-close"></i> <span class="labeltext">Hide Annotations</span>
+                </button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Control Annotation Text Size">
+                <div class="pull-left" style="padding: 6px 12px;">Text Size:</div>
+                <button id="annotations-text-size-plus" type="button" class="btn btn-default" role="button">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <button id="annotations-text-size-minus" type="button" class="btn btn-default" role="button">
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
         <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
         	<div class="instructions-title">
             	Instructions

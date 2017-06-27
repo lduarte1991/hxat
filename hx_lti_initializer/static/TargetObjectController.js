@@ -28,13 +28,21 @@
         var self = this;
 
         // Shows annotation toggle label only when hovered
-        jQuery('.annotations-status').hover(function() {
+        jQuery('#annotations-status').hover(function() {
             jQuery('.hover-inst').toggleClass("hidden");
         });
 
         // Actually toggles whether annotaitons are displayed or not
-        jQuery('.annotations-status').click(function() {
+        jQuery('#annotations-status').click(function() {
             self.toggleAnnotations();
+        });
+
+        jQuery('#annotations-text-size-plus').click(function() {
+            console.log("toggle text size");
+            self.toggleTextSize(20);
+        });
+       jQuery('#annotations-text-size-minus').click(function() {
+            self.toggleTextSize(-20);
         });
 
         // helper function to turn off keyboard-input mode
@@ -972,19 +980,17 @@
             if (this.initOptions.mediaType === "text") {
                 var annotator = window.AController.annotationCore.annotation_tool;
                 var store = annotator.plugins.Store;
-                if (jQuery('.annotations-status').hasClass('on')) {
-                    jQuery('.annotations-status .hover-inst').html("Show annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Show annotations");
-                    jQuery('.annotations-status i').removeClass('fa-close');
-                    jQuery('.annotations-status i').addClass('fa-comments');
+                if (jQuery('#annotations-status').hasClass('on')) {
+                    jQuery('#annotations-status .labeltext').html("Show annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Show annotations");
+                    jQuery('#annotations-status i').removeClass('fa-close').addClass('fa-comments');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
                 } else {
-                    jQuery('.annotations-status .hover-inst').html("Hide annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Hide annotations");
-                    jQuery('.annotations-status i').addClass('fa-close');
-                    jQuery('.annotations-status i').removeClass('fa-comments');
+                    jQuery('#annotations-status .labeltext').html("Hide annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Hide annotations");
+                    jQuery('#annotations-status i').addClass('fa-close').removeClass('fa-comments');
                     this.annotationsSaved.forEach(function (annotation) {
                             annotator.setupAnnotation(annotation);
                             store.registerAnnotation(annotation);
@@ -992,8 +998,20 @@
                     annotator.publish("externalCallToHighlightTags");
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
                 }
-                jQuery('.annotations-status').toggleClass("on");
-            };
+                jQuery('#annotations-status').toggleClass("on");
+            }
+        };
+
+        $.TargetObjectController.prototype.toggleTextSize = function(step) {
+            var $content = jQuery("#viewer .content");
+            var fontsize = parseInt($content.data("textsize"), 10);
+            step = step || 0;
+
+            if(!fontsize) {
+                fontsize = 100;
+            }
+            fontsize = (fontsize + step) + "%";
+            $content.data('textsize', fontsize).css("font-size", fontsize);
         };
 
 }(AController));
