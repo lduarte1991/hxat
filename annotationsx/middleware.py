@@ -35,11 +35,12 @@ def ip_address(request):
 
 class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
-        logger.debug("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        return self._set_xframe_options(request, response)
 
+    def _set_xframe_options(self, request, response):
         referrer = request.META.get('HTTP_REFERER')
-        logger.debug("SERVER_NAME: %s" % settings.SERVER_NAME)
-        logger.debug("HTTP_REFERER: %s" % referrer)
+        logger.debug("server_name: %s http_referrer: %s" % (settings.SERVER_NAME, referrer))
 
         # if this is localhost and non-https (i.e. development), we won't
         # receive the referer header so just make the response exempt from xframe controls
@@ -47,18 +48,19 @@ class XFrameOptionsMiddleware(object):
             setattr(response, 'xframe_options_exempt', True)
             return response
 
-        # means the person accessed site directly and not via iframe so
-        # leave response as is
+        # person accessed site directly (not via iframe) so leave response as is
         if referrer is None:
             return response
 
+        # person is navigating the site internally, so just set the original reference
         if settings.SERVER_NAME in referrer:
             try:
-                response['X-Frame-Options'] = "ALLOW-FROM " +\
-                    request.session['hx_lti_original_ref']
+                response['X-Frame-Options'] = "ALLOW-FROM " + request.session['hx_lti_original_ref']
                 return response
             except:
                 return response
+
+        # otherwise check if the referrer is an allowed site
         else:
             # parse the url it came from and default to not allow
             parsed_uri = urlparse.urlparse(referrer)
@@ -80,8 +82,7 @@ class XFrameOptionsMiddleware(object):
                 response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
                 request.session["hx_lti_original_ref"] = x_frame_allow
 
-            logger.debug('URI: %s' % domain)
-            logger.debug('X-Frame: %s' % response['X-Frame-Options'])
+            logger.debug('X-Frame-Options: %s' % response['X-Frame-Options'])
 
             return response
 
@@ -100,7 +101,7 @@ class CookielessSessionMiddleware(object):
         self.SessionStore = engine.SessionStore
 
     def process_request(self, request):
-        logger.debug("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
 
         # Retrieve the sessionid from the cookiejar, or if cookies are not allowed, attempt to
         # get the identifier from the URL query string. Note that the query parameter is obfuscated as 'utm_source'.
@@ -140,9 +141,9 @@ class MultiLTILaunchMiddleware(object):
     '''
 
     def process_request(self, request):
-        logger.debug("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
         is_basic_lti_launch = (request.method == 'POST' and request.POST.get('lti_message_type') == 'basic-lti-launch-request')
-        logger.debug("Detected basic-lti-launch-request? %s" % is_basic_lti_launch)
+        logger.debug("basic-lti-launch-request? %s" % is_basic_lti_launch)
         if is_basic_lti_launch:
             self._validate_request(request)
             self._update_session(request)
@@ -178,8 +179,8 @@ class MultiLTILaunchMiddleware(object):
         for key in postparams:
             logger.debug('POST %s: %s' % (key, postparams.get(key)))
         logger.debug('request abs url is %s' % request.build_absolute_uri())
-        for key in request.META:
-            logger.debug('META %s: %s' % (key, request.META.get(key)))
+        #for key in request.META:
+        #    logger.debug('META %s: %s' % (key, request.META.get(key)))
 
         logger.info("about to check the signature")
         try:
@@ -202,9 +203,9 @@ class MultiLTILaunchMiddleware(object):
             request_is_valid = False
 
         if request_is_valid:
-            logger.debug("signature verified")
+            logger.info("signature verified")
         else:
-            logger.debug("invalid request: signature check failed")
+            logger.error("invalid request: signature check failed")
             raise PermissionDenied
 
         logger.info("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
@@ -283,7 +284,7 @@ class MultiLTILaunchMiddleware(object):
         '''
         setattr(request, 'LTI', LTILaunchSession(request.session, resource_link_id))
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
-        logger.info("Setting request.LTI to LTILaunchSession with resource_link_id=%s" % resource_link_id)
+        logger.info("setting current LTI session to resource_link_id=%s" % resource_link_id)
 
 
 class LTILaunchSession(object):

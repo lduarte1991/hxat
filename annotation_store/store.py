@@ -78,7 +78,7 @@ class AnnotationStore(object):
         raise NotImplementedError
 
     def search(self):
-        logger.debug(u"Search: %s" % self.request.GET)
+        logger.info(u"Search: %s" % self.request.GET)
         self._verify_course(self.request.GET.get('contextId', None))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
@@ -86,7 +86,7 @@ class AnnotationStore(object):
 
     def create(self):
         body = json.loads(self.request.body)
-        logger.debug(u"Create annotation: %s" % body)
+        logger.info(u"Create annotation: %s" % body)
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -110,7 +110,7 @@ class AnnotationStore(object):
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.debug(u"Update annotation %s: %s" % (annotation_id, body))
+        logger.info(u"Update annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -126,7 +126,7 @@ class AnnotationStore(object):
 
     def delete(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.debug(u"Delete annotation %s: %s" % (annotation_id, body))
+        logger.info(u"Delete annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -266,7 +266,11 @@ class StoreBackend(object):
         raise NotImplementedError
 
     def _get_assignment(self, assignment_id):
-        return get_object_or_404(Assignment, assignment_id=assignment_id)
+        try:
+            return get_object_or_404(Assignment, assignment_id=assignment_id)
+        except Exception as e:
+            logger.error("Error loading assignment object: %s" % assignment_id)
+            raise e
 
     def _get_request_body(self):
         body = json.loads(self.request.body)
@@ -345,6 +349,7 @@ class CatchStoreBackend(StoreBackend):
         # Note: this only works if the "__admin__" group ID was added to the annotation read permissions
         # prior to saving it, otherwise this will have no effect.
         if self.ADMIN_GROUP_ENABLED and self.request.LTI['is_staff']:
+            logger.info('CATCH updating auth token for admin')
             assignment = self._get_assignment(self.request.GET.get('collectionId', None))
             self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(
                 assignment=assignment,
@@ -355,27 +360,37 @@ class CatchStoreBackend(StoreBackend):
         assignment = self._get_assignment(self.request.GET.get('collectionId', None))
         params = self.request.GET.urlencode()
         database_url = self._get_database_url(assignment, '/search')
+        logger.info('CATCH search request: url=%s headers=%s params=%s' % (database_url, self.headers, params))
         response = requests.get(database_url, headers=self.headers, params=params)
+        logger.info('CATCH search response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def create(self):
         body = self._get_request_body()
         assignment = self._get_assignment(body.get('collectionId', None))
         database_url = self._get_database_url(assignment, '/create')
-        response = requests.post(database_url, data=json.dumps(body), headers=self.headers)
+        data = json.dumps(body)
+        logger.info('CATCH create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        response = requests.post(database_url, data=data, headers=self.headers)
+        logger.info('CATCH create response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def update(self, annotation_id):
         body = self._get_request_body()
         assignment = self._get_assignment(body.get('collectionId', None))
         database_url = self._get_database_url(assignment, '/update/%s' % annotation_id)
-        response = requests.post(database_url, data=json.dumps(body), headers=self.headers)
+        data = json.dumps(body)
+        logger.info('CATCH update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        response = requests.post(database_url, data=data, headers=self.headers)
+        logger.info('CATCH update response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
         assignment = self._get_assignment(self.request.LTI['hx_collection_id'])
         database_url = self._get_database_url(assignment, '/delete/%s' % annotation_id)
+        logger.info('CATCH delete request: url=%s headers=%s' % (database_url, self.headers))
         response = requests.delete(database_url, headers=self.headers)
+        logger.info('CATCH update response status_code=%s' % response.status_code)
         return HttpResponse(response)
 
 
