@@ -335,6 +335,7 @@ class CatchStoreBackend(StoreBackend):
             'x-annotator-auth-token': request.META.get('HTTP_X_ANNOTATOR_AUTH_TOKEN', '!!MISSING!!'),
             'content-type': 'application/json',
         }
+        self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
 
     def _get_database_url(self, assignment, path='/'):
         base_url = str(assignment.annotation_database_url).strip()
@@ -342,6 +343,9 @@ class CatchStoreBackend(StoreBackend):
 
     def _retrieve_annotator_token(self, user_id, assignment):
         return retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token)
+
+    def _response_timeout(self):
+        return HttpResponse(json.dumps({"error": "request timeout"}), status=500, content_type='application/json')
 
     def before_search(self):
         # Override the auth token when the user is a course administrator, so they can query annotations
@@ -357,11 +361,16 @@ class CatchStoreBackend(StoreBackend):
             )
 
     def search(self):
+        timeout = 10.0
         assignment = self._get_assignment(self.request.GET.get('collectionId', None))
         params = self.request.GET.urlencode()
         database_url = self._get_database_url(assignment, '/search')
-        logger.info('CATCH search request: url=%s headers=%s params=%s' % (database_url, self.headers, params))
-        response = requests.get(database_url, headers=self.headers, params=params)
+        logger.info('CATCH search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
+        try:
+            response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
+        except requests.exceptions.Timeout as e:
+            logger.error("CATCH requested timed out!")
+            return self._response_timeout()
         logger.info('CATCH search response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
@@ -371,7 +380,11 @@ class CatchStoreBackend(StoreBackend):
         database_url = self._get_database_url(assignment, '/create')
         data = json.dumps(body)
         logger.info('CATCH create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
-        response = requests.post(database_url, data=data, headers=self.headers)
+        try:
+            response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            logger.error("CATCH requested timed out!")
+            return self._response_timeout()
         logger.info('CATCH create response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
@@ -381,7 +394,11 @@ class CatchStoreBackend(StoreBackend):
         database_url = self._get_database_url(assignment, '/update/%s' % annotation_id)
         data = json.dumps(body)
         logger.info('CATCH update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
-        response = requests.post(database_url, data=data, headers=self.headers)
+        try:
+            response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            logger.error("CATCH requested timed out!")
+            return self._response_timeout()
         logger.info('CATCH update response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
@@ -389,7 +406,11 @@ class CatchStoreBackend(StoreBackend):
         assignment = self._get_assignment(self.request.LTI['hx_collection_id'])
         database_url = self._get_database_url(assignment, '/delete/%s' % annotation_id)
         logger.info('CATCH delete request: url=%s headers=%s' % (database_url, self.headers))
-        response = requests.delete(database_url, headers=self.headers)
+        try:
+            response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            logger.error("CATCH requested timed out!")
+            return self._response_timeout()
         logger.info('CATCH update response status_code=%s' % response.status_code)
         return HttpResponse(response)
 

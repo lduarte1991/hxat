@@ -35,7 +35,7 @@ def ip_address(request):
 
 class XFrameOptionsMiddleware(object):
     def process_response(self, request, response):
-        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        logger.info("Inside %s process_response: %s" % (self.__class__.__name__, request.path))
         return self._set_xframe_options(request, response)
 
     def _set_xframe_options(self, request, response):
