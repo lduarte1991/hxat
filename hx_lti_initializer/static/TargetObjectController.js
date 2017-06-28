@@ -38,7 +38,6 @@
         });
 
         jQuery('#annotations-text-size-plus').click(function() {
-            console.log("toggle text size");
             self.toggleTextSize(1);
         });
        jQuery('#annotations-text-size-minus').click(function() {
@@ -1005,27 +1004,32 @@
         $.TargetObjectController.prototype.toggleTextSize = function(step) {
             var $content = jQuery("#viewer .content");
             var nodes = [], curnode, stylesize, styleunit;
+            var minsize = 8;
 
             step = step || 1;
             if(typeof this.targetFontSize === "undefined") {
                 this.targetFontSize = 14;
             }
-            if(this.targetFontSize > 0) {
-                this.targetFontSize += step;
+            this.targetFontSize += step;
+            if(this.targetFontSize < minsize) {
+                this.targetFontSize = minsize;
             }
 
             // set the font size on the content container
+            //console.log("setting font size: ", this.targetFontSize, "step:", step);
             $content.css('fontSize', String(this.targetFontSize) + "px");
 
             // walk the dom and find custom fontStyle declarations and adust as necessary
             nodes.push($content[0]);
             while(nodes.length > 0) {
                 curnode = nodes.pop();
-                stylesize = parseInt(curnode.style.fontSize);
-                if(!isNaN(stylesize) && stylesize > 0) {
+                stylesize = parseInt(curnode.style.fontSize, 10);
+                if(!isNaN(stylesize)) {
                     styleunit = curnode.style.fontSize.replace(stylesize, '');
+                    stylesize += step;
+                    stylesize = stylesize < minsize ? minsize : stylesize;
                     if(styleunit === "px" || styleunit === "pt") {
-                        curnode.style.fontSize = stylesize + step + styleunit;
+                        curnode.style.fontSize = stylesize + styleunit;
                     }
                 }
                 for(var i = curnode.children.length; i > 0; i--) {
