@@ -106,11 +106,11 @@ class CookielessSessionMiddleware(object):
         # Retrieve the sessionid from the cookiejar, or if cookies are not allowed, attempt to
         # get the identifier from the URL query string. Note that the query parameter is obfuscated as 'utm_source'.
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, request.GET.get('utm_source'))
-        logger.debug("Loaded session_key: %s" % session_key)
-
         request.session = self.SessionStore(session_key)
+        logger.debug("Loaded session store using session_key: %s" % session_key)
+
         if not request.session.exists(request.session.session_key):
-            logger.debug("Created new session")
+            logger.debug("Session does not exist, so creating new session")
             request.session.create()
 
         # Mitigate security risks by ensuring the requesting user's IP matches the logged IP
