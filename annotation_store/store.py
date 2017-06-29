@@ -17,9 +17,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-CONSUMER_KEY, LTI_SECRET = settings.CONSUMER_KEY, settings.LTI_SECRET
+CONSUMER_KEY = settings.CONSUMER_KEY
+LTI_SECRET = settings.LTI_SECRET
+ANNOTATION_DB_URL = settings.ANNOTATION_DB_URL
+ANNOTATION_DB_API_KEY = settings.ANNOTATION_DB_API_KEY
+ANNOTATION_DB_SECRET_TOKEN = settings.ANNOTATION_DB_SECRET_TOKEN
 ANNOTATION_STORE_SETTINGS = getattr(settings, 'ANNOTATION_STORE', {})
-
+ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
 class AnnotationStore(object):
     '''
@@ -88,8 +92,6 @@ class AnnotationStore(object):
         body = json.loads(self.request.body)
         self.logger.info(u"Create annotation: %s" % body)
         self._verify_course(body.get('contextId', None))
-        self._verify_assignment(body.get('collectionId', None))
-        self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
         self._verify_user(body.get('user', {}).get('id', None))
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
@@ -112,8 +114,6 @@ class AnnotationStore(object):
         body = json.loads(self.request.body)
         self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
-        self._verify_assignment(body.get('collectionId', None))
-        self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
         self._verify_user(body.get('user', {}).get('id', None))
         if hasattr(self.backend, 'before_update'):
             self.backend.before_update(annotation_id)
@@ -128,8 +128,6 @@ class AnnotationStore(object):
         body = json.loads(self.request.body)
         self.logger.info(u"Delete annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
-        self._verify_assignment(body.get('collectionId', None))
-        self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
         self._verify_user(body.get('user', {}).get('id', None))
         if hasattr(self.backend, 'before_delete'):
             self.backend.before_delete(annotation_id)
@@ -145,30 +143,6 @@ class AnnotationStore(object):
         result = context_id == expected
         if not result:
             self.logger.warning("Course verification failed. Expected: %s Actual: %s" % (expected, context_id))
-        if raise_exception and not result:
-            raise PermissionDenied
-        return result
-
-    def _verify_assignment(self, assignment_id, raise_exception=True):
-        expected = self.request.LTI['hx_collection_id']
-        result = assignment_id == expected
-        if not result:
-            self.logger.warning("Assignment verification failed. Expected: %s Actual: %s" % (expected, assignment_id))
-        if raise_exception and not result:
-            raise PermissionDenied
-        return result
-
-    def _verify_object(self, media=None, uri=None, raise_exception=True):
-        expected = self.request.LTI['hx_object_id']
-        if media == 'text':
-            result = str(uri) == str(expected)
-        else:
-            # NOTE: Relaxing verification on image objects, because the submitted URI is not the IIIF manifest
-            # URI saved in the session (content of the target object). The object URI is the IIIF canvas, and
-            # the only way to know for sure if the canvas belongs to that manifest is to fetch the manifest document.
-            result = True  #(str(uri) == str(self.request.LTI['hx_object_uri']))
-        if not result:
-            self.logger.warning("Object verification failed media %s. Expected: %s Actual: %s" % (media, expected, uri))
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -246,7 +220,7 @@ class AnnotationStore(object):
 class StoreBackend(object):
     BACKEND_NAME = None
     ADMIN_GROUP_ID = '__admin__'
-    ADMIN_GROUP_ENABLED = True if settings.ORGANIZATION == 'ATG' else False
+    ADMIN_GROUP_ENABLED = True if ORGANIZATION == 'ATG' else False
 
     def __init__(self, request):
         self.request = request
@@ -343,12 +317,12 @@ class CatchStoreBackend(StoreBackend):
         }
         self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
 
-    def _get_database_url(self, assignment, path='/'):
-        base_url = str(assignment.annotation_database_url).strip()
+    def _get_database_url(self, path='/'):
+        base_url = str(ANNOTATION_DB_URL).strip()
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
-    def _retrieve_annotator_token(self, user_id, assignment):
-        return retrieve_token(user_id, assignment.annotation_database_apikey, assignment.annotation_database_secret_token)
+    def _retrieve_annotator_token(self, user_id):
+        return retrieve_token(user_id, ANNOTATION_DB_API_KEY, ANNOTATION_DB_SECRET_TOKEN)
 
     def _response_timeout(self):
         return HttpResponse(json.dumps({"error": "request timeout"}), status=500, content_type='application/json')
@@ -360,17 +334,12 @@ class CatchStoreBackend(StoreBackend):
         # prior to saving it, otherwise this will have no effect.
         if self.ADMIN_GROUP_ENABLED and self.request.LTI['is_staff']:
             self.logger.info('updating auth token for admin')
-            assignment = self._get_assignment(self.request.GET.get('collectionId', None))
-            self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(
-                assignment=assignment,
-                user_id=self.ADMIN_GROUP_ID
-            )
+            self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(user_id=self.ADMIN_GROUP_ID)
 
     def search(self):
         timeout = 10.0
-        assignment = self._get_assignment(self.request.GET.get('collectionId', None))
         params = self.request.GET.urlencode()
-        database_url = self._get_database_url(assignment, '/search')
+        database_url = self._get_database_url('/search')
         self.logger.info('search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
         try:
             response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
@@ -382,8 +351,7 @@ class CatchStoreBackend(StoreBackend):
 
     def create(self):
         body = self._get_request_body()
-        assignment = self._get_assignment(body.get('collectionId', None))
-        database_url = self._get_database_url(assignment, '/create')
+        database_url = self._get_database_url('/create')
         data = json.dumps(body)
         self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
@@ -396,8 +364,7 @@ class CatchStoreBackend(StoreBackend):
 
     def update(self, annotation_id):
         body = self._get_request_body()
-        assignment = self._get_assignment(body.get('collectionId', None))
-        database_url = self._get_database_url(assignment, '/update/%s' % annotation_id)
+        database_url = self._get_database_url('/update/%s' % annotation_id)
         data = json.dumps(body)
         self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
@@ -409,8 +376,7 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
-        assignment = self._get_assignment(self.request.LTI['hx_collection_id'])
-        database_url = self._get_database_url(assignment, '/delete/%s' % annotation_id)
+        database_url = self._get_database_url('/delete/%s' % annotation_id)
         self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
         try:
             response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
