@@ -24,7 +24,6 @@ import json
 import importlib
 import oauth2
 
-
 logger = logging.getLogger(__name__)
 
 def ip_address(request):
@@ -34,13 +33,16 @@ def ip_address(request):
 
 
 class XFrameOptionsMiddleware(object):
+    def __init__(self):
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
+
     def process_response(self, request, response):
-        logger.info("Inside %s process_response: %s" % (self.__class__.__name__, request.path))
+        self.logger.info("Inside %s process_response: %s" % (self.__class__.__name__, request.path))
         return self._set_xframe_options(request, response)
 
     def _set_xframe_options(self, request, response):
         referrer = request.META.get('HTTP_REFERER')
-        logger.debug("server_name: %s http_referrer: %s" % (settings.SERVER_NAME, referrer))
+        self.logger.debug("server_name: %s http_referrer: %s" % (settings.SERVER_NAME, referrer))
 
         # if this is localhost and non-https (i.e. development), we won't
         # receive the referer header so just make the response exempt from xframe controls
@@ -82,7 +84,7 @@ class XFrameOptionsMiddleware(object):
                 response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
                 request.session["hx_lti_original_ref"] = x_frame_allow
 
-            logger.debug('X-Frame-Options: %s' % response['X-Frame-Options'])
+            self.logger.debug('X-Frame-Options: %s' % response['X-Frame-Options'])
 
             return response
 
@@ -99,18 +101,19 @@ class CookielessSessionMiddleware(object):
         logger.debug("Starting session engine %s" % settings.SESSION_ENGINE)
         engine = importlib.import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
     def process_request(self, request):
-        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
 
         # Retrieve the sessionid from the cookiejar, or if cookies are not allowed, attempt to
         # get the identifier from the URL query string. Note that the query parameter is obfuscated as 'utm_source'.
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, request.GET.get('utm_source'))
         request.session = self.SessionStore(session_key)
-        logger.debug("Loaded session store using session_key: %s" % session_key)
+        self.logger.debug("Loaded session store using session_key: %s" % session_key)
 
-        if not request.session.exists(request.session.session_key):
-            logger.debug("Session does not exist, so creating new session")
+        if not request.session.exists(session_key):
+            self.logger.debug("Session does not exist. Creating new session.")
             request.session.create()
 
         # Mitigate security risks by ensuring the requesting user's IP matches the logged IP
@@ -118,7 +121,7 @@ class CookielessSessionMiddleware(object):
             request_ip = ip_address(request)
             logged_ip = request.session['LOGGED_IP']
             if request_ip != logged_ip:
-                logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
+                self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
                 request.session.flush()
         except:
             pass
@@ -133,17 +136,16 @@ class MultiLTILaunchMiddleware(object):
     The current LTI launch may be accessed via the request.LTI attribute, which maps to an entry
     in the request.session['LTI_LAUNCH'] dict keyed by the resource_link_id.
 
-        logger.debug("All launches: %s" % request['LTI_LAUNCH'])
-        logger.debug("Current launch: %s" % request.LTI)
-
     Note: this middleware is derived from django_auth_lti.middleware_patched with some changes for
     this application.
     '''
+    def __init__(self):
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
     def process_request(self, request):
-        logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
         is_basic_lti_launch = (request.method == 'POST' and request.POST.get('lti_message_type') == 'basic-lti-launch-request')
-        logger.debug("basic-lti-launch-request? %s" % is_basic_lti_launch)
+        self.logger.debug("basic-lti-launch-request? %s" % is_basic_lti_launch)
         if is_basic_lti_launch:
             self._validate_request(request)
             self._update_session(request)
@@ -159,30 +161,30 @@ class MultiLTILaunchMiddleware(object):
         consumer_key = getattr(settings, 'CONSUMER_KEY', None)
         secret = getattr(settings, 'LTI_SECRET', None)
         if consumer_key is None or secret is None:
-            logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
+            self.logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
             raise ImproperlyConfigured("Unable to validate LTI launch. Missing setting: CONSUMER_KEY or LTI_SECRET")
 
         request_key = request.POST.get('oauth_consumer_key', None)
         if request_key is None:
-            logger.error("request doesn't contain an oauth_consumer_key; can't continue.")
+            self.logger.error("request doesn't contain an oauth_consumer_key; can't continue.")
             raise PermissionDenied
 
         if request_key != consumer_key:
-            logger.error("could not get a secret for requested key: %s" % request_key)
+            self.logger.error("could not get a secret for requested key: %s" % request_key)
             raise PermissionDenied
 
-        logger.debug('using key/secret %s/%s' % (request_key, secret))
+            self.logger.debug('using key/secret %s/%s' % (request_key, secret))
         tool_provider = DjangoToolProvider(request_key, secret, request.POST)
 
         postparams = request.POST.dict()
-        logger.debug('request is secure: %s' % request.is_secure())
+        self.logger.debug('request is secure: %s' % request.is_secure())
         for key in postparams:
-            logger.debug('POST %s: %s' % (key, postparams.get(key)))
-        logger.debug('request abs url is %s' % request.build_absolute_uri())
+            self.logger.debug('POST %s: %s' % (key, postparams.get(key)))
+        self.logger.debug('request abs url is %s' % request.build_absolute_uri())
         #for key in request.META:
         #    logger.debug('META %s: %s' % (key, request.META.get(key)))
 
-        logger.info("about to check the signature")
+        self.logger.info("about to check the signature")
         try:
             # NOTE: before validating the request, temporarily remove the
             # QUERY_STRING to work around an issue with how Canvas signs requests
@@ -194,36 +196,36 @@ class MultiLTILaunchMiddleware(object):
             # validating the request, the library will generate the signature based only on
             # the POST parameters like Canvas.
             qs = request.META.pop('QUERY_STRING', '')
-            logger.debug('removed query string temporarily: %s' % qs)
+            self.logger.debug('removed query string temporarily: %s' % qs)
             request_is_valid = tool_provider.is_valid_request(request, parameters={}, handle_error=False)
             request.META['QUERY_STRING'] = qs  # restore the query string
-            logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
+            self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
         except oauth2.Error:
-            logger.exception(u'error attempting to validate LTI launch %s' % postparams)
+            self.logger.exception(u'error attempting to validate LTI launch %s' % postparams)
             request_is_valid = False
 
         if request_is_valid:
-            logger.info("signature verified")
+            self.logger.info("signature verified")
         else:
-            logger.error("invalid request: signature check failed")
+            self.logger.error("invalid request: signature check failed")
             raise PermissionDenied
 
-        logger.info("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
+        self.logger.info("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
         if time.time() - int(tool_provider.oauth_timestamp) > 60 * 60:
-            logger.error("OAuth timestamp is too old.")
+            self.logger.error("OAuth timestamp is too old.")
             # raise PermissionDenied
         else:
-            logger.info("OAuth timestamp looks good")
-        logger.info("done checking the timestamp")
+            self.logger.info("OAuth timestamp looks good")
+        self.logger.info("done checking the timestamp")
 
         for required_param in ('resource_link_id', 'context_id', 'user_id'):
-            logger.info("about to check that %s was provided" % required_param)
+            self.logger.info("about to check that %s was provided" % required_param)
             if required_param not in request.POST:
-                logger.error('LTI param %s was not present in request' % required_param)
+                self.logger.error('LTI param %s was not present in request' % required_param)
                 raise PermissionDenied
 
         if ('lis_person_sourcedid' not in request.POST and 'lis_person_name_full' not in request.POST and request.POST['user_id'] != "student"):
-            logger.error('person identifier (i.e. username) or full name was not present in request')
+            self.logger.error('person identifier (i.e. username) or full name was not present in request')
             raise PermissionDenied
 
     def _update_session(self, request):
@@ -257,17 +259,17 @@ class MultiLTILaunchMiddleware(object):
             request.session['LTI_LAUNCH'] = lti_launches
 
         max_launches = getattr(settings, 'LTI_MAX_LAUNCHES', 10)
-        logger.info("LTI launches in session: %s [max=%s]" % (lti_launches.keys(), max_launches))
+        self.logger.info("LTI launches in session: %s [max=%s]" % (lti_launches.keys(), max_launches))
         if len(lti_launches.keys()) >= max_launches:
             invalidated_launch = lti_launches.popitem(last=False)
-            logger.info("LTI launch invalidated: %s", json.dumps(invalidated_launch, indent=4))
+            self.logger.info("LTI launch invalidated: %s", json.dumps(invalidated_launch, indent=4))
 
         lti_launches[resource_link_id] = {
             'launch_params': lti_params,
             'resource_link_id': resource_link_id,
         }
         request.session.modified = True
-        logger.info("LTI launch session saved: %s" % resource_link_id)
+        self.logger.info("LTI launch session saved: %s" % resource_link_id)
 
     def _log_ip_address(self, request):
         '''
@@ -275,7 +277,7 @@ class MultiLTILaunchMiddleware(object):
         '''
         logged_ip = ip_address(request)
         request.session['LOGGED_IP'] = logged_ip
-        logger.info("Logged IP address: %s" % logged_ip)
+        self.logger.info("Logged IP address: %s" % logged_ip)
 
     def _set_current_session(self, request, resource_link_id=None, raise_exception=False):
         '''
@@ -284,7 +286,7 @@ class MultiLTILaunchMiddleware(object):
         '''
         setattr(request, 'LTI', LTILaunchSession(request.session, resource_link_id))
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
-        logger.info("setting current LTI session to resource_link_id=%s" % resource_link_id)
+        self.logger.info("setting current LTI session to resource_link_id=%s" % resource_link_id)
 
 
 class LTILaunchSession(object):
@@ -304,6 +306,7 @@ class LTILaunchSession(object):
     def __init__(self, session, resource_link_id=None):
         self.session = session
         self.resource_link_id = resource_link_id
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
     def valid(self):
         '''Returns true if the launch session dict is populated and can be keyed by the resource_link_id, otherwise False.'''
@@ -313,7 +316,7 @@ class LTILaunchSession(object):
         '''Raises an exception if a valid launch session is not present, usually because the resource_link_id is not provided.'''
         if not self.valid():
             logmsg = "Invalid LTI launch session [resource_link_id=%s]" % self.resource_link_id
-            logger.error(logmsg)
+            self.logger.error(logmsg)
             raise Exception(logmsg)
 
     def get(self, key, default_value=None):

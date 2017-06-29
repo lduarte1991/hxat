@@ -53,9 +53,9 @@ class AnnotationStore(object):
         self.backend = backend_instance
         self.gather_statistics = gather_statistics
         self.grade_passback_outcome = None
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
         assert self.backend is not None
         assert isinstance(self.gather_statistics, bool)
-        logger.debug("Initialized %s with backend=%s gather_statistics=%s" % (self.__class__.__name__, self.backend.__class__.__name__, self.gather_statistics))
 
     @classmethod
     def from_settings(cls, request):
@@ -78,7 +78,7 @@ class AnnotationStore(object):
         raise NotImplementedError
 
     def search(self):
-        logger.info(u"Search: %s" % self.request.GET)
+        self.logger.info(u"Search: %s" % self.request.GET)
         self._verify_course(self.request.GET.get('contextId', None))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
@@ -86,7 +86,7 @@ class AnnotationStore(object):
 
     def create(self):
         body = json.loads(self.request.body)
-        logger.info(u"Create annotation: %s" % body)
+        self.logger.info(u"Create annotation: %s" % body)
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -110,7 +110,7 @@ class AnnotationStore(object):
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.info(u"Update annotation %s: %s" % (annotation_id, body))
+        self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -126,7 +126,7 @@ class AnnotationStore(object):
 
     def delete(self, annotation_id):
         body = json.loads(self.request.body)
-        logger.info(u"Delete annotation %s: %s" % (annotation_id, body))
+        self.logger.info(u"Delete annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_assignment(body.get('collectionId', None))
         self._verify_object(media=body.get('media', None), uri=body.get('uri', None))
@@ -143,7 +143,7 @@ class AnnotationStore(object):
     def _verify_course(self, context_id, raise_exception=True):
         result = (context_id == self.request.LTI['hx_context_id'])
         if not result:
-            logger.info("Course verification failed: %s" % context_id)
+            self.logger.info("Course verification failed: %s" % context_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -151,7 +151,7 @@ class AnnotationStore(object):
     def _verify_assignment(self, assignment_id, raise_exception=True):
         result = (assignment_id == self.request.LTI['hx_collection_id'])
         if not result:
-            logger.info("Assignment verification failed: %s" % assignment_id)
+            self.logger.info("Assignment verification failed: %s" % assignment_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -165,7 +165,7 @@ class AnnotationStore(object):
             # the only way to know for sure if the canvas belongs to that manifest is to fetch the manifest document.
             result = True  #(str(uri) == str(self.request.LTI['hx_object_uri']))
         if not result:
-            logger.info("Object verification failed for %s media: %s" % (media, uri))
+            self.logger.info("Object verification failed for %s media: %s" % (media, uri))
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -173,7 +173,7 @@ class AnnotationStore(object):
     def _verify_user(self, user_id, raise_exception=True):
         result = (user_id == self.request.LTI['hx_user_id'] or self.request.LTI['is_staff'])
         if not result:
-            logger.info("User verification failed: %s" % user_id)
+            self.logger.info("User verification failed: %s" % user_id)
         if raise_exception and not result:
             raise PermissionDenied
         return result
@@ -184,21 +184,21 @@ class AnnotationStore(object):
         return tool_provider
 
     def _lti_grade_passback(self, is_graded=False, status_code=None, result_score=1):
-        logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
+        self.logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
         if not is_graded:
             return
         if status_code != 200:
-            logger.info("LTI Grade Passback aborted because status_code=%s" % status_code)
+            self.logger.info("LTI Grade Passback aborted because status_code=%s" % status_code)
             return
         try:
             outcome = self._get_tool_provider().post_replace_result(result_score)
             if outcome.is_success():
-                logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
+                self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
             else:
-                logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
+                self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
             self.grade_passback_outcome = outcome
         except Exception as e:
-            logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
+            self.logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
         return self.grade_passback_outcome
 
     def _update_stats(self, action, response):
@@ -207,7 +207,7 @@ class AnnotationStore(object):
         if action not in ('create', 'update', 'delete'):
             return
 
-        logger.info("Updating stats action=%s" % action)
+        self.logger.info("Updating stats action=%s" % action)
         body = json.loads(response.content)
         attrs = {
             'context_id':body['contextId'],
@@ -246,6 +246,7 @@ class StoreBackend(object):
 
     def __init__(self, request):
         self.request = request
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
     def root(self):
         return HttpResponse(json.dumps(dict(name=self.BACKEND_NAME)), content_type='application/json')
@@ -269,7 +270,7 @@ class StoreBackend(object):
         try:
             return get_object_or_404(Assignment, assignment_id=assignment_id)
         except Exception as e:
-            logger.error("Error loading assignment object: %s" % assignment_id)
+            self.self.logger.error("Error loading assignment object: %s" % assignment_id)
             raise e
 
     def _get_request_body(self):
@@ -296,7 +297,7 @@ class StoreBackend(object):
         '''
         permissions = {"read": [], "admin": [], "update": [], "delete": []}
         permissions.update(data.get('permissions', {}))
-        logger.debug("_modify_permissions() before: %s" % str(permissions))
+        self.logger.debug("_modify_permissions() before: %s" % str(permissions))
 
         # No change required when the annotation is world-readable
         if len(permissions['read']) == 0:
@@ -321,7 +322,7 @@ class StoreBackend(object):
             if self.ADMIN_GROUP_ID not in permissions['read']:
                 permissions['read'].append(self.ADMIN_GROUP_ID)
 
-        logger.debug("_modify_permissions() after: %s" % str(permissions))
+        self.logger.debug("_modify_permissions() after: %s" % str(permissions))
 
         data['permissions'] = permissions
         return data
@@ -331,6 +332,7 @@ class CatchStoreBackend(StoreBackend):
 
     def __init__(self, request):
         super(CatchStoreBackend, self).__init__(request)
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
         self.headers = {
             'x-annotator-auth-token': request.META.get('HTTP_X_ANNOTATOR_AUTH_TOKEN', '!!MISSING!!'),
             'content-type': 'application/json',
@@ -353,7 +355,7 @@ class CatchStoreBackend(StoreBackend):
         # Note: this only works if the "__admin__" group ID was added to the annotation read permissions
         # prior to saving it, otherwise this will have no effect.
         if self.ADMIN_GROUP_ENABLED and self.request.LTI['is_staff']:
-            logger.info('CATCH updating auth token for admin')
+            self.logger.info('updating auth token for admin')
             assignment = self._get_assignment(self.request.GET.get('collectionId', None))
             self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(
                 assignment=assignment,
@@ -365,13 +367,13 @@ class CatchStoreBackend(StoreBackend):
         assignment = self._get_assignment(self.request.GET.get('collectionId', None))
         params = self.request.GET.urlencode()
         database_url = self._get_database_url(assignment, '/search')
-        logger.info('CATCH search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
+        self.logger.info('search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
         try:
             response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
         except requests.exceptions.Timeout as e:
-            logger.error("CATCH requested timed out!")
+            self.logger.error("requested timed out!")
             return self._response_timeout()
-        logger.info('CATCH search response status_code=%s' % response.status_code)
+        self.logger.info('search response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def create(self):
@@ -379,13 +381,13 @@ class CatchStoreBackend(StoreBackend):
         assignment = self._get_assignment(body.get('collectionId', None))
         database_url = self._get_database_url(assignment, '/create')
         data = json.dumps(body)
-        logger.info('CATCH create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
         except requests.exceptions.Timeout as e:
-            logger.error("CATCH requested timed out!")
+            self.logger.error("requested timed out!")
             return self._response_timeout()
-        logger.info('CATCH create response status_code=%s' % response.status_code)
+        self.logger.info('create response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def update(self, annotation_id):
@@ -393,25 +395,25 @@ class CatchStoreBackend(StoreBackend):
         assignment = self._get_assignment(body.get('collectionId', None))
         database_url = self._get_database_url(assignment, '/update/%s' % annotation_id)
         data = json.dumps(body)
-        logger.info('CATCH update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
         except requests.exceptions.Timeout as e:
-            logger.error("CATCH requested timed out!")
+            self.logger.error("requested timed out!")
             return self._response_timeout()
-        logger.info('CATCH update response status_code=%s' % response.status_code)
+        self.logger.info('update response status_code=%s' % response.status_code)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
         assignment = self._get_assignment(self.request.LTI['hx_collection_id'])
         database_url = self._get_database_url(assignment, '/delete/%s' % annotation_id)
-        logger.info('CATCH delete request: url=%s headers=%s' % (database_url, self.headers))
+        self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
         try:
             response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
         except requests.exceptions.Timeout as e:
-            logger.error("CATCH requested timed out!")
+            self.logger.error("requested timed out!")
             return self._response_timeout()
-        logger.info('CATCH update response status_code=%s' % response.status_code)
+        self.logger.info('update response status_code=%s' % response.status_code)
         return HttpResponse(response)
 
 

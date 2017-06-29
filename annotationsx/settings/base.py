@@ -243,7 +243,6 @@ if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
-    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Organization-specific configuration
