@@ -181,8 +181,8 @@ class MultiLTILaunchMiddleware(object):
         for key in postparams:
             self.logger.debug('POST %s: %s' % (key, postparams.get(key)))
         self.logger.debug('request abs url is %s' % request.build_absolute_uri())
-        #for key in request.META:
-        #    logger.debug('META %s: %s' % (key, request.META.get(key)))
+        for key in request.META:
+            self.logger.debug('META %s: %s' % (key, request.META.get(key)))
 
         self.logger.info("about to check the signature")
         try:
