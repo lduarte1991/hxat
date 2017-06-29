@@ -413,7 +413,7 @@ class CatchStoreBackend(StoreBackend):
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
-        self.logger.info('update response status_code=%s' % response.status_code)
+        self.logger.info('delete response status_code=%s' % response.status_code)
         return HttpResponse(response)
 
 
