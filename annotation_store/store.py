@@ -274,7 +274,7 @@ class StoreBackend(object):
         try:
             return get_object_or_404(Assignment, assignment_id=assignment_id)
         except Exception as e:
-            self.self.logger.error("Error loading assignment object: %s" % assignment_id)
+            self.logger.error("Error loading assignment object: %s" % assignment_id)
             raise e
 
     def _get_request_body(self):
