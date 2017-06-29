@@ -189,7 +189,7 @@ class MultiLTILaunchMiddleware(object):
         for key in request.META:
             self.logger.debug('META %s: %s' % (key, request.META.get(key)))
 
-        self.logger.info("about to check the signature")
+        self.logger.debug("about to check the signature")
         try:
             # NOTE: before validating the request, temporarily remove the
             # QUERY_STRING to work around an issue with how Canvas signs requests
@@ -215,18 +215,16 @@ class MultiLTILaunchMiddleware(object):
             self.logger.error("invalid request: signature check failed")
             raise PermissionDenied
 
-        self.logger.info("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
+        self.logger.debug("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
         if time.time() - int(tool_provider.oauth_timestamp) > 60 * 60:
-            self.logger.error("OAuth timestamp is too old.")
+            self.logger.warning("OAuth timestamp is too old.")
             # raise PermissionDenied
         else:
             self.logger.info("OAuth timestamp looks good")
-        self.logger.info("done checking the timestamp")
 
         for required_param in ('resource_link_id', 'context_id', 'user_id'):
-            self.logger.info("about to check that %s was provided" % required_param)
             if required_param not in request.POST:
-                self.logger.error('LTI param %s was not present in request' % required_param)
+                self.logger.error("Required LTI param '%s' was not present in request" % required_param)
                 raise PermissionDenied
 
         if ('lis_person_sourcedid' not in request.POST and 'lis_person_name_full' not in request.POST and request.POST['user_id'] != "student"):

@@ -141,39 +141,43 @@ class AnnotationStore(object):
         self._update_stats('delete', response)
 
     def _verify_course(self, context_id, raise_exception=True):
-        result = (context_id == self.request.LTI['hx_context_id'])
+        expected = self.request.LTI['hx_context_id']
+        result = context_id == expected
         if not result:
-            self.logger.info("Course verification failed: %s" % context_id)
+            self.logger.warning("Course verification failed. Expected: %s Actual: %s" % (expected, context_id))
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_assignment(self, assignment_id, raise_exception=True):
-        result = (assignment_id == self.request.LTI['hx_collection_id'])
+        expected = self.request.LTI['hx_collection_id']
+        result = assignment_id == expected
         if not result:
-            self.logger.info("Assignment verification failed: %s" % assignment_id)
+            self.logger.warning("Assignment verification failed. Expected: %s Actual: %s" % (expected, assignment_id))
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_object(self, media=None, uri=None, raise_exception=True):
+        expected = self.request.LTI['hx_object_id']
         if media == 'text':
-            result = (str(uri) == str(self.request.LTI['hx_object_id']))
+            result = str(uri) == str(expected)
         else:
             # NOTE: Relaxing verification on image objects, because the submitted URI is not the IIIF manifest
             # URI saved in the session (content of the target object). The object URI is the IIIF canvas, and
             # the only way to know for sure if the canvas belongs to that manifest is to fetch the manifest document.
             result = True  #(str(uri) == str(self.request.LTI['hx_object_uri']))
         if not result:
-            self.logger.info("Object verification failed for %s media: %s" % (media, uri))
+            self.logger.warning("Object verification failed media %s. Expected: %s Actual: %s" % (media, expected, uri))
         if raise_exception and not result:
             raise PermissionDenied
         return result
 
     def _verify_user(self, user_id, raise_exception=True):
-        result = (user_id == self.request.LTI['hx_user_id'] or self.request.LTI['is_staff'])
+        expected = self.request.LTI['hx_user_id']
+        result = (user_id == expected or self.request.LTI['is_staff'])
         if not result:
-            self.logger.info("User verification failed: %s" % user_id)
+            self.logger.warning("User verification failed. Expected: %s Actual: %s" % (expected, user_id))
         if raise_exception and not result:
             raise PermissionDenied
         return result
