@@ -27,10 +27,10 @@ class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         hashed_files = OrderedDict()
 
         # We can be reasonably confident that JS files can be hashed without any problem because we're not trying to
-        # change references inside the files themselves. This is not the case with CSS.
+        # change references inside the files themselves. We can also be confident in our own custom CSS (but not vendors).
         paths_to_process, paths_to_skip = dict(), dict()
         for path in paths:
-            if path.endswith(".js"):
+            if path.endswith(".js") or (path.startswith('css/') and path.endswith('.css')):
                 paths_to_process[path] = paths[path]
             else:
                 paths_to_skip[path] = paths[path]
