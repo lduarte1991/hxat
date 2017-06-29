@@ -28,13 +28,20 @@
         var self = this;
 
         // Shows annotation toggle label only when hovered
-        jQuery('.annotations-status').hover(function() {
+        jQuery('#annotations-status').hover(function() {
             jQuery('.hover-inst').toggleClass("hidden");
         });
 
         // Actually toggles whether annotaitons are displayed or not
-        jQuery('.annotations-status').click(function() {
+        jQuery('#annotations-status').click(function() {
             self.toggleAnnotations();
+        });
+
+        jQuery('#annotations-text-size-plus').click(function() {
+            self.toggleTextSize(1);
+        });
+       jQuery('#annotations-text-size-minus').click(function() {
+            self.toggleTextSize(-1);
         });
 
         // helper function to turn off keyboard-input mode
@@ -972,19 +979,17 @@
             if (this.initOptions.mediaType === "text") {
                 var annotator = window.AController.annotationCore.annotation_tool;
                 var store = annotator.plugins.Store;
-                if (jQuery('.annotations-status').hasClass('on')) {
-                    jQuery('.annotations-status .hover-inst').html("Show annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Show annotations");
-                    jQuery('.annotations-status i').removeClass('fa-close');
-                    jQuery('.annotations-status i').addClass('fa-comments');
+                if (jQuery('#annotations-status').hasClass('on')) {
+                    jQuery('#annotations-status .labeltext').html("Show annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Show annotations");
+                    jQuery('#annotations-status i').removeClass('fa-close').addClass('fa-comments');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
                 } else {
-                    jQuery('.annotations-status .hover-inst').html("Hide annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Hide annotations");
-                    jQuery('.annotations-status i').addClass('fa-close');
-                    jQuery('.annotations-status i').removeClass('fa-comments');
+                    jQuery('#annotations-status .labeltext').html("Hide annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Hide annotations");
+                    jQuery('#annotations-status i').addClass('fa-close').removeClass('fa-comments');
                     this.annotationsSaved.forEach(function (annotation) {
                             annotator.setupAnnotation(annotation);
                             store.registerAnnotation(annotation);
@@ -992,8 +997,45 @@
                     annotator.publish("externalCallToHighlightTags");
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
                 }
-                jQuery('.annotations-status').toggleClass("on");
-            };
+                jQuery('#annotations-status').toggleClass("on");
+            }
+        };
+
+        $.TargetObjectController.prototype.toggleTextSize = function(step) {
+            var $content = jQuery("#viewer .content");
+            var nodes = [], curnode, stylesize, styleunit;
+            var minsize = 8;
+
+            step = step || 1;
+            if(typeof this.targetFontSize === "undefined") {
+                this.targetFontSize = 14;
+            }
+            this.targetFontSize += step;
+            if(this.targetFontSize < minsize) {
+                this.targetFontSize = minsize;
+            }
+
+            // set the font size on the content container
+            //console.log("setting font size: ", this.targetFontSize, "step:", step);
+            $content.css('fontSize', String(this.targetFontSize) + "px");
+
+            // walk the dom and find custom fontStyle declarations and adust as necessary
+            nodes.push($content[0]);
+            while(nodes.length > 0) {
+                curnode = nodes.pop();
+                stylesize = parseInt(curnode.style.fontSize, 10);
+                if(!isNaN(stylesize)) {
+                    styleunit = curnode.style.fontSize.replace(stylesize, '');
+                    stylesize += step;
+                    stylesize = stylesize < minsize ? minsize : stylesize;
+                    if(styleunit === "px" || styleunit === "pt") {
+                        curnode.style.fontSize = stylesize + styleunit;
+                    }
+                }
+                for(var i = curnode.children.length; i > 0; i--) {
+                    nodes.push(curnode.children[i-1]);
+                }
+            }
         };
 
 }(AController));
