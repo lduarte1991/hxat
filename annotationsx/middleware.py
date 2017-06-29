@@ -99,10 +99,10 @@ class CookielessSessionMiddleware(object):
     This must be added to INSTALLED_APPS prior to other middleware that uses the session.
     '''
     def __init__(self):
-        logger.debug("Starting session engine %s" % settings.SESSION_ENGINE)
         engine = importlib.import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
+        self.logger.debug("Starting session engine %s" % settings.SESSION_ENGINE)
 
     def process_request(self, request):
         self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
@@ -120,16 +120,14 @@ class CookielessSessionMiddleware(object):
             self.logger.debug("Session does not exist. Creating new session.")
             request.session.create()
 
-        if check_ip:
-            try:
-                self.logger.info("Checking IP address against session")
-                request_ip = ip_address(request)
-                logged_ip = request.session.get('LOGGED_IP')
-                if request_ip != logged_ip:
-                    self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
-                    request.session.flush()
-            except:
-                pass
+        logged_ip = request.session.get('LOGGED_IP', None)
+        if check_ip and logged_ip is not None:
+            self.logger.info("Checking IP address against session")
+            request_ip = ip_address(request)
+            if request_ip != logged_ip:
+                self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
+                request.session.flush()
+                self.logger.info("Flushed session")
 
 
 
