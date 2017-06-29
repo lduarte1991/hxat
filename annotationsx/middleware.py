@@ -29,8 +29,9 @@ logger = logging.getLogger(__name__)
 def ip_address(request):
     ''' Returns the real IP address from a request, or if that fails, returns 1.2.3.4.'''
     meta = request.META
-    return meta.get('HTTP_X_FORWARDED_FOR', meta.get('HTTP_X_REAL_IP', meta.get('REMOTE_ADDR', '1.2.3.4')))
-
+    # Not using HTTP_X_FORWARDED_FOR because it returns a list: client, proxy1, proxy2, ...
+    # which is more prone to varying between requests from the same client
+    return meta.get('HTTP_X_REAL_IP', meta.get('HTTP_CLIENT_IP', meta.get('REMOTE_ADDR', '1.2.3.4')))
 
 class XFrameOptionsMiddleware(object):
     def __init__(self):
@@ -105,26 +106,30 @@ class CookielessSessionMiddleware(object):
 
     def process_request(self, request):
         self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
+        check_ip = False
+        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+        if session_key is None:
+            self.logger.info("Session key (%s) not found in cookies" % settings.SESSION_COOKIE_NAME)
+            session_key = request.GET.get('utm_source')
+            check_ip = True
 
-        # Retrieve the sessionid from the cookiejar, or if cookies are not allowed, attempt to
-        # get the identifier from the URL query string. Note that the query parameter is obfuscated as 'utm_source'.
-        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, request.GET.get('utm_source'))
         request.session = self.SessionStore(session_key)
-        self.logger.debug("Loaded session store using session_key: %s" % session_key)
+        self.logger.info("Loaded session store using session_key: %s" % session_key)
 
         if not request.session.exists(session_key):
             self.logger.debug("Session does not exist. Creating new session.")
             request.session.create()
 
-        # Mitigate security risks by ensuring the requesting user's IP matches the logged IP
-        try:
-            request_ip = ip_address(request)
-            logged_ip = request.session['LOGGED_IP']
-            if request_ip != logged_ip:
-                self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
-                request.session.flush()
-        except:
-            pass
+        if check_ip:
+            try:
+                self.logger.info("Checking IP address against session")
+                request_ip = ip_address(request)
+                logged_ip = request.session.get('LOGGED_IP')
+                if request_ip != logged_ip:
+                    self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
+                    request.session.flush()
+            except:
+                pass
 
 
 
