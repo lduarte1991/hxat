@@ -30,7 +30,7 @@ class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         # change references inside the files themselves. We can also be confident in our own custom CSS (but not vendors).
         paths_to_process, paths_to_skip = dict(), dict()
         for path in paths:
-            if path.endswith(".js") or (path.startswith('css/') and path.endswith('.css')):
+            if path.endswith(".js") or path.startswith('css/'):
                 paths_to_process[path] = paths[path]
             else:
                 paths_to_skip[path] = paths[path]
