@@ -1028,6 +1028,9 @@
                     curnode.style.fontSize = computed['font-size'];
                     curnode.size = "";
                 }
+                if(curnode != $content[0] && curnode.className != "") {
+                    curnode.style.fontSize = "inherit";
+                }
                 stylesize = parseInt(curnode.style.fontSize, 10);
                 if (!isNaN(stylesize)) {
                     styleunit = curnode.style.fontSize.replace(stylesize, '');
