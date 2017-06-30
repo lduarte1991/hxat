@@ -20,28 +20,28 @@
         <header class="header" role="banner">
             <div id='banner-logo-left'>
                 {% if org == "HARVARDX" %}
-                    <div class="logo" aria-label="HarvardX Logo" onclick="window.location='{% url "hx_lti_initializer:course_admin_hub" %}'">
+                    <div class="logo" aria-label="HarvardX Logo" onclick="window.location='{% url "hx_lti_initializer:course_admin_hub" %}?resource_link_id={{ resource_link_id }}'">
                         <img src="{% static "css/images/hx_inv.png" %}" aria-label='HarvardX Logo' style="height:40px;" />
                     </div>
                 {% endif %}
                 <div class="site-title">
-                    <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">The HarvardX Annotation Tool</a>
+                  <a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}">The HarvardX Annotation Tool</a>
                 </div>
             </div>
             <!-- Broken off into two sections, information on the left and content on the right -->
             <nav class="navigation" role="navigation" aria-label="Main Menu">
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class='selected'><i class="fa fa-home"></i>  Home</a>
+                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}" class='selected'><i class="fa fa-home"></i>  Home</a>
                 {% if is_instructor %}
                     {% get_annotation_manual  default_url="pages/instructor_manual/hxat-instructor-manual.html" default_target="_self" as annotation_manual %}
                     <a target="{{ annotation_manual.target }}" href="{{ annotation_manual.url }}">Manual</a>
-                    <a role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}">Dashboard</a>
+                    <a role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}?resource_link_id={{ resource_link_id }}">Dashboard</a>
                 {% endif %}
             </nav>
         </header>
 
         <main class="container" role="main">
             {% if org != "HARVARDX" or is_instructor %}
-    	    {% block content %}{% endblock %}	
+            {% block content %}{% endblock %}	
             {% else %}
             <p></p>
             <p></p>

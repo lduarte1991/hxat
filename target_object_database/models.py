@@ -77,6 +77,11 @@ class TargetObject(LTI_TodApi):
             )
         return None
 
+    def get_target_content_uri(self):
+        if self.target_type in ('ig', 'vd'):
+            return self.target_content.strip()
+        return None
+
     def get_target_content_from_id(id_requested):
         return TargetObject.objects.get(pk=id_requested)
 

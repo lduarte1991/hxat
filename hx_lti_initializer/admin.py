@@ -5,6 +5,7 @@ The initializer needs to set up a profile. This is the one thing consistent
 throughout the LTI. Even courses is only related via the target objects.
 """
 
+from django.contrib.sessions.models import Session
 from django.contrib import admin
 from hx_lti_initializer.models import LTIProfile, LTICourse, LTIResourceLinkConfig
 
@@ -34,6 +35,13 @@ class LTIResourceLinkConfigAdmin(admin.ModelAdmin):
     list_display = ('id', 'collection_id', 'object_id', 'resource_link_id')
     search_fields = ('collection_id', )
 
+
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+
+admin.site.register(Session, SessionAdmin)
 admin.site.register(LTIProfile, LTIProfileAdmin)
 admin.site.register(LTICourse, LTICourseAdmin)
 admin.site.register(LTIResourceLinkConfig, LTIResourceLinkConfigAdmin)

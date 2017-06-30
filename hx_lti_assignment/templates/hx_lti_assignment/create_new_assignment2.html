@@ -44,10 +44,10 @@
 						<textarea id='instructions-{{forloop.counter0}}' class='instructions' placeholder="Instructions seen by learners. HTML is acceptable.">{{source.instance.target_instructions}}</textarea>
 						<div class='button-collection'>
 							<a href='#' class='show-settings'><i class='fa fa-gear'></i>Show settings</a>
-							<a href='{% url "target_object_database:edit_source" id=source.instance.target_object.pk%}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
+							<a href='{% url "target_object_database:edit_source" id=source.instance.target_object.pk%}?resource_link_id={{ resource_link_id }}' class='edit'><i class='fa fa-pencil'></i>Edit</a>
 							<a href='#' class='remove'><i class='fa fa-trash-o'></i>Remove</a>
 							{% if assignment_id %}
-								<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=context_id assignment_id=assignment_id object_id=source.instance.target_object.id %}" class='preview'><i class='fa fa-eye'></i>Preview</a>
+								<a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=context_id assignment_id=assignment_id object_id=source.instance.target_object.id %}?resource_link_id={{ resource_link_id }}" class='preview'><i class='fa fa-eye'></i>Preview</a>
 							{% endif %}
 						</div>
 						<div class='advanced-settings' style='display:none'>
@@ -93,7 +93,7 @@
 		{% endif %}
 		<div class='button-collection add-source-collection'>
 			<div class='save' id='add-source-button'>Add a source</div> or
-			<a id='create-new-source-button' href='{% url "target_object_database:popUpNewSource" %}' onclick=" return showAddAnotherPopup(this);">create a new source</a>
+			<a id='create-new-source-button' href='{% url "target_object_database:popUpNewSource" %}?resource_link_id={{ resource_link_id }}' onclick=" return showAddAnotherPopup(this);">create a new source</a>
 		</div>
 	</div>
 
@@ -115,7 +115,7 @@
 		<div type="submit" class="save" id='save-button' role="button" onclick='window.assignment_editor.save_form();'>
 			Save
 		</div>
-		<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+		<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}";'>
 		Cancel
 		</div>
 	</div>
@@ -244,7 +244,7 @@
         <option value="{{obj.id}}" data-type="{{obj.target_type}}" data-author="{{obj.target_author}}" data-date="{{obj.target_created}}">{{obj.target_title}}</option>
     {% endfor %}
 </div>
-<form method="POST" class="post-form" style='display:none;'>{% csrf_token %}
+<form method="POST" action="?resource_link_id={{ resource_link_id }}" class="post-form" style='display:none;'>{% csrf_token %}
 {{form}}
 {% for item in targets_form %}
 	{% if forloop.counter0 < number_of_targets %}
@@ -290,7 +290,7 @@
 							</div>
 						</td>
 						<td>
-							<a href="{% url "target_object_database:popUpNewSource" %}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
+							<a href="{% url "target_object_database:popUpNewSource" %}?resource_link_id={{ resource_link_id }}" class="add-another" id="add_id_assignmenttargets_set-{{forloop.counter0}}-target_object" onclick="return showAddAnotherPopup(this);" title="Create New Source Material">{% bootstrap_icon "plus" %}</a>
 						</td>
 						<td class="field-order hidden"><input id="id_assignmenttargets_set-{{forloop.counter0}}-order" name="assignmenttargets_set-{{forloop.counter0}}-order" value='{{item.order.value}}'></td>
 						<td class="field-settings clickable" data-toggle="collapse" data-target="#assignment-target-object-settings-{{forloop.counter0}}" role="button">{% bootstrap_icon "cog" %}</td>

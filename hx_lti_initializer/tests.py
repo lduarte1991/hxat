@@ -21,7 +21,7 @@ Corner Cases Found:
     4. User tries to view "Share" page while not logged in.
 """
 import sys
-from utils import create_new_user, initialize_lti_tool_provider
+from utils import create_new_user
 from views import *
 from test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
 from django.utils import six
@@ -97,6 +97,7 @@ class LTIInitializerUtilsTests(TestCase):
         """
         del self.tp
 
+'''
     def test_get_lti_value(self):
         """
         Should return the attribute within the LTI tool provider.
@@ -114,7 +115,6 @@ class LTIInitializerUtilsTests(TestCase):
         """
         value_found = get_lti_value('launch_presentation_return_url', self.tp)
         self.assertNotEqual(value_found, 'http://fake.com/lti_return')
-
     @patch('hx_lti_initializer.utils.logger')
     def test_debug_printer_when_lti_debug_enabled(self, mock_logger):
         """
@@ -130,6 +130,7 @@ class LTIInitializerUtilsTests(TestCase):
         settings.LTI_DEBUG = False
         value_found = get_lti_value('lis_outcome_service_url', self.tp)
         mock_logger.debug.assert_not_called()
+'''
 
 '''
     def test_retrieve_token(self):
@@ -312,37 +313,6 @@ class LTIInitializerViewsTests(TestCase):
         del self.small_request
         del self.missing_user_id
         del self.missing_username
-
-    def test_validate_request(self):
-        """
-        Simply checks to see if a bad request raises an exception while a
-        good one does not
-        """
-        self.assertRaises(PermissionDenied, validate_request, self.bad_request)
-        self.assertTrue(validate_request(self.good_request) == None)
-        self.assertRaises(
-            PermissionDenied,
-            validate_request,
-            self.missing_user_id
-        )
-        self.assertRaises(
-            PermissionDenied,
-            validate_request,
-            self.missing_username
-        )
-        settings.LTI_DEBUG = True
-        with capture_err(validate_request, self.small_request) as output:
-            self.assertTrue(output.find("DEBUG - user_id: 234jfhrwekljrsfw8abcd35cseddda"))
-
-    def test_initialize_lti_tool_provider(self):
-        """
-        Checks to see if initialize_lti_tool_provider actually does check
-        that therequest was valid.
-        """
-        self.assertIsInstance(
-            initialize_lti_tool_provider(self.other_request),
-            DjangoToolProvider
-        )
 
     def test_create_new_user(self):
         """

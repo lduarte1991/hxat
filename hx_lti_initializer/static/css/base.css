@@ -119,19 +119,14 @@
 }
 
 .course-name {
-    color: black;
     font-family: Verdana, Arial, sans-serif;
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 16px;
+    margin: 10px 0 0 0;
 }
 
 .assignment-header {
 	color: rgb(86, 86, 86);
 	font-family: Verdana, Arial, sans-serif;
-	font-size: 18px;
-	margin-top: 40px;
-	font-weight: bold;
+    margin: 15px 0;
 }
 
 td {
@@ -149,8 +144,7 @@ th {
 
 .settingslink {
     font-size: 12px;
-    float: left;
-    margin-top: -15px;
+    display: block;
 }
 
 .leftfloat{
@@ -1303,8 +1297,9 @@ progress[value]::-webkit-progress-value {
 }
 
 .starting-resource {
-	margin-top: 35px;
-	margin-bottom: -20px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 14px;
+    margin: 15px 0 0 0;
 }
 
 .make-starting-resource {

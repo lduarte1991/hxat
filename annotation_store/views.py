@@ -43,7 +43,7 @@ def delete(request, annotation_id):
 
 @login_required
 def transfer(request, instructor_only="1"):
-    user_id = request.session['hx_user_id']
+    user_id = request.LTI['hx_user_id']
 
     old_assignment_id = request.POST.get('old_assignment_id')
     new_assignment_id = request.POST.get('new_assignment_id')

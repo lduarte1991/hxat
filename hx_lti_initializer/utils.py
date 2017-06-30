@@ -28,70 +28,12 @@ from target_object_database.models import TargetObject
 
 logger = logging.getLogger(__name__)
 
-# If we were to restructure (not recommended because then we can't reconcile with HX),
-# these first 4 functions would be in utils.py
-def validate_request(req):
-    """
-    Validates the request in order to permit or deny access to the LTI tool.
-    """
-    # print out the request to the terminal window if in debug mode
-    # this item is set in the set tings, in the __init__.py file
-    if settings.LTI_DEBUG:
-        for item in sorted(req.POST.dict()):
-            debug_printer('DEBUG - %s: %s \r' % (item, req.POST[item]))
-
-    # verifies that request contains the information needed
-    if 'oauth_consumer_key' not in req.POST:
-        debug_printer('DEBUG - Consumer Key was not present in request.')
-        raise PermissionDenied()
-    if 'user_id' not in req.POST:
-        debug_printer('DEBUG - Anonymous ID was not present in request.')
-        raise PermissionDenied()
-    if ('lis_person_sourcedid' not in req.POST and
-            'lis_person_name_full' not in req.POST and
-            req.POST['user_id'] != "student"):
-        debug_printer('DEBUG - Username or Name was not present in request.')
-        raise PermissionDenied()
-
-
-def initialize_lti_tool_provider(req):
-    """
-    Starts the provider given the consumer_key and secret.
-    """
-    consumer_key = settings.CONSUMER_KEY
-    secret = settings.LTI_SECRET
-
-    # use the function from ims_lti_py app to verify and initialize tool
-    provider = DjangoToolProvider(consumer_key, secret, req.POST)
-
-    # NOTE: before validating the request, temporarily remove the
-    # QUERY_STRING to work around an issue with how Canvas signs requests
-    # that contain GET parameters. Before Canvas launches the tool, it duplicates the GET
-    # parameters as POST parameters, and signs the POST parameters (*not* the GET parameters).
-    # However, the oauth2 library that validates the request generates
-    # the oauth signature based on the combination of POST+GET parameters together,
-    # resulting in a signature mismatch. By removing the QUERY_STRING before
-    # validating the request, the library will generate the signature based only on
-    # the POST parameters like Canvas.
-    qs = req.META.pop('QUERY_STRING', '')
-
-    # now validate the tool via the valid_request function
-    # this means that request was well formed but invalid
-    if provider.valid_request(req) == False:
-        debug_printer("DEBUG - LTI Exception: Not a valid request.")
-        raise PermissionDenied()
-    else:
-        debug_printer('DEBUG - LTI Tool Provider was valid.')
-
-    req.META['QUERY_STRING'] = qs  # restore the query string
-
-    return provider
 
 @transaction.atomic
 def create_new_user(anon_id=None, username=None, display_name=None, roles=None, scope=None):
-    debug_printer('DEBUG - Creating new user with parameters: anon_id=%s, username=%s, display_name=%s, roles=%s' % (anon_id, username, display_name, roles))
+    logger.debug('create_new_user: anon_id=%s, username=%s, display_name=%s, roles=%s' % (anon_id, username, display_name, roles))
     if anon_id is None or display_name is None or roles is None:
-        raise Exception("Missing required parameters to create new user: anon_id, display_name, roles")
+        raise Exception("create_new_user missing required parameters: anon_id, display_name, roles")
 
     lti_profile = LTIProfile(anon_id=anon_id)
     lti_profile.name = display_name
@@ -116,11 +58,11 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
     
-    debug_printer('DEBUG - Created LTIProfile.%s associated with User.%s' % (lti_profile.id, user.id))
+    logger.debug('create_new_user: LTIProfile.%s associated with User.%s' % (lti_profile.id, user.id))
     return user, lti_profile
 
 def save_session(request, **kwargs):
-    session_key_for = {
+    session_map = {
         "user_id": ["hx_user_id", None],
         "user_name": ["hx_user_name", None],
         "user_scope": ["hx_user_scope", None],
@@ -129,6 +71,7 @@ def save_session(request, **kwargs):
         "course_name": ["course_name", None],
         "collection_id": ["hx_collection_id", None],
         "object_id": ["hx_object_id", None],
+        "object_uri": ["hx_object_uri", None],
         "roles": ["hx_roles", []],
         "is_staff": ["is_staff", False],
         "is_instructor": ["is_instructor", False],
@@ -136,35 +79,30 @@ def save_session(request, **kwargs):
         "lti_params": ['lti_params', None],
         "resource_link_id": ['resource_link_id', None]
     }
-    
+
     for k in kwargs:
-        if k not in session_key_for:
-            raise Exception("invalid keyword argument: %s" % k)
+        assert k in session_map, 'save_session kwarg=%s is not valid!' % k
 
-    for k, v in kwargs.iteritems():
-        session_key, session_key_default = session_key_for[k]
-        request.session[session_key] = kwargs.get(k, session_key_default)
-        debug_printer("DEBUG - save_session: (%s, %s) => (%s, %s)" % (k, v, session_key, kwargs.get(k, session_key_default)))
+    resource_link_id = request.LTI['resource_link_id']
 
-def get_lti_value(key, tool_provider):
-    """
-    Searches for the given key in the tool_provider. If not found returns None
-    """
+    for kwarg in kwargs:
+        session_key, default_value = session_map[kwarg]
+        session_value = kwargs.get(kwarg, default_value)
+        logger.debug("save_session: %s=%s" % (session_key, session_value))
+        request.session['LTI_LAUNCH'][resource_link_id][session_key] = session_value
+        request.session.modified = True
 
-    lti_value = None
-    if "custom" in key:
-        lti_value = tool_provider.custom_params[key]
-    else:
-        try:
-            lti_value = getattr(tool_provider, key)
-        except AttributeError:
-            debug_printer("%s not found in LTI tool_provider" % key)
-            return None
+def get_session_value(request, key, default_value=None):
+    resource_link_id = request.LTI['resource_link_id']
+    value = request.session['LTI_LAUNCH'][resource_link_id].get(key, default_value)
+    logger.debug("get_session_value: %s=%s" % (key, value))
+    return value
 
-    debug_printer(lti_value)
-
-    return lti_value
-
+def get_lti_value(key, request):
+    """Returns the LTI parameter from the request otherwise None."""
+    value = request.LTI.get('lti_params', {}).get(key, None)
+    logger.debug("get_lti_value: %s=%s" % (key, value))
+    return value
 
 def debug_printer(debug_text):
     """Logs debug information to the logging system"""
@@ -295,7 +233,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
     encoded_context_id = urllib.quote_plus(context_id)
     request_url = "%s/search?contextId=%s&limit=%s" % (annotation_db_url, encoded_context_id, limit)
 
-    debug_printer("DEBUG - fetch_annotations_by_course(): url: %s" % request_url)
+    logger.debug("fetch_annotations_by_course(): url: %s" % request_url)
 
     # make request
     request_start_time = time.clock()
@@ -303,8 +241,8 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
     request_end_time = time.clock()
     request_elapsed_time = request_end_time - request_start_time
 
-    debug_printer("DEBUG - fetch_annotations_by_course(): annotation database response code: %s" % r.status_code)
-    debug_printer("DEBUG - fetch_annotations_by_course(): request time elapsed: %s seconds" % (request_elapsed_time))
+    logger.debug("fetch_annotations_by_course(): annotation database response code: %s" % r.status_code)
+    logger.debug("fetch_annotations_by_course(): request time elapsed: %s seconds" % (request_elapsed_time))
 
     try:
         # this gets the whole request, including such things as 'count'

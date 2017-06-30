@@ -4,8 +4,7 @@
     padding: .5em 1em;
     border: 1px solid #c8c8c8;
     border-radius: 0.5em;
-    margin-bottom: 0.5em;
-    margin-top: 1.5em;
+    margin: 0 0 10px 0;
 }
 
 .toggle-instructions {
@@ -27,11 +26,13 @@
     padding-top: 0.5em;
 }
 
-.annotations-status {
-    font-size: 18pt;
-    padding-top: 10px;
-    margin-bottom: -15px;
-    cursor: pointer;
+.target-object-controls {
+    padding: 10px 0;
+    margin: 10px 0 0 0;
+}
+.target-object-control {
     display: inline-block;
+    cursor: pointer;
+    font-size: 18pt;
 }
 

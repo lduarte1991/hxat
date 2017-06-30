@@ -48,6 +48,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'annotationsx.middleware.CookielessSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -55,7 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'annotationsx.middleware.XFrameOptionsMiddleware',
-    'annotationsx.middleware.CookielessSessionMiddleware',
+    'annotationsx.middleware.MultiLTILaunchMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
 )
 
@@ -84,6 +85,18 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages",
+    "annotationsx.context_processors.resource_link_id_processor",
+    "annotationsx.context_processors.utm_source_processor",
+)
 
 MESSAGE_TAGS = {
             messages.SUCCESS: 'success success',
@@ -141,7 +154,7 @@ LOGGING = {
     # here is a bit more explicit.  See link for more details:
     # https://docs.python.org/2.7/library/logging.config.html#dictionary-schema-details
     'root': {
-        'level': logging.WARNING,
+        'level': logging.INFO,
         'handlers': ['default', 'console'],
     },
     'loggers': {
@@ -169,6 +182,11 @@ LOGGING = {
             'propagate': False,
         },
         'annotation_store': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
+        'annotationsx.middleware': {
             'level': _DEFAULT_LOG_LEVEL,
             'handlers': ['default', 'console'],
             'propagate': False,
@@ -225,7 +243,6 @@ if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
-    SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Organization-specific configuration

@@ -206,7 +206,7 @@
 			<div type="submit" class="save" id='source-save-button'>
 				Save
 			</div>
-			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save" id='source-cancel-button'>
+			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}" class="save" id='source-cancel-button'>
 				Cancel
 			</a>
 		{% endbuttons %}
