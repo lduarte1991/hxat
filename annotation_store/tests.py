@@ -131,18 +131,11 @@ class AnnotationStoreTest(TestCase):
 
         tests = [
             {"method": "get",    "action": "search", "invalidate": invalidator('contextId')},
-            {"method": "post",   "action": "create", "invalidate": invalidator('user.id')},
             {"method": "post",   "action": "create", "invalidate": invalidator('contextId')},
-            {"method": "post",   "action": "create", "invalidate": invalidator('collectionId')},
-            {"method": "post",   "action": "create", "invalidate": invalidator('uri')},
             {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('user.id')},
             {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('contextId')},
-            {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('collectionId')},
-            {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('uri')},
             {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('user.id')},
             {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('contextId')},
-            {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('collectionId')},
-            {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('uri')},
         ]
 
         for test in tests:
