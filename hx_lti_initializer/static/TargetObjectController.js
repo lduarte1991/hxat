@@ -1003,7 +1003,7 @@
 
         $.TargetObjectController.prototype.toggleTextSize = function(step) {
             var $content = jQuery("#viewer .content");
-            var nodes = [], curnode, stylesize, styleunit;
+            var nodes = [], curnode, stylesize, styleunit, computed;
             var minsize = 8;
 
             step = step || 1;
@@ -1023,12 +1023,17 @@
             nodes.push($content[0]);
             while(nodes.length > 0) {
                 curnode = nodes.pop();
+                if(curnode.tagName.toLowerCase() == 'font') {
+                    computed = window.getComputedStyle(curnode);
+                    curnode.style.fontSize = computed['font-size'];
+                    curnode.size = "";
+                }
                 stylesize = parseInt(curnode.style.fontSize, 10);
-                if(!isNaN(stylesize)) {
+                if (!isNaN(stylesize)) {
                     styleunit = curnode.style.fontSize.replace(stylesize, '');
                     stylesize += step;
                     stylesize = stylesize < minsize ? minsize : stylesize;
-                    if(styleunit === "px" || styleunit === "pt") {
+                    if (styleunit === "px" || styleunit === "pt") {
                         curnode.style.fontSize = stylesize + styleunit;
                     }
                 }
