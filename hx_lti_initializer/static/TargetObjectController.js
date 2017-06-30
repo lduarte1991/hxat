@@ -1023,20 +1023,24 @@
             nodes.push($content[0]);
             while(nodes.length > 0) {
                 curnode = nodes.pop();
+                // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
                 if(curnode.tagName.toLowerCase() == 'font') {
                     computed = window.getComputedStyle(curnode);
                     curnode.style.fontSize = computed['font-size'];
                     curnode.size = "";
                 }
+                // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
                 if(curnode != $content[0] && curnode.className != "") {
                     curnode.style.fontSize = "inherit";
                 }
+
+                // handle case with an inline style fontSize (only adjust absolute fontSize values)
                 stylesize = parseInt(curnode.style.fontSize, 10);
                 if (!isNaN(stylesize)) {
                     styleunit = curnode.style.fontSize.replace(stylesize, '');
                     stylesize += step;
                     stylesize = stylesize < minsize ? minsize : stylesize;
-                    if (styleunit === "px" || styleunit === "pt") {
+                    if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
                         curnode.style.fontSize = stylesize + styleunit;
                     }
                 }
