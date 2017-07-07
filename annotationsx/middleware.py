@@ -262,6 +262,7 @@ class MultiLTILaunchMiddleware(object):
         max_launches = getattr(settings, 'LTI_MAX_LAUNCHES', 10)
         self.logger.info("LTI launches in session: %s [max=%s]" % (lti_launches.keys(), max_launches))
         if len(lti_launches.keys()) >= max_launches:
+            self.logger.info("Invalidating oldest LTI launch (FIFO)")
             invalidated_launch = lti_launches.popitem(last=False)
             self.logger.info("LTI launch invalidated: %s", json.dumps(invalidated_launch, indent=4))
 
