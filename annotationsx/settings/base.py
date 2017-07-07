@@ -245,6 +245,11 @@ if ANNOTATION_HTTPS_ONLY:
     SESSION_COOKIE_SECURE = True
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# Instead of using the default JSON serializer, we need to modify it slightly so that
+# session dicts stored in JSON are de-serialized with their order preserved. This functionality
+# is used in particular by the MultiLTILaunchMiddleware.
+SESSION_SERIALIZER = 'annotationsx.serializers.JsonOrderedDictSerializer'
+
 # Organization-specific configuration
 # Try to minimize this as much as possible in favor of configuration
 if ORGANIZATION == "ATG":
