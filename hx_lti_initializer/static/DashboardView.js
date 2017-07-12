@@ -112,7 +112,7 @@
 
     $.DashboardView.prototype.addPrintButton = function() {
         if (this.initOptions.is_instructor) {
-            jQuery('.handleAnnotations').show();
+            //jQuery('.handleAnnotations').show();
         }
     };
 
