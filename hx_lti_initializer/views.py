@@ -112,6 +112,7 @@ def launch_lti(request):
             raise PermissionDenied()
     debug_printer("DEBUG - user name: " + display_name)
     lti_grade_url = get_lti_value('lis_outcome_service_url', tool_provider)
+    debug_printer(u"LTI GRADE URL: {grade_url}".format(grade_url=lti_grade_url))
     if lti_grade_url is not None:
         save_session(request, is_graded=True)
     save_session(request, lti_params=request.POST)
@@ -641,6 +642,21 @@ def annotation_database_search(request):
         )
 
     response = requests.post(database_url, headers=headers, params=url_values)
+    if request.session['hx_user_id'] in url_values:
+        try:
+            if request.session['is_graded'] and response.status_code == 200 and int(json.loads(response.content)['total']) > 0:
+                consumer_key = settings.CONSUMER_KEY
+                secret = settings.LTI_SECRET
+                params = request.session['lti_params']
+                tool_provider = DjangoToolProvider(consumer_key, secret, params)
+                outcome = tool_provider.post_replace_result(1)
+                debug_printer(u"Provider: {provider}".format(provider=tool_provider.outcome_requests[0].generate_request_xml()))
+                debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
+                    successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
+                ))
+        except:
+            debug_printer("Error: {error}".format(error=sys.exc_info()[0]))
+            debug_printer("is_graded was not found in the session")
     return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
 
@@ -688,7 +704,7 @@ def annotation_database_create(request):
         data=json.dumps(json_body),
         headers=headers
     )
-
+    debug_printer(u"session: {session}".format(session=request.session['is_graded']))
     try:
         if request.session['is_graded'] and response.status_code == 200:
             consumer_key = settings.CONSUMER_KEY
@@ -696,10 +712,12 @@ def annotation_database_create(request):
             params = request.session['lti_params']
             tool_provider = DjangoToolProvider(consumer_key, secret, params)
             outcome = tool_provider.post_replace_result(1)
+            debug_printer(u"Provider: {provider}".format(provider=tool_provider.outcome_requests[0].generate_request_xml()))
             debug_printer(u"LTI grade request was {successful}. Description is {description}".format(
                 successful="successful" if outcome.is_success() else "unsuccessful", description=outcome.description
             ))
     except:
+        debug_printer("Error: {error}".format(error=sys.exc_info()[0]))
         debug_printer("is_graded was not found in the session")
 
     return HttpResponse(response.content, status=response.status_code, content_type='application/json')

@@ -628,8 +628,14 @@
                         showTitle: false,
                         showTrackSelector: false,
                     };
-                    var transcript = self.vid.transcript(options);
-                    document.querySelector('#transcript').appendChild(transcript.el());
+                    // if (jQuery(vidElement).find('source').length > 0) {
+                        var transcript = self.vid.transcript(options);
+                        document.querySelector('#transcript').appendChild(transcript.el());
+                    // } else {
+                    //     jQuery('.vjs-transcript-control.vjs-control').click();
+                    //     jQuery('.vjs-transcript-control.vjs-control').hide();
+                    // }
+                    
                 jQuery(document).bind('annotation_core_init', function() {
                     self.vid.rangeslider(jQuery.extend(true, {}, {}));
                     self.vid.annotations(jQuery.extend(true, {}, {posBigNew: "none"}));

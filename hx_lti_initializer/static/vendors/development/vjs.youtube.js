@@ -65,6 +65,7 @@ videojs.Youtube = videojs.MediaTechController.extend({
       marginWidth: 0,
       marginHeight: 0,
       frameBorder: 0,
+      title: "Youtube Video",
       webkitAllowFullScreen: 'true',
       mozallowfullscreen: 'true',
       allowFullScreen: 'true'
