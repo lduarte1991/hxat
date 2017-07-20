@@ -59,7 +59,10 @@ def initialize_lti_tool_provider(req):
     Starts the provider given the consumer_key and secret.
     """
     consumer_key = settings.CONSUMER_KEY
-    secret = settings.LTI_SECRET
+    try:
+        secret = settings.LTI_SECRET_DICT[req.POST.get('context_id')]
+    except:
+        secret = settings.LTI_SECRET
 
     # use the function from ims_lti_py app to verify and initialize tool
     provider = DjangoToolProvider(consumer_key, secret, req.POST)
