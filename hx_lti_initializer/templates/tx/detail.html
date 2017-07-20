@@ -42,13 +42,13 @@ Annotation Tool | Text | {{ target_object.target_title }}
 {% endblock %}
 
 {% block keyboardinput %}
-<div role="button" aria-label="Use Keyboard Input to make annotations. To make an annotation, click the 'Make an Annotation' button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the 'Save Highlights' button." class="fa fa-keyboard-o" title="Make annotations using keyboard input" id="keyboard-input-toggle-text"></div>
+<div role="button" aria-label="Use Keyboard Input to make annotations. To make an annotation, click the 'Make an Annotation' button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the 'Save Highlights' button." class="fa fa-keyboard-o clicking_allowed" title="Make annotations using keyboard input" id="keyboard-input-toggle-text" tabindex="0"></div>
 {% endblock %}
 
 {% block mainapplication %}
 <section role="application" aria-label="Annotation Tool Text Content">
 	<div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
-		<div class="annotations-status on" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
+		<div class="annotations-status on clicking_allowed" tabindex="0" role="button" aria-labeledby="annotations-status-label"><i class="fa fa-close"></i> <span role="tooltip" id="annotations-status-label" class="hover-inst hidden">Hide Annotations</span></div>
 		{% if org = 'ATG' %}
       		<div class="navigation">
                 <a href="{% url 'hx_lti_initializer:course_admin_hub' %}">Home</a>

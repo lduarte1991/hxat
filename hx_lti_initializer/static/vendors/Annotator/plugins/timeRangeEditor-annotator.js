@@ -39,7 +39,7 @@ Annotator.Plugin.TimeRangeEditor.prototype.updateEditor = function(field, annota
 		AController.targetObjectController.vid.rangeslider.setValue(1, endElement.val());
 	});
 	var self = Annotator._instances[0]
-	console.log(self.editor);
+
 	jQuery('#preview').click(function(e) {
 		e.preventDefault();
 		AController.targetObjectController.vid.player().playBetween(startElement.val(), endElement.val());

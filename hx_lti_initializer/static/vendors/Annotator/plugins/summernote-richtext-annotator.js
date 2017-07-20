@@ -33,6 +33,8 @@ Annotator.Plugin.SummernoteRichText.prototype.pluginInit = function() {
 	self.annotator.subscribe("annotationEditorShown", function() {
 		// checks to make sure it can fit on screen
 		$('#annotator-field-0').summernote(self.options);
+		delete $.summernote.options.keyMap.pc.TAB;
+		delete $.summernote.options.keyMap.mac.TAB;
 		self.checkOrientation();
 
 		// then it will restart summernote, otherwise it may cause all <li> to have Save
@@ -45,6 +47,7 @@ Annotator.Plugin.SummernoteRichText.prototype.pluginInit = function() {
 		$('#annotator-field-0').destroy();
 		$('.fullscreen').toggleClass('fullscreen');
 	});
+
 };
 
 Annotator.Plugin.SummernoteRichText.prototype.checkOrientation = function() {
