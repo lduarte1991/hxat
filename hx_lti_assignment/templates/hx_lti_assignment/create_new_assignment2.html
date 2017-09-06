@@ -155,8 +155,7 @@
 	<input class='hx-textfield full-width' type='number' id='pagination-limit' value='{{form.pagination_limit.value}}'>
 
 	<h3>Optional plug-ins</h3>
-
-	<input type='checkbox' {% if form.allow_highlights.value == "True" %}checked{% endif %} id='enable-tags'>
+	<input type='checkbox' {% if form.allow_highlights.value == True %}checked{% endif %} id='enable-tags'>
 	<label for='enable-tags'>Enable highlight tagging</label>
 
 	<div class='save' id='add-tags-button' {% if not form.allow_highlights.value or tag_list|length > 0 %}style='display:none;'{% endif %}>Add custom highlight tags</div>
