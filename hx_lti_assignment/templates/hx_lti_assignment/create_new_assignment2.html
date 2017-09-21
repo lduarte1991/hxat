@@ -5,9 +5,21 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 {% bootstrap_javascript %}
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote-bs3.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<script src="{% static "vendors/development/summernote.js" %}"></script>
 <script src="{% static "vendors/development/underscore.js" %}"></script>
 <script src="{% static "vendors/development/ExpandedRelatedObjectLookups.js" %}"></script>
 <script src="{% static "AssignmentEditor.js" %}"></script>
+<script>
+$(document).ready(function() {
+   var num_sources = {{targets_form|length}};
+   for(var counter = 0; counter < num_sources; counter++) {
+       AssignmentEditor.setupWysiwyg('#instructions-'+counter);
+   }
+});
+</script>
 <div class='main-page'>
 	<h2>Assignment Editor</h2>
 
