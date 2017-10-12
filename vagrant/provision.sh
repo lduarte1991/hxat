@@ -1,10 +1,11 @@
 #!/bin/bash
 PROJECT=annotationsx
+PASSWORD=password
 USER=vagrant
 HOME=/home/vagrant
 
 # Update packages
-#sudo apt-get update
+sudo apt-get -y update
 #sudo apt-get -y autoremove
 
 # Install system packages
@@ -22,7 +23,7 @@ sudo pip install urllib3[secure]
 # Setup database 
 #sudo -u postgres -i psql -d postgres -c "DROP DATABASE IF EXISTS $PROJECT"
 #sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
-sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PROJECT'"
+sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PASSWORD'"
 sudo -u postgres -i psql -d postgres -c "ALTER USER $PROJECT CREATEDB"
 sudo -u postgres -i psql -d postgres -c "CREATE DATABASE $PROJECT WITH OWNER $PROJECT"
 
