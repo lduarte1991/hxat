@@ -27,6 +27,9 @@
         
         var self = this;
 
+        // Initialize text size label.
+        self.toggleTextSize(0);
+
         // Shows annotation toggle label only when hovered
         jQuery('#annotations-status').hover(function() {
             jQuery('.hover-inst').toggleClass("hidden");
@@ -40,7 +43,7 @@
         jQuery('#annotations-text-size-plus').click(function() {
             self.toggleTextSize(1);
         });
-       jQuery('#annotations-text-size-minus').click(function() {
+        jQuery('#annotations-text-size-minus').click(function() {
             self.toggleTextSize(-1);
         });
 
@@ -1002,25 +1005,38 @@
         };
 
         $.TargetObjectController.prototype.toggleTextSize = function(step) {
+            step = isNaN(Number(step)) ? 0 : Number(step);
+
             var $content = jQuery("#viewer .content");
+            var $label = jQuery("#annotations-text-size-label");
             var nodes = [], curnode, stylesize, styleunit, computed;
             var minsize = 8;
+            var sizediff = 0;
 
-            step = step || 1;
-            if(typeof this.targetFontSize === "undefined") {
-                this.targetFontSize = 14;
+            if(typeof this.defaultFontSize === "undefined") {
+                this.defaultFontSize = 14;
             }
+            if(typeof this.targetFontSize === "undefined") {
+                this.targetFontSize = this.defaultFontSize;
+            }
+
             this.targetFontSize += step;
             if(this.targetFontSize < minsize) {
                 this.targetFontSize = minsize;
             }
 
-            // set the font size on the content container
-            //console.log("setting font size: ", this.targetFontSize, "step:", step);
-            $content.css('fontSize', String(this.targetFontSize) + "px");
+            sizediff = this.targetFontSize - this.defaultFontSize;
+            if(sizediff === 0) {
+                $label.html("(default)");
+                $content.css('fontSize', '');
+            } else {
+                $label.html("(" + (sizediff > 0 ? "+"+sizediff : sizediff) + ")");
+                $content.css('fontSize', String(this.targetFontSize) + "px");
+                nodes.push($content[0]);
+            }
 
             // walk the dom and find custom fontStyle declarations and adust as necessary
-            nodes.push($content[0]);
+            //console.log("updating font size to: ", this.targetFontSize, "step:", step);
             while(nodes.length > 0) {
                 curnode = nodes.pop();
                 // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
@@ -1044,6 +1060,7 @@
                         curnode.style.fontSize = stylesize + styleunit;
                     }
                 }
+
                 for(var i = curnode.children.length; i > 0; i--) {
                     nodes.push(curnode.children[i-1]);
                 }
