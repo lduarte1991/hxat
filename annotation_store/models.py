@@ -1,22 +1,5 @@
 from django.db import models
 
-###########################################################
-# Models For Statistics Gathering
-
-class UserStats(models.Model):
-    context_id = models.CharField(db_index=True, max_length=1024, blank=False)
-    collection_id = models.CharField(max_length=1024, blank=False)
-    uri = models.CharField(max_length=2048, blank=False)
-    user_id = models.CharField(max_length=1024)
-    user_name = models.CharField(max_length=1024)
-    total_annotations = models.PositiveIntegerField(default=0)
-    total_comments = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-###########################################################
-# Models For Application Store
-
 class DeletedManager(models.Manager):
     def get_queryset(self):
         return super(DeletedManager, self).get_queryset().filter(is_deleted=False)
