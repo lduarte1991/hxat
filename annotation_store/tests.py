@@ -133,9 +133,7 @@ class AnnotationStoreTest(TestCase):
             {"method": "get",    "action": "search", "invalidate": invalidator('contextId')},
             {"method": "post",   "action": "create", "invalidate": invalidator('contextId')},
             {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('user.id')},
-            {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('contextId')},
-            {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('user.id')},
-            {"method": "delete", "action": "delete", "annotation_id": 123, "invalidate": invalidator('contextId')},
+            {"method": "put",    "action": "update", "annotation_id": 123, "invalidate": invalidator('contextId')}
         ]
 
         for test in tests:
