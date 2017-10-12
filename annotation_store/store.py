@@ -102,13 +102,13 @@ class AnnotationStore(object):
     def after_create(self, response):
         is_graded = self.request.LTI.get('is_graded', False)
         self._lti_grade_passback(is_graded=is_graded, status_code=response.status_code, result_score=1)
-        self._update_stats('create', response)
+        self._update_stats('create', response=response)
 
     def read(self, annotation_id):
         raise NotImplementedError
 
-    def after_read(self, response):
-        self._update_stats('read', response)
+    def after_read(self, annotation_id, response):
+        self._update_stats('read', response=response, annotation_id=annotation_id)
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
@@ -118,25 +118,22 @@ class AnnotationStore(object):
         if hasattr(self.backend, 'before_update'):
             self.backend.before_update(annotation_id)
         response = self.backend.update(annotation_id)
-        self.after_update(response)
+        self.after_update(annotation_id, response)
         return response
 
-    def after_update(self, response):
-        self._update_stats('update', response)
+    def after_update(self, annotation_id, response):
+        self._update_stats('update', response=response, annotation_id=annotation_id)
 
     def delete(self, annotation_id):
-        body = json.loads(self.request.body)
-        self.logger.info(u"Delete annotation %s: %s" % (annotation_id, body))
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        self.logger.info(u"Delete annotation %s" % annotation_id)
         if hasattr(self.backend, 'before_delete'):
             self.backend.before_delete(annotation_id)
         response = self.backend.delete(annotation_id)
-        self.after_delete(response)
+        self.after_delete(annotation_id, response)
         return response
 
-    def after_delete(self, response):
-        self._update_stats('delete', response)
+    def after_delete(self, annotation_id, response):
+        self._update_stats('delete', response=response, annotation_id=annotation_id)
 
     def _verify_course(self, context_id, raise_exception=True):
         expected = self.request.LTI['hx_context_id']
@@ -179,14 +176,20 @@ class AnnotationStore(object):
             self.logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
         return self.grade_passback_outcome
 
-    def _update_stats(self, action, response):
+    def _update_stats(self, action, **kwargs):
+        response = kwargs.get('response', None)
         if not self.gather_statistics:
             return
         if action not in ('create', 'update', 'delete'):
             return
 
         self.logger.info("Updating stats action=%s" % action)
+        if not response.content:
+            return
         body = json.loads(response.content)
+        if not body or 'contextId' not in body:
+            return
+
         attrs = {
             'context_id':body['contextId'],
             'collection_id': body['collectionId'],
@@ -196,7 +199,10 @@ class AnnotationStore(object):
         }
         qs = list(UserStats.objects.filter(**attrs))
         if len(qs) == 0:
-            userstats = UserStats.objects.create(**attrs)
+            if action in ('create', 'update'):
+                userstats = UserStats.objects.create(**attrs)
+            else:
+                return
         else:
             userstats = qs[0]
 
