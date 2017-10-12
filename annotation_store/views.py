@@ -31,8 +31,12 @@ def search(request):
 def create(request):
     return AnnotationStore.from_settings(request).create()
 
+
+# NOTE: annotator updates text annotations using the "PUT" method, while
+#  image annotations are updated using the "POST" method, so this endpoint
+#  will accept either request method.
 @csrf_exempt
-@require_http_methods(["PUT"])
+@require_http_methods(["PUT","POST"])
 def update(request, annotation_id):
     return AnnotationStore.from_settings(request).update(annotation_id)
 
