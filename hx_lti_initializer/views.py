@@ -79,8 +79,9 @@ def launch_lti(request):
     debug_printer("DEBUG - user logging in with roles: " + str(roles))
 
 
-    # This is the name that we will show on the UI
-    display_name = request.LTI['launch_params']['lis_person_name_full']
+    # This is the name that we will show on the UI if provided...
+    # EDX-NOTE: edx does not return the person's name!
+    display_name = request.LTI['launch_params'].get('lis_person_name_full', None)
     if not display_name:
         display_name = request.LTI['launch_params'].get('lis_person_sourcedid', '')
 
