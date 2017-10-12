@@ -8,7 +8,7 @@ from ims_lti_py.tool_provider import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
-from models import Annotation, AnnotationTags, UserStats
+from models import Annotation, AnnotationTags
 
 import json
 import requests
@@ -102,13 +102,12 @@ class AnnotationStore(object):
     def after_create(self, response):
         is_graded = self.request.LTI.get('is_graded', False)
         self._lti_grade_passback(is_graded=is_graded, status_code=response.status_code, result_score=1)
-        self._update_stats('create', response=response)
 
     def read(self, annotation_id):
         raise NotImplementedError
 
     def after_read(self, annotation_id, response):
-        self._update_stats('read', response=response, annotation_id=annotation_id)
+        pass
 
     def update(self, annotation_id):
         body = json.loads(self.request.body)
@@ -122,7 +121,7 @@ class AnnotationStore(object):
         return response
 
     def after_update(self, annotation_id, response):
-        self._update_stats('update', response=response, annotation_id=annotation_id)
+        pass
 
     def delete(self, annotation_id):
         self.logger.info(u"Delete annotation %s" % annotation_id)
@@ -133,7 +132,7 @@ class AnnotationStore(object):
         return response
 
     def after_delete(self, annotation_id, response):
-        self._update_stats('delete', response=response, annotation_id=annotation_id)
+        pass
 
     def _verify_course(self, context_id, raise_exception=True):
         expected = self.request.LTI['hx_context_id']
@@ -176,48 +175,6 @@ class AnnotationStore(object):
             self.logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
         return self.grade_passback_outcome
 
-    def _update_stats(self, action, **kwargs):
-        response = kwargs.get('response', None)
-        if not self.gather_statistics:
-            return
-        if action not in ('create', 'update', 'delete'):
-            return
-
-        self.logger.info("Updating stats action=%s" % action)
-        if not response.content:
-            return
-        body = json.loads(response.content)
-        if not body or 'contextId' not in body:
-            return
-
-        attrs = {
-            'context_id':body['contextId'],
-            'collection_id': body['collectionId'],
-            'uri': body['uri'],
-            'user_id': body['user']['id'],
-            'user_name': body['user']['name'],
-        }
-        qs = list(UserStats.objects.filter(**attrs))
-        if len(qs) == 0:
-            if action in ('create', 'update'):
-                userstats = UserStats.objects.create(**attrs)
-            else:
-                return
-        else:
-            userstats = qs[0]
-
-        if body['media'] == 'comment':
-            if action == 'create':
-                userstats.total_comments = F('total_comments') + 1
-            elif action == 'delete':
-                userstats.total_comments = F('total_comments') - 1
-        else:
-            if action == 'create':
-                userstats.total_annotations = F('total_annotations') + 1
-            elif action == 'delete':
-                userstats.total_annotations = F('total_annotations') - 1
-
-        userstats.save()
 
 ###########################################################
 # Backend Classes
