@@ -162,7 +162,11 @@ class MultiLTILaunchMiddleware(object):
         Validates an LTI launch request.
         '''
         consumer_key = getattr(settings, 'CONSUMER_KEY', None)
-        secret = getattr(settings, 'LTI_SECRET', None)
+        try:
+            secret = settings.LTI_SECRET_DICT[request.POST.get('context_id')]
+        except:
+            secret = settings.LTI_SECRET
+
         if consumer_key is None or secret is None:
             self.logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
             raise ImproperlyConfigured("Unable to validate LTI launch. Missing setting: CONSUMER_KEY or LTI_SECRET")

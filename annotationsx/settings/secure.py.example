@@ -9,6 +9,7 @@ SECURE_SETTINGS = {
     'log_level': 'DEBUG',
     'CONSUMER_KEY': '123key',
     'LTI_SECRET': 'secret',
+    'LTI_SECRET_DICT': {},
     'ORGANIZATION': '',
     'SERVER_NAME': 'localhost',
     'X_FRAME_ALLOWED_SITES': {'canvas.localhost', 'edx.localhost'},

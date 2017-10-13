@@ -227,7 +227,7 @@ LTI_SETUP = {
 
 CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
 LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
-
+LTI_SECRET_DICT = SECURE_SETTINGS.get('LTI_SECRET_DICT', {})
 ANNOTATION_MANUAL_URL = SECURE_SETTINGS.get("annotation_manual_url", None)
 ANNOTATION_MANUAL_TARGET = SECURE_SETTINGS.get("annotation_manual_target", None)
 ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
