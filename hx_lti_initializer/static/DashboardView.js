@@ -799,9 +799,8 @@
 
         jQuery('.annotationModal svg').show();
         if (annotationItem.tags && annotationItem.tags.length > 0) {
-            var tagColor = AController.main.tags[annotationItem.tags[annotationItem.tags.length-1]];
+            var tagColor = this.getAnnotationColor(annotationItem);
             var cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
-            
             jQuery('.annotationModal svg path').attr('stroke', cssColor);
             if (typeof(annotationItem.svg) === "undefined" ) {
                 jQuery('.annotationModal.item-modal-' + annotationItem.id.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + cssColor);
@@ -811,6 +810,21 @@
         }
 
 
+    };
+
+    $.DashboardView.prototype.getAnnotationColor = function(annotationItem) {
+        var tags = annotationItem.hasOwnProperty('tags') && annotationItem.tags ? annotationItem.tags : [];
+        var tag_colors = AController.main.tags || {};
+        var tag_color = false;
+
+        for(var i = tags.length - 1; i >= 0; i--) {
+            if(tag_colors[tags[i]]) {
+                tag_color = tag_colors[tags[i]];
+                break;
+            }
+        }
+
+        return tag_color;
     };
 
     $.DashboardView.prototype.sortAnnotationsByCreated = function(annotations) {

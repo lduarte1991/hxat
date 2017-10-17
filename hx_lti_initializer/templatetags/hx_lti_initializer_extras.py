@@ -32,7 +32,7 @@ def format_date(str):
 	'''
 		Converts a date string into a more readable format
 	'''
-	
+
 	# Check for None case
 	if str is None:
 		return ""
@@ -49,7 +49,7 @@ def format_date(str):
 		date = str
 
 	return date
-			
+
 @register.filter
 def format_tags(tagslist):
 	'''
@@ -72,31 +72,46 @@ def get_annotation_manual(**kwargs):
 	if settings.ANNOTATION_MANUAL_TARGET is not None:
 		target = settings.ANNOTATION_MANUAL_TARGET
 	return {'url': url, 'target': target}
-	
+
 @register.simple_tag
 def get_lti_frame_resize_js(**kwargs):
+	# This is only relevant for Canvas (i.e. ATG uses the tool in Canvas so...)
+	if settings.ORGANIZATION != 'ATG':
+		return ''
+
 	receiver = kwargs.get('receiver', 'https://canvas.harvard.edu')
 	max_height = kwargs.get('max_height', None)
+	min_height = kwargs.get('min_height', None) or 600
 	target_type = kwargs.get('target_type', None)
+
+	# Video and image types should constrain height automatically
+	# Text types don't necessarily need/want to constrain the height
 	if target_type in ('vd', 'ig') and max_height is None:
 		max_height = 900;
-	if max_height is None:
-		height_expr = 'body_height+100'
-	else:
-		height_expr = '(body_height > %d ? %d : body_height+100)' % (int(max_height), int(max_height));
+
+	# This creates a JS expression to constrain the height
+	height_expr = '(h + 200)'
+	if max_height is not None:
+		height_expr = '(h > %d ? %d : %s)' % (int(max_height), int(max_height), height_expr)
+	if min_height is not None:
+		height_expr = '(h < %d ? %d : %s)' % (int(min_height), int(min_height), height_expr)
+
 	javascript = '''
 // Sends message to parent to resize the iframe so we don't have scrolling issues
 jQuery(document).ready(function() {
 	var receiver = "%s";
-	var body_height = jQuery("body").height();
-	var message = {subject:"lti.frameResize", height: %s};
+	var h = jQuery("#viewer").height() || jQuery("body").height();
+	var height = %s;
+	var message = {
+	  subject: "lti.frameResize",
+	  height: height
+	};
 	console.log("sending lti.frameResize message", message, receiver);
 	window.parent.postMessage(JSON.stringify(message), receiver);
 }, 1000);
 ''' % (receiver, height_expr)
-	if settings.ORGANIZATION == 'ATG':
-		return mark_safe(javascript)
-	return ''
+
+	return mark_safe(javascript)
 
 @register.filter(name='only_published')
 def only_published(assignments, is_instructor):

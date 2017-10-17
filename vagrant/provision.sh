@@ -1,17 +1,18 @@
 #!/bin/bash
 PROJECT=annotationsx
+PASSWORD=password
 USER=vagrant
 HOME=/home/vagrant
 
 # Update packages
-sudo apt-get update
-sudo apt-get -y autoremove
+sudo apt-get -y update
+#sudo apt-get -y autoremove
 
 # Install system packages
 sudo apt-get -y install build-essential libffi-dev
 sudo apt-get -y install libxslt1-dev libxml2 libxml2-dev
 sudo apt-get -y install openssl libcurl4-openssl-dev
-sudo apt-get -y install git curl wget unzip
+sudo apt-get -y install git curl wget unzip inotify-tools
 sudo apt-get -y install python-dev python-pip python-setuptools redis-server
 sudo apt-get -y install postgresql postgresql-contrib libpq-dev
 
@@ -22,10 +23,9 @@ sudo pip install urllib3[secure]
 # Setup database 
 #sudo -u postgres -i psql -d postgres -c "DROP DATABASE IF EXISTS $PROJECT"
 #sudo -u postgres -i psql -d postgres -c "DROP USER IF EXISTS $PROJECT"
-sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PROJECT'"
+sudo -u postgres -i psql -d postgres -c "CREATE USER $PROJECT WITH PASSWORD '$PASSWORD'"
+sudo -u postgres -i psql -d postgres -c "ALTER USER $PROJECT CREATEDB"
 sudo -u postgres -i psql -d postgres -c "CREATE DATABASE $PROJECT WITH OWNER $PROJECT"
-
-sudo -u $USER -s bash
 
 # Ensure github.com ssh public key is in $HOME/.ssh/known_hosts file
 chmod 700 $HOME/.ssh

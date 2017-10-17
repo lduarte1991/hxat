@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render_to_response, render, redirect  # noqa
+from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponse
 from django.utils.html import escape
+from django.forms import ValidationError
 from models import *
 from serializers import *
 from forms import SourceForm
@@ -12,10 +14,10 @@ from rest_framework import generics
 from hx_lti_initializer.utils import debug_printer
 
 def get_course_id(request):
-	return request.session['hx_lti_course_id']
+	return request.LTI['hx_lti_course_id']
 
 def get_lti_profile(request):
-    return LTIProfile.objects.get(anon_id=request.session['hx_user_id'])
+    return LTIProfile.objects.get(anon_id=request.LTI['hx_user_id'])
 
 def get_lti_profile_id(request):
     lti_profile = get_lti_profile(request)
@@ -44,7 +46,8 @@ def create_new_source(request):
             source.save()
 
             messages.success(request, 'Source was successfully created!')
-            return redirect('hx_lti_initializer:course_admin_hub')
+            url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+            return redirect(url)
         else:
             debug_printer(form.errors)
     else:
@@ -54,9 +57,9 @@ def create_new_source(request):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'username': request.session['hx_user_name'],
+            'username': request.LTI['hx_user_name'],
             'org': settings.ORGANIZATION,
-            'is_instructor': request.session["is_staff"],
+            'is_instructor': request.LTI['is_staff'],
         }
     )
 
@@ -73,7 +76,8 @@ def edit_source(request, id):
             source.save()
 
             messages.success(request, 'Source was successfully edited!')
-            return redirect('hx_lti_initializer:course_admin_hub')
+            url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+            return redirect(url)
         else:
             debug_printer(form.errors)
     else:
@@ -83,11 +87,11 @@ def edit_source(request, id):
         'target_object_database/source_form.html',
         {
             'form': form,
-            'username': request.session['hx_user_name'],
+            'username': request.LTI['hx_user_name'],
             'creator': get_lti_profile_id(request),
             'course': get_course_id(request),
             'org': settings.ORGANIZATION,
-            'is_instructor': request.session["is_staff"],
+            'is_instructor': request.LTI['is_staff'],
         }
     )
 
@@ -98,7 +102,7 @@ def handlePopAdd(request, addForm, field):
         if form.is_valid():
             try:
                 newObject = form.save()
-            except forms.ValidationError, error:
+            except ValidationError, error:
                 newObject = None
             if newObject:
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s", "%s", "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject.target_title), escape(newObject.target_author), escape(newObject.target_created), escape(newObject.target_type)))  # noqa
@@ -107,11 +111,11 @@ def handlePopAdd(request, addForm, field):
     pageContext = {
         'form': form,
         'field': field,
-        'username': request.session['hx_user_name'],
+        'username': request.LTI['hx_user_name'],
         'creator': get_lti_profile_id(request),
         'course': get_course_id(request),
         'org': settings.ORGANIZATION,
-        'is_instructor': request.session["is_staff"],
+        'is_instructor': request.LTI['is_staff'],
     }
     return render_to_response(
         "target_object_database/source_form.html",

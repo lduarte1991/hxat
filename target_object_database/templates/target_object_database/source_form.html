@@ -34,12 +34,12 @@
 		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 
-		window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link}}";
-		window.html5Link = "{{form.target_content.value | just_the_html5_vid_link}}";
-		window.transcript_link = "{{form.target_content.value | just_the_transcript_link}}";
+		window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link:form.target_type | escapejs}}";
+		window.html5Link = "{{form.target_content.value | just_the_html5_vid_link:form.target_type | escapejs}}";
+		window.transcript_link = "{{form.target_content.value | just_the_transcript_link:form.target_type | escapejs}}";
 
-		{% if form.target_content.value != None and form.target_content.value != "None" %}
-		var jqxhr = $.ajax( "{{form.target_content.value}}")
+		{% if form.target_type = 'ig' and form.target_content.value != None and form.target_content.value != "None" %}
+		var jqxhr = $.ajax( "{{ form.target_content.value|escapejs }}")
 		  .done(function(html) {
 		  	var manifest = html;
 		  	var imgURL = manifest.sequences[0].canvases[0].images[0].resource["@id"];
@@ -176,11 +176,11 @@
 		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 
             {{form.target_content.errors}}
-			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | safe }}</textarea>
+			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | escape  }}</textarea>
 		</div>
 		<div class="form-group">
 			<label for="id_target_citation">Source Citation:</label> 
-			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | safe }}</textarea>
+			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | escape }}</textarea>
 		</div>
 
 		<div class="form-group" style='display:none;'>
@@ -206,7 +206,7 @@
 			<div type="submit" class="save" id='source-save-button'>
 				Save
 			</div>
-			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}" class="save" id='source-cancel-button'>
+			<a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}" class="save" id='source-cancel-button'>
 				Cancel
 			</a>
 		{% endbuttons %}

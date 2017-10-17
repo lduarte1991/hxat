@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 2
     # This VM comes without swap memory enabled, so we need to bump up
     # from 512 in order to accomodate installation of lxml
-    v.memory = 1024
+    v.memory = 2048
   end
 
   # Create a forwarded port mapping which allows access to a specific port
@@ -23,6 +23,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network :forwarded_port, guest: 80, host: 8080
   config.vm.network :forwarded_port, guest: 8000, host: 8000, auto_correct: true
+  config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: true
+  config.vm.network :forwarded_port, guest: 9000, host: 9000, auto_correct: true
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -47,5 +49,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Provisioning
   # -------------
   config.vm.provision :shell, path: "vagrant/provision.sh"
+
+  # Uncomment this line to also provision the CATCH database to run on the same box
+  #config.vm.provision :shell, path: "vagrant/catch.sh"
 
 end

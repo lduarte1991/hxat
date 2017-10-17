@@ -4,8 +4,8 @@ from crispy_forms.helper import FormHelper
 from django.forms.models import modelformset_factory, inlineformset_factory
 from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML, Hidden
 from crispy_forms.bootstrap import TabHolder, Tab
+from django.utils.html import strip_tags
 import re
-
 
 class AssignmentForm(forms.ModelForm):
 
@@ -65,6 +65,7 @@ class AssignmentForm(forms.ModelForm):
 
         return url
 
+
     class Meta:
         model = Assignment
 
@@ -81,6 +82,16 @@ class AssignmentTargetsForm(forms.ModelForm):
                 'target_external_css'
             ),
         )
+
+    def clean_target_instructions(self):
+        '''
+        When instructions are just an empty paragraph or line break, set to the empty string
+        which is used to determine whether or not to display instructions to students.
+        '''
+        target_instructions = self.cleaned_data['target_instructions']
+        if strip_tags(target_instructions).strip() == '':
+            return ''
+        return target_instructions
 
     class Meta:
         model = AssignmentTargets

@@ -16,7 +16,7 @@ import sys
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
 def get_course_id(request):
-	return request.session['hx_lti_course_id']
+	return request.LTI['hx_lti_course_id']
 
 @login_required
 def create_new_assignment(request):
@@ -46,7 +46,8 @@ def create_new_assignment(request):
                     at.save()
                 assignment.save()
                 messages.success(request, 'Assignment successfully created!')
-                return redirect('hx_lti_initializer:course_admin_hub')
+                url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+                return redirect(url)
             else:
                 target_num = 0 if assignment_targets is None else len(assignment_targets)
                 debug = "Assignment Form is NOT valid" +\
@@ -58,13 +59,13 @@ def create_new_assignment(request):
                     {
                         'form': form,
                         'targets_form': targets_form,
-                        'username': request.session['hx_user_name'],
+                        'username': request.LTI['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
                         'course_id': get_course_id(request),
-                        'is_instructor': request.session['is_staff'],
+                        'is_instructor': request.LTI['is_staff'],
                         'org': settings.ORGANIZATION,
-                        'context_id': request.session['hx_context_id'],
+                        'context_id': request.LTI['hx_context_id'],
                         'tag_list': [],
                     }
                 )
@@ -104,13 +105,13 @@ def create_new_assignment(request):
         {
             'form': form,
             'targets_form': targets_form,
-            'username': request.session['hx_user_name'],
+            'username': request.LTI['hx_user_name'],
             'number_of_targets': target_num,
             'debug': debug,
             'course_id': get_course_id(request),
-            'is_instructor': request.session['is_staff'],
+            'is_instructor': request.LTI['is_staff'],
             'org': settings.ORGANIZATION,
-            'context_id': request.session['hx_context_id'],
+            'context_id': request.LTI['hx_context_id'],
             'tag_list': [],
 
         }
@@ -157,7 +158,8 @@ def edit_assignment(request, id):
             assign1 = form.save(commit=False)
             assign1.save()
             messages.success(request, 'Assignment was successfully edited!')
-            return redirect('hx_lti_initializer:course_admin_hub')
+            url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
+            return redirect(url)
         else:
             return render(
                     request,
@@ -165,14 +167,14 @@ def edit_assignment(request, id):
                     {
                         'form': form,
                         'targets_form': targets_form,
-                        'username': request.session['hx_user_name'],
+                        'username': request.LTI['hx_user_name'],
                         'number_of_targets': target_num,
                         'debug': debug,
                         'assignment_id': assignment.assignment_id,
                         'course_id': get_course_id(request),
-                        'is_instructor': request.session['is_staff'],
+                        'is_instructor': request.LTI['is_staff'],
                         'org': settings.ORGANIZATION,
-                        'context_id': request.session['hx_context_id'],
+                        'context_id': request.LTI['hx_context_id'],
                         'tag_list': assignment.array_of_tags(),
                     }
                 )
@@ -181,7 +183,7 @@ def edit_assignment(request, id):
         form = AssignmentForm(instance=assignment)
 
     try:
-        course_name = request.session['course_name']
+        course_name = request.LTI['course_name']
     except:
         course_name = None
 
@@ -192,13 +194,13 @@ def edit_assignment(request, id):
             'form': form,
             'targets_form': targets_form,
             'number_of_targets': target_num,
-            'username': request.session['hx_user_name'],
+            'username': request.LTI['hx_user_name'],
             'debug': debug,
             'assignment_id': assignment.assignment_id,
             'course_id': get_course_id(request),
-            'is_instructor': request.session['is_staff'],
+            'is_instructor': request.LTI['is_staff'],
             'org': settings.ORGANIZATION,
-            'context_id': request.session['hx_context_id'],
+            'context_id': request.LTI['hx_context_id'],
             'tag_list': assignment.array_of_tags(),
 
         }
@@ -216,7 +218,7 @@ def delete_assignment(request, id):
             for at in aTargets:
                 at.delete()
             assignment.delete()
-            url = reverse('hx_lti_initializer:course_admin_hub')
+            url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
 
     raise PermissionDenied()
@@ -229,7 +231,7 @@ def import_assignment(request):
         'hx_lti_assignment/import_assignment.html',
         {
             'courses': LTICourse.objects.all(),
-            'is_instructor': request.session['is_staff'],
+            'is_instructor': request.LTI['is_staff'],
             'org': settings.ORGANIZATION,
             'current_course_id': get_course_id(request),
         }
@@ -237,9 +239,9 @@ def import_assignment(request):
 
 
 @login_required
-def assignments_from_course(request, id):
-    course = get_object_or_404(LTICourse, pk=id)
-    result = course.assignment_set.all()
+def assignments_from_course(request, course_id):
+    course = get_object_or_404(LTICourse, pk=course_id)
+    result = course.assignments.all()
     data = serializers.serialize("json", result)
     return HttpResponse(data, content_type='application/json')
 

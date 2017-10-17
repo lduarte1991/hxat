@@ -103,6 +103,21 @@
 	    }
 	};
 
+	$.AnnotationCore.prototype.buildStoreUrl = function(url) {
+		var k, v, query = [], query_string = '';
+		for(k in this.initOptions.database_params) {
+			v = this.initOptions.database_params[k];
+			if(v !== '') {
+				query.push([k,v].join("="));
+			}
+		}
+		query_string = query.join("&");
+		if(query_string == '') {
+			return url;
+		}
+		return url + '?' + query_string;
+	};
+
 	$.AnnotationCore.prototype.setUpPlugins = function() {
 	    for (var plugin in this.initOptions.plugins){
 	    	var pluginName = this.initOptions.plugins[plugin];
@@ -119,11 +134,11 @@
 	                },
 	                urls: {
 	                    // These are the default URLs.
-	                    create:  '/create?utm_source=' + this.initOptions.utm_source,
-	                    read:    '/read/:id?utm_source=' + this.initOptions.utm_source,
-	                    update:  '/update/:id?utm_source=' + this.initOptions.utm_source,
-	                    destroy: '/delete/:id?utm_source=' + this.initOptions.utm_source,
-	                    search:  '/search?utm_source=' + this.initOptions.utm_source
+	                    create:  this.buildStoreUrl('/create'), 
+	                    read:    this.buildStoreUrl('/read/:id'), 
+	                    update:  this.buildStoreUrl('/update/:id'),
+	                    destroy: this.buildStoreUrl('/delete/:id'),
+	                    search:  this.buildStoreUrl('/search')
 	                },
 	                loadFromSearch:{
 	                    uri: this.initOptions.object_id,
@@ -192,9 +207,10 @@
 		            tag: this.initOptions.highlightTags_options,
 		    	}
 		    }
+			console.log("Adding plugin " + pluginName + " with options: ", options);
 		    
 		    this.annotation_tool.addPlugin(pluginName, options);
-	    } 
+	    }
 	};
 	$.AnnotationCore.prototype.alert = function(error) {
 		var overlaybckg = document.createElement('div');

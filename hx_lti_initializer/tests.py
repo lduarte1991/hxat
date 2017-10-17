@@ -21,9 +21,9 @@ Corner Cases Found:
     4. User tries to view "Share" page while not logged in.
 """
 import sys
-from utils import *
+from utils import create_new_user
 from views import *
-from test_helper import *
+from test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
 from django.utils import six
 from cStringIO import StringIO
 from contextlib import contextmanager
@@ -31,16 +31,14 @@ from models import LTICourse, LTIProfile
 from django.contrib.auth.models import User
 from django.core.urlresolvers import resolve
 from django.test.client import RequestFactory
-from django.core.wsgi import get_wsgi_application
 from django.test import TestCase, override_settings
 from django.core.exceptions import PermissionDenied
 from ims_lti_py.tool_provider import DjangoToolProvider
 from django.core.servers.basehttp import get_internal_wsgi_application
+from mock import patch
+
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.models import LTICourse
-
-settings.LTI_OAUTH_CREDENTIALS = {}
-settings.LTI_OAUTH_CREDENTIALS['123key'] = 'secret'
 
 
 @contextmanager
@@ -50,6 +48,23 @@ def capture_err(command, *args, **kwargs):
     sys.stderr.seek(0)
     yield sys.stderr.read()
     sys.stderr = err
+
+def create_user_for_test(self, **kwargs):
+    anon_id = kwargs.get('anon_id', 'AnOnYmOuSiD')
+    external_user_id = kwargs.get('username', 'FakeUsername')
+    user_scope = kwargs.get('scope', 'course_or_consumer:123')
+    display_name = kwargs.get('display_name', external_user_id)
+    roles = kwargs.get('roles', ['Learner'])
+
+    user, lti_profile = create_new_user(
+        anon_id=anon_id,
+        username=external_user_id,
+        display_name=display_name,
+        roles=roles,
+        scope=user_scope
+    )
+
+    return user, lti_profile
 
 
 class LTIInitializerUtilsTests(TestCase):
@@ -82,6 +97,7 @@ class LTIInitializerUtilsTests(TestCase):
         """
         del self.tp
 
+'''
     def test_get_lti_value(self):
         """
         Should return the attribute within the LTI tool provider.
@@ -99,21 +115,23 @@ class LTIInitializerUtilsTests(TestCase):
         """
         value_found = get_lti_value('launch_presentation_return_url', self.tp)
         self.assertNotEqual(value_found, 'http://fake.com/lti_return')
-
-    def test_debug_printer(self):
+    @patch('hx_lti_initializer.utils.logger')
+    def test_debug_printer_when_lti_debug_enabled(self, mock_logger):
         """
         Should check to see if the value is being printed out to stderr only if
         the LTI_DEBUG in settings is set to True.
         """
         settings.LTI_DEBUG = True
         value_found = get_lti_value('roles', self.tp)
-        with capture_err(debug_printer, value_found) as output:
-            self.assertIn("['Learner', 'Instructor', 'Observer']", output)
+        mock_logger.debug.assert_called_with("['Learner', 'Instructor', 'Observer']")
 
+    @patch('hx_lti_initializer.utils.logger')
+    def test_debug_printer_when_lti_debug_disabled(self, mock_logger):
         settings.LTI_DEBUG = False
         value_found = get_lti_value('lis_outcome_service_url', self.tp)
-        with capture_err(debug_printer, value_found) as output:
-            self.assertNotIn("http://localhost/lis_grade_passback", output)
+        mock_logger.debug.assert_not_called()
+'''
+
 '''
     def test_retrieve_token(self):
         """
@@ -139,19 +157,13 @@ class LTIInitializerModelsTests(TestCase):
     Focuses on models and static methods found in hx_lti_initializer/models.py
     """
 
-    def createFakeUser(self, username, userid):
-        user = User.objects.create_user(username, userid)
-        user.set_unusable_password()
-        user.is_superuser = False
-        user.is_staff = False
-        user.save()
-        return user
+    createFakeUser = create_user_for_test
 
     def setUp(self):
         """
         This creates a user to test the LTIProfile autocreation
         """
-        self.user = self.createFakeUser("FakeUsername", "AnOnYmOuSiD")
+        self.user, self.lti_profile = self.createFakeUser()
 
     def tearDown(self):
         """
@@ -211,9 +223,9 @@ class LTIInitializerModelsTests(TestCase):
         """
         Checks that all courses are returned regardless of admin user
         """
-        user2 = self.createFakeUser("FakeUsername2", "AnOnYmOuSiD2")
-        instructor1 = LTIProfile.objects.get(user=self.user)
-        instructor2 = LTIProfile.objects.get(user=user2)
+        user2, lti_profile2 = self.createFakeUser(username="FakeUsername2", anon_id="AnOnYmOuSiD2")
+        instructor1 = LTIProfile.objects.get(user_id=self.user.pk)
+        instructor2 = LTIProfile.objects.get(user_id=user2.pk)
         list_of_courses = LTICourse.get_all_courses()
         self.assertTrue(isinstance(list_of_courses, list))
         self.assertTrue(len(list_of_courses) == 0)
@@ -233,12 +245,13 @@ class LTIInitializerViewsTests(TestCase):
     """
     Focuses on the views methods found within hx_lti_initializer/views.py
     """
+    createFakeUser = create_user_for_test
 
     def setUp(self):
         rf = RequestFactory()
         self.good_request = rf.post('/launch_lti/', {
             "lti_message_type": "basic-lti-launch-request",
-            "oauth_consumer_key": "123key",
+            "oauth_consumer_key": TEST_CONSUMER_KEY,
             "lti_version": "LTI-1p0",
             "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
             "lis_result_sourcedid": "261-154-728-17-784",
@@ -269,18 +282,18 @@ class LTIInitializerViewsTests(TestCase):
         })
         self.small_request = rf.post('/launch_lti/', {
             "test": "one",
-            "oauth_consumer_key": "123key",
+            "oauth_consumer_key": TEST_CONSUMER_KEY,
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
             "lis_person_sourcedid": "fakeusername",
         })
         self.missing_user_id = rf.post('/launch_lti/', {
             "test": "one",
-            "oauth_consumer_key": "123key",
+            "oauth_consumer_key": TEST_CONSUMER_KEY,
             "lis_person_sourcedid": "fakeusername",
         })
         self.missing_username = rf.post('/launch_lti/', {
             "test": "one",
-            "oauth_consumer_key": "123key",
+            "oauth_consumer_key": TEST_CONSUMER_KEY,
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
         })
         self.tool_consumer = create_test_tc()
@@ -301,37 +314,6 @@ class LTIInitializerViewsTests(TestCase):
         del self.missing_user_id
         del self.missing_username
 
-    def test_validate_request(self):
-        """
-        Simply checks to see if a bad request raises an exception while a
-        good one does not
-        """
-        self.assertRaises(PermissionDenied, validate_request, self.bad_request)
-        self.assertTrue(validate_request(self.good_request) == None)
-        self.assertRaises(
-            PermissionDenied,
-            validate_request,
-            self.missing_user_id
-        )
-        self.assertRaises(
-            PermissionDenied,
-            validate_request,
-            self.missing_username
-        )
-        settings.LTI_DEBUG = True
-        with capture_err(validate_request, self.small_request) as output:
-            self.assertTrue(output.find("DEBUG - user_id: 234jfhrwekljrsfw8abcd35cseddda"))
-
-    def test_initialize_lti_tool_provider(self):
-        """
-        Checks to see if initialize_lti_tool_provider actually does check
-        that therequest was valid.
-        """
-        self.assertIsInstance(
-            initialize_lti_tool_provider(self.other_request),
-            DjangoToolProvider
-        )
-
     def test_create_new_user(self):
         """
         Checks to see that a user and its linking LTIProfile are created.
@@ -339,7 +321,11 @@ class LTIInitializerViewsTests(TestCase):
         username = self.good_request.POST["lis_person_sourcedid"]
         user_id = self.good_request.POST["user_id"]
         roles = self.good_request.POST["roles"]
-        newuser, newprofile = create_new_user(username, user_id, roles)
+        newuser, newprofile = self.createFakeUser(
+            username=username,
+            anon_id=user_id,
+            roles=roles.split(",")
+        )
         self.assertIsInstance(newuser, User)
         self.assertIsInstance(newprofile, LTIProfile)
         self.assertEqual(newuser.username, username)
@@ -378,6 +364,7 @@ class LTIInitializerCourseFormTests(TestCase):
     def setUp(self):
         # Create users
         users = []
+        profiles = []
         names = ('Sally Singer', 'Bob Brown', 'Jimmy Kim', 'Jimmy Jam') # intentionally unordered
         for name in names:
             first, last = name.split(' ')
@@ -385,26 +372,28 @@ class LTIInitializerCourseFormTests(TestCase):
             user = User(username=username, first_name=first, last_name=last, email="%s@localhost" % username)
             user.save()
             users.append(user)
+            profiles.append(LTIProfile.objects.create(user=user))
 
         # Create course with admins
         course = LTICourse(course_id=1)
         course.save()
-        course.course_admins.add(*[user.id for user in users])
+        for profile in profiles:
+            course.add_admin(profile)
 
         # Add instance reference to course and form
-        self.course_admins = users
+        self.course_admins = profiles
         self.course = course
         self.course_form = CourseForm(instance=course)
 
     def tearDown(self):
-        User.objects.filter(pk__in=[u.id for u in self.course_admins]).delete()
+        LTIProfile.objects.filter(pk__in=[p.pk for p in self.course_admins]).delete()
         self.course.delete()
 
     def test_course_form_admins(self):
-        course_admins_queryset = self.course_form.get_course_admins().all()
-        given_course_admin_names = [(profile.user.first_name, profile.user.last_name) for profile in course_admins_queryset]
-        expected_course_admin_names = sorted([(user.first_name, user.last_name) for user in self.course_admins],
-            key=lambda user: user[0] + user[1])
+        queryset = self.course_form.get_course_admins().all()
 
-        self.assertEqual(len(given_course_admin_names), len(expected_course_admin_names))
-        self.assertEqual(given_course_admin_names, expected_course_admin_names)
+        expected_names = sorted([(profile.user.first_name, profile.user.last_name) for profile in self.course_admins], key=lambda user: user[0] + user[1])
+        actual_names = sorted([(profile.user.first_name, profile.user.last_name) for profile in queryset], key=lambda user: user[0] + user[1])
+
+        self.assertEqual(len(expected_names), len(actual_names))
+        self.assertEqual(expected_names, actual_names)

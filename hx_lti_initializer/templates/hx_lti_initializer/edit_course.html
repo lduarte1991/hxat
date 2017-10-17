@@ -59,7 +59,7 @@
 			<div type="submit" class="save" id='save-button' role="button" onclick="javascript:jQuery('#edit_course_form').submit();">
 			Save
 			</div>
-			<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}";'>
+			<div class="save" id='cancel-button' role='button' onclick='window.location="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}";'>
 			Cancel
 			</div>
 		</div>

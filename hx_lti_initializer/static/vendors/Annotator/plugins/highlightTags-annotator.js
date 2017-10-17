@@ -343,15 +343,16 @@ Annotator.Plugin.HighlightTags.prototype.updateViewer = function(field, annotati
 
 // The following function is run when a person hits submit.
 Annotator.Plugin.HighlightTags.prototype.pluginSubmit = function(field, annotation) {
-    arr = $(field).find('input[name=tags]').val().split(',');
-    //console.log(arr.indexOf("") !== -1);
-    //console.log(arr.length === 1);
-    if (arr.indexOf("") !== -1 && arr.length === 1) {
-    	annotation.tags = [];
-    } else {
-    	annotation.tags = arr;
+    var submitted_tags = $(field).find('input[name=tags]').val().split(',');
+    var submitted_tag, cleaned_tags = [];
+    for(var i = 0; i < submitted_tags.length; i++) {
+        submitted_tag = submitted_tags[i].trim();
+        if(submitted_tag !== "") {
+            cleaned_tags.push(submitted_tag);
+        }
     }
-    //console.log(annotation.tags);
+    annotation.tags = cleaned_tags;
+    //console.log("highlightTags::pluginSubmit()", "submitted:", submitted_tags, "cleaned:", annotation.tags);
 };
 
 // The following will call the colorize function during an external call and then return

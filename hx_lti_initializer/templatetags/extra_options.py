@@ -96,8 +96,8 @@ def do_captureas(parser, token):
 
 
 @register.filter_function
-def just_the_youtube_vid_link(content):
-    if content is None:
+def just_the_youtube_vid_link(content, target_type='vd'):
+    if content is None or target_type != 'vd':
         return ""
     result = content.split(';')
     if len(result) < 3:
@@ -109,8 +109,8 @@ def just_the_youtube_vid_link(content):
         return result[0]
 
 @register.filter_function
-def just_the_html5_vid_link(content):
-    if content is None:
+def just_the_html5_vid_link(content, target_type='vd'):
+    if content is None or target_type != 'vd':
         return ""
     result = content.split(';')
     if len(result) < 3:
@@ -123,8 +123,8 @@ def just_the_html5_vid_link(content):
 
 
 @register.filter_function
-def just_the_transcript_link(content):
-    if content is None:
+def just_the_transcript_link(content, target_type='vd'):
+    if content is None or target_type != 'vd':
         if settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT:
             return settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT
         else:

@@ -27,14 +27,24 @@
         
         var self = this;
 
+        // Initialize text size label.
+        self.toggleTextSize(0);
+
         // Shows annotation toggle label only when hovered
-        jQuery('.annotations-status').hover(function() {
+        jQuery('#annotations-status').hover(function() {
             jQuery('.hover-inst').toggleClass("hidden");
         });
 
         // Actually toggles whether annotaitons are displayed or not
-        jQuery('.annotations-status').click(function() {
+        jQuery('#annotations-status').click(function() {
             self.toggleAnnotations();
+        });
+
+        jQuery('#annotations-text-size-plus').click(function() {
+            self.toggleTextSize(1);
+        });
+        jQuery('#annotations-text-size-minus').click(function() {
+            self.toggleTextSize(-1);
         });
 
         // helper function to turn off keyboard-input mode
@@ -990,19 +1000,17 @@
             if (this.initOptions.mediaType === "text") {
                 var annotator = window.AController.annotationCore.annotation_tool;
                 var store = annotator.plugins.Store;
-                if (jQuery('.annotations-status').hasClass('on')) {
-                    jQuery('.annotations-status .hover-inst').html("Show annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Show annotations");
-                    jQuery('.annotations-status i').removeClass('fa-close');
-                    jQuery('.annotations-status i').addClass('fa-comments');
+                if (jQuery('#annotations-status').hasClass('on')) {
+                    jQuery('#annotations-status .labeltext').html("Show annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Show annotations");
+                    jQuery('#annotations-status i').removeClass('fa-close').addClass('fa-comments');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
                 } else {
-                    jQuery('.annotations-status .hover-inst').html("Hide annotations");
-                    jQuery('.annotations-status').attr('aria-label', "Hide annotations");
-                    jQuery('.annotations-status i').addClass('fa-close');
-                    jQuery('.annotations-status i').removeClass('fa-comments');
+                    jQuery('#annotations-status .labeltext').html("Hide annotations");
+                    jQuery('#annotations-status').attr('aria-label', "Hide annotations");
+                    jQuery('#annotations-status i').addClass('fa-close').removeClass('fa-comments');
                     this.annotationsSaved.forEach(function (annotation) {
                             annotator.setupAnnotation(annotation);
                             store.registerAnnotation(annotation);
@@ -1010,8 +1018,71 @@
                     annotator.publish("externalCallToHighlightTags");
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
                 }
-                jQuery('.annotations-status').toggleClass("on");
-            };
+                jQuery('#annotations-status').toggleClass("on");
+            }
+        };
+
+        $.TargetObjectController.prototype.toggleTextSize = function(step) {
+            step = isNaN(Number(step)) ? 0 : Number(step);
+
+            var $content = jQuery("#viewer .content");
+            var $label = jQuery("#annotations-text-size-label");
+            var nodes = [], curnode, stylesize, styleunit, computed;
+            var minsize = 8;
+            var sizediff = 0;
+
+            if(typeof this.defaultFontSize === "undefined") {
+                this.defaultFontSize = 14;
+            }
+            if(typeof this.targetFontSize === "undefined") {
+                this.targetFontSize = this.defaultFontSize;
+            }
+
+            this.targetFontSize += step;
+            if(this.targetFontSize < minsize) {
+                this.targetFontSize = minsize;
+            }
+
+            sizediff = this.targetFontSize - this.defaultFontSize;
+            if(sizediff === 0) {
+                $label.html("(default)");
+                $content.css('fontSize', '');
+            } else {
+                $label.html("(" + (sizediff > 0 ? "+"+sizediff : sizediff) + ")");
+                $content.css('fontSize', String(this.targetFontSize) + "px");
+                nodes.push($content[0]);
+            }
+
+            // walk the dom and find custom fontStyle declarations and adust as necessary
+            //console.log("updating font size to: ", this.targetFontSize, "step:", step);
+            while(nodes.length > 0) {
+                curnode = nodes.pop();
+                // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
+                if(curnode.tagName.toLowerCase() == 'font') {
+                    computed = window.getComputedStyle(curnode);
+                    curnode.style.fontSize = computed['font-size'];
+                    curnode.size = "";
+                }
+                // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
+                if(curnode != $content[0] && curnode.className != "") {
+                    curnode.style.fontSize = "inherit";
+                }
+
+                // handle case with an inline style fontSize (only adjust absolute fontSize values)
+                stylesize = parseInt(curnode.style.fontSize, 10);
+                if (!isNaN(stylesize)) {
+                    styleunit = curnode.style.fontSize.replace(stylesize, '');
+                    stylesize += step;
+                    stylesize = stylesize < minsize ? minsize : stylesize;
+                    if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
+                        curnode.style.fontSize = stylesize + styleunit;
+                    }
+                }
+
+                for(var i = curnode.children.length; i > 0; i--) {
+                    nodes.push(curnode.children[i-1]);
+                }
+            }
         };
 
 }(AController));

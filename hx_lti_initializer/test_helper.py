@@ -5,6 +5,8 @@ https://github.com/tophatmonocle/ims_lti_py/blob/develop/tests/test_helper.py
 from ims_lti_py import ToolProvider
 from ims_lti_py import ToolConsumer
 
+TEST_CONSUMER_KEY = '123key'
+TEST_SECRET_KEY = 'secret'
 
 def create_params_tp():
     '''
@@ -61,8 +63,7 @@ def create_test_tc(params=None):
     '''
 
     params = create_params_tc() if params is None else params
-    consumer_key = '123key'
-    tc = ToolConsumer(consumer_key, 'secret', params)
+    tc = ToolConsumer(TEST_CONSUMER_KEY, TEST_SECRET_KEY, params)
     tc.launch_url = 'http://testserver/launch_lti/'
     tc.timestamp = '1251600739'
     tc.nonce = 'c8350c0e47782d16d2fa48b2090c1d8f'

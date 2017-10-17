@@ -21,6 +21,19 @@ function AssignmentEditor() {
     this.init();
 }
 
+AssignmentEditor.setupWysiwyg = function(selector, options) {
+    var $textarea = $(selector);
+    options = jQuery.extend({
+       focus: false,
+       onChange: function(contents, $editable) {
+           $textarea.val( contents );
+           $textarea.change();
+       }
+    }, options || {});
+
+    $textarea.summernote(options);
+};
+
 AssignmentEditor.prototype = {
     constructor: AssignmentEditor,
     init: function() {
@@ -413,6 +426,8 @@ AssignmentEditor.prototype = {
         jQuery('#assignment-css-' + count).val(jQuery('#assignment-css').val());
         jQuery('#canvas-id-' + count).val(jQuery('#assignment-open-to-page').val());
         jQuery('#dashboard_hidden-' + count).prop("checked", jQuery("#hide_dash").prop("checked"));
+
+        AssignmentEditor.setupWysiwyg('#instructions-'+count);
     },
     getColorValues: function(color) {
         var values = { red:null, green:null, blue:null, alpha:null };
