@@ -20,8 +20,12 @@
         <header class="header" role="banner">
             <div id='banner-logo-left'>
                 {% if org == "HARVARDX" %}
+<<<<<<< HEAD
                     <div class="logo" aria-label="HarvardX Logo" onclick="window.location='{% url "hx_lti_initializer:course_admin_hub" %}?resource_link_id={{ resource_link_id }}'">
-                        <img src="{% static "css/images/hx_inv.png" %}" aria-label='HarvardX Logo' style="height:40px;" />
+=======
+                    <div class="logo" aria-label="HarvardX Logo" onclick="window.location='{% url "hx_lti_initializer:course_admin_hub" %}'">
+>>>>>>> 8ffc8942e2b8d88d7c0a546e520a43e3b1c14fa1
+                        <img src="{% static "css/images/hx_inv.png" %}" alt='HarvardX Logo' style="height:40px;" />
                     </div>
                 {% endif %}
                 <div class="site-title">
