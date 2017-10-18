@@ -753,8 +753,9 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.ShowStatistics.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-statistics-annotation vjs-control',
+            className: 'vjs-statistics-annotation allow_clicking vjs-control',
             title: 'Show the Statistics',
+            tabindex: '0',
         });
     };
 
@@ -787,8 +788,9 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.ShowAnnotations.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-showannotations-annotation vjs-control',
+            className: 'vjs-showannotations-annotation allow_clicking vjs-control',
             title: 'Show Annotations',
+            tabindex: '0',
         });
     };
 
@@ -824,8 +826,9 @@ Util.mousePosition = function(e, offsetEl) {
 
     videojs.NewAnnotation.prototype.createEl = function() {
         return videojs.Button.prototype.createEl.call(this, 'div', {
-            className: 'vjs-new-annotation vjs-control',
+            className: 'vjs-new-annotation allow_clicking vjs-control',
             title: 'New Annotation',
+            tabindex: '0'
         });
     };
 
