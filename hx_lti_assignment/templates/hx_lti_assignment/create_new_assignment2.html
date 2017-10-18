@@ -21,7 +21,7 @@ $(document).ready(function() {
 });
 </script>
 <div class='main-page'>
-	<h2>Assignment Editor</h2>
+	<h3>Assignment Editor</h3>
 
 	<label for='assignment-name-input' class='subheading'>Assignment name:</label>
 	<input class='hx-textfield' type='text' id='assignment-name-input' placeholder="Untitled" value='{{form.instance.assignment_name}}' data-course-id="{{course_id}}">
@@ -34,7 +34,7 @@ $(document).ready(function() {
 		{% else %}
 			<div class='save' id='reorder-list-button'>Reorder list</div>
 			{% for source in targets_form %}
-				<div class='source-item' id='item-{{forloop.counter0}}' data-order='{{source.instance.order}}' data-id='{{source.instance.target_object.pk}}' data-aTarget="{{source.instance.id}}" data-media="{{source.instance.target_type}}">
+				<div class='source-item' id='item-{{forloop.counter0}}' tabindex="0" data-order='{{source.instance.order}}' data-id='{{source.instance.target_object.pk}}' data-aTarget="{{source.instance.id}}" data-media="{{source.instance.target_type}}">
 					<div class='first-row'>
 						<i class='fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i> <span class='source-title'>{{source.instance.target_object.target_title}}</span>
 						<div class='order-div'><input type="number" class='ordernum' style='display:none;' min="1" value="{{source.instance.order}}"><a href='#' style='display: none' class='order-change-button'>Move</a></div>
