@@ -30999,11 +30999,13 @@ this._cbs.ontext(data)}};Tokenizer.prototype.reset=function(){Tokenizer.call(thi
     getAnnotationInEndpoint: function(oaAnnotation) {
       var _this = this,
       uris = [];
-      oaAnnotation.on.forEach(function(value) {
-        if (jQuery.inArray(value.full, uris) === -1) {
-          uris.push(value.full);
-        }
-      });
+      if (jQuery.isArray(oaAnnotation)) {
+	      oaAnnotation.on.forEach(function(value) {
+	        if (jQuery.inArray(value.full, uris) === -1) {
+	          uris.push(value.full);
+	        }
+	      });
+	  }
       var annotations = [];
 
       uris.forEach(function(uri) {
@@ -37706,14 +37708,14 @@ bindEvents: function() {
                                  '<div class="mirador-osd-context-controls hud-container">',
                                  '{{#if showAnno}}',
                                   '<div class="mirador-osd-annotation-controls">',
-                                  '<a class="mirador-osd-annotations-layer hud-control" role="button" title="{{t "annotationTooltip"}}" aria-label="{{t "annotationTooltip"}}">',
+                                  '<a class="mirador-osd-annotations-layer hud-control clicking_allowed" tabindex="0" role="button" title="{{t "annotationTooltip"}}" aria-label="{{t "annotationTooltip"}}">',
                                   '<i class="fa fa-lg fa-comments"></i>',
                                   '</a>',
                                   '</div>',
                                  '{{/if}}',
                                  '{{#if showImageControls}}',
                                   '<div class="mirador-manipulation-controls">',
-                                  '<a class="mirador-manipulation-toggle hud-control" role="button" title="{{t "imageManipulationTooltip"}}" aria-label="{{t "imageManipulationTooltip"}}">',
+                                  '<a class="mirador-manipulation-toggle hud-control clicking_allowed" tabindex="0" role="button" title="{{t "imageManipulationTooltip"}}" aria-label="{{t "imageManipulationTooltip"}}">',
                                   '<i class="material-icons">tune</i>',
                                   '</a>',
                                   '</div>',
@@ -37725,30 +37727,30 @@ bindEvents: function() {
                                  '</a>',
                                  '{{/if}}',
                                  '{{#if showBottomPanel}}',
-                                 '<a class="mirador-osd-toggle-bottom-panel hud-control" role="button" aria-label="Toggle Bottom Panel">',
+                                 '<a class="mirador-osd-toggle-bottom-panel hud-control clicking_allowed" tabindex="0" role="button" aria-label="Toggle Bottom Panel">',
                                  '<i class="fa fa-2x fa-ellipsis-h"></i>',
                                  '</a>',
                                  '{{/if}}',
                                  '<div class="mirador-pan-zoom-controls hud-control">',
-                                 '<a class="mirador-osd-up hud-control" role="button" aria-label="Move image up">',
+                                 '<a class="mirador-osd-up hud-control clicking_allowed" tabindex="0" role="button" aria-label="Move image up">',
                                  '<i class="fa fa-chevron-circle-up"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-right hud-control" role="button" aria-label="Move image right">',
+                                 '<a class="mirador-osd-right hud-control clicking_allowed" tabindex="0" role="button" aria-label="Move image right">',
                                  '<i class="fa fa-chevron-circle-right"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-down hud-control" role="button" aria-label="Move image down">',
+                                 '<a class="mirador-osd-down hud-control clicking_allowed" tabindex="0" role="button" aria-label="Move image down">',
                                  '<i class="fa fa-chevron-circle-down"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-left hud-control" role="button" aria-label="Move image left">',
+                                 '<a class="mirador-osd-left hud-control clicking_allowed" tabindex="0" role="button" aria-label="Move image left">',
                                  '<i class="fa fa-chevron-circle-left"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-zoom-in hud-control" role="button" aria-label="Zoom in">',
+                                 '<a class="mirador-osd-zoom-in hud-control clicking_allowed" tabindex="0" role="button" aria-label="Zoom in">',
                                  '<i class="fa fa-plus-circle"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-zoom-out hud-control" role="button" aria-label="Zoom out">',
+                                 '<a class="mirador-osd-zoom-out hud-control clicking_allowed" tabindex="0" role="button" aria-label="Zoom out">',
                                  '<i class="fa fa-minus-circle"></i>',
                                  '</a>',
-                                 '<a class="mirador-osd-go-home hud-control" role="button" aria-label="Reset image bounds">',
+                                 '<a class="mirador-osd-go-home hud-control clicking_allowed" tabindex="0" role="button" aria-label="Reset image bounds">',
                                  '<i class="fa fa-home"></i>',
                                  '</a>',
                                  '</div>',
