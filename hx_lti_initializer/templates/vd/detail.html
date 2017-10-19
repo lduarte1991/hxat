@@ -62,6 +62,10 @@ Annotation Tool | Video | {{ target_object.target_title }}
 
 {% block mainapplication %}
 <section role="main" aria-label="Annotation Tool Video Content" style="height: 100%">
+  <h3 class='offscreen'>Video to be Annotated</h3>
+  <div id="text-content-notifications" aria-live="assertive"></div>
+  <div id="hxat-status" role="alert"></div>
+  <div id="hxat-alert" role="alert"></div>
 	<div  id="viewer" class="test" style="padding-top:50px; height:80%;" class="fit-to-canvas">
 		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:80%;">
       {{ target_object.get_target_content_for_video | safe }}
