@@ -9,7 +9,7 @@
  */
 
 window.AController = window.AController || function(options) {
-	Acontroller.accessibility = new AController.Accessibility({
+	AController.accessibility = new AController.Accessibility({
 		'triggerClicks': ['.clicking_allowed']
 	});
 	if (typeof options.targetObjectOptions !== "undefined") {
