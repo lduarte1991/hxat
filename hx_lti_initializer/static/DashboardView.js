@@ -512,6 +512,7 @@
                 section.css('right', '-5px');
                 jQuery('.modal-navigation').addClass('hidden'); 
                 jQuery('.editgroup').addClass('hidden');
+                jQuery('#hxat-alert').html('Sidebar has been hidden');
             } else {
                 AController.utils.logThatThing('toggled_sidebar', {'opening': true}, 'harvardx', 'hxat');
                 jQuery('#leftCol').attr('class', 'col-xs-7');
@@ -521,6 +522,7 @@
                 section.css('right', '0px');
                 jQuery('.modal-navigation').removeClass('hidden'); 
                 jQuery('.editgroup').removeClass('hidden');
+                jQuery('#hxat-alert').html('Sidebar is now being shown.');
             }
             handle.find('i').toggleClass('fa-arrow-right');
             handle.find('i').toggleClass('fa-arrow-left');
@@ -795,6 +797,7 @@
             onConfirm: function (){
                 if(annotationItem.authToDeleteButton) {
                     self.initOptions.endpoint.deleteAnnotation(annotation);
+                    jQuery('#hxat-alert').html('Annotation has been deleted');
                 }
             },
         });
