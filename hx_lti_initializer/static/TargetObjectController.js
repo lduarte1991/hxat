@@ -228,15 +228,10 @@
 
                 // make the text editable and change UI to reflect change
                 jQuery('.content').attr('contenteditable', 'true');
-                jQuery(this).attr('data-toggled', 'true');
+                jQuery('#make_annotations_panel button').attr('data-toggled', 'true');
                 jQuery('.content').attr('role', 'textbox');
                 jQuery('.content').attr('tabindex', '0');
                 jQuery('.content').attr('aria-multiline', 'true');
-                jQuery(this).html("Save Highlights");
-                
-                // automatically bring person to beginning of target text
-                // this helps orient a person using a screen reader
-                jQuery('.content')[0].focus();
 
                 // makes sure that key count is set to 0 again so that you
                 // can only make two asterisks
@@ -311,6 +306,11 @@
                                 return false;
                             }
                             window.keyCount = window.keyCount+1;
+                            if (window.keyCount === 1) {
+                                jQuery('#hxat-alert').html('Asterisk added. Add one more to the text to make an annotation.');
+                            } else if (window.keyCount === 2) {
+                                jQuery('#hxat-alert').html('Annotation selection completed. Hit ENTER to save highlight or delete and replace asterisks to make a different selection.');
+                            }
                             break;
                         // Esc button
                         case 27:
@@ -339,6 +339,10 @@
 
                 // save the original content of the tool so you can set it back to normal later
                 window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
+                self.annotationsSaved = window.AController.annotationCore.annotation_tool.plugins.Store.annotations.slice();
+                window.AController.dashboardObjectController.endpoint._clearAnnotator();
+                jQuery('.content')[0].focus();
+
             } else if(jQuery(this).attr('data-toggled') == "true") {
                 // if user has submitted highlights
 
@@ -403,6 +407,17 @@
 
                 // this adds the annotation to the dashboard
                 AController.dashboardObjectController.annotationCreated(window.savingAnnotation);
+
+                // notifies user that annotation was created
+                jQuery('#hxat-status').html("Annotation was created. Visit the Annotation List Section to view it.");
+
+                var annotator = window.AController.annotationCore.annotation_tool;
+                var store = annotator.plugins.Store;
+                self.annotationsSaved.forEach(function (annotation) {
+                        annotator.setupAnnotation(annotation);
+                        store.registerAnnotation(annotation);
+                });
+                annotator.publish("externalCallToHighlightTags");
             }
         });
 
@@ -426,7 +441,120 @@
                 jQuery('#keyboard-input-toggle-text').css('color', '#FFFF00');
                 setTimeout(
                     function(){
-                        jQuery('#make_annotations_panel button')[0].focus();
+                        // make the text editable and change UI to reflect change
+                        jQuery('.content').attr('contenteditable', 'true');
+                        jQuery('#make_annotations_panel button').attr('data-toggled', 'true');
+                        jQuery('.content').attr('role', 'textbox');
+                        jQuery('.content').attr('tabindex', '0');
+                        jQuery('.content').attr('aria-multiline', 'true');
+                        
+                        // makes sure that key count is set to 0 again so that you
+                        // can only make two asterisks
+                        window.keyCount = 0;
+
+                        // in case this is not the first time that a person is making an annotation
+                        // via keyboard input, this unloads event. 
+                        jQuery('.content').off('keydown');
+                        jQuery('.content').on('keydown', function(event) {
+                            var keyCode = event.keyCode;
+                            // if you haven't already:
+                            event = event || window.event;
+
+                            switch(keyCode) {
+                                // left arrow key
+                                case 37:
+                                // up arrow key
+                                case 38:
+                                // right arrow key
+                                case 39:
+                                // bottom arrow key
+                                case 40:
+                                    // arrow keys should work normally
+                                    break;
+                                // backspace key
+                                case 8:
+
+                                    // make sure that item you are trying to backspace is the delimiter
+                                    // TODO: change this asterisk to delimiter
+                                        var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])-1) !== '*';
+                                        
+                                        // if it isn't an asterisk, prevent the user from deleting it
+                                        // likewise prevent them if they never even typed an asterisk in the first place
+                                        if (window.keyCount == 0 || deleted) {
+                                        // to cancel the event:
+                                        if( event.preventDefault) event.preventDefault();
+                                        return false;
+                                    } else {
+                                        window.keyCount = window.keyCount-1;
+                                    }
+                                    break;
+                                // delete key
+                                case 46:
+                                    // make sure item you are trying to [forward] delete is the delimiter
+                                    // TODO: change this asterisk to delimiter
+                                    var deleted = jQuery('.content').text().charAt(getTextCursor(jQuery('.content')[0])) !== '*';
+                                    
+                                    // like above, if it isn't an asterisk prevent user from deleting it
+                                    // likewise prevent them if they never even typed an asterisk in the first place
+                                    if (window.keyCount == 0 || deleted) {
+                                        // to cancel the event:
+                                        if( event.preventDefault) event.preventDefault();
+                                        return false;
+                                    } else {
+                                        window.keyCount = window.keyCount-1;
+                                    }
+                                    break;
+                                // 8/* button
+                                case 56:
+
+                                    // if person hit 8 and not * then prevent them from doing so
+                                    if (!event.shiftKey) {
+                                        // to cancel the event:
+                                        if( event.preventDefault) event.preventDefault();
+                                        return false;
+                                    }
+
+                                    // likewise prevent the if they were trying to add more than 2 delimiters
+                                    if (window.keyCount == 2) {
+                                        // to cancel the event:
+                                        if( event.preventDefault) event.preventDefault();
+                                        return false;
+                                    }
+                                    window.keyCount = window.keyCount+1;
+                                    if (window.keyCount === 1) {
+                                        jQuery('#hxat-alert').html('Asterisk added. Add one more to the text to make an annotation.');
+                                    } else if(window.keyCount === 2) {
+                                        jQuery('#hxat-alert').html('Annotation selection completed. Hit ENTER to save highlight or delete and replace asterisks to make a different selection.');
+                                    }
+                                    break;
+                                // Esc button
+                                case 27:
+                                    // sets the target text back to normal and erases delimiter marks
+                                    clearKeyboardInput();
+                                    break;
+                                // Enter button
+                                case 13:
+                                    // submits highlights like pressing the "Save Highlights" button
+                                    jQuery('#make_annotations_panel button').click();
+                                    return false;
+                                // Tab button
+                                case 9:
+                                    // moves it to the "Save Highlights" button
+                                    jQuery('#make_annotations_panel button')[0].focus();
+                                    return false;
+                                default:
+                                    // to cancel the event:
+                                    if( event.preventDefault) event.preventDefault();
+                                    return false;
+                            }
+                        });
+
+                        // save the original content of the tool so you can set it back to normal later
+                        window.originalContent = jQuery(AController.annotationCore.annotation_tool.wrapper[0]).html();
+                        self.annotationsSaved = window.AController.annotationCore.annotation_tool.plugins.Store.annotations.slice();
+                        window.AController.dashboardObjectController.endpoint._clearAnnotator();
+                        jQuery('.content')[0].focus();
+                        jQuery('#hxat-status').html('Keyboard input is enabled. JAWS Users and newcomers should visit Instructions to Make Annotations Using Keyboard Input section if you need help.');
                     }, 
                 500);
             }
@@ -948,7 +1076,7 @@
                                 }
                             });
                         });
-                    }
+                    };
 
                     jQuery.each(AController.dashboardObjectController.endpoint.annotationsMasterList, function(index, value) {
                         if (annotationId == value.id) {
@@ -968,14 +1096,14 @@
                                             checkDrawnOutlines(value1.selector.item['value']);
                                         }
                                     }
-                                })
+                                });
                             } else {
                                 setTimeout(function() {jQuery('.annotationItem.item-' + annotationId.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + rgbHex), 500});
                             }
                         }
                     });
                 }, 30);
-            };
+            }
         };
 
         $.TargetObjectController.prototype.colorizeViewer = function (){
@@ -985,7 +1113,7 @@
                 var rgbColor = window.AController.main.tags[tag];
                 if (rgbColor !== undefined) {
                         jQuery(item).css("background-color", "rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")");
-                };
+                }
             });
         };
 
@@ -1008,6 +1136,7 @@
                     jQuery('#annotations-status .labeltext').html("Show annotations");
                     jQuery('#annotations-status').attr('aria-label', "Show annotations");
                     jQuery('#annotations-status i').removeClass('fa-close').addClass('fa-comments');
+                    jQuery('#hxat-status').html('Annotations have been hidden.');
                     this.annotationsSaved = store.annotations.slice();
                     window.AController.dashboardObjectController.endpoint._clearAnnotator();
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'hidden'}, 'harvardx', 'hxat');
@@ -1015,9 +1144,10 @@
                     jQuery('#annotations-status .labeltext').html("Hide annotations");
                     jQuery('#annotations-status').attr('aria-label', "Hide annotations");
                     jQuery('#annotations-status i').addClass('fa-close').removeClass('fa-comments');
+                    jQuery('#hxat-status').html('Annotations are being shown.');
                     this.annotationsSaved.forEach(function (annotation) {
-                            annotator.setupAnnotation(annotation);
-                            store.registerAnnotation(annotation);
+                        annotator.setupAnnotation(annotation);
+                        store.registerAnnotation(annotation);
                     });
                     annotator.publish("externalCallToHighlightTags");
                     AController.utils.logThatThing('toggle_annotations_display', {'status': 'shown'}, 'harvardx', 'hxat');
