@@ -1045,7 +1045,7 @@
       root = this.wrapper[0];
       annotation.ranges || (annotation.ranges = this.selectedRanges);
       normedRanges = [];
-      _ref1 = annotation.range || [];
+      _ref1 = annotation.ranges || [];
       for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
         r = _ref1[_k];
         try {
