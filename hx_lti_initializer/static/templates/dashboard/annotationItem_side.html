@@ -45,8 +45,13 @@
     </div>
     <% if (typeof tags !== "undefined") { %>
         <div class="tagList field side">
-            <% _.each(tags, function(tagItem){ %>
-                <div class="tag side" aria-label="tag: <%- tagItem.replace(/"/g, '&quot;') %>">
+            <% _.each(tags, function(tagItem) { %>
+                <% var style = ""; %>
+                <% if (window.AController.main.tags[tagItem] !== undefined) { %>
+                        <% var rgbColor = window.AController.main.tags[tagItem]; %>
+                        <% style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\""; %>
+                <% }; %>
+                <div class="tag side" <%= style %> aria-label="Tag: <%- tagItem.replace(/"/g, '&quot;') %>">
                     <%= tagItem %>
                 </div>
             <% }); %>
