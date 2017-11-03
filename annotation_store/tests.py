@@ -18,7 +18,6 @@ TEST_SESSION_NOT_STAFF = {
     'hx_object_id': '7',
     'hx_user_id': 'cfc663eb08c91046',
     'is_staff': False,
-    'is_graded': False,
 }
 TEST_SESSION_IS_STAFF = dict(TEST_SESSION_NOT_STAFF)
 TEST_SESSION_IS_STAFF['is_staff'] = True
@@ -82,18 +81,16 @@ class AnnotationStoreTest(TestCase):
     def test_from_settings(self):
         request = self.request_factory.get('/foo')
         test_settings = [
-            {'backend': 'catch', 'gather_statistics': True},
-            {'backend': 'app',   'gather_statistics': False},
+            {'backend': 'catch'},
+            {'backend': 'app'},
         ]
         for settings in test_settings:
             store = AnnotationStore.update_settings(settings).from_settings(request=request)
-            self.assertEqual(settings['gather_statistics'], store.gather_statistics)
             self.assertEqual(settings['backend'], store.backend.BACKEND_NAME)
 
     def test_from_settings_defaults(self):
         request = self.request_factory.get('/foo')
         store = AnnotationStore.update_settings({}).from_settings(request=request)
-        self.assertEqual(False, store.gather_statistics)
         self.assertEqual('catch', store.backend.BACKEND_NAME)
 
     def test_from_settings_invalid(self):
