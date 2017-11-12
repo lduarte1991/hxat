@@ -24,7 +24,7 @@ enum34==1.0.4
 firebase-token-generator==2.0.0
 httplib2==0.9
 idna==2.0
-ims-lti-py==0.6
+git+https://github.com/tophatmonocle/ims_lti_py@develop#egg=ims_lti_py
 ipaddress==1.0.7
 logilab-common==0.63.2
 lxml==3.4.1
