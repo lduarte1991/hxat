@@ -92,14 +92,7 @@ class AnnotationStore(object):
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
         response = self.backend.create()
-        self.after_create(response)
         return response
-
-    def after_create(self, response):
-        if response.status_code == 200:
-            self._lti_grade_passback(score=1.0)
-        else:
-            self.logger.info("LTI Grade Passback aborted because status_code=%s" % status_code)
 
     def read(self, annotation_id):
         raise NotImplementedError
@@ -151,10 +144,13 @@ class AnnotationStore(object):
         return result
 
     def _get_tool_provider(self):
-        params = self.request.LTI['launch_params']
-        return DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
+        if 'launch_params' in self.request.LTI:
+            params = self.request.LTI['launch_params']
+            return DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
+        return DjangoToolProvider(CONSUMER_KEY, LTI_SECRET)
 
-    def _lti_grade_passback(self, score=1.0):
+
+    def lti_grade_passback(self, score=1.0):
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
@@ -167,6 +163,7 @@ class AnnotationStore(object):
                 self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
             else:
                 self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
+            print outcome
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))

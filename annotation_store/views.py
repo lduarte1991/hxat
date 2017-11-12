@@ -29,6 +29,9 @@ def search(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create(request):
+    if request.LTI['launch_params']['lis_result_sourcedid'] and request.LTI['launch_params']['lis_outcome_service_url']:
+        AnnotationStore.from_settings(request).create()
+        return AnnotationStore.from_settings(request).lti_grade_passback()
     return AnnotationStore.from_settings(request).create()
 
 
