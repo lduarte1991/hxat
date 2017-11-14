@@ -186,10 +186,16 @@ class AnnotationStoreTest(TestCase):
         request = create_request(method='post', session=session, data=data)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
 
-        grades = [.1, .9, .6, 8., .3, .2, 1.0, 0.125, 0.36]
+        grades = [.1, .9, .6, 0.8, .3, .2, 1.0, 0.125, 0.36]
         for grade in grades:
             store.lti_grade_passback(grade)
             mock_post_replace_result.assert_called_with(grade)
+        store.lti_grade_passback("text")
+        mock_post_replace_result.reset_mock()
+        mock_post_replace_result.assert_not_called()
+        store.lti_grade_passback(8.0)
+        mock_post_replace_result.assert_not_called()
+
 
 class StoreBackendTest(TestCase):
     def setUp(self):

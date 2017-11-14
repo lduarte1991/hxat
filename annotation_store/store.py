@@ -151,11 +151,13 @@ class AnnotationStore(object):
 
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
+            print params
             return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
         return DjangoToolProvider(CONSUMER_KEY, lti_secret)
 
-
     def lti_grade_passback(self, score=1.0):
+        if score < 0 or score > 1.0 or isinstance(score, basestring):
+            return
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
