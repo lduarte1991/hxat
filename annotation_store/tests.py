@@ -13,18 +13,20 @@ from store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 
-launch_params = dict({'context_id': '2a8b2d3fa55b7866a9',
-                      'resource_link_id': '2a8b2d3fa51ea413d19e480fb6c2eb085b7866a9',
-                      'consumer_key': '123key',
-                      'consumer_secret': 'secret',
-                      'lis_result_sourcedid': '10357-39-176095-241388-bb66bc4607aab98c2b5ad0f946939611bc77a80b',
-                      'lis_outcome_service_url':'https://canvas.harvard.edu/api/lti/v1/tools/10357/grade_passback'
-                      })
+launch_params = {'context_id': '2a8b2d3fa55b7866a9',
+                 'resource_link_id': '2a8b2d3fa51ea413d19e480fb6c2eb085b7866a9',
+                 'consumer_key': '123key',
+                 'consumer_secret': 'secret',
+                 'lis_result_sourcedid': '10357-39-176095-241388-bb66bc4607aab98c2b5ad0f946939611bc77a80b',
+                 'lis_outcome_service_url':'https://canvas.harvard.edu/api/lti/v1/tools/10357/grade_passback',
+                 'user_id':'cfc663eb08c91046'
+                 }
+
 TEST_SESSION_NOT_STAFF = {
-    'hx_context_id': '2a8b2d3fa55b7866a9',
+    'hx_context_id': launch_params.get('context_id', 'cfc663eb08c91046'),
+    'hx_user_id': launch_params.get('user_id', 'cfc663eb08c91046'),
     'hx_collection_id': '123',
     'hx_object_id': '7',
-    'hx_user_id': 'cfc663eb08c91046',
     'is_staff': False,
     'launch_params': launch_params
 }
@@ -184,7 +186,7 @@ class AnnotationStoreTest(TestCase):
         request = create_request(method='post', session=session, data=data)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
 
-        grades = [.1, .9, .6, 8., .3, .2]
+        grades = [.1, .9, .6, 8., .3, .2, 1.0, 0.125, 0.36]
         for grade in grades:
             store.lti_grade_passback(grade)
             mock_post_replace_result.assert_called_with(grade)

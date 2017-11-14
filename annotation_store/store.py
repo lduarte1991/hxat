@@ -144,10 +144,15 @@ class AnnotationStore(object):
         return result
 
     def _get_tool_provider(self):
+        try:
+            lti_secret = settings.LTI_SECRET_DICT[self.request.LTI.get('hx_context_id')]
+        except KeyError:
+            lti_secret = settings.LTI_SECRET
+
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
-            return DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
-        return DjangoToolProvider(CONSUMER_KEY, LTI_SECRET)
+            return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
+        return DjangoToolProvider(CONSUMER_KEY, lti_secret)
 
 
     def lti_grade_passback(self, score=1.0):
@@ -163,7 +168,6 @@ class AnnotationStore(object):
                 self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
             else:
                 self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
-            print outcome
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))

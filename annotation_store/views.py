@@ -29,11 +29,14 @@ def search(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create(request):
-    if request.LTI['launch_params']['lis_result_sourcedid'] and request.LTI['launch_params']['lis_outcome_service_url']:
-        AnnotationStore.from_settings(request).create()
-        return AnnotationStore.from_settings(request).lti_grade_passback()
-    return AnnotationStore.from_settings(request).create()
-
+    store = AnnotationStore.from_settings(request)
+    response = store.create()
+    if response.status_code == 200:
+        passback_response = store.lti_grade_passback()
+    if passback_response is not None:
+        return passback_response
+    else:
+        return response
 
 # NOTE: annotator updates text annotations using the "PUT" method, while
 #  image annotations are updated using the "POST" method, so this endpoint
