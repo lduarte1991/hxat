@@ -32,11 +32,8 @@ def create(request):
     store = AnnotationStore.from_settings(request)
     response = store.create()
     if response.status_code == 200:
-        passback_response = store.lti_grade_passback()
-    if passback_response is not None:
-        return passback_response
-    else:
-        return response
+        store.lti_grade_passback()
+    return response
 
 # NOTE: annotator updates text annotations using the "PUT" method, while
 #  image annotations are updated using the "POST" method, so this endpoint
