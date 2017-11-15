@@ -7,21 +7,33 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+import ims_lti_py.tool_provider
 
 from store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 
+launch_params = {'context_id': '2a8b2d3fa55b7866a9',
+                 'resource_link_id': '2a8b2d3fa51ea413d19e480fb6c2eb085b7866a9',
+                 'consumer_key': '123key',
+                 'consumer_secret': 'secret',
+                 'lis_result_sourcedid': '10357-39-176095-241388-bb66bc4607aab98c2b5ad0f946939611bc77a80b',
+                 'lis_outcome_service_url':'https://canvas.harvard.edu/api/lti/v1/tools/10357/grade_passback',
+                 'user_id':'cfc663eb08c91046'
+                 }
+
 TEST_SESSION_NOT_STAFF = {
-    'hx_context_id': '2a8b2d3fa55b7866a9',
+    'hx_context_id': launch_params.get('context_id', 'cfc663eb08c91046'),
+    'hx_user_id': launch_params.get('user_id', 'cfc663eb08c91046'),
     'hx_collection_id': '123',
     'hx_object_id': '7',
-    'hx_user_id': 'cfc663eb08c91046',
     'is_staff': False,
-    'is_graded': False,
+    'launch_params': launch_params
 }
+
 TEST_SESSION_IS_STAFF = dict(TEST_SESSION_NOT_STAFF)
 TEST_SESSION_IS_STAFF['is_staff'] = True
+del TEST_SESSION_IS_STAFF['launch_params']
 
 def object_params_from_session(session):
     return {
@@ -38,7 +50,7 @@ def search_params_from_session(session):
 def create_request(method='get', **kwargs):
     resource_link_id = kwargs.pop('resource_link_id', "2a8b2d3fa51ea413d19e480fb6c2eb085b7866a9")
     session = {"LTI_LAUNCH": {}}
-    session['LTI_LAUNCH'][resource_link_id] = kwargs.pop('session', TEST_SESSION_NOT_STAFF)
+    session['LTI_LAUNCH'][resource_link_id] = kwargs.pop('session')
     params = kwargs.pop('params', {})
     body = kwargs.pop('data', {})
     url = kwargs.pop('url', '/foo')
@@ -82,18 +94,16 @@ class AnnotationStoreTest(TestCase):
     def test_from_settings(self):
         request = self.request_factory.get('/foo')
         test_settings = [
-            {'backend': 'catch', 'gather_statistics': True},
-            {'backend': 'app',   'gather_statistics': False},
+            {'backend': 'catch'},
+            {'backend': 'app'},
         ]
         for settings in test_settings:
             store = AnnotationStore.update_settings(settings).from_settings(request=request)
-            self.assertEqual(settings['gather_statistics'], store.gather_statistics)
             self.assertEqual(settings['backend'], store.backend.BACKEND_NAME)
 
     def test_from_settings_defaults(self):
         request = self.request_factory.get('/foo')
         store = AnnotationStore.update_settings({}).from_settings(request=request)
-        self.assertEqual(False, store.gather_statistics)
         self.assertEqual('catch', store.backend.BACKEND_NAME)
 
     def test_from_settings_invalid(self):
@@ -149,14 +159,43 @@ class AnnotationStoreTest(TestCase):
                 else:
                     action()
 
-    def test_lti_passback_triggered_after_create(self):
+    def test_lti_passback_triggered(self):
+        # Test basic calling
         session = self.not_staff_session
         data = object_params_from_session(session)
-        request = create_request(method="post", session=session, data=data)
+        request = create_request(method='post', session=session, data=data)
+        mock_store = mock.create_autospec(AnnotationStore(request, backend_instance=DummyStoreBackend(request)))
+        mock_store.lti_grade_passback()
+        mock_store.lti_grade_passback.assert_called_with()
+
+    # Ensuring no grade passback if not assignment or if teacher
+    @mock.patch.object(ims_lti_py.tool_provider.DjangoToolProvider, 'post_replace_result')
+    def test_lti_passback_not_triggered(self, mock_post_replace_result):
+        session = self.staff_session
+        data = object_params_from_session(session)
+        request = create_request(method='post', session=session, data=data)
         store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
-        store._lti_grade_passback = mock.Mock(return_value=True)
-        response = store.create()
-        store._lti_grade_passback.assert_called()
+        store.lti_grade_passback()
+        self.assertFalse(mock_post_replace_result.called, "LTI consumer does not expect a grade for the current user and assignment")
+
+    # Test different grades called
+    @mock.patch.object(ims_lti_py.tool_provider.DjangoToolProvider, 'post_replace_result')
+    def test_differing_grades(self, mock_post_replace_result):
+        session = TEST_SESSION_NOT_STAFF
+        data = object_params_from_session(session)
+        request = create_request(method='post', session=session, data=data)
+        store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
+
+        grades = [.1, .9, .6, 0.8, .3, .2, 1.0, 0.125, 0.36]
+        for grade in grades:
+            store.lti_grade_passback(grade)
+            mock_post_replace_result.assert_called_with(grade)
+        store.lti_grade_passback("text")
+        mock_post_replace_result.reset_mock()
+        mock_post_replace_result.assert_not_called()
+        store.lti_grade_passback(8.0)
+        mock_post_replace_result.assert_not_called()
+
 
 class StoreBackendTest(TestCase):
     def setUp(self):

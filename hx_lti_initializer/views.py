@@ -102,10 +102,6 @@ def launch_lti(request):
             raise PermissionDenied()
     debug_printer("DEBUG - user name: " + display_name)
 
-    lti_grade_url = request.LTI['launch_params'].get('lis_outcome_service_url')
-    if lti_grade_url is not None:
-        save_session(request, is_graded=True)
-
     # Check whether user is a admin, instructor or teaching assistant
     if set(roles) & set(settings.ADMIN_ROLES):
         try:

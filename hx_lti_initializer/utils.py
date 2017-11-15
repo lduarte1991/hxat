@@ -75,7 +75,6 @@ def save_session(request, **kwargs):
         "roles": ["hx_roles", []],
         "is_staff": ["is_staff", False],
         "is_instructor": ["is_instructor", False],
-        "is_graded": ['is_graded', False],
         "lti_params": ['lti_params', None],
         "resource_link_id": ['resource_link_id', None]
     }

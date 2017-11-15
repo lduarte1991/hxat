@@ -29,8 +29,11 @@ def search(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create(request):
-    return AnnotationStore.from_settings(request).create()
-
+    store = AnnotationStore.from_settings(request)
+    response = store.create()
+    if response.status_code == 200:
+        store.lti_grade_passback()
+    return response
 
 # NOTE: annotator updates text annotations using the "PUT" method, while
 #  image annotations are updated using the "POST" method, so this endpoint
