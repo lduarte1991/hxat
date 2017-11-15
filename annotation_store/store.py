@@ -150,7 +150,6 @@ class AnnotationStore(object):
 
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
-            print params
             return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
         return DjangoToolProvider(CONSUMER_KEY, lti_secret)
 
