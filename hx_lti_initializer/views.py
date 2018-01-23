@@ -205,10 +205,8 @@ def launch_lti(request):
                 userfound.delete()
             except:
                 debug_printer("DEBUG - Not waiting to be added as admin")
-            return course_admin_hub(request)
-        else:
-            debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
-            return access_annotation_target(request, course_id, assignment_id, object_id)
+        debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
+        return access_annotation_target(request, course_id, assignment_id, object_id)
     except PermissionDenied as e:
         raise PermissionDenied(e) # make sure to re-raise this exception since we shouldn't proceed
     except:
