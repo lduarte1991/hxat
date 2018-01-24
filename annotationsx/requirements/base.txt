@@ -30,7 +30,7 @@ markdown2==2.3.0
 mock==2.0.0
 oauth2==1.5.211
 pep8==1.6.2
-psycopg2==2.6.1
+psycopg2==2.7.3.2
 pyasn1==0.1.7
 pycparser==2.13
 pylint==1.4.3
