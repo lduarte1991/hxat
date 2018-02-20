@@ -161,6 +161,9 @@ AnnotatorEndpointController.prototype.loadMoreAnnotations = function(annotations
 
 AnnotatorEndpointController.prototype.addNewAnnotationToMasterList = function(annotation) {
 	this.annotationsMasterList.unshift(annotation);
+	if (annotation.media === "comment") {
+		this.list_of_replies[annotation.id] = annotation;
+	}
 };
 
 AnnotatorEndpointController.prototype.removeAnnotationFromMasterList = function(annotation) {
