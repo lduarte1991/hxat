@@ -33,63 +33,27 @@ def ip_address(request):
     # which is more prone to varying between requests from the same client
     return meta.get('HTTP_X_REAL_IP', meta.get('HTTP_CLIENT_IP', meta.get('REMOTE_ADDR', '1.2.3.4')))
 
-class XFrameOptionsMiddleware(object):
+class ContentSecurityPolicyMiddleware(object):
+    '''
+    Sets the Content-Security-Policy header to restrict webpages from being
+    embedded on other domains. This is better supported and more flexible than X-Frame-Options.
+
+    Expects the CONTENT_SECURITY_POLICY_DOMAIN to be set in the django.settings object.
+    '''
     def __init__(self):
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
     def process_response(self, request, response):
-        self.logger.info("Inside %s process_response: %s" % (self.__class__.__name__, request.path))
-        return self._set_xframe_options(request, response)
-
-    def _set_xframe_options(self, request, response):
-        referrer = request.META.get('HTTP_REFERER')
-        self.logger.debug("server_name: %s http_referrer: %s" % (settings.SERVER_NAME, referrer))
-
-        # if this is localhost and non-https (i.e. development), we won't
-        # receive the referer header so just make the response exempt from xframe controls
-        if settings.SERVER_NAME == 'localhost':
-            setattr(response, 'xframe_options_exempt', True)
-            return response
-
-        # person accessed site directly (not via iframe) so leave response as is
-        if referrer is None:
-            return response
-
-        # person is navigating the site internally, so just set the original reference
-        if settings.SERVER_NAME in referrer:
-            try:
-                response['X-Frame-Options'] = "ALLOW-FROM " + request.session['hx_lti_original_ref']
-                return response
-            except:
-                return response
-
-        # otherwise check if the referrer is an allowed site
-        else:
-            # parse the url it came from and default to not allow
-            parsed_uri = urlparse.urlparse(referrer)
-            domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
-            x_frame_allow = False
-
-            # if it does exist within the allowed list, then allow it to enter
-            # the map here is for situations in which the user is clicking
-            # within the LTI tool but the iframe still needs to give
-            # permissions to the consumer site.
-            for item in settings.X_FRAME_ALLOWED_SITES:
-                if domain.endswith(item):
-                    x_frame_allow = domain
-
-            # explicitly set it to deny or allow from the site if found
-            if x_frame_allow is False:
-                response['X-Frame-Options'] = "DENY"
+        if 'content-type' in response and response['content-type'].startswith('text/html'):
+            self.logger.info("Inside %s process_response: %s" % (self.__class__.__name__, request.path))
+            domain = getattr(settings, 'CONTENT_SECURITY_POLICY_DOMAIN', None)
+            if domain:
+                policy = "frame-ancestors 'self' {domain}".format(domain=domain)
+                response['Content-Security-Policy'] = policy
+                self.logger.info('Content-Security-Policy header set to: %s' % policy)
             else:
-                response['X-Frame-Options'] = "ALLOW-FROM " + x_frame_allow
-                request.session["hx_lti_original_ref"] = x_frame_allow
-
-            self.logger.debug('X-Frame-Options: %s' % response['X-Frame-Options'])
-
-            return response
-
-
+                self.logger.warn('Content-Security-Policy header not set')
+        return response
 
 class CookielessSessionMiddleware(object):
     '''
@@ -117,7 +81,7 @@ class CookielessSessionMiddleware(object):
         self.logger.info("Loaded session store using session_key: %s" % session_key)
 
         if not request.session.exists(session_key):
-            self.logger.debug("Session does not exist. Creating new session.")
+            self.logger.info("Session does not exist. Creating new session.")
             request.session.create()
 
         logged_ip = request.session.get('LOGGED_IP', None)

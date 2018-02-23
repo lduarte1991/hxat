@@ -54,8 +54,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'annotationsx.middleware.XFrameOptionsMiddleware',
+    'annotationsx.middleware.ContentSecurityPolicyMiddleware',
     'annotationsx.middleware.MultiLTILaunchMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
 )
@@ -201,7 +200,8 @@ LTI_ROLES = "roles"
 LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
 ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
 LTI_UNIQUE_RESOURCE_ID = 'resource_link_id'
-X_FRAME_ALLOWED_SITES = SECURE_SETTINGS.get('X_FRAME_ALLOWED_SITES')
+CONTENT_SECURITY_POLICY_DOMAIN = SECURE_SETTINGS.get('content_security_policy_domain', None)
+
 SERVER_NAME = SECURE_SETTINGS.get('SERVER_NAME')
 ORGANIZATION = SECURE_SETTINGS.get('ORGANIZATION')
 
@@ -228,6 +228,7 @@ LTI_SETUP = {
 CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
 LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
 LTI_SECRET_DICT = SECURE_SETTINGS.get('LTI_SECRET_DICT', {})
+
 ANNOTATION_MANUAL_URL = SECURE_SETTINGS.get("annotation_manual_url", None)
 ANNOTATION_MANUAL_TARGET = SECURE_SETTINGS.get("annotation_manual_target", None)
 ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
