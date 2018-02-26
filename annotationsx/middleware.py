@@ -239,7 +239,8 @@ class MultiLTILaunchMiddleware(object):
             'resource_link_id': resource_link_id,
         }
         request.session.modified = True
-        self.logger.info("LTI launch session saved: %s" % resource_link_id)
+        user_id = lti_params.get('user_id', None)
+        self.logger.info("LTI launch session saved resource_link_id={resource_link_id} for user_id={user_id}".format(user_id=user_id, resource_link_id=resource_link_id))
 
     def _log_ip_address(self, request):
         '''
@@ -256,7 +257,8 @@ class MultiLTILaunchMiddleware(object):
         '''
         setattr(request, 'LTI', LTILaunchSession(request.session, resource_link_id))
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
-        self.logger.info("setting current LTI session to resource_link_id=%s" % resource_link_id)
+        user_id = request.LTI.get('user_id', None)
+        self.logger.info("setting current LTI session to resource_link_id={resource_link_id} for user_id={user_id}".format(user_id=user_id, resource_link_id=resource_link_id))
 
 
 class LTILaunchSession(object):
