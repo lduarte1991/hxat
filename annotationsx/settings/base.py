@@ -160,6 +160,16 @@ LOGGING = {
         # Add app-specific loggers below.
         # Make sure that propagate is False so that the root logger doesn't get involved
         # after an app logger handles a log message.
+        'django': {
+            'level': 'ERROR',
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
+        'django.request': {
+            'level': 'ERROR',
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
         'django.db.backends': {
             'level': 'DEBUG' if _LOG_QUERIES else 'ERROR',
             'handlers': ['default', 'console'],
