@@ -168,9 +168,11 @@ class CookielessSessionMiddleware(object):
             self.logger.info("Checking IP address against session")
             request_ip = ip_address(request)
             if request_ip != logged_ip:
-                self.logger.warning("IP address does not match IP logged in session: %s != %s" % (request_ip, logged_ip))
-                request.session.flush()
-                self.logger.info("Flushed session")
+                self.logger.warning("IP address does not match IP logged in session: %s != %s. " % (request_ip, logged_ip))
+                # NOTE: commenting these next few lines out because of confirmed reports from students
+                #       that their session was being invalidated, which was traced back to this. -abarrett 3/9/18
+                #request.session.flush()
+                #self.logger.info("Flushed session")
 
 
 
