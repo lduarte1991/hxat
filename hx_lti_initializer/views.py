@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import login
 from django.contrib import messages
 
+from annotationsx.exceptions import AnnotationTargetDoesNotExist
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
 from hx_lti_assignment.models import Assignment, AssignmentTargets
@@ -205,6 +206,11 @@ def launch_lti(request):
                 logger.info("Not waiting to be added as admin")
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
         return access_annotation_target(request, course_id, assignment_id, object_id)
+    except AnnotationTargetDoesNotExist as e:
+        logger.warning('Could not access annotation target using resource config.')
+        logger.info('Deleting resource config because it is invalid.')
+        LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
+        logger.info('Proceed to the admin hub.')
     except PermissionDenied as e:
         raise e # make sure to re-raise this exception since we shouldn't proceed
     except:
@@ -381,7 +387,7 @@ def access_annotation_target(
         course_obj = LTICourse.objects.get(course_id=course_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         logger.error("User attempted to access an Assignment or Target Object that does not exist: assignment_id={assignment_id} object_id={object_id}".format(assignment_id=assignment_id, object_id=object_id))
-        raise PermissionDenied('Assignment or target object does not exist')
+        raise AnnotationTargetDoesNotExist('Assignment or target object does not exist')
     try:
         is_instructor = request.LTI['is_staff']
     except:
