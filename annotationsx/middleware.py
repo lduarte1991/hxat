@@ -342,3 +342,9 @@ class MultiLTILaunchMiddleware(object):
         '''
         setattr(request, 'LTI', LTILaunchSession(request.session, resource_link_id))
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
+
+
+class ExceptionLoggingMiddleware(object):
+
+    def process_exception(self, request, exception):
+        logging.exception('Exception logged for request: ' + request.path)

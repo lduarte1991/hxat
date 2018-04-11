@@ -57,6 +57,7 @@ MIDDLEWARE_CLASSES = (
     'annotationsx.middleware.ContentSecurityPolicyMiddleware',
     'annotationsx.middleware.MultiLTILaunchMiddleware',
     #'annotationsx.middleware.SessionMiddleware',
+    'annotationsx.middleware.ExceptionLoggingMiddleware',
 )
 
 ROOT_URLCONF = 'annotationsx.urls'
