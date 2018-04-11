@@ -47,10 +47,10 @@ def launch_lti(request):
     # collect anonymous_id and consumer key in order to fetch LTIProfile
     # if it exists, we initialize the tool otherwise, we create a new user
     user_id = request.LTI['launch_params']['user_id']
-    debug_printer('DEBUG - Found anonymous ID in request: %s' % user_id)
+    logger.debug('DEBUG - Found anonymous ID in request: %s' % user_id)
 
     course = request.LTI['launch_params'][settings.LTI_COURSE_ID]
-    debug_printer('DEBUG - Found course being accessed: %s' % course)
+    logger.debug('DEBUG - Found course being accessed: %s' % course)
 
     resource_link_id = request.LTI['launch_params']['resource_link_id']
 
@@ -67,7 +67,7 @@ def launch_lti(request):
         tool_consumer_instance_guid = request.LTI['launch_params']['tool_consumer_instance_guid']
         if tool_consumer_instance_guid:
             user_scope = "consumer:%s" % tool_consumer_instance_guid
-    debug_printer("DEBUG - user scope is: %s" % user_scope)
+    logger.debug("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
     save_session(request, is_staff=False)
@@ -76,7 +76,7 @@ def launch_lti(request):
     # the tool the 'roles' field usually consists of just 'Instructor'
     # or 'Learner'
     roles = request.LTI['launch_params'][settings.LTI_ROLES]
-    debug_printer("DEBUG - user logging in with roles: " + str(roles))
+    logger.debug("DEBUG - user logging in with roles: " + str(roles))
 
 
     # This is the name that we will show on the UI if provided...
@@ -98,19 +98,19 @@ def launch_lti(request):
             messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
             messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
         except:
-            debug_printer('DEBUG - username not found in post.')
-            raise PermissionDenied()
-    debug_printer("DEBUG - user name: " + display_name)
+            logger.debug('DEBUG - username not found in post.')
+            raise PermissionDenied('username not found in LTI launch')
+    logger.debug("DEBUG - user name: " + display_name)
 
     # Check whether user is a admin, instructor or teaching assistant
     if set(roles) & set(settings.ADMIN_ROLES):
         try:
             # See if the user already has a profile, and use it if so.
             lti_profile = LTIProfile.objects.get(anon_id=user_id)
-            debug_printer('DEBUG - LTI Profile was found via anonymous id.')
+            logger.debug('DEBUG - LTI Profile was found via anonymous id.')
         except LTIProfile.DoesNotExist:
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
-            debug_printer('DEBUG - LTI Profile NOT found. New User to be created.')
+            logger.debug('DEBUG - LTI Profile NOT found. New User to be created.')
             user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -148,7 +148,7 @@ def launch_lti(request):
     # with users as they can flow in and out in a MOOC
     try:
         course_object = LTICourse.get_course_by_id(course)
-        debug_printer('DEBUG - Course was found %s' % course)
+        logger.debug('DEBUG - Course was found %s' % course)
 
         # save the course name to the session so it auto-populate later.
         save_session(
@@ -158,7 +158,7 @@ def launch_lti(request):
         )
 
     except LTICourse.DoesNotExist:
-        debug_printer('DEBUG - Course %s was NOT found. Will be created.' %course)
+        logger.debug('DEBUG - Course %s was NOT found. Will be created.' %course)
 
         # Put a message on the screen to indicate to the user that the course doesn't exist
         message_error = "Sorry, the course you are trying to reach does not exist."
@@ -185,14 +185,12 @@ def launch_lti(request):
                 course_id=course_object.id,
             )
         else:
-            debug_printer('Course not created because user does not have an admin role')
+            logger.info('Course not created because user does not have an admin role')
     try:
         config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
         assignment_id = config.collection_id
         object_id = config.object_id
-        debug_printer("Config: {config}".format(config=resource_link_id))
-        debug_printer("Config: {config}".format(config=config.collection_id))
-        debug_printer("Config: {config}".format(config=config.object_id))
+        logger.debug("DEBUG - LTIResourceLinkConfig: resource_link_id=%s collection_id=%s object_id=%s" % (resource_link_id, config.collection_id, config.object_id))
         course_id = str(course)
         if set(roles) & set(settings.ADMIN_ROLES):
             try:
@@ -201,14 +199,14 @@ def launch_lti(request):
                     new_admin_course_id=course
                 )
                 course_object.add_admin(lti_profile)
-                debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+                logger.info("CourseAdmin Pending found: %s" % userfound)
                 userfound.delete()
             except:
-                debug_printer("DEBUG - Not waiting to be added as admin")
-        debug_printer("DEBUG - User wants to go directly to annotations for a specific target object using UI")
+                logger.info("Not waiting to be added as admin")
+        logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
         return access_annotation_target(request, course_id, assignment_id, object_id)
     except PermissionDenied as e:
-        raise PermissionDenied(e) # make sure to re-raise this exception since we shouldn't proceed
+        raise e # make sure to re-raise this exception since we shouldn't proceed
     except:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
@@ -230,16 +228,16 @@ def launch_lti(request):
                         new_admin_course_id=course
                     )
                     course_object.add_admin(lti_profile)
-                    debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+                    logger.info("CourseAdmin Pending found: %s" % userfound)
                     userfound.delete()
                 except:
-                    debug_printer("DEBUG - Not waiting to be added as admin")
+                    logger.info("Not waiting to be added as admin")
                 return course_admin_hub(request)
             else:
-                debug_printer("DEBUG - User wants to go directly to annotations for a specific target object")
+                logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
                 return access_annotation_target(request, course_id, assignment_id, object_id)
         except:
-            debug_printer("DEBUG - User wants the index")
+            logger.debug("DEBUG - User wants the index")
 
     try:
         userfound = LTICourseAdmin.objects.get(
@@ -247,10 +245,10 @@ def launch_lti(request):
             new_admin_course_id=course
         )
         course_object.add_admin(lti_profile)
-        debug_printer("DEBUG - CourseAdmin Pending found: %s" % userfound)
+        logger.info("CourseAdmin Pending found: %s" % userfound)
         userfound.delete()
     except:
-        debug_printer("DEBUG - Not waiting to be added as admin")
+        logger.debug("DEBUG - Not waiting to be added as admin")
 
     return course_admin_hub(request)
 
@@ -288,7 +286,7 @@ def edit_course(request, id):
                             new_course_admin.save()
                         except:
                             # admin already pending
-                            debug_printer("Admin already pending.")
+                            logger.info("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
             save_session(request, course_name=course.course_name)
@@ -297,7 +295,7 @@ def edit_course(request, id):
             url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
         else:
-            raise PermissionDenied()
+            raise PermissionDenied('Invalid course form submitted')
     else:
         form = CourseForm(instance=course, user_scope=user_scope)
 
@@ -382,15 +380,15 @@ def access_annotation_target(
         object_uri = targ_obj.get_target_content_uri()
         course_obj = LTICourse.objects.get(course_id=course_id)
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
-        debug_printer("DEBUG - User attempted to access a non-existant Assignment or Target Object")
-        raise PermissionDenied()
+        logger.error("User attempted to access an Assignment or Target Object that does not exist: assignment_id={assignment_id} object_id={object_id}".format(assignment_id=assignment_id, object_id=object_id))
+        raise PermissionDenied('Assignment or target object does not exist')
     try:
         is_instructor = request.LTI['is_staff']
     except:
         is_instructor = False
 
     if not is_instructor and not assignment.is_published:
-        raise PermissionDenied("Permission to access unpublished assignment is denied")
+        raise PermissionDenied('Permission to access unpublished assignment by a non-instructor is denied')
 
     save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
 
@@ -399,7 +397,7 @@ def access_annotation_target(
     # also, we may want to consider denying if theres no ssl
     protocol = 'https://' if request.is_secure() else 'http://'
     abstract_db_url = protocol + get_current_site(request).domain + reverse('annotation_store:api_root')
-    debug_printer("DEBUG - Abstract Database URL: " + abstract_db_url)
+    logger.debug("DEBUG - Abstract Database URL: " + abstract_db_url)
     original = {
         'user_id': user_id,
         'username': user_name,
@@ -555,7 +553,7 @@ def delete_assignment(request):
         collection_id = request.POST['assignment_id']
         assignment = Assignment.objects.get(assignment_id=collection_id)
         assignment.delete()
-        debug_printer("DEBUG - Assignment Deleted: " + unicode(assignment))
+        logger.debug("DEBUG - Assignment Deleted: " + unicode(assignment))
     except:
         return error_view(request, "The assignment deletion may have failed")
 
@@ -576,7 +574,7 @@ def change_starting_resource(request, assignment_id, object_id):
         'assignment_id': assignment_id,
         'object_id': object_id
     })
-    debug_printer("change_starting_resource (%s): %s" % (request.method, data))
+    logger.info("change_starting_resource (%s): %s" % (request.method, data))
 
     if request.method == 'POST':
         try:

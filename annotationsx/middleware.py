@@ -347,4 +347,4 @@ class MultiLTILaunchMiddleware(object):
 class ExceptionLoggingMiddleware(object):
 
     def process_exception(self, request, exception):
-        logging.exception('Exception logged for request: ' + request.path)
+        logging.exception('Exception logged for request: %s message: %s' % (request.path, str(exception)))
