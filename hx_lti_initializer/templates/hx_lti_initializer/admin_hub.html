@@ -59,7 +59,7 @@
                                     {% endif %}
                                 </a>
                                 {% endif %}
-                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}?resource_link_id={{resource_link_id}}">{{file.target_title}}</a>
+                                <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course.course_id assignment_id=assignment.assignment_id object_id=file.id %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}">{{file.target_title}}</a>
                                 {% if is_instructor %}
                                 <a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}">
                                     <i class='fa fa-cog' style='margin-right:4px'></i> Setup info

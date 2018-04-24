@@ -18,7 +18,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 CONSUMER_KEY = settings.CONSUMER_KEY
-LTI_SECRET = settings.LTI_SECRET
 ANNOTATION_DB_URL = settings.ANNOTATION_DB_URL
 ANNOTATION_DB_API_KEY = settings.ANNOTATION_DB_API_KEY
 ANNOTATION_DB_SECRET_TOKEN = settings.ANNOTATION_DB_SECRET_TOKEN
@@ -46,29 +45,25 @@ class AnnotationStore(object):
     
     ANNOTATION_STORE = {
         "backend": "catch"
-        "gather_statistics": False,
     }
 
     '''
     SETTINGS = dict(ANNOTATION_STORE_SETTINGS)
 
-    def __init__(self, request, backend_instance=None, gather_statistics=False):
+    def __init__(self, request, backend_instance=None):
         self.request = request
         self.backend = backend_instance
-        self.gather_statistics = gather_statistics
-        self.grade_passback_outcome = None
+        self.outcome = None
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
         assert self.backend is not None
-        assert isinstance(self.gather_statistics, bool)
 
     @classmethod
     def from_settings(cls, request):
-        gather_statistics = cls.SETTINGS.get('gather_statistics', False)
         backend_type = cls.SETTINGS.get('backend', 'catch')
         backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend}
         assert backend_type in backend_types
         backend_instance = backend_types[backend_type](request)
-        return cls(request, backend_instance=backend_instance, gather_statistics=gather_statistics)
+        return cls(request, backend_instance)
 
     @classmethod
     def update_settings(cls, settings_dict):
@@ -96,12 +91,7 @@ class AnnotationStore(object):
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
         response = self.backend.create()
-        self.after_create(response)
         return response
-
-    def after_create(self, response):
-        is_graded = self.request.LTI.get('is_graded', False)
-        self._lti_grade_passback(is_graded=is_graded, status_code=response.status_code, result_score=1)
 
     def read(self, annotation_id):
         raise NotImplementedError
@@ -153,27 +143,35 @@ class AnnotationStore(object):
         return result
 
     def _get_tool_provider(self):
-        params = self.request.LTI['launch_params']
-        tool_provider = DjangoToolProvider(CONSUMER_KEY, LTI_SECRET, params)
-        return tool_provider
-
-    def _lti_grade_passback(self, is_graded=False, status_code=None, result_score=1):
-        self.logger.debug("LTI Grade Passback: is_graded=%s status_code=%s result_score=%s" % (is_graded, status_code, result_score))
-        if not is_graded:
-            return
-        if status_code != 200:
-            self.logger.info("LTI Grade Passback aborted because status_code=%s" % status_code)
-            return
         try:
-            outcome = self._get_tool_provider().post_replace_result(result_score)
+            lti_secret = settings.LTI_SECRET_DICT[self.request.LTI.get('hx_context_id')]
+        except KeyError:
+            lti_secret = settings.LTI_SECRET
+
+        if 'launch_params' in self.request.LTI:
+            params = self.request.LTI['launch_params']
+            return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
+        return DjangoToolProvider(CONSUMER_KEY, lti_secret)
+
+    def lti_grade_passback(self, score=1.0):
+        if score < 0 or score > 1.0 or isinstance(score, basestring):
+            return
+        tool_provider = self._get_tool_provider()
+        if not tool_provider.is_outcome_service():
+            self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
+            return
+        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+        try:
+            outcome = tool_provider.post_replace_result(score)
+            self.logger.info(vars(outcome))
             if outcome.is_success():
                 self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
             else:
                 self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
-            self.grade_passback_outcome = outcome
+            self.outcome = outcome
         except Exception as e:
-            self.logger.error("Error submitting grade outcome after annotation created: %s" % str(e))
-        return self.grade_passback_outcome
+            self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+        return self.outcome
 
 
 ###########################################################
@@ -309,7 +307,7 @@ class CatchStoreBackend(StoreBackend):
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
-        self.logger.info('search response status_code=%s' % response.status_code)
+        self.logger.info('search response status_code=%s content_length=%s' % (response.status_code, response.headers.get('content-length', 0)))
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def create(self):

@@ -75,8 +75,6 @@ def save_session(request, **kwargs):
         "roles": ["hx_roles", []],
         "is_staff": ["is_staff", False],
         "is_instructor": ["is_instructor", False],
-        "is_graded": ['is_graded', False],
-        "lti_params": ['lti_params', None],
         "resource_link_id": ['resource_link_id', None]
     }
 
@@ -95,7 +93,6 @@ def save_session(request, **kwargs):
 def get_session_value(request, key, default_value=None):
     resource_link_id = request.LTI['resource_link_id']
     value = request.session['LTI_LAUNCH'][resource_link_id].get(key, default_value)
-    logger.debug("get_session_value: %s=%s" % (key, value))
     return value
 
 def get_lti_value(key, request):

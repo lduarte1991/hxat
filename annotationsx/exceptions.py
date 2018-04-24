@@ -1,0 +1,2 @@
+class AnnotationTargetDoesNotExist(Exception):
+    pass
