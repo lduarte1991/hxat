@@ -518,6 +518,7 @@ def instructor_dashboard_student_list_view(request):
 
     context_id = request.LTI['hx_context_id']
     user_id = request.LTI['hx_user_id']
+    resource_link_id = request.LTI['resource_link_id']
 
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
@@ -526,13 +527,14 @@ def instructor_dashboard_student_list_view(request):
     fetch_elapsed_time = fetch_end_time - fetch_start_time
 
     # Transform the raw annotation results into something useful for the dashboard
-    user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
+    user_annotations = DashboardAnnotations(request, course_annotations).get_annotations_by_user()
     context = {
         'username': request.LTI['hx_user_name'],
         'is_instructor': request.LTI['is_staff'],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
         'org': settings.ORGANIZATION,
+        'resource_link_id': resource_link_id
     }
     return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 

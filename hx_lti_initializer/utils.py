@@ -345,7 +345,8 @@ class DashboardAnnotations(object):
     is going to be small compared to the number of annotations, so the memory use
     should be negligible.
     '''
-    def __init__(self, annotations):
+    def __init__(self, request, annotations):
+        self.request = request
         self.annotations = annotations
         self.annotation_by_id = self.get_annotations_by_id()
         self.distinct_users = self.get_distinct_users()
@@ -428,7 +429,7 @@ class DashboardAnnotations(object):
         media_type = annotation.get('media', None)
         context_id = annotation['contextId']
         collection_id = annotation['collectionId']
-        url_format = "%s?focus_on_id=%s"
+        url_format = "{url}?resource_link_id={resource_link_id}&focus_on_id={focus_id}"
         preview_url = ''
 
         if media_type == 'image':
@@ -449,7 +450,8 @@ class DashboardAnnotations(object):
                 self.preview_url_cache[url_cache_key] = preview_url
 
         if preview_url:
-            preview_url = url_format % (preview_url, annotation_id)
+            resource_link_id = self.request.LTI['resource_link_id']
+            preview_url = url_format.format(url=preview_url, resource_link_id=resource_link_id, focus_id=annotation_id)
 
         return preview_url
     
