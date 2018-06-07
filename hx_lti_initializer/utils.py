@@ -351,7 +351,7 @@ class DashboardAnnotations(object):
         self.distinct_users = self.get_distinct_users()
         self.assignment_name_of = self.get_assignments_dict()
         self.target_objects_list = self.get_target_objects_list()
-        self.target_objects_by_id = {x['id']: x for x in self.target_objects_list}
+        self.target_objects_by_id = {str(x['id']): x for x in self.target_objects_list}
         self.target_objects_by_content = {
             x.get('target_content', '').strip(): x
             for x in self.target_objects_list
@@ -398,6 +398,7 @@ class DashboardAnnotations(object):
         return users
 
     def get_target_id(self, media_type, object_id):
+        object_id = str(object_id) # ensure we have the target id as a string, not an int
         target_id = ''
         if media_type == 'image':
             trimmed_object_id = object_id[0:object_id.find('/canvas/')] # only use regex if absolutely necessary
