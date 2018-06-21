@@ -16,7 +16,7 @@
         </div>
     <% } else if (media === 'image' && thumbnail) {%>
         <div class="zoomToImageBounds" style='position:relative;'>
-            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';" data-svg=".thumbnail-<%= id %>"/>
+            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';" data-svg=".thumbnail-<%= id %>" alt="Thumbnail Preview"/>
             <% if (typeof(svg) !== "undefined") { %>
                 <%= svg %>
             <% } %>
@@ -39,14 +39,19 @@
         <% } %>
     </div>
     
-    <div class="totalreplies field side" role="button" aria-label="Make or view replies Annotation #<%=index %>">
+    <div class="totalreplies field side clicking_allowed" tabindex="0" role="button" aria-label="Make or view replies Annotation #<%=index %>">
         <span class="glyphicon glyphicon-comment"></span>
         <span class="replyNum"> <%= totalComments %> </span>
     </div>
     <% if (typeof tags !== "undefined") { %>
         <div class="tagList field side">
-            <% _.each(tags, function(tagItem){ %>
-                <div class="tag side" aria-label="tag: <%- tagItem.replace(/"/g, '&quot;') %>">
+            <% _.each(tags, function(tagItem) { %>
+                <% var style = ""; %>
+                <% if (window.AController.main.tags[tagItem] !== undefined) { %>
+                        <% var rgbColor = window.AController.main.tags[tagItem]; %>
+                        <% style = "style=\"background-color:rgba(" + rgbColor.red + ", " + rgbColor.green + ", " + rgbColor.blue + ", " + rgbColor.alpha + ")\""; %>
+                <% }; %>
+                <div class="tag side" <%= style %> aria-label="Tag: <%- tagItem.replace(/"/g, '&quot;') %>">
                     <%= tagItem %>
                 </div>
             <% }); %>

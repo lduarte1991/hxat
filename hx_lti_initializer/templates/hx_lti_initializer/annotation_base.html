@@ -39,6 +39,7 @@
         <script src="{% static "DashboardView.js" %}"></script>
         <script src="{% static "TargetObjectController.js" %}"></script>
         <script src="{% static "utilities.js" %}"></script>
+        <script src="{% static "accessibility.js" %}"></script>
 
         {# stylesheet for icons, dashboard and instructions #}
         <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
@@ -58,31 +59,31 @@
             {% endif %}
             <div class="pagination">
                 {% if prev_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?resource_link_id={{resource_link_id}}&utm_source={{utm_source}}" class="btn btn-default" role="button" onclick="AController.utils.logThatThing('clicked_previous_source_button', {}, 'harvardx', 'hxat');" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" class="btn btn-default" tabindex="0" role="button" onClick="AController.utils.logThatThing('clicked_previous_source_button', {}, 'harvardx', 'hxat');" id="prev_target_object" aria-label="Move to previous document"><i class="glyphicon glyphicon-chevron-left"></i> Previous</a>
                 {% endif %}
                 {% if prev_object or next_object %}
                     <div class="pages" aria-label="You are in document {{assignment_target.order}} out of {{assignment.assignment_objects.count}}.">{{assignment_target.order}} / {{ assignment.assignment_objects.count }}</div>
                 {% endif %}
                 {% if next_object %}
-                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?resource_link_id={{resource_link_id}}&utm_source={{utm_source}}" class="btn btn-default" onclick="AController.utils.logThatThing('clicked_next_source_button', {}, 'harvardx', 'hxat');" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
+                    <a href="{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" class="btn btn-default" tabindex="0" onClick="AController.utils.logThatThing('clicked_next_source_button', {}, 'harvardx', 'hxat');" role="button" id="next_target_object" aria-label="Move to next document">Next <i class="glyphicon glyphicon-chevron-right"></i></a><br />
                 {% endif %}
             </div>
             
-            <div class="annotation-fullscreen" role="button" aria-label="Toggle Fullscreen Mode">
+            <div class="annotation-fullscreen clicking_allowed" tabindex="0" role="button" aria-label="Toggle Fullscreen Mode">
                 <i class="fa fa-expand"></i>
             </div>
             {% block keyboardinput %}{% endblock %}
             {% if org == "HARVARDX" %}
                 <div class="logo" aria-label="HarvardX Logo">
-                    <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" />
+                    <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" alt="HarvardX Logo" />
                 </div>
             {% endif %}
-            <div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-navicon"></i></div>
+            <div class="handle-button clicking_allowed" tabindex="0" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-navicon"></i></div>
         </nav>
 
         {% block mainapplication %}{% endblock %}
 
-        <section role="application" aria-label="Annotation Tool | Annotations List">
+        <section role="complementary" aria-label="Annotation Tool | Annotations List">
             <div id="dashboard" class="annotationListContainer"></div>
         </section>
     </div>
