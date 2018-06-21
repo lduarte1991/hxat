@@ -30999,7 +30999,7 @@ this._cbs.ontext(data)}};Tokenizer.prototype.reset=function(){Tokenizer.call(thi
     getAnnotationInEndpoint: function(oaAnnotation) {
       var _this = this,
       uris = [];
-      if (jQuery.isArray(oaAnnotation)) {
+      if (jQuery.isArray(oaAnnotation.on)) {
 	      oaAnnotation.on.forEach(function(value) {
 	        if (jQuery.inArray(value.full, uris) === -1) {
 	          uris.push(value.full);
