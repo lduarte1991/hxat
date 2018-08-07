@@ -231,6 +231,7 @@ LTI_SETUP = {
                 "enabled": "true",
                 "default": "enabled",
                 "text": "AnnotationsX",
+                "windowTarget": "_blank"
             }
         }
     }
