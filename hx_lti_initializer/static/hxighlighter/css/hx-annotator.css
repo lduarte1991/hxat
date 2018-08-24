@@ -1,0 +1,498 @@
+:root {
+    --accent-color: #333;
+    --back-color: #fff;
+    --light-font-folor: #fff;
+    --accent-font-color: #888;
+    --dark-font-color: #000;
+
+    --nav-bar-offset: 0px;
+
+    --sidebar-width: 400px;
+    --sidebar-background: #fff;
+    --sidebar-border: 2px solid darkgray;
+    --sidebar-button-back: #fff;
+    --sidebar-button-back-accent: #fff;
+    --sidebar-button-color: #000;
+    --sidebar-button-color-accent: #666;
+
+}
+
+/* target css */
+.annotation-slot {
+    width: 90%;
+    width: calc(100% - var(--sidebar-width));
+    margin-left: 50px;
+    margin-bottom: 70px;
+    background: white;
+    padding: 20px;
+    border: 2px solid rgba(88, 88, 88, 0.1);
+}
+
+.hxighlighter-container {
+    background: rgb(249, 250, 253);
+    padding-top: 70px;
+    padding-bottom: 1px;
+}
+
+/* highlighter */
+.annotator-hl {
+    cursor: pointer;
+}
+
+/* floating viewer - adder */
+
+.annotator-adder.annotator-invert-y{
+    margin-top: 8px;
+    background-position: right bottom;
+}
+
+.annotator-adder.annotator-invert-y:hover{
+    background-position: center bottom;
+}
+
+.annotator-adder.annotator-invert-y:active{
+    margin-top: 8px;
+    background-position: left bottom;
+}
+
+
+/* floating viewer - editor and viewer */
+
+.annotation-editor.annotator-invert-y {
+    margin-top: -277px;
+}
+
+.annotation-viewer.annotator-invert-y  {
+    margin-top: -235px;
+}
+
+.annotation-editor.annotator-invert-x, .annotation-viewer.annotator-invert-x {
+    margin-left: -210px;
+}
+
+.annotation-editor, .annotation-viewer {
+    position: fixed;
+    width: 400px;
+    min-height: 200px;
+    border: 1px solid var(--accent-color);
+    background: var(--back-color);
+    box-shadow: 5px 5px 3px #888;
+    z-index: 9999;
+}
+
+.annotation-editor {
+    min-height: 237px;
+}
+
+.note-toolbar.btn-toolbar {
+    cursor: move;
+}
+
+.annotation-editor textarea#annotation-text-field {
+    width: 100%;
+    min-height: 165px;
+    margin: 0;
+}
+
+.annotation-editor .annotation-editor-nav-bar, .annotation-viewer .annotation-viewer-nav-bar {
+    height: 25px;
+    position: relative;
+    background: var(--accent-color);
+    text-align: right;
+}
+
+.annotation-editor .annotation-editor-nav-bar, .annotation-viewer.static .annotation-viewer-nav-bar {
+    cursor: move;
+}
+
+.annotation-editor .annotation-editor-nav-bar button, .annotation-viewer .annotation-viewer-nav-bar button{
+    display: inline;
+    background-color: var(--accent-color);
+    border: 0;
+    color: var(--light-font-folor);
+}
+
+.annotation-viewer .delete, .annotation-viewer .edit {
+    background-color: var(--back-color);
+    border: 0;
+    color: var(--dark-font-color);
+    display: inline-block;
+}
+
+.annotation-viewer .delete:focus, .annotation-viewer .edit:focus {
+    outline: none;
+}
+
+.annotation-viewer .delete:hover, .annotation-viewer .edit:hover {
+    border: 0;
+    color: var(--accent-font-color);
+}
+
+.annotation-text-field {
+    padding: 15px;
+    overflow-y: scroll;
+    max-height: 200px;
+
+}
+
+.annotation-text-field .annotation-username {
+    font-weight: bold;
+    border-top: 1px solid var(--accent-font-color);
+    padding-top: 10px;
+    margin-top: -10px;
+}
+
+.annotation-text-field .annotation-date {
+    font-size: 8pt;
+    color: var(--dark-font-color);
+}
+
+.annotation-text-field .annotation-date:before{
+    content: "(";
+}
+
+.annotation-text-field .annotation-date:after{
+    content: ")";
+}
+
+.annotation-text-field .annotation-quote {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    padding-left: 10px;
+    padding-right: 20px;
+    color: var(--accent-font-color);
+    border-left: 2px solid var(--accent-color);
+    font-size: 8pt;
+}
+
+.annotation-text-field .annotation-text {
+    margin-bottom: 20px;
+}
+
+.annotation-text-field .annotation-tag {
+    padding: 5px;
+    border: 1px solid var(--dark-font-color);
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.annotation-tags {
+    margin-bottom: 0px;
+}
+
+.annotation-replies {
+    margin-bottom: 20px;
+}
+
+
+/* sidebar viewer css */
+
+.annotationSection.side {
+    position: fixed;
+    top: var(--nav-bar-offset);
+    right: 0;
+    left: auto;
+    width: 300px;
+    width: calc(var(--sidebar-width) - 100px);
+    min-width: 150px;
+    height: 100%;
+    height: calc(100% - var(--nav-bar-offset));
+    padding: 5px;
+    overflow-x: hidden;
+    background: var(--sidebar-background);
+    overflow-y: auto; /* let the browser control when to show/hide the scrollbar based on the content */
+    -moz-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    -webkit-box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    box-shadow: -4px 0px 4px rgba(0,0,0,0.3);
+    padding-top: 60px;
+    /* For videojs */
+    z-index: 999;
+    /* For IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=270, Color='rgba(0,0,0,0.3)')";
+}
+
+.annotationSection .annotation-viewer-side .delete, .annotation-viewer-side .edit {
+    background: var(--sidebar-button-back);
+    outline: 0;
+    border: 0;
+    color: var(--sidebar-button-color);
+}
+
+.annotationSection .annotation-viewer-side .delete:hover, .annotation-viewer-side .edit:hover {
+    background: var(--sidebar-button-back-accent);
+    color: var(--sidebar-button-color-accent);
+}
+
+.annotationSection .annotationsHolder {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.annotationSection .annotationsHolder .annotation-viewer-side {
+    height: 100%;
+}
+
+.annotationSection .annotationsHolder .annotation-viewer-side .annotation-text-field {
+    max-height: 100%!important;
+}
+
+.annotationSection .annotationsHolder .annotationItem {
+    border: 2px solid rgba(88, 88, 88, 0.2);
+    padding: 10px;
+    margin-top: 17px;
+}
+
+.annotationSection .annotationsHolder .annotationItem .annotatedBy{
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+.annotationSection .annotationsHolder .annotationItem .quote{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    padding-left: 10px;
+    padding-right: 20px;
+    color: var(--accent-font-color);
+    border-left: 2px solid var(--accent-color);
+    font-size: 8pt;
+}
+
+.annotationSection .annotationsHolder .annotationItem .body {
+    margin-bottom: 10px;
+}
+
+.annotationSection .annotationsHolder .annotationItem .annotation-tag{
+    padding: 5px;
+    border: 1px solid var(--dark-font-color);
+    display: inline-block;
+}
+
+button.sidebar-button {
+    position: absolute;
+    background: black;
+    width: 101px;
+    color: white;
+    top: 0;
+    border: 0;
+}
+
+button.sidebar-button#create-annotation-side{
+    left: 0px;   
+}
+
+button.sidebar-button#search {
+    left: 102px;
+}
+
+button.sidebar-button#hide_label {
+    left: 203.5px;
+}
+
+.annotation-filter-buttons.btn-group {
+    position: absolute;
+    top: 24px;
+    left: 0;
+}
+
+.btn.user-filter {
+    border-radius: 0;
+    background: white;
+    border: 1px solid rgb(160, 216, 242);
+    width: 101px;
+    color: rgb(17, 118, 178);
+    position: absolute;
+}
+
+.btn.user-filter.selected {
+    background: rgb(17, 118, 178);
+    color: white;
+    font-weight: bold;
+}
+
+.btn.user-filter#mynotes {
+    left: 0px;
+}
+
+.btn.user-filter#instructor {
+    left: 103px;
+}
+
+.btn.user-filter#public {
+    left: 204.5px;
+}
+
+/* plugins */
+.token-input-input-token input {
+    width: 100%!important;
+}
+
+.popover, .tooltip {
+    z-index: 99999;
+}
+
+.btn.btn-primary.save.action-button, .btn.btn-default.cancel.action-button {
+    width: 197px;
+    border-radius: 0;
+}
+
+.note-btn.btn {
+    background: white;
+}
+
+.note-popover .popover-content .dropdown-menu, .card-header.note-toolbar .dropdown-menu {
+    min-width: 152px!important;
+}
+
+.search-bar .input-group .input-group-btn {
+    width: 120px;
+}
+
+#search-submit, #search-clear {
+    width: 50%;
+    border-radius: 0;
+}
+
+#tag-search-alert {
+    padding: 10px;
+    font-size: 8pt;
+    border: 1px dashed black;
+    cursor: pointer;
+    background: rgba(88,88,88,0.1);
+}
+
+
+/* misc */
+div[class^="reply-list"] {
+    cursor: pointer;
+}
+
+.reply-row:nth-child(odd) {
+    background: rgb(240, 240, 240);
+}
+
+button[id^="replies-close"], div[id^="create-reply"] button {
+    width: 100%;
+    margin-top: 5px;
+    /* margin-bottom: 5px; */
+    background: darkred;
+    color: white;
+    margin-bottom: 5px;
+}
+
+div[id^="create-reply"] button {
+    background: darkblue;
+}
+
+/* Full screen
+---------------------------------------------------------------------------- */
+html:-webkit-full-screen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:-moz-full-screen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:-ms-fullscreen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+html:fullscreen {
+  height: 100%;
+  left: 0;
+  margin: 0;
+  top: 0;
+  width: 100%;
+  background-color:white;
+}
+
+.for-screen-readers-only {
+    margin-left:-9999px;
+    margin-top:-9999px;
+}
+
+@supports (not(--value: 0)) {
+    /* CSS variables not supported */
+
+    /* target css */
+    .annotation-slot {
+        width: 90%;
+        width: calc(100% - 400px);
+    }
+
+    .annotation-editor, .annotation-viewer {
+        border: 1px solid black;
+        background: white;
+    }
+
+    .annotation-editor .annotation-editor-nav-bar, .annotation-viewer .annotation-viewer-nav-bar {
+        background: #333;
+    }
+
+    .annotation-editor .annotation-editor-nav-bar button, .annotation-viewer .annotation-viewer-nav-bar button{
+        background-color: #333;
+        color: white;
+    }
+
+    .annotation-viewer .delete, .annotation-viewer .edit {
+        background-color: white;
+        color: black;
+    }
+
+    .annotation-viewer .delete:hover, .annotation-viewer .edit:hover {
+        color: #666;
+    }
+
+    .annotation-text-field .annotation-username {
+        border-top: 1px solid black;
+    }
+
+    .annotation-text-field .annotation-date {
+        color: #333;
+    }
+
+    .annotation-text-field .annotation-quote {
+        color: #555;
+    }
+
+    .annotation-text-field .annotation-tag {
+        border: 1px solid black;
+    }
+
+    .annotationSection.side {
+        top: 50px;
+        height: calc(100% - 50px);
+    }
+
+    .annotation-viewer-side .delete, .annotation-viewer-side .edit {
+        background: white;
+        color: black;
+    }
+
+    .annotation-viewer-side .delete:hover, .annotation-viewer-side .edit:hover {
+        color: #666;
+    }
+
+    /* sidebar */
+
+    .annotationSection .annotationsHolder .annotationItem .quote{
+        border-left: 2px solid var(--accent-color);
+    }
+}

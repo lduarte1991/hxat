@@ -1,0 +1,69 @@
+<div class="resize-handle side">
+    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->
+</div>
+<div class="annotationSection side">
+    <div>
+        <button class="sidebar-button" id='create-annotation-side'><i class="fa fa-edit"></i></button>
+        <button class="sidebar-button" id="hide_label" id="sidebar-hide-sidebar-instructions" onclick="jQuery('.annotationSection.side').hide();"><i class="fa fa-bars"></i></button>
+        <button class="sidebar-button" id="search" id="sidebar-search"><i class="fa fa-search"></i></button>
+    </div>
+    <div class="group-wrap">
+        <div class="annotation-filter-buttons btn-group">
+            <% if (show_mynotes_tab === "True") {%>
+        	<button type="button" class="btn user-filter" id='mynotes' aria-label="View only my annotations" role="button">My Notes</button>
+            <% } %>
+            <% if (show_instructor_tab === "True") {%>
+            	<button type="button" class="btn user-filter" id='instructor' aria-label="View only instructor annotations" role="button">Instructor</button>
+            <% } %>
+            <% if (show_public_tab === "True") {%>
+        	<button type="button" class="btn user-filter" id='public' aria-label="View everybody's annotations" role="button">Public</button>
+            <% } %>
+        </div>
+    </div>
+    <div class="separator-solid side"></div>
+    <!-- <div class="filter-options side search-toggle" style='display:none;'>
+        <div class="search-label">Search by:</div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>
+            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>
+            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>
+        </div>
+    </div> -->
+    <div class="search-bar side search-toggle" style='display:none;'>
+        <div id="search-info" style="display:none">The following allows you to search annotations. The default filter is to search for a username, but make sure to change filter to annotation text or tag for other types of searches.</div>
+    	<div class="input-group">
+            <label for="srch-term" id="searchlabel" class="hidden">Search annotations:</label>
+            <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" aria-describedby="search-info" aria-labeledby="searchlabel">
+            <div class="input-group-btn">
+                <select class="form-control">
+                    <option>User</option>
+                    <option>Annotation</option>
+                    <option>Tag</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group-btn">
+                <button title="Search" class="btn btn-default" type="submit" id="search-submit" role="button" aria-label="Submit search"><i class="glyphicon glyphicon-search"></i></button>
+                <button title="Clear" class="btn btn-default" type="clear" id="search-clear" role="button" aria-label="Clear search input"><i class="glyphicon glyphicon-ban-circle"></i></button>
+            </div>
+        <div id="timeRangeFilter" style="display:none; color:white; margin-top:15px; margin-bottom:-30px">
+            <label for="startTimeFilter">Start:</label> <input type="text" id="startTimeFilter" style="display:inline; width:20%; color: black;" value="0:00"/>
+            <label for="endTimeFilter">End:</label> <input type="text" id="endTimeFilter" style="display:inline;width:20%; color: black;" value="0:00"/>
+        </div>
+    </div>
+    <div class="handleAnnotations" style="display:none">
+        <div id="printAnnotations"> <i class="fa fa-print"></i>   Print My Notes</div>
+        <div id="exportAnnotations"> <i class="fa fa-cloud-download"></i> Export</div>
+        <div id="importAnnotations"> <i class="fa fa-cloud-upload"></i> Import</div>
+    </div>
+    <div class="annotationsHolder side" role="list" aria-label="Annotations" >
+		<% _.each(annotationItems, function(item) { %>
+			<%= item %>
+		<% }); %>
+        <% if (annotationItems.length == 0) { %>
+            <div id='empty-alert' style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>
+        <% } else {%>
+             <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>
+        <% } %>
+	</div>
+</div>

@@ -1,0 +1,31 @@
+<div class="annotation-viewer" id="annotation-viewer-<%= viewerid %>">
+    <nav class='annotation-viewer-nav-bar'>
+        <button class="cancel" tabindex="0" aria-label="Close Viewer" tile="Close Viewer"><i class="fa fa-close"></i></button>
+    </nav>
+    <div class="plugin-area-top">
+    </div>
+    <div class="annotation-text-field">
+        <% _.each(annotations, function(ann){ %>
+            <div class="ann-item annotationItem" id="annotation-<%= ann.id %>">
+                <div class="annotation-username">lduarte1991</div>
+                <div class="annotation-date">last updated 2 hours ago</div>
+                <button class="edit" id="edit-<%= ann.id %>" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fa fa-pencil"></i></button>
+                <button class="delete" id="delete-<%= ann.id %>" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>
+                <div class="annotation-quote"><%= ann.exact %></div>
+                <div class="annotation-text"><%= ann.annotationText %></div>
+                <% if (ann.tags && ann.tags.length > 0) { %>
+                    <div class="annotation-tags">
+                        Tags: 
+                        
+                        <% _.each(ann.tags, function(tag){ %>
+                            <div class="annotation-tag"><%= tag %></div>
+                        <% }); %>
+                    </div>
+                <% } %>
+                <div class="annotation-plugin-area-bottom"></div>
+            </div>
+        <% }); %>
+    </div>
+    <div class="plugin-area-bottom">
+    </div>
+</div>

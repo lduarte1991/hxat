@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Each page should have its own title -->
+        <title>HxAT v2</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- This currently uses bootstrap so as to work with summernote -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <!-- Font Awesome Icons are used throughout -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <!-- custom css for HXAT outside of the annotator stuff that is already inlined in js -->
+        <link href='css/custom-hx-annotator.css' rel="stylesheet" type="text/css">
+        <link href='css/summernote.css' rel="stylesheet" type="text/css">
+        <link href='css/summernote-bs3.css' rel="stylesheet" type="text/css">
+        <link href='css/summernote-richtext-annotator.css' rel="stylesheet" type="text/css">
+        <link href='css/token-input.css' rel="stylesheet" type="text/css">
+
+    </head>
+    <body>
+        <nav id="navigation_bar" aria-label="Annotation Tool Navigation Bar" class="annotation-navigation">
+            <button id="sidebar_button" title="Toggle Annotation List Sidebar" aria-label="Toggle Annotation List Sidebar" class="annotation-navigation-button">
+                <i class="fa fa-navicon" role="presentation"></i>
+            </button>
+        </nav>
+
+        <!--Each container wil follow depending on set up. Default is to have
+            them one after the other, but "side-by-side" can be achieved by
+            using CSS.-->
+        <div id="container" class="annotation-slot">
+            
+        </div>
+
+        <!-- you need jQuery and very very slimmed-down version of annotator-->
+        <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous" type="text/javascript"></script>
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    </body>
+</html>

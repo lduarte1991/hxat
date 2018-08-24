@@ -1,0 +1,12 @@
+.annotation-editor textarea.note-editable{
+	background-color:white;
+	overflow: auto;
+}
+
+.annotation-editor textarea.note-codable {
+	display: none;
+}
+
+.annotation-editor textarea.note-dropzone {
+	display: none;
+}

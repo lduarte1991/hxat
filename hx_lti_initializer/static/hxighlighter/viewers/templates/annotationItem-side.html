@@ -1,0 +1,70 @@
+<div class="annotationItem item-<%= id %> side" role="listitem" aria-label="Annotation #<%=index%>">
+    <div style="overflow:auto;">
+    <span class="idAnnotation" style="display:none;"><%= id %></span>
+    <% if (typeof(user) !== 'undefined') { %>
+    <div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">     
+        <%= user.name %>
+        <% } else { %>
+        <div class= "annotatedBy field side" aria-label="Annotation created by lduarte1991">
+        lduarte1991
+        <% } %>
+    </div>
+    <% if( typeof(updated) !== 'undefined') { %>
+        <% var date = new Date(updated); %>
+        <div class="annotatedAt field side" title="<% print(date) %>" aria-label="last updated <% print(jQuery.timeago(date)); %>">
+            last updated <% print(jQuery.timeago(date)); %>
+        </div>
+    <% } %>
+    </div>
+    <% if (media === 'text') {%>
+        <div class="quote field side">
+            <div class="quoteText" aria-label="Excerpt selected for this annotation:"><%= exact %></div>
+        </div>
+    <% } else if (media === 'image' && thumbnail) {%>
+        <div class="zoomToImageBounds" style='position:relative;'>
+            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="<%= thumbnail %>" onError="this.onerror=null;this.src='/static/css/images/image-error.png';" data-svg=".thumbnail-<%= id %>" alt="Thumbnail Preview"/>
+            <% if (typeof(svg) !== "undefined") { %>
+                <%= svg %>
+            <% } %>
+            <span class="idAnnotation" style="display:none"><%= id %></span>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    <% } else if (media === "video") {%>
+        <div class="playMediaButton" style="text-align:center;">
+            <div class="btn btn-default" style="text-align:center;margin-top:20px;">
+                Segment <%= rangeTime.start %> - <%= rangeTime.end %>
+            </div>
+            <span class="idAnnotation" style="display:none"><%= id %></span>
+            <span class="uri" style="display:none"><%= uri %></span>
+        </div>
+    <% } %>
+    <div style="display:none;" id="annotationTextLabel">Annotation text</div>
+    <div class="body field side" aria-label="Comment: <%- annotationText.replace(/"/g, '&quot;') %>">
+        <% if (typeof annotationText !== 'undefined') {%>
+            <%= annotationText %>
+        <% } %>
+    </div>
+    <% if (typeof tags !== "undefined") { %>
+        <div class="tagList field side">
+            <% _.each(tags, function(tagItem){ %>
+                <div class="annotation-tag side" aria-label="tag: <%- tagItem.replace(/"/g, '&quot;') %>">
+                    <%= tagItem %>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+
+    <div class="annotation-plugin-area-bottom"></div>
+
+    <!-- <div class="totalreplies field side clicking_allowed" tabindex="0" role="button" aria-label="Make or view replies Annotation #<%=index %>">
+        <span class="glyphicon glyphicon-comment"></span>
+        <% if (typeof(replyCount) == "undefined") { %>
+        <span class="replyNum"> 0 </span>
+        <% } else { %>
+        <span class="replyNum"> <%= replyCount %> </span>
+        <% } %>
+    </div> -->
+    <script>
+        jQuery('.annotationItem.item-<%= id %>.side').data('annotation')
+    </script>
+</div>
