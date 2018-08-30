@@ -110,3 +110,10 @@ a#next_target_object {
     width: 425px;
     margin-left: 10px;
 }
+
+/* accessibility */
+#hxat-alert, #hat-status, #text-content-notifications {
+	float: left;
+	margin-top: -999999px;
+	margin-left: -999999px;
+}
