@@ -318,7 +318,7 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
-        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', ''):
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
         return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
     def create(self):
