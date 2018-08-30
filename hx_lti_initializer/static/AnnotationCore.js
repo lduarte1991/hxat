@@ -224,6 +224,7 @@
             "left": "0",
             "z-index": "999"
         });
+        overlaybckg.id = 'hx-temp-overlay';
         jQuery(overlaydialog).css({
             "background-color": "white",
             "width": "500px",
@@ -241,7 +242,7 @@
         jQuery(overlaybckg).append(overlaydialog);
         jQuery("body").append(overlaybckg);
         jQuery('#ignorewarning').click(function(){
-            jQuery(overlaybckg).remove();
+            jQuery('#hx-temp-overlay').remove();
         });
 	}
 
