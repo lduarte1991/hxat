@@ -302,8 +302,8 @@ button#hideParent {
 
 .offscreen {
     position: absolute;
-    top: -9999999999999;
-    left: -999999999999;
+    top: -9999999999999px;
+    left: -999999999999px;
 }
 
 .annotationModal .idAnnotation {

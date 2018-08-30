@@ -1307,3 +1307,10 @@ progress[value]::-webkit-progress-value {
 	text-decoration: none;
 	cursor: pointer;
 }
+
+/* accessibility */
+#hxat-alert, #hat-status, #text-content-notifications {
+    float: left;
+    margin-top: -999999px;
+    margin-left: -999999px;
+}
