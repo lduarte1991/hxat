@@ -88,6 +88,7 @@ Annotator.Plugin.SummernoteRichText.prototype.submitEditor = function(field, ann
 	var result = $('#annotator-field-0').code();
 	if (result.indexOf('<script') >= 0) {
         alert('Content contains JavaScript code that will be escaped and ignored.');
-        annotation.text = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;').replace('>', '&gt;');
+        result = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;').replace('>', '&gt;');
     }
+    annotation.text = result;
 };

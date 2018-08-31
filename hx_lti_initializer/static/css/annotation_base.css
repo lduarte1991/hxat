@@ -95,6 +95,10 @@ a#next_target_object {
 	cursor: pointer;
 }
 
+.author-label {
+	margin-bottom: 20px;
+}
+
 .vjs-control-bar {
 	z-index: 99;
 }
