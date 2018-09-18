@@ -174,7 +174,7 @@ def launch_lti(request):
 
             # create and save a new course for the instructor, with a default name of their canvas course's name
             context_title = None
-            if request.LTI['launch_params']['context_title'] is not None:
+            if 'context_title' in request.LTI['launch_params']:
                 context_title = request.LTI['launch_params']['context_title']
             course_object = LTICourse.create_course(course, lti_profile, name=context_title)
             create_new_user(anon_id=str(course), username='preview:%s' % course_object.id, display_name="Preview %s" % str(course_object), roles=['student'], scope=user_scope)

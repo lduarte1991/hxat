@@ -454,7 +454,7 @@ footer {
 	font-weight: bold;
 }
 
-.form-group label.course_name, .edit_course_subheading, .subheading {
+.form-group label.course_name, .edit_course_subheading, .subheading, .form-group label.edit_course_subheading {
 	font-size: 11pt;
 	color: rgb(107, 107, 107);
 	font-weight:normal;
@@ -677,7 +677,7 @@ p.help {
 
 .save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button, .save#import-button {
 	color: white;
-	background-color: rgb(55, 124, 182);
+	background-color: #285b85;
 }
 
 .save#save-button:hover, .save#annotation-settings-save-button:hover, .save#database-settings-cancel-button:hover, .save#source-save-button:hover, .save#import-button:hover {
@@ -827,6 +827,7 @@ p.help {
 
 #create-new-source-button {
 	margin-left: 10px;
+	color: #1f496e;
 }
 
 .source-detail {
@@ -1304,4 +1305,12 @@ progress[value]::-webkit-progress-value {
 
 .make-starting-resource {
 	text-decoration: none;
+	cursor: pointer;
+}
+
+/* accessibility */
+#hxat-alert, #hat-status, #text-content-notifications {
+    float: left;
+    margin-top: -999999px;
+    margin-left: -999999px;
 }

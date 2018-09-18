@@ -3,6 +3,7 @@
 {% load staticfiles %}
 {% load list_of_ids %}
 {% block beginningscripts %}
+<script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
 <script src="{% static "vendors/mirador/mirador.js" %}"></script>
 {% endblock %}
 
@@ -24,23 +25,6 @@
 <style type="text/css">
     #viewer { position: fixed; width: 100%; height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
 </style>
-<style type="text/css">
-#home{
-  font-size: 2.5em !important;
-}
-.pages{
-  font-size: 2.5em !important;
-}
-.annotation-fullscreen{
-  font-size: 2.5em !important;
-  margin-right: 60px !important;
-}
-
-.handle-button {
-  font-size: 2.5em !important;
-}
-
-</style>
 {% endblock %}
 
 {% block tokeninputcss %}
@@ -48,11 +32,15 @@
 {% endblock %}
 
 {% block keyboardinput %}
-<div style="margin-right: 30px; float:right; margin-top:3px;font-size:3em; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
+<div style="margin-right: 30px; float:right; margin-top:3px;font-size:2em; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
 {% endblock %}
 
 {% block mainapplication %}
-<section role="application" aria-label="Annotation Tool Image Content" style="position:absolute; top:50px; height: 100%; height: calc(100% - 50px);">
+<section role="main" aria-label="Annotation Tool Image Content" style="position:absolute; top:50px; height: 100%; height: calc(100% - 50px);">
+  <h3 class='offscreen'>Image to be Annotated</h3>
+  <div id="text-content-notifications" aria-live="assertive"></div>
+  <div id="hxat-status" role="alert"></div>
+  <div id="hxat-alert" role="alert"></div>
   <div id="viewer" class="test">
   </div>
 </section>

@@ -33,6 +33,8 @@ Annotator.Plugin.SummernoteRichText.prototype.pluginInit = function() {
 	self.annotator.subscribe("annotationEditorShown", function() {
 		// checks to make sure it can fit on screen
 		$('#annotator-field-0').summernote(self.options);
+		delete $.summernote.options.keyMap.pc.TAB;
+		delete $.summernote.options.keyMap.mac.TAB;
 		self.checkOrientation();
 
 		// then it will restart summernote, otherwise it may cause all <li> to have Save
@@ -83,8 +85,10 @@ Annotator.Plugin.SummernoteRichText.prototype.updateViewer = function(field, ann
 };
 
 Annotator.Plugin.SummernoteRichText.prototype.submitEditor = function(field, annotation) {
-	var text = $('#annotator-field-0').code();
-	if (annotation.text !== text) {
-        annotation.text = text;
-	}
+	var result = $('#annotator-field-0').code();
+	if (result.indexOf('<script') >= 0) {
+        alert('Content contains JavaScript code that will be escaped and ignored.');
+        result = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;').replace('>', '&gt;');
+    }
+    annotation.text = result;
 };

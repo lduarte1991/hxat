@@ -81,7 +81,14 @@ class AnnotationStore(object):
         self._verify_course(self.request.GET.get('contextId', None))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
-        return self.backend.search()
+        response = self.backend.search()
+        if hasattr(self.backend, 'after_search'):
+            # to give participation grades retroactively after instructor
+            # forgets to turn it on initially
+            is_graded = self.request.LTI.get('is_graded', False)
+            if is_graded and self.backend.after_search(response):
+                self.lti_grade_passback(is_graded=is_graded, status_code=response.status_code, restul_score=1)
+        return response
 
     def create(self):
         body = json.loads(self.request.body)
@@ -309,6 +316,10 @@ class CatchStoreBackend(StoreBackend):
             return self._response_timeout()
         self.logger.info('search response status_code=%s content_length=%s' % (response.status_code, response.headers.get('content-length', 0)))
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def after_search(self, response):
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
+        return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
     def create(self):
         body = self._get_request_body()

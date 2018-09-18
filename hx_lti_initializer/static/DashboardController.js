@@ -118,6 +118,7 @@
 		jQuery('button#search-submit').click(function (e) {
 			var text = jQuery('#srch-term').val();
 			var search_filter = self.viewer.getSelectedFilterValue().attr("id");
+			jQuery('#hxat-alert').html('Search has been completed. Traverse filtered list below.');
 			if (search_filter === "users-filter"){
 				self.endpoint.queryDatabase({
 					"username": text,
@@ -139,6 +140,7 @@
 		jQuery('button#search-clear').click(function (e) {
 			jQuery('#srch-term').val("");
 			self.viewer.getSelectedTabValue().trigger("click");
+			jQuery('#hxat-alert').html('Search has been cleared. List below shows all annotations.');
 		});
 
 		var annotationClicked = self.__bind(self.annotationClicked, self);

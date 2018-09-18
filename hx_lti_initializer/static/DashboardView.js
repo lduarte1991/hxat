@@ -165,6 +165,7 @@
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
+            jQuery('.annotationSection').focus();
         });
 
         jQuery('.annotationModal #importarea').click( function(e) {
@@ -511,6 +512,7 @@
                 section.css('right', '-5px');
                 jQuery('.modal-navigation').addClass('hidden'); 
                 jQuery('.editgroup').addClass('hidden');
+                jQuery('#hxat-alert').html('Sidebar has been hidden');
             } else {
                 AController.utils.logThatThing('toggled_sidebar', {'opening': true}, 'harvardx', 'hxat');
                 jQuery('#leftCol').attr('class', 'col-xs-7');
@@ -520,6 +522,7 @@
                 section.css('right', '0px');
                 jQuery('.modal-navigation').removeClass('hidden'); 
                 jQuery('.editgroup').removeClass('hidden');
+                jQuery('#hxat-alert').html('Sidebar is now being shown.');
             }
             handle.find('i').toggleClass('fa-arrow-right');
             handle.find('i').toggleClass('fa-arrow-left');
@@ -716,6 +719,7 @@
             jQuery('.annotationsHolder').removeClass("hidden");
             jQuery('.annotationModal').remove();
             jQuery('.annotationSection').scrollTop(saved_section_scrolltop);
+            jQuery('.item-' + annotationItem.id + ' .totalreplies').focus();
         });
         jQuery('.annotationModal #hideParent').click( function (e) {
             jQuery('.parentAnnotation').toggleClass("hidden");
@@ -793,6 +797,7 @@
             onConfirm: function (){
                 if(annotationItem.authToDeleteButton) {
                     self.initOptions.endpoint.deleteAnnotation(annotation);
+                    jQuery('#hxat-alert').html('Annotation has been deleted');
                 }
             },
         });
@@ -800,7 +805,10 @@
         jQuery('.annotationModal svg').show();
         if (annotationItem.tags && annotationItem.tags.length > 0) {
             var tagColor = this.getAnnotationColor(annotationItem);
-            var cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
+            var cssColor = "";
+            if (typeof tagColor !== "undefined") {
+                cssColor = "rgba(" + tagColor.red + ", " + tagColor.green + ", " + tagColor.blue + ", 1)";
+            }
             jQuery('.annotationModal svg path').attr('stroke', cssColor);
             if (typeof(annotationItem.svg) === "undefined" ) {
                 jQuery('.annotationModal.item-modal-' + annotationItem.id.toString() + ' .zoomToImageBounds img').css('border', '3px solid ' + cssColor);
@@ -874,6 +882,7 @@
         jQuery('.annotationModal #closeModal').focus();
         jQuery('.annotationModal #closeModal').click( function (e) {
             jQuery('.annotationModal').remove();
+            jQuery('.annotation-instructions').focus();
         });
     };
 

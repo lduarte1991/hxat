@@ -9,6 +9,9 @@
  */
 
 window.AController = window.AController || function(options) {
+	AController.accessibility = new AController.Accessibility({
+		'triggerClicks': ['.clicking_allowed']
+	});
 	if (typeof options.targetObjectOptions !== "undefined") {
 		AController.targetObjectController = new AController.TargetObjectController(options.targetObjectOptions, options.commonInfo);
 	}
@@ -21,5 +24,6 @@ window.AController = window.AController || function(options) {
 		AController.dashboardObjectController = new AController.DashboardController(options.dashboardControllerOptions, options.commonInfo, AController.dashboardView);
 	}
 	AController.main = new AController.AnnotationMain(options);
-	AController.utils = new AController.Utils(options.commonInfo.logger_url);
-}
+	var logger_url = options.commonInfo.logger_url || "";
+	AController.utils = new AController.Utils(logger_url);
+};
