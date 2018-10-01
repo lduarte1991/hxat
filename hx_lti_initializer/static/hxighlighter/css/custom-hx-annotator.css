@@ -281,6 +281,16 @@
 ********/
 /* Side Dashboard */
 
+.handle-button {
+    position: absolute;
+    float: right;
+    top: 5px;
+    right: 15px;
+    font-size: 2em;
+    color: white;
+    cursor: pointer;
+}
+
 .annotationSection.side{
 	position: fixed;
 	top: 50px;

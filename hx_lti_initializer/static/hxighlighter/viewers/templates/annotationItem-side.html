@@ -16,6 +16,8 @@
         </div>
     <% } %>
     </div>
+    <button class="edit" id="edit-<%= id %>" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fa fa-pencil"></i></button>
+                <button class="delete" id="delete-<%= id %>" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>
     <% if (media === 'text') {%>
         <div class="quote field side">
             <div class="quoteText" aria-label="Excerpt selected for this annotation:"><%= exact %></div>

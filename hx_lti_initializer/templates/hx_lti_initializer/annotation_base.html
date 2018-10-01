@@ -19,7 +19,7 @@
         {% block cssfiles %}{% endblock %}
 
         {# library for dashboard templates #}
-        <script src="{% static "vendors/development/underscore.js" %}"></script>
+       <!--  <script src="{% static "vendors/development/underscore.js" %}"></script>
         {# library for "last updated X hours ago" for annotations #}
         <script src="{% static "vendors/development/jquery.timeago.js" %}"></script>
         {# library to guess timezone of user #}
@@ -32,18 +32,18 @@
 
         {# files needed to run the HxAT #}
         <script src="{% static "AController.js" %}"></script>
-        <script src="{% static "AnnotationMain.js" %}"></script>
+        <script src="{% static "AnnotationMain.js" %}"></script> -->
         {% block annotationCore %}{% endblock %}
-        <script src="{% static "AnnotationStoreController.js" %}"></script>
+        <!-- <script src="{% static "AnnotationStoreController.js" %}"></script>
         <script src="{% static "DashboardController.js" %}"></script>
         <script src="{% static "DashboardView.js" %}"></script>
         <script src="{% static "TargetObjectController.js" %}"></script>
         <script src="{% static "utilities.js" %}"></script>
-        <script src="{% static "accessibility.js" %}"></script>
+        <script src="{% static "accessibility.js" %}"></script> -->
 
         {# stylesheet for icons, dashboard and instructions #}
-        <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
-        <link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+        <!-- <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+        <link rel="stylesheet" href="{% static "css/dashboard.css" %}"> -->
         <link rel="stylesheet" href="{% static "css/instructions.css" %}">
         <link rel="stylesheet" href="{% static "css/annotation_base.css" %}">
 
@@ -92,64 +92,64 @@
 
     <script>
         // options for the HxAT
-        var options = {
+        // var options = {
 
-            // this info will be shared among the various sections of the tool
-            commonInfo: {
-                context_id: "{{ course }}",
-                collection_id: "{{ collection }}",
-                object_id: {{ object }},
-                token: "{{ token }}",
-                username: "{{ username }}",
-                user_id: "{{ user_id }}",
-                is_instructor: "{{ is_instructor }}",
-                pagination: {{ assignment.pagination_limit }},
-                logger_url: "{{ logger_url }}",
-                utm_source: "{{ utm_source }}"
-            },
+        //     // this info will be shared among the various sections of the tool
+        //     commonInfo: {
+        //         context_id: "{{ course }}",
+        //         collection_id: "{{ collection }}",
+        //         object_id: {{ object }},
+        //         token: "{{ token }}",
+        //         username: "{{ username }}",
+        //         user_id: "{{ user_id }}",
+        //         is_instructor: "{{ is_instructor }}",
+        //         pagination: {{ assignment.pagination_limit }},
+        //         logger_url: "{{ logger_url }}",
+        //         utm_source: "{{ utm_source }}"
+        //     },
 
-            // this should handle the colorization of the target
-            annotationMainOptions: {
-              {% if assignment.allow_highlights %}
-              'highlightTags_options': "{{ assignment.highlights_options }}",
-              {% endif %}
-            },
+        //     // this should handle the colorization of the target
+        //     annotationMainOptions: {
+        //       {% if assignment.allow_highlights %}
+        //       'highlightTags_options': "{{ assignment.highlights_options }}",
+        //       {% endif %}
+        //     },
 
-            // this handles setting up the dashboard that collects the annotations
-            dashboardControllerOptions: {
-                annotationElement: jQuery("#dashboard"),
-                initOptions: {
-                    template_urls: '{% static "templates/dashboard/"%}',
-                    showPublicPrivateSelectors: true,
-                    showMediaSelector: false,
-                    flags: false,
-                    instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
-                    default_tab: "{{ assignment.default_tab }}",
-                    show_instructor_tab: "{{assignment.include_instructor_tab}}",
-                    show_mynotes_tab: "{{assignment.include_mynotes_tab}}",
-                    show_public_tab: "{{assignment.include_public_tab}}",
-                    instructions: "{{instructions | escapejs }}",
-                    dashboard_hidden: {{dashboard_hidden}},
-                    {% if transcript_hidden %}
-                    transcript_hidden: {{transcript_hidden}},
-                    {% endif %}
-                    {% if focus_on_id %}
-                    focus_on_annotation: {{focus_on_id}},
-                    {% endif %}
-                },
-            },
+        //     // this handles setting up the dashboard that collects the annotations
+        //     dashboardControllerOptions: {
+        //         annotationElement: jQuery("#dashboard"),
+        //         initOptions: {
+        //             template_urls: '{% static "templates/dashboard/"%}',
+        //             showPublicPrivateSelectors: true,
+        //             showMediaSelector: false,
+        //             flags: false,
+        //             instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+        //             default_tab: "{{ assignment.default_tab }}",
+        //             show_instructor_tab: "{{assignment.include_instructor_tab}}",
+        //             show_mynotes_tab: "{{assignment.include_mynotes_tab}}",
+        //             show_public_tab: "{{assignment.include_public_tab}}",
+        //             instructions: "{{instructions | escapejs }}",
+        //             dashboard_hidden: {{dashboard_hidden}},
+        //             {% if transcript_hidden %}
+        //             transcript_hidden: {{transcript_hidden}},
+        //             {% endif %}
+        //             {% if focus_on_id %}
+        //             focus_on_annotation: {{focus_on_id}},
+        //             {% endif %}
+        //         },
+        //     },
 
-            // this sets up the content itself (e.g. keyboard input)
-            targetObjectOptions: {
-                annotationElement: jQuery('#viewer'),
-                transcript_download: {{transcript_download}},
-                    video_download: {{video_download}},
-            }
-        };
+        //     // this sets up the content itself (e.g. keyboard input)
+        //     targetObjectOptions: {
+        //         annotationElement: jQuery('#viewer'),
+        //         transcript_download: {{transcript_download}},
+        //             video_download: {{video_download}},
+        //     }
+        // };
         {% block extraOptions %}
         {% endblock %}
 
-        AController(options);
+        // AController(options);
       
         {% get_lti_frame_resize_js target_type=target_object.target_type %}
 

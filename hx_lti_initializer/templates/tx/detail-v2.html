@@ -1,0 +1,175 @@
+{% extends 'hx_lti_initializer/annotation_base.html' %}
+
+{% load staticfiles %}
+{% load list_of_ids %}
+{% block beginningscripts %}
+<script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous" type="text/javascript"></script>
+{% endblock %}
+
+{% load bootstrap3 %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "hxighlighter/vendor/Annotator/annotator.ui.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ba-tiny-pubsub.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/hxelper-functions.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ui/underscore.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ui/jquery-confirm.min.js" %}"></script>
+
+<script type="text/javascript" src="{% static "hxighlighter/hxighlighter.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/targetcontroller.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/viewers/floatingviewer.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/viewers/sidebar.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/storage/local.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/storage/catchpy.js" %}"></script>
+
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ui/summernote.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/summernote-richtext-plugin.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ui/jquery.tokeninput.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/colored-token-tags-plugin.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/reply-plugin.js" %}"></script>
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="{% static "hxighlighter/css/hx-annotator.css" %}">
+
+<link rel="stylesheet" href="{% static "hxighlighter/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "hxighlighter/css/summernote-bs4.css" %}">
+<link rel="stylesheet" href="{% static "hxighlighter/css/summernote-richtext-annotator.css" %}">
+<link rel="stylesheet" href="{% static "hxighlighter/css/jquery-confirm.min.css" %}">
+{% endblock %}
+
+{% block annotationCore %}
+<script type="text/javascript" src="{% static "hxighlighter/core.js" %}"></script>
+{% endblock %}
+
+{% block tokeninputcss %}
+<link rel="stylesheet" href="{% static "hxighlighter/css/token-input.css" %}">
+{% endblock %}
+
+{% block title %}
+Annotation Tool | Text | {{ target_object.target_title }}
+{% endblock %}
+
+{% block keyboardinput %}
+<div role="button" aria-label="Use Keyboard Input to make annotations. To make an annotation, click the 'Make an Annotation' button. You will be taken to back to the content where you can add an asterisk (*) to the beginning and an asterisk(*) to the end of the area you would like to select. Make sure not to edit any other parts of the text! Then hit the 'Save Highlights' button." class="fa fa-keyboard-o clicking_allowed" title="Make annotations using keyboard input" id="keyboard-input-toggle-text" tabindex="0"></div>
+{% endblock %}
+
+{% block mainapplication %}
+<section role="main" class="hxighlighter-container" aria-label="Annotation Tool Text Content">
+  <div id="text-content-notifications" aria-live="assertive"></div>
+  <div id="hxat-status" role="alert"></div>
+  <div id="hxat-alert" role="alert"></div>
+	<div  id="viewer" class="annotation-slot test" style="padding:50px 75px;" class="fit-to-canvas">
+        <section id="make_annotations_panel" class="hidden" role="region" aria-label="Make annotations using keyboard input">
+        <h3>Instructions to Make Annotations using Keyboard Input</h3>
+          <ol>
+            <li>Move to the beginning of the text to be anotated.</li>
+            <li>Once over the text, JAWS users should click the "Left Button Key" on your keyboard, FORWARDSLASH on the NUMPAD is the default. (Note: JAWS may only read out the first and last lines of the text until you've hit the "Left Button Key")</li>
+            <li>Add an asterisk before the text you want to annotate.</li>
+            <li>Add an asterisk after the text to mark the ending of the annotation. (Note: you are only allowed 2 asterisks at a time, so make one annotation at a time).</li>
+            <li>Hit ENTER to confirm your selection and move towards the text fields to enter your comments and tags.</li>
+          </ol>
+          <div class="hidden" id="annotation-maker">
+            <label for="id_annotation_text_screen_reader">Enter annotation for highlighted section:
+                <input type="text" id="id_annotation_text_screen_reader"/>
+            </label>
+            <label for="id_annotation_tag_screen_reader">Enter tags for this annotation (separate tags with a single space):
+              <input type="text" id="id_annotation_tag_screen_reader" />
+            </label>
+          </div>
+          <button role="button" class="btn btn-default" data-toggled="false">Save Highlights</button>
+      </section>
+        <div class="btn-toolbar target-object-controls" role="toolbar" aria-label="Annotation toolbar controls">
+            <div class="btn-group" role="group" aria-label="Hide or Show Annotations">
+                <button id="annotations-status" type="button" class="btn btn-default on" aria-label="Hide Annotations">
+                    <i class="fa fa-close"></i> <span class="labeltext">Hide Annotations</span>
+                </button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Control Annotation Text Size" aria-live="polite" >
+                <div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label"></span>:</div>
+                <button aria-label="Increase font size" id="annotations-text-size-plus" type="button" class="btn btn-default" role="button">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <button aria-label="Decrease font size" id="annotations-text-size-minus" type="button" class="btn btn-default" role="button">
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="instructions-container" style="display:{% if instructions or instructions != '' %}block{% else %}none{% endif %};">
+        	<div class="instructions-title">
+            	Instructions
+	            <span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions">Collapse Instructions</span>
+          	</div>
+        	<section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">{{instructions | safe}}</section>
+        </div>
+        <h4>{{ target_object.target_title | safe }}</h4>
+	    {% if target_object.target_author != "None" %}
+		    <div class="author-label">by {{ target_object.target_author | safe }}</div>
+	    {% endif %}
+	    <div class="content annotations-section">
+		    {{ target_object.target_content | safe }}
+	    </div>
+
+	    {% if target_object.target_citation != "None" %}
+    		<div class="citation" style="margin-top:20px;">
+    			<i>{{ target_object.target_citation }}</i>
+    		</div>
+    	{% endif %}
+      </div>
+	</div>
+</section>
+{% endblock %}
+
+{% block extraOptions %}
+      var hxighlighter_object1 = {
+            "commonInfo": {
+              "mediaType": "text",
+              "context_id": "{{ course}}",
+              "collection_id": "{{ collection }}",
+              "object_id": "{{ object }}",
+              "username": "{{ username }}",
+              "user_id": "{{ user_id }}",
+              "object_source": "hxat-backend/{{course}}::{{collection}}::{{object}}",
+            },
+            "targetOptions": {
+              "method": 'html', // url - ajax to retrieve, html - already loaded in page
+              "target_selector": '.hxighlighter-container',
+            },
+            "coreOptions": {
+              "viewers": ['floating', 'sidebar'],
+              "viewersOptions": {
+                "use_external_button": true,
+                "sidebar_button_class": ".handle-button",
+              },
+              "plugins": {
+                'SummernoteRichText': {},
+                'ColoredTokenTags': {
+                  hasColors: true,
+                  tags: "tag1:red,tag2:blue"
+                },
+                'Reply': {}
+              },
+              "storageOptions": {
+                "backend": ['catchpy', 'backup', 'local'],
+                "token": "{{token}}",
+                "deleteAfterBackup": true,
+                "exportButtonSelector": '.export-temporary',
+                        "external_url": {
+                            'catchpy': 'https://catchpy.harvardx.harvard.edu/annos'
+                        }
+              },
+              "default_editor": 'floating',
+              "should_highlight": true,
+              "template_urls": '{% static "hxighlighter/viewers/templates/" %}',
+            }
+          };
+          Hxighlighter(hxighlighter_object1);
+{% endblock %}

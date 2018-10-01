@@ -15,6 +15,7 @@
             template_suffix: "v2",
             template_urls: ""
         };
+        this.name = 'Floating';
         this.options = jQuery.extend({}, defaultOptions, options);
         this.instance_id = inst_id;
         this.annotation_tool = {
@@ -35,7 +36,7 @@
                     // if pserson clicks on the adder
                     onCreate: function(annotation) {
                         // the annotation is drawn to the page
-                        hxPublish('shouldHighlight', self.instance_id, [annotation]);
+                        //hxPublish('shouldHighlight', self.instance_id, [annotation]);
 
                         // clears the selection of the text
                         if (window.getSelection) {

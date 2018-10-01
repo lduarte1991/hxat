@@ -12,11 +12,14 @@
 
         // keeps track of viewer/plugin modules for UI
         this.viewers = [];
+        this.disabledViewers = [];
         this.plugins = [];
+        this.disabledPlugins = [];
 
         // keeps track of annotations and storage modules for backend
         this.annotations = [];
         this.storage = [];
+        this.disabledStorage;
 
         // initializes tool
         this.init(this.options.mediaType);
@@ -253,6 +256,72 @@
         return jQuery(event.target).parents('.annotator-hl').addBack().map(function(_, elem) {
             return jQuery(elem).data('annotation');
         }).toArray();
+    };
+
+    $.Core.prototype.disable = function(itemId, activeList, disabledList) {
+        var self = this;
+        var itemToDisable = undefined;
+        var indexFound = undefined;
+        for (var i = activeList.length - 1; i >= 0; i--) {
+            if (activeList[i].name == itemId) {
+                indexFound = i;
+            }
+        }
+        if (indexFound) {
+            var foundItem = activeList.splice(indexFound)[0];
+            if (typeof(foundItem.disable) == "function") {
+                foundItem.disable();
+            }
+            disabledList.push(foundItem);
+        }
+    };
+
+    $.Core.prototype.enable = function(itemId, activeList, disabledList) {
+        var self = this;
+        var itemToDisable = undefined;
+        var indexFound = undefined;
+        for (var i = disabledList.length - 1; i >= 0; i--) {
+            if (disabledList[i].name == itemId) {
+                indexFound = i;
+            }
+        }
+        if (indexFound) {
+            var foundItem = disabledList.splice(indexFound)[0];
+            if (typeof(foundItem.enable) == "function") {
+                foundItem.enable();
+            }
+            activeList.push(foundItem);
+        }
+    };
+
+    $.Core.prototype.disableViewer = function(viewerId) {
+        var self = this;
+        self.disable(viewerId, self.viewers, self.disabledViewers);
+    };
+
+    $.Core.prototype.disablePlugins = function(pluginId) {
+        var self = this;
+        self.disable(pluginId, self.plugins, self.disabledPlugins);
+    };
+
+    $.Core.prototype.disableStorage = function(storageId) {
+        var self = this;
+        self.disable(storageId, self.storage, self.disabledStorage);
+    };
+
+    $.Core.prototype.enableViewer = function(viewerId) {
+        var self = this;
+        self.enable(viewerId, self.viewers, self.disabledViewers);
+    };
+
+    $.Core.prototype.enablePlugins = function(pluginId) {
+        var self = this;
+        self.enable(pluginId, self.plugins, self.disabledPlugins);
+    };
+
+    $.Core.prototype.enableStorage = function(storageId) {
+        var self = this;
+        self.enable(storageId, self.storage, self.disabledStorage);
     };
 
 }(Hxighlighter));

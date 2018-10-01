@@ -5,7 +5,7 @@
     --accent-font-color: #888;
     --dark-font-color: #000;
 
-    --nav-bar-offset: 0px;
+    --nav-bar-offset: 50px;
 
     --sidebar-width: 400px;
     --sidebar-background: #fff;
@@ -290,6 +290,17 @@ button.sidebar-button#hide_label {
     left: 203.5px;
 }
 
+.two-button-version button#hide_label {
+    display: none;
+}
+.two-button-version button#create-annotation-side {
+    width: 151.5px;
+}
+.two-button-version button#search {
+    width: 151.5px;
+    left: 153px;
+}
+
 .annotation-filter-buttons.btn-group {
     position: absolute;
     top: 24px;
@@ -360,6 +371,16 @@ button.sidebar-button#hide_label {
     border: 1px dashed black;
     cursor: pointer;
     background: rgba(88,88,88,0.1);
+}
+
+.handle-button {
+    position: absolute;
+    float: right;
+    top: 5px;
+    right: 15px;
+    font-size: 2em;
+    color: white;
+    cursor: pointer;
 }
 
 

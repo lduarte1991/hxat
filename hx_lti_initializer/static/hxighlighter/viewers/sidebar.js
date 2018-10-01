@@ -17,13 +17,15 @@
             template_suffix: "side",
             template_urls: ""
         };
+        this.name = 'Sidebar';
         this.options = jQuery.extend({}, defaultOptions, options);
         this.instance_id = inst_id;
         this.annotation_tool = {
             interactionPoint: null,
             editing: false,
             editor: null,
-            viewer: null
+            viewer: null,
+            annotations: []
         };
         this.init();
     };
@@ -64,7 +66,6 @@
             self.setUpListeners();
             
         });
-
     };
 
     $.Sidebar.prototype.setUpListeners = function() {
@@ -124,7 +125,6 @@
                 return ann.id !== annotation.id
             });
         });
-
     };
 
     $.Sidebar.prototype.setUpSidebar = function() {
@@ -144,7 +144,7 @@
             jQuery('body').css('overflow', 'inherit');
         });
 
-        self.element.find('.annotation-viewer-side .delete').confirm({
+        self.element.find('.delete').confirm({
             title: 'Delete Annotation?',
             content: 'Would you like to delete your annotation? This is permanent.',
             buttons: {
@@ -160,6 +160,21 @@
                 }
             }
         });
+
+        if (self.options.viewersOptions && self.options.viewersOptions['use_external_button']) {
+            console.log(jQuery('.annotationSection.side #search'));
+            jQuery('.annotationSection.side #search').parent().addClass('two-button-version');
+        }
+
+        if (self.options.viewersOptions && self.options.viewersOptions['sidebar_button_class']) {
+            jQuery(self.options.viewersOptions['sidebar_button_class']).click(function() {
+                if (jQuery('.annotationSection.side:visible').length > 0) {
+                    jQuery('.annotationSection.side').hide();
+                } else {
+                    jQuery('.annotationSection.side').show();
+                }
+            }); 
+        }
 
         // jQuery(window).on('scroll', function(event) {
         //     console.log(self.element);
@@ -182,19 +197,19 @@
         //     console.log(elementTop, elementBottom, viewTop, viewBottom);
         // });
 
-        self.element.on('click', '.annotation-viewer-side .edit', function() {
-            jQuery(this).click(function(event) {
-                var id = jQuery(event.currentTarget).attr('id').replace('edit-', '');
-                var found = undefined;
-                jQuery.each(annotations, function(index, ann) {
-                    if (ann.id === id) {
-                        found = ann;
-                    }
-                });
+        // self.element.on('click', '.annotation-viewer-side .edit', function() {
+        //     jQuery(this).click(function(event) {
+        //         var id = jQuery(event.currentTarget).attr('id').replace('edit-', '');
+        //         var found = undefined;
+        //         jQuery.each(annotations, function(index, ann) {
+        //             if (ann.id === id) {
+        //                 found = ann;
+        //             }
+        //         });
                 
-                self.showEditor(found, true);
-            });
-        });
+        //         self.showEditor(found, true);
+        //     });
+        // });
 
         self.setUpButtons();
     };
@@ -296,6 +311,7 @@
             hxPublish('viewerShown', self.instance_id, [self.annotation_tool.annotations, jQuery('.annotationsHolder')])
         });
 
+
         if (self.annotation_tool.annotations) {
             self.onLoad(self.annotation_tool.annotations);
         }
@@ -361,7 +377,7 @@
         var annotations = annotations1.sort(function compare(a, b) {
             var dateA = new Date(a.created);
             var dateB = new Date(b.created);
-            return dateB - dateA;
+            return dateB > dateA;
         });
 
         if (annotations.length > 0) {
@@ -375,6 +391,7 @@
                 if (annotation.media !== "comment") {
                     var annotationItem = jQuery.extend({}, annotation, {'index': index});
                     annotations_html += self.options.TEMPLATES.annotationItem(annotationItem);
+                    self.annotation_tool.annotations.push(annotation)
                 }
             });
             // var annotations_html = self.options.TEMPLATES.viewer({

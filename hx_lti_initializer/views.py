@@ -486,7 +486,7 @@ def access_annotation_target(
         get_paras[k] = request.GET[k]
 
     original.update(get_paras)
-    return render(request, '%s/detail.html' % targ_obj.target_type, original)
+    return render(request, '%s/detail-v2.html' % targ_obj.target_type, original)
 
 
 def instructor_dashboard_view(request):

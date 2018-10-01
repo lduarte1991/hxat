@@ -2550,7 +2550,9 @@ var TEXTSELECTOR_NS = 'annotator-textselector';
 // Returns true if the element is a child of an annotator element.
 function isAnnotator(element) {
     var elAndParents = $(element).parents().addBack();
-    return (elAndParents.filter('[class^=annotator-]').length !== 0);
+    return (elAndParents.filter(function(a, elem){
+        if(elem.className.indexOf('annotator-') != -1) return elem;
+    }).length !== 0);
 }
 
 
@@ -2663,7 +2665,6 @@ TextSelector.prototype._checkForEndSelection = function (event) {
 
     // Get the currently selected ranges.
     var selectedRanges = this.captureDocumentSelection();
-
     if (selectedRanges.length === 0) {
         _nullSelection();
         return;
@@ -2675,12 +2676,12 @@ TextSelector.prototype._checkForEndSelection = function (event) {
         if ($(container).hasClass('annotator-hl')) {
             container = $(container).parents('[class!=annotator-hl]')[0];
         }
+
         if (!isAnnotator(container)) {
             _nullSelection();
             return;
         }
     }
-
     if (typeof this.onSelection === 'function') {
         this.onSelection(selectedRanges, event);
     }

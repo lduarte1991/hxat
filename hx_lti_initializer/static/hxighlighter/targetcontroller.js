@@ -27,6 +27,13 @@
             case 'text':
                 if (self.options.method == "url") {
                     self.makeQuery(self.options.object_source, self.createTextSlot, target_selector);
+                } else if (self.options.method = "html") {
+                    var guid = Hxighlighter.getUniqueId();
+                    jQuery(target_selector).find('.annotation-slot').attr("id", guid);
+                    jQuery(target_selector).find('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section');
+                    setTimeout(function(){
+                        hxPublish('targetLoaded', self.instance_id, [jQuery('#' + guid)]);
+                    }, 1000);
                 }
                 break;
             case 'image':
@@ -87,7 +94,7 @@
         hxSubscribe('targetLoaded', self.instance_id, function(_, element) {
             //annotation element gets data that may be needed later
             self.element = element;
-            self.element.data('source_type', self.options.object_source);
+            self.element.data('source', self.options.object_source);
             self.element.data('source_type', self.options.mediaType);
 
             // finish setting up selectors
