@@ -112,6 +112,22 @@
                 jQuery('.annotationsHolder').prepend(self.options.TEMPLATES.annotationItem(jQuery.extend({}, annotation, {'index': 0})));
                 hxPublish('viewerShown', self.instance_id, [[annotation], jQuery('.annotationItem.item-' + annotation.id)]);
                 jQuery('#empty-alert').hide();
+                self.element.find('.delete').confirm({
+                    title: 'Delete Annotation?',
+                    content: 'Would you like to delete your annotation? This is permanent.',
+                    buttons: {
+                        confirm: function() {
+                            var annotation_id = this.$target[0].id.replace('delete-', '');
+                            hxPublish('deleteAnnotationById', self.instance_id, [annotation_id]);
+                            if (self.annotation_tool.viewer) {
+                                jQuery('.annotation-viewer').remove();
+                                delete self.annotation_tool.viewer;
+                            }
+                        },
+                        cancel: function () {
+                        }
+                    }
+                });
                 self.annotation_tool.annotations.push(annotation);
             }
         });
@@ -142,23 +158,6 @@
 
         self.element.on('mouseleave', '.annotationsHolder', function(event) {
             jQuery('body').css('overflow', 'inherit');
-        });
-
-        self.element.find('.delete').confirm({
-            title: 'Delete Annotation?',
-            content: 'Would you like to delete your annotation? This is permanent.',
-            buttons: {
-                confirm: function() {
-                    var annotation_id = this.$target[0].id.replace('delete-', '');
-                    hxPublish('deleteAnnotationById', self.instance_id, [annotation_id]);
-                    if (self.annotation_tool.viewer) {
-                        jQuery('.annotation-viewer').remove();
-                        delete self.annotation_tool.viewer;
-                    }
-                },
-                cancel: function () {
-                }
-            }
         });
 
         if (self.options.viewersOptions && self.options.viewersOptions['use_external_button']) {
@@ -197,19 +196,18 @@
         //     console.log(elementTop, elementBottom, viewTop, viewBottom);
         // });
 
-        // self.element.on('click', '.annotation-viewer-side .edit', function() {
-        //     jQuery(this).click(function(event) {
-        //         var id = jQuery(event.currentTarget).attr('id').replace('edit-', '');
-        //         var found = undefined;
-        //         jQuery.each(annotations, function(index, ann) {
-        //             if (ann.id === id) {
-        //                 found = ann;
-        //             }
-        //         });
-                
-        //         self.showEditor(found, true);
-        //     });
-        // });
+
+        self.element.on('click', '.annotationItem .edit', function(event) {
+            var id = jQuery(event.currentTarget).attr('id').replace('edit-', '');
+            var found = undefined;
+            jQuery.each(self.annotation_tool.annotations, function(index, ann) {
+                if (ann.id === id) {
+                    found = ann;
+                }
+            });
+            
+            self.showEditor(found, true);
+        });
 
         self.setUpButtons();
     };
@@ -399,6 +397,22 @@
             //     'annotations': annotations
             // });
             jQuery('.annotationsHolder').append(annotations_html);
+            self.element.find('.delete').confirm({
+                title: 'Delete Annotation?',
+                content: 'Would you like to delete your annotation? This is permanent.',
+                buttons: {
+                    confirm: function() {
+                        var annotation_id = this.$target[0].id.replace('delete-', '');
+                        hxPublish('deleteAnnotationById', self.instance_id, [annotation_id]);
+                        if (self.annotation_tool.viewer) {
+                            jQuery('.annotation-viewer').remove();
+                            delete self.annotation_tool.viewer;
+                        }
+                    },
+                    cancel: function () {
+                    }
+                }
+            });
             hxPublish('viewerShown', self.instance_id, [annotations1, jQuery('.annotationsHolder')])
         } else {
             self.annotation_tool.annotations = annotations; 
