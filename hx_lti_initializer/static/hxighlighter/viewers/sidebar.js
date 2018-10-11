@@ -91,7 +91,11 @@
                 id: Hxighlighter.getUniqueId(),
                 exact: getQuoteFromHighlights(ranges).exact,
                 media: self.options.mediaType,
-                created: new Date()
+                created: new Date(),
+                creator: {
+                    name: self.options.username,
+                    id: self.options.user_id
+                }
             };
 
             self.currentSelection = annotation;

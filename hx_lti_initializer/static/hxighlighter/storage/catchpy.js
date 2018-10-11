@@ -16,7 +16,7 @@
             data: {
                 limit: 10,
                 offset: 0,
-                userid: this.options.user_id,
+                uri: this.options.object_id,
                 context_id: this.options.context_id,
                 collection_id: this.options.collection_id
             },

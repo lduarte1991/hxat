@@ -33,6 +33,7 @@
 <script type="text/javascript" src="{% static "hxighlighter/vendor/ui/jquery.tokeninput.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/colored-token-tags-plugin.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/reply-plugin.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/permissions-plugin.js" %}"></script>
 {% endblock %}
 
 {% block cssfiles %}
@@ -155,7 +156,12 @@ Annotation Tool | Text | {{ target_object.target_title }}
                   hasColors: true,
                   tags: "tag1:red,tag2:blue"
                 },
-                'Reply': {}
+                'Reply': {},
+                'Permissions': {
+                  "username": "{{ username }}",
+                  "user_id": "{{ user_id }}",
+                  "admin_role": "{{ is_instructor }}"
+                }
               },
               "storageOptions": {
                 "backend": ['catchpy', 'backup', 'local'],

@@ -1,0 +1,116 @@
+{% extends 'hx_lti_initializer/annotation_base.html' %}
+
+{% load staticfiles %}
+{% load list_of_ids %}
+
+{% block beginningscripts %}
+<script src="{% static "vendors/development/jquery-1.12.4.js" %}"></script>
+<link rel="stylesheet" href="{% static "vendors/Annotator/annotator.css" %}">
+{% endblock %}
+
+{% load bootstrap3 %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% block javascript %}
+<script src="{% static "vendors/development/json2.js" %}"></script>
+<script src="{% static "vendors/development/summernote.js" %}"></script>
+<script src="{% static "vendors/development/video.dev.js" %}"></script>
+<script src="{% static "vendors/development/vjs.youtube.js" %}"></script>
+<script src="{% static "vendors/development/videojs-transcript.js" %}"></script>
+<script src="{% static "vendors/development/jquery-Watch.js" %}"></script>
+<script src="{% static "vendors/development/rangeslider.js" %}"></script>
+<script src="{% static "vendors/development/videojs-annotator-plugin.js" %}"></script>
+<script src="{% static "vendors/development/video-speed.js" %}"></script>
+<script src="{% static "vendors/development/mousetrap.js" %}"></script>
+<script src="{% static "vendors/Annotator/annotator-full.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/highlightTags-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/reply-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/videojs-annotator.js" %}"></script>
+<script src="{% static "vendors/Annotator/plugins/timeRangeEditor-annotator.js" %}"></script>
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
+<link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/video-js.min.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/videojs-transcript.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/rangeslider.css" %}">
+<link rel="stylesheet" href="{% static "vendors/development/css/ova.css" %}">
+<link rel="stylesheet" href="{% static "css/video_annotation.css" %}">
+{% endblock %}
+
+{% block annotationCore %}
+<script src="{% static "AnnotationCore.js" %}"></script>
+{% endblock %}
+
+{% block tokeninputcss %}
+<link rel="stylesheet" href="{% static "vendors/development/css/token-input.css" %}">
+{% endblock %}
+
+{% block title %}
+Annotation Tool | Video | {{ target_object.target_title }}
+{% endblock %}
+
+{% block keyboardinput %}
+{% endblock %}
+
+{% block mainapplication %}
+<section role="main" aria-label="Annotation Tool Video Content" style="height: 100%">
+  <h3 class='offscreen'>Video to be Annotated</h3>
+  <div id="text-content-notifications" aria-live="assertive"></div>
+  <div id="hxat-status" role="alert"></div>
+  <div id="hxat-alert" role="alert"></div>
+	<div  id="viewer" class="test" style="padding-top:50px; height:80%;" class="fit-to-canvas">
+		<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="auto" height="100%" style="height:80%;">
+      {{ target_object.get_target_content_for_video | safe }}
+      <!-- <source src="{{ target_object.target_content | safe }}" type='video/youtube' />
+      <track kind="captions" src="/static/2NRQPzSNXLM.srt" srclang="en" label="English" default /> -->
+    </video>
+	</div>
+  <div id="transcript" style="height:20%; overflow-y: scroll; background-color:white; color:black;"></div>
+</section>
+{% endblock %}
+
+{% block extraOptions %}
+  // makes sure that the HxAT also instantiates Annotator for the text tool
+  options.commonInfo.mediaType = 'video';
+  options.annotationCoreOptions = {
+    annotationElement: jQuery("#viewer"),
+    initOptions: {
+      'plugins': [
+        // order matters, auth before store
+        'Auth',
+        'Permissions',
+        'Store',
+        'SummernoteRichText',
+        'VideoJS',
+        {% if assignment.allow_highlights %}
+        'HighlightTags',
+        {% endif %}
+        //'RichText',
+        'Reply',
+        //'Accessibility',
+        //'Touch',
+        'TimeRangeEditor',
+      ],
+      'database_url': "{% url 'annotation_store:api_root' %}",
+      'database_params': {
+        "resource_link_id": "{{ resource_link_id }}",
+        "utm_source": "{{ utm_source }}"
+      },
+      'citation': "{{ target_object.target_citation | escapejs }}",
+      {% if assignment.allow_highlights %}
+      'highlightTags_options': "{{ assignment.highlights_options }}",
+      {% endif %}
+      {% if not assignment.include_mynotes_tab %}
+      'readOnly': true,
+      {% endif %}
+    },
+  };
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'hx_lti_initializer/annotation_base.html' %}
+
+{% load staticfiles %}
+{% load list_of_ids %}
+{% block beginningscripts %}
+<script src="{% static "vendors/development/jquery-1.9.1.js" %}"></script>
+<script src="{% static "vendors/mirador/mirador.js" %}"></script>
+{% endblock %}
+
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+{% block javascript %}
+<script src="{% static "vendors/development/jquery.unveil.js" %}"></script>
+
+{% endblock %}
+{% block cssfiles %}
+<link rel="stylesheet" href="{% static "vendors/mirador/css/mirador-combined.css" %}">
+<style type="text/css">
+    #viewer { position: fixed; width: 100%; height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
+</style>
+{% endblock %}
+
+{% block tokeninputcss %}
+<link rel="stylesheet" href="{% static "vendors/development/css/mirador-token-input.css" %}">
+{% endblock %}
+
+{% block keyboardinput %}
+<div style="margin-right: 30px; float:right; margin-top:3px;font-size:2em; color:white; cursor:pointer;" role="button" tabindex="0" aria-label="Make annotations using keyboard input" alt="Make annotations using keyboard input" id="keyboard-input-button"><i class="fa fa-keyboard-o"></i></div>
+{% endblock %}
+
+{% block mainapplication %}
+<section role="main" aria-label="Annotation Tool Image Content" style="position:absolute; top:50px; height: 100%; height: calc(100% - 50px);">
+  <h3 class='offscreen'>Image to be Annotated</h3>
+  <div id="text-content-notifications" aria-live="assertive"></div>
+  <div id="hxat-status" role="alert"></div>
+  <div id="hxat-alert" role="alert"></div>
+  <div id="viewer" class="test">
+  </div>
+</section>
+{% endblock %}
+
+{% block extraOptions %}
+// sets up Mirador with specific options
+var mir = Mirador({
+  "id": "viewer",
+  "mainMenuSettings" : {
+     'show' : false
+  },
+  "buildPath" : "{% static "vendors/mirador/" %}",
+  "layout" : "1x1",
+  "saveSession" : false,
+  "data": [
+  {% for i in target_object.get_target_content_as_list %}
+  { "manifestUri": "{{ i }}", "location": "Harvard University"},
+  {% endfor %}
+  ],
+  "availableAnnotationStylePickers": [],
+  "availableAnnotationDrawingTools": [
+      'Rectangle', 'Ellipse', 'Freehand', 'Polygon'
+  ],
+  "windowObjects": [
+    {
+      "loadedManifest": "{{ target_object.get_target_content_as_list.0 }}",
+  	  "viewType" : "{{ viewType }}",
+      {% if canvas_id %}
+        "canvasID" : "{{ canvas_id }}",
+      {% endif %}
+      "annotationLayer" : true,
+      {% if not assignment.include_mynotes_tab %}
+      "annotationCreation" : false,
+      {% else %}
+      "annotationCreation": true,
+      {% endif %}
+  	  "sidePanel" : false,
+      "bottomPanel": false,
+      "fullScreen" : false,
+      "displayLayout": false,
+      "canvasControls": {
+        "annotations": {
+          "annotationState": "on",
+        }
+      },
+
+      // This will eventually be put back in whenever we add layout options
+      // to the admin hub
+      // "layoutOptions" : 
+      //  {
+      //  "newObject" : true,
+      //  "close" : false,
+      //  "slotRight" : false,
+      //  "slotLeft" : false,
+      //  "slotAbove" : false,
+      //  "slotBelow" : false
+      //  }
+    },
+  ],
+  "annotationEndpoint": 
+    {
+    "name":"Harvard CATCH Production",
+    "module": "CatchEndpoint",
+    "options": {
+      token: "{{ token }}",
+      // The endpoint of the store on your server.
+			prefix: "{% url 'annotation_store:api_root' %}",
+      {% if utm_source %}
+      params: "?utm_source={{ utm_source }}&resource_link_id={{ resource_link_id }}",
+      {% else %}
+      params: "?resource_link_id={{ resource_link_id }}",
+      {% endif %}
+      userid : "{{ user_id }}",
+      username : "{{ username }}",
+      roles : {{ roles | safe }},
+      collection_id : "{{ collection }}",
+      context_id : "{{ course }}",
+    }
+  }
+});   
+options.commonInfo.mediaType = 'image';
+{% endblock %}
