@@ -164,12 +164,16 @@ Annotation Tool | Text | {{ target_object.target_title }}
                 }
               },
               "storageOptions": {
-                "backend": ['catchpy', 'backup', 'local'],
+                "backend": ['catchpy'],
                 "token": "{{token}}",
                 "deleteAfterBackup": true,
+                "database_params": {
+                  "resource_link_id": "{{ resource_link_id }}",
+                  "utm_source": "{{ utm_source }}"
+                },
                 "exportButtonSelector": '.export-temporary',
                         "external_url": {
-                            'catchpy': 'https://catchpy.harvardx.harvard.edu/annos'
+                            'catchpy': "{% url 'annotation_store:api_root' %}"
                         }
               },
               "default_editor": 'floating',

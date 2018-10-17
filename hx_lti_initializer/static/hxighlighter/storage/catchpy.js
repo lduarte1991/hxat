@@ -11,14 +11,14 @@
     $.CatchPy.prototype.onLoad = function() {
         var self = this;
         jQuery.ajax({
-            url: this.url_base,
+            url: this.url_base + '/search?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
             method: 'GET',
             data: {
-                limit: 10,
+                limit: -1,
                 offset: 0,
                 uri: this.options.object_id,
                 context_id: this.options.context_id,
-                collection_id: this.options.collection_id
+                collection_id: this.options.collection_id,
             },
             headers: {
                 'x-annotator-auth-token': self.options.storageOptions.token,
@@ -35,21 +35,23 @@
     $.CatchPy.prototype.saveAnnotation = function(ann_to_save, elem) {
         var self = this;
         console.log(ann_to_save);
-        console.log(self.convertToWebAnnotation(ann_to_save, elem));
-        // jQuery.ajax({
-        //     url: this.url_base,
-        //     method: 'POST',
-        //     data: ann_to_save,
-        //     headers: {
-        //         'x-annotator-auth-token': self.options.storageOptions.token,
-        //     },
-        //     success: function(result) {
-        //         console.log(result);
-        //     },
-        //     error: function(xhr, status, error) {
-        //         console.log(xhr, status, error);
-        //     }
-        // });
+        var save_ann = self.convertToWebAnnotation(ann_to_save, elem)
+        console.log(save_ann)
+        jQuery.ajax({
+            url: this.url_base + '/create?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(save_ann),
+            headers: {
+                'x-annotator-auth-token': self.options.storageOptions.token,
+            },
+            success: function(result) {
+                console.log(result);
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr, status, error);
+            }
+        });
     };
 
     $.CatchPy.prototype.deleteAnnotation = function(ann_to_delete, elem) {
@@ -73,15 +75,16 @@
             "@context": "http://catch-dev.harvardx.harvard.edu/catch-context.jsonld",
             'type': 'Annotation',
             'schema_version': '1.1.0',
+            '@id': annotation['id'],
             'creator':  {
                 'id': self.options.user_id,
                 'name': this.options.username,
             },
             'permissions': {
-                'can_read': [],
-                'can_update': [this.options.username],
-                'can_delete': [this.options.username],
-                'can_admin': [this.options.username],
+                'can_read': [this.options.user_id],
+                'can_update': [this.options.user_id],
+                'can_delete': [this.options.user_id],
+                'can_admin': [this.options.user_id],
             },
             'platform': {
                 'platform_name': 'edX',
@@ -95,50 +98,94 @@
                     'type': 'TextualBody',
                     'format': 'text/html',
                     'language': 'en',
-                    'value': annotation.annotationText
+                    'value': annotation.annotationText,
+                    'purpose': 'commenting'
                 }].concat(tags),
             },
-            // 'target': {
-            //     'type': 'List',
-            //     'items': [{
-            //         'source': 'http://sample.com/fake_content/preview',
-            //         'type': this.options.mediaType,
-            //         'selectors': {
-            //             'type': 'List',
-            //             'items': [{
-            //                 'type': "Choice",
-            //                 'items': [{
-            //                     'type': 'RangeSelector',
-            //                     'start': {
-            //                         'type': 'XPathSelector',
-            //                         'value': annotation.ranges[0].start,
-            //                     },
-            //                     'end': {
-            //                         'type': 'XPathSelector',
-            //                         'value': annotation.ranges[0].end,
-            //                     },
-            //                     'refinedBy': {
-            //                         'type': 'TextPositionSelector',
-            //                         'start': annotation.ranges[0].startOffset,
-            //                         'end': annotation.ranges[0].endOffset,
-            //                     }
-            //                 }, {
-            //                     'type': 'TextPositionSelector',
-            //                     'start': annotation.fullTextRanges.startOffset,
-            //                     'end': annotation.fullTextRanges.endOffset,
-            //                 }, {
-            //                     'type': 'TextQuoteSelector',
-            //                     'exact': annotation.exact,
-            //                     'prefix': annotation.prefix,
-            //                     'suffix': annotation.suffix
-            //                 }]
-            //             }],
-            //         }
-            //     }],
-            // }
+            'target': {
+                'type': 'List',
+                'items': [{
+                    'source': 'http://sample.com/fake_content/preview',
+                    'type': this.options.mediaType.charAt(0).toUpperCase() + this.options.mediaType.slice(1),
+                    'selector': {
+                        'type': 'Choice',
+                        'items': [{
+                                'type': 'RangeSelector',
+                                'start': {
+                                    'type': 'XPathSelector',
+                                    'value': serializedRanges.serial[0].start
+                                },
+                                'end': {
+                                    'type': 'XPathSelector',
+                                    'value': serializedRanges.serial[0].end,
+                                },
+                                'refinedBy': {
+                                    'type': 'TextPositionSelector',
+                                    'start': serializedRanges.serial[0].startOffset,
+                                    'end': serializedRanges.serial[0].endOffset,
+                                }
+                            }, {
+                                'type': 'TextPositionSelector',
+                                'start': serializedRanges.extra[0].startOffset,
+                                'end': serializedRanges.extra[0].endOffset,
+                            }, {
+                                'type': 'TextQuoteSelector',
+                                'exact': serializedRanges.extra[0].exact,
+                                'prefix': serializedRanges.extra[0].prefix,
+                                'suffix': serializedRanges.extra[0].suffix
+                        }],
+                    }
+                }],
+            }
         };
         return webAnnotationVersion;
     };
+
+    // $.CatchPy.prototype.convertFromWebAnnotation = function(webAnn, elem) {
+    //     // var self = this;
+    //     // var annotation = {
+    //     //     annotationText: self.getAnnotationText(),
+    //     //     created: self.getAnnotationCreated(),
+    //     //     creator: self.getAnnotationCreator(),
+    //     //     exact: [],
+    //     //     id: ""
+    //     //     media: "".
+    //     //     tags: [],
+    //     // }
+
+    // };
+
+    // $.CatchPy.prototype.getAnnotationText = function(webAnn) {
+    //     try() {
+    //         return webAnn['body'][0].value;
+    //     } catch(e) {
+    //         return "";
+    //     }
+    // }
+
+    // $.CatchPy.prototype.getAnnotationCreated = function(webAnn) {
+    //     try() {
+    //         return Data.parse(webAnn['created']);
+    //     } catch(e) {
+    //         return new Date();
+    //     }
+    // }
+
+    // $.CatchPy.prototype.getAnnotationCreator = function(webAnn) {
+    //     try() {
+    //         return webAnn['creator'];
+    //     } catch(e) {
+    //         return {username:'Unknown', id:'error'};
+    //     }
+    // };
+
+    // $.CatchPy.prototype.getAnnotationExact = function(webAnn) {
+    //     try() {
+    //         return webAnn['target'][0].value;
+    //     } catch(e) {
+    //         return "";
+    //     }
+    // }
 
     $.CatchPy.prototype.storeCurrent = function() {
         

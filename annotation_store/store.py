@@ -78,7 +78,7 @@ class AnnotationStore(object):
 
     def search(self):
         self.logger.info(u"Search: %s" % self.request.GET)
-        self._verify_course(self.request.GET.get('contextId', None))
+        self._verify_course(self.request.GET.get('contextId', self.request.GET.get('context_id', None)))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
         response = self.backend.search()
@@ -91,10 +91,12 @@ class AnnotationStore(object):
         return response
 
     def create(self):
+        self.logger.info(u"Create annotation: %s" % self.request.body)
         body = json.loads(self.request.body)
         self.logger.info(u"Create annotation: %s" % body)
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        if body.get('schema_version', None) != "1.1.0":
+            self._verify_course(body.get('contextId', None))
+            self._verify_user(body.get('user', {}).get('id', None))
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
         response = self.backend.create()
@@ -307,7 +309,10 @@ class CatchStoreBackend(StoreBackend):
     def search(self):
         timeout = 10.0
         params = self.request.GET.urlencode()
-        database_url = self._get_database_url('/search')
+        if 'collection_id' not in params:
+            database_url = self._get_database_url('/search')
+        else:
+            database_url = self._get_database_url('')
         self.logger.info('search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
         try:
             response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
@@ -323,8 +328,13 @@ class CatchStoreBackend(StoreBackend):
 
     def create(self):
         body = self._get_request_body()
-        database_url = self._get_database_url('/create')
-        data = json.dumps(body)
+        data = json.loads(self.request.body)
+        if data.get('schema_version', None) != "1.1.0":
+            database_url = self._get_database_url('/create')
+        else:
+            database_url = self._get_database_url('/%s' % data['@id'])
+            del data['@id']
+        data = json.dumps(data)
         self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)

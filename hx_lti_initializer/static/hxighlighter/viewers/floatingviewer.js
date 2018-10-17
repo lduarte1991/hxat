@@ -184,6 +184,13 @@
         hxSubscribe('toggleViewer', self.instance_id, function(_, event, status, annotations) {
             self.toggleViewer(event, status, annotations);
         });
+
+        hxSubscribe('addAnnotationList', function(_, ann_list) {
+            jQuery.each(ann_list, function(ann) {
+                hxPublish('shouldHighlight', self.instance_id, [ann]);
+            });
+            
+        });
     };
 
     $.FloatingViewer.prototype.setUpPinAndMove = function() {
