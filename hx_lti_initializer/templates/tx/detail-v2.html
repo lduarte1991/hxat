@@ -150,6 +150,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
                 "use_external_button": true,
                 "sidebar_button_class": ".handle-button",
               },
+              "hideAnnotationsButton": "#annotations-status",
               "plugins": {
                 'SummernoteRichText': {},
                 'ColoredTokenTags': {
@@ -172,13 +173,20 @@ Annotation Tool | Text | {{ target_object.target_title }}
                   "utm_source": "{{ utm_source }}"
                 },
                 "exportButtonSelector": '.export-temporary',
-                        "external_url": {
-                            'catchpy': "{% url 'annotation_store:api_root' %}"
-                        }
+                "external_url": {
+                    'catchpy': "{% url 'annotation_store:api_root' %}"
+                }
               },
               "default_editor": 'floating',
               "should_highlight": true,
               "template_urls": '{% static "hxighlighter/viewers/templates/" %}',
+              "instructors": {{ assignment.course.course_admins| list_of_ids | safe}},
+              "sidebar_options": {
+                default_tab: "{{ assignment.default_tab }}",
+                show_instructor_tab: "{{assignment.include_instructor_tab}}",
+                show_mynotes_tab: "{{assignment.include_mynotes_tab}}",
+                show_public_tab: "{{assignment.include_public_tab}}",
+              }
             }
           };
           Hxighlighter(hxighlighter_object1);

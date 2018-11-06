@@ -21,7 +21,6 @@
      */
     $.Permissions.prototype.init = function() {
         var self = this;
-        console.log(self.options);
     };
 
     $.Permissions.prototype.returnValue = function() {
@@ -45,7 +44,7 @@
     $.Permissions.prototype.viewerShown = function(annotations, viewer) {
         var self = this;
         jQuery.each(annotations, function(_, annotation) {
-            if(annotation.creator.id !== self.options.user_id) {
+            if(annotation.creator.id !== self.options.user_id && self.options.admin_role != "True") {
                 jQuery('#delete-' + annotation.id).remove();
                 jQuery('#edit-' + annotation.id).remove();
             }

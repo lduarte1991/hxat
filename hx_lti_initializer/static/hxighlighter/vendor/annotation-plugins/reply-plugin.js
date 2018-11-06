@@ -62,7 +62,6 @@
 
     $.Reply.prototype.annotationDrawn = function(annotation) {
         var self = this;
-        console.log(annotation);
         if (annotation.media == "comment") {
             var par = annotation.ranges[0].parent;
             jQuery('.item-' + par + ' .annotation-replies').append("<div class='reply-row reply-" + annotation.id + "'>" + annotation.annotationText + "</div>")

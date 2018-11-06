@@ -59,6 +59,7 @@
 
                 hxSubscribe('shouldDeleteHighlight', self.instance_id, function(_, annotation) {
                     if (annotation.media !== "comment") {
+                        console.log(annotation);
                         self.highlighter.undraw(annotation);
                     }
                     self.annotationRemoved(annotation);
@@ -85,7 +86,11 @@
             });
 
             jQuery.each(self.storage, function(_, st) {
-                st.saveAnnotation(updatedAnnotation, self.element);
+                if (isNew) {
+                    st.saveAnnotation(updatedAnnotation, self.element);
+                } else {
+                    st.updateAnnotation(updatedAnnotation, self.element);
+                }
             });
 
             hxPublish('shouldUpdateHighlight', self.instance_id, [updatedAnnotation, isNew]);
@@ -101,6 +106,20 @@
                 hxPublish('shouldDeleteHighlight', self.instance_id, [found.annotation]);
                 jQuery.each(self.storage, function(_, st) {
                     st.deleteAnnotation(found, self.element);
+                });
+            }
+        });
+
+        jQuery(self.options.hideAnnotationsButton).on('click', function() {
+            if (jQuery(this).hasClass('hidden-annotations')) {
+                jQuery(this).removeClass('hidden-annotations');
+                jQuery.each(self.annotations, function(_, ann) {
+                    self.highlighter.redraw(ann);
+                });
+            } else {
+                jQuery(this).addClass('hidden-annotations');
+                jQuery.each(self.annotations, function(_, ann) {
+                    self.highlighter.undraw(ann);
                 });
             }
         });
@@ -138,7 +157,7 @@
         hxSubscribe('finishedHighlighterSetup', self.instance_id, function(_) {
             var all_annotations = [];
             jQuery.each(self.storage, function(_, store) {
-                var anns = store.onLoad() || [];
+                var anns = store.onLoad(self.element) || [];
                 jQuery.each(anns, function(_, ann) {
                     hxPublish('shouldHighlight', self.instance_id, [ann]);
                 });

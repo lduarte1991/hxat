@@ -111,8 +111,9 @@ class AnnotationStore(object):
     def update(self, annotation_id):
         body = json.loads(self.request.body)
         self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        if body.get('schema_version', None) != "1.1.0":
+            self._verify_course(body.get('contextId', None))
+            self._verify_user(body.get('user', {}).get('id', None))
         if hasattr(self.backend, 'before_update'):
             self.backend.before_update(annotation_id)
         response = self.backend.update(annotation_id)
@@ -346,11 +347,15 @@ class CatchStoreBackend(StoreBackend):
 
     def update(self, annotation_id):
         body = self._get_request_body()
-        database_url = self._get_database_url('/update/%s' % annotation_id)
-        data = json.dumps(body)
+        data = json.loads(self.request.body)
+        if data.get('schema_version', None) != '1.1.0':
+            database_url = self._get_database_url('/update/%s' % annotation_id)
+        else:
+            database_url = self._get_database_url('/%s' % annotation_id)
+        data = json.dumps(data)
         self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
-            response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            response = requests.put(database_url, data=data, headers=self.headers, timeout=self.timeout)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -358,7 +363,13 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
-        database_url = self._get_database_url('/delete/%s' % annotation_id)
+        params = self.request.GET.urlencode()
+
+        if 'catchpy=true' in params:
+            database_url = self._get_database_url('/%s' % annotation_id)
+            self.logger.info('%s' % database_url)
+        else:
+            database_url = self._get_database_url('/delete/%s' % annotation_id)
         self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
         try:
             response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)

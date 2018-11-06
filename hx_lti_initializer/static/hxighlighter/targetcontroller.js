@@ -99,7 +99,29 @@
 
             // finish setting up selectors
             self.setUpSelector(self.element[0]);
+
+            jQuery('#annotations-text-size-plus').click(function() {
+                self.toggleTextSize(20);
+            });
+            jQuery('#annotations-text-size-minus').click(function() {
+                self.toggleTextSize(-20);
+            });
         });
+
+
     };
+
+    $.Target.prototype.toggleTextSize = function(step) {
+        var self = this;
+        var $content = jQuery(self.element).find('.content');
+        var fontsize = parseInt($content.data('textsize'), 10);
+        step = step || 0;
+
+        if (!fontsize) {
+            fontsize = 100;
+        }
+        fontsize = (fontsize + step) + "%";
+        $content.data('textsize', fontsize).css("font-size", fontsize);
+    }
 
 }(Hxighlighter))

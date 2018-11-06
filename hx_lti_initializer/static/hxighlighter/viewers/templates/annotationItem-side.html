@@ -1,9 +1,9 @@
 <div class="annotationItem item-<%= id %> side" role="listitem" aria-label="Annotation #<%=index%>">
     <div style="overflow:auto;">
     <span class="idAnnotation" style="display:none;"><%= id %></span>
-    <% if (typeof(user) !== 'undefined') { %>
-    <div class= "annotatedBy field side" aria-label="Annotation created by <%= user.name %>">     
-        <%= user.name %>
+    <% if (typeof(creator) !== 'undefined') { %>
+    <div class= "annotatedBy field side" aria-label="Annotation created by <%= creator.name %>">     
+        <%= creator.name %>
         <% } else { %>
         <div class= "annotatedBy field side" aria-label="Annotation created by lduarte1991">
         lduarte1991

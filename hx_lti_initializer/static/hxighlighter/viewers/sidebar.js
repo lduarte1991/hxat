@@ -116,7 +116,7 @@
                 jQuery('.annotationsHolder').prepend(self.options.TEMPLATES.annotationItem(jQuery.extend({}, annotation, {'index': 0})));
                 hxPublish('viewerShown', self.instance_id, [[annotation], jQuery('.annotationItem.item-' + annotation.id)]);
                 jQuery('#empty-alert').hide();
-                self.element.find('.delete').confirm({
+                self.element.find('.delete:not([jc-attached])').confirm({
                     title: 'Delete Annotation?',
                     content: 'Would you like to delete your annotation? This is permanent.',
                     buttons: {
@@ -138,9 +138,12 @@
 
         hxSubscribe('shouldDeleteHighlight', self.instance_id, function (_, annotation) {
             jQuery('.annotationItem.item-' + annotation.id).remove();
-            if (jQuery('.annotationItem').length == 0) {
-                jQuery('#empty-alert').show();
-            }
+
+            setTimeout(function() {
+                if (jQuery('.annotationItem').length == 0) {
+                    jQuery('#empty-alert').show();
+                }
+            }, 500);
             self.annotation_tool.annotations = self.annotation_tool.annotations.filter(function(ann) {
                 return ann.id !== annotation.id
             });
@@ -149,12 +152,8 @@
 
     $.Sidebar.prototype.setUpSidebar = function() {
         var self = this;
-        self.element.append(self.options.TEMPLATES.annotationSection({
-            'show_mynotes_tab': "True",
-            'show_instructor_tab': "True",
-            'show_public_tab': "True",
-            'annotationItems': []
-        }));
+        var sidebarOptions = jQuery.extend({}, self.options.sidebar_options, {annotationItems:[]});
+        self.element.append(self.options.TEMPLATES.annotationSection(sidebarOptions));
 
         self.element.on('mouseover', '.annotationsHolder', function(event) {
             jQuery('body').css('overflow', 'hidden');
@@ -165,7 +164,6 @@
         });
 
         if (self.options.viewersOptions && self.options.viewersOptions['use_external_button']) {
-            console.log(jQuery('.annotationSection.side #search'));
             jQuery('.annotationSection.side #search').parent().addClass('two-button-version');
         }
 
@@ -375,13 +373,13 @@
     };
 
     $.Sidebar.prototype.onLoad = function(annotations1) {
+        
         var self = this;
         var annotations = annotations1.sort(function compare(a, b) {
             var dateA = new Date(a.created);
             var dateB = new Date(b.created);
-            return dateB > dateA;
+            return dateB < dateA;
         });
-
         if (annotations.length > 0) {
             jQuery('#empty-alert').remove();
         }
