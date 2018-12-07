@@ -20,6 +20,7 @@
 <script type="text/javascript" src="{% static "hxighlighter/hxelper-functions.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/ui/underscore.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/ui/jquery-confirm.min.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/vendor/ui/jquery.timeago.js" %}"></script>
 
 <script type="text/javascript" src="{% static "hxighlighter/hxighlighter.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/targetcontroller.js" %}"></script>
@@ -34,6 +35,8 @@
 <script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/colored-token-tags-plugin.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/reply-plugin.js" %}"></script>
 <script type="text/javascript" src="{% static "hxighlighter/vendor/annotation-plugins/permissions-plugin.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/hx-key-text-selection.js" %}"></script>
+<script type="text/javascript" src="{% static "hxighlighter/hxighlighter-accessibility.js" %}"></script>
 {% endblock %}
 
 {% block cssfiles %}
@@ -151,13 +154,18 @@ Annotation Tool | Text | {{ target_object.target_title }}
                 "sidebar_button_class": ".handle-button",
               },
               "hideAnnotationsButton": "#annotations-status",
+              'keyboardInputButton': '#keyboard-input-toggle-text',
               "plugins": {
                 'SummernoteRichText': {},
                 'ColoredTokenTags': {
                   hasColors: true,
                   tags: "tag1:red,tag2:blue"
                 },
-                'Reply': {},
+                'Reply': {
+                  "template_urls": '{% static "hxighlighter/viewers/templates/" %}',
+                  "username": "{{ username }}",
+                  "user_id": "{{ user_id }}",
+                },
                 'Permissions': {
                   "username": "{{ username }}",
                   "user_id": "{{ user_id }}",

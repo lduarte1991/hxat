@@ -52,7 +52,7 @@
     };
 
     $.Permissions.prototype.annotationDrawn = function(annotation) {
-        
+        console.log(annotation);
     };
 
     $.Permissions.prototype.retrieveReplies = function(annotation_id, selector) {

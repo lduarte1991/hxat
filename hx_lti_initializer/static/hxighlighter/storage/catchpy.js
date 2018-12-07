@@ -7,35 +7,50 @@
     };
 
 
-    $.CatchPy.prototype.onLoad = function(element) {
+    $.CatchPy.prototype.onLoad = function(element, opts) {
         var self = this;
+        var callB = function(result) {
+            jQuery.each(result.rows, function(_, ann) {
+                var waAnnotation = self.convertFromWebAnnotation(ann, jQuery(element).find('.content'));
+                setTimeout(function() {
+                    hxPublish('shouldUpdateHighlight', self.instance_id, [waAnnotation, false])
+                }, 250);
+            });
+        }
+        self.search(opts, callB);
+    };
+
+    $.CatchPy.prototype.search = function(options, callBack) {
+        var self = this;
+        var data = jQuery.extend({}, {
+            limit: -1,
+            offset: 0,
+            source_id: self.options.object_id,
+            context_id: self.options.context_id,
+            collection_id: self.options.collection_id,
+        }, options);
         jQuery.ajax({
-            url: this.url_base + '/search?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
+            url: self.url_base + '/search?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
             method: 'GET',
-            data: {
-                limit: -1,
-                offset: 0,
-                uri: this.options.object_id,
-                context_id: this.options.context_id,
-                collection_id: this.options.collection_id,
-            },
+            data: data,
             headers: {
                 'x-annotator-auth-token': self.options.storageOptions.token,
             },
             success: function(result) {
-                jQuery.each(result.rows, function(_, ann) {
-                    hxPublish('shouldUpdateHighlight', self.instance_id, [self.convertFromWebAnnotation(ann, element), false])
-                });
+                callBack(result);
             },
             error: function(xhr, status, error) {
                 console.log(xhr, status, error);
+                callBack([xhr, status, error]);
             }
         });
-    };
+
+    }
 
     $.CatchPy.prototype.saveAnnotation = function(ann_to_save, elem) {
         var self = this;
-        var save_ann = self.convertToWebAnnotation(ann_to_save, elem)
+        console.log(elem);
+        var save_ann = self.convertToWebAnnotation(ann_to_save, jQuery(elem).find('.content'));
         jQuery.ajax({
             url: self.url_base + '/create?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
             method: 'POST',
@@ -69,7 +84,7 @@
 
     $.CatchPy.prototype.updateAnnotation = function(ann_to_update, elem) {
         var self = this;
-        var save_ann = self.convertToWebAnnotation(ann_to_update, elem)
+        var save_ann = self.convertToWebAnnotation(ann_to_update, jQuery(elem).find('.content'));
         jQuery.ajax({
             url: self.url_base + '/update/'+ann_to_update.id+'?resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
             method: 'PUT',
@@ -96,7 +111,61 @@
             };
             tags.push(t_el);
         })
-        var serializedRanges = self.serializeRanges(annotation.ranges, elem);
+
+       
+        var targetList = [];
+        var source_id = this.options.object_id;
+        var purpose = 'commenting';
+        if (annotation.media === "Annotation") {
+            jQuery.each(annotation.ranges, function(_, range){
+                targetList.push({
+                    'type': 'Annotation',
+                    'source': range.parent
+                })
+                source_id = range.parent;
+            });
+
+            purpose = 'replying';
+        } else {
+            console.log(annotation.ranges);
+            var serializedRanges = self.serializeRanges(annotation.ranges, elem);
+            var mediatype = this.options.mediaType.charAt(0).toUpperCase() + this.options.mediaType.slice(1);
+            jQuery.each(serializedRanges.serial, function(index, range){
+                targetList.push({
+                    'source': 'http://sample.com/fake_content/preview',
+                    'type': mediatype,
+                    'selector': {
+                        'type': 'Choice',
+                        'items': [{
+                                'type': 'RangeSelector',
+                                'start': {
+                                    'type': 'XPathSelector',
+                                    'value': range.start
+                                },
+                                'end': {
+                                    'type': 'XPathSelector',
+                                    'value': range.end,
+                                },
+                                'refinedBy': {
+                                    'type': 'TextPositionSelector',
+                                    'start': range.startOffset,
+                                    'end': range.endOffset,
+                                }
+                            }, {
+                                'type': 'TextPositionSelector',
+                                'start': serializedRanges.extra[index].startOffset,
+                                'end': serializedRanges.extra[index].endOffset,
+                            }, {
+                                'type': 'TextQuoteSelector',
+                                'exact': serializedRanges.extra[index].exact,
+                                'prefix': serializedRanges.extra[index].prefix,
+                                'suffix': serializedRanges.extra[index].suffix
+                        }],
+                    }
+                });
+            });
+        }
+
         var webAnnotationVersion = {
             "@context": "http://catch-dev.harvardx.harvard.edu/catch-context.jsonld",
             'type': 'Annotation',
@@ -116,7 +185,7 @@
                 'platform_name': 'edX',
                 'context_id': this.options.context_id,
                 'collection_id': this.options.collection_id,
-                'target_source_id': this.options.object_id,
+                'target_source_id': source_id,
             },
             'body': {
                 'type': 'List',
@@ -125,43 +194,12 @@
                     'format': 'text/html',
                     'language': 'en',
                     'value': annotation.annotationText,
-                    'purpose': 'commenting'
+                    'purpose': purpose
                 }].concat(tags),
             },
             'target': {
                 'type': 'List',
-                'items': [{
-                    'source': 'http://sample.com/fake_content/preview',
-                    'type': this.options.mediaType.charAt(0).toUpperCase() + this.options.mediaType.slice(1),
-                    'selector': {
-                        'type': 'Choice',
-                        'items': [{
-                                'type': 'RangeSelector',
-                                'start': {
-                                    'type': 'XPathSelector',
-                                    'value': serializedRanges.serial[0].start
-                                },
-                                'end': {
-                                    'type': 'XPathSelector',
-                                    'value': serializedRanges.serial[0].end,
-                                },
-                                'refinedBy': {
-                                    'type': 'TextPositionSelector',
-                                    'start': serializedRanges.serial[0].startOffset,
-                                    'end': serializedRanges.serial[0].endOffset,
-                                }
-                            }, {
-                                'type': 'TextPositionSelector',
-                                'start': serializedRanges.extra[0].startOffset,
-                                'end': serializedRanges.extra[0].endOffset,
-                            }, {
-                                'type': 'TextQuoteSelector',
-                                'exact': serializedRanges.extra[0].exact,
-                                'prefix': serializedRanges.extra[0].prefix,
-                                'suffix': serializedRanges.extra[0].suffix
-                        }],
-                    }
-                }],
+                'items': targetList
             }
         };
         return webAnnotationVersion;
@@ -175,39 +213,57 @@
             creator: self.getAnnotationCreator(webAnn),
             exact: self.getAnnotationExact(webAnn),
             id: self.getAnnotationId(webAnn),
-            media: self.options.mediaType,
+            media: self.getMediaType(webAnn),
             tags: self.getAnnotationTags(webAnn),
-            ranges: self.getAnnotationTarget(webAnn, element),
+            ranges: self.getAnnotationTarget(webAnn, jQuery(element)),
+            replyCount: webAnn.totalReplies,
         }
+        console.log(annotation);
         return annotation;
+    };
+
+    $.CatchPy.prototype.getMediaType = function(webAnn, element) {
+        return webAnn['target']['items'][0]['type'];
     };
 
     $.CatchPy.prototype.getAnnotationTargetItems = function(webAnn) {
         try {
+            console.log("reached getAnnotationTargetItems", webAnn);
+            if (webAnn['target']['items'][0]['type'] == "Annotation") {
+                console.log([{'parent':webAnn['target']['items'][0]['source']}]);
+                return [{'parent':webAnn['target']['items'][0]['source']}]
+            }
+            console.log("nope, something went wrong");
             return webAnn['target']['items'][0]['selector']['items'];
         } catch(e) {
             console.log(e);
             return [];
         }
-    }
+    };
 
     $.CatchPy.prototype.getAnnotationTarget = function(webAnn, element) {
         var self = this;
         try {
             var ranges = []
             jQuery.each(this.getAnnotationTargetItems(webAnn), function(_, targetItem) {
-                
-                if (targetItem['type'] == "RangeSelector") {
-                    ranges.push({
-                        start: targetItem['oa:start'].value,
-                        startOffset: targetItem['refinedBy'][0].start,
-                        end: targetItem['oa:end'].value,
-                        endOffset: targetItem['refinedBy'][0].end
-                    });
+                console.log('targetItem', targetItem);
+                if (!('parent' in targetItem)) {
+                    if (targetItem['type'] == "RangeSelector") {
+                        ranges.push({
+                            start: targetItem['oa:start'].value,
+                            startOffset: targetItem['refinedBy'][0].start,
+                            end: targetItem['oa:end'].value,
+                            endOffset: targetItem['refinedBy'][0].end
+                        });
+                    }
                 } else {
-                    return [];
+                    return ranges.push(targetItem)
                 }
             });
+            if (webAnn['target']['items'][0]['type'] == "Annotation") {
+                return ranges;
+            }
+            console.log('getAnnotationTarget', ranges, element);
             return self.normalizeRanges(ranges, element);
         } catch(e) {
             console.log(e);
@@ -217,7 +273,13 @@
 
     $.CatchPy.prototype.getAnnotationText = function(webAnn) {
         try {
-            return webAnn['body']["items"][0].value;
+            var found = "";
+            jQuery.each(webAnn['body']['items'], function(_, bodyItem) {
+                if (bodyItem.purpose == "commenting") {
+                    found = bodyItem.value;
+                }
+            });
+            return found;
         } catch(e) {
             return "";
         }
@@ -225,7 +287,7 @@
 
     $.CatchPy.prototype.getAnnotationCreated = function(webAnn) {
         try {
-            return Data.parse(webAnn['created']);
+            return new Date(webAnn['created']);
         } catch(e) {
             return new Date();
         }
@@ -266,12 +328,17 @@
 
 
     $.CatchPy.prototype.getAnnotationTags = function(webAnn) {
-        // try {
-        //     var tags = [];
-        //     jQuery(webAnn['body']['items'])
-        // } catch(e) {
+        try {
+            var tags = [];
+            jQuery.each(webAnn['body']['items'], function(_, bodyItem) {
+                if (bodyItem.purpose == "tagging") {
+                    tags.push(bodyItem.value);
+                }
+            });
+            return tags;
+        } catch(e) {
             return [];
-        // }
+        }
     };
 
     $.CatchPy.prototype.storeCurrent = function() {
@@ -333,38 +400,9 @@
         var normalizedRanges = [];
 
         jQuery.each(ranges, function(_, range) {
-            var startElement = self.getElementViaXpath(range.start, elem);
-            var endElement = self.getElementViaXpath(range.end, elem);
-
-            var startNodes = self.getTextNodes(jQuery(startElement));
-            var endNodes = self.getTextNodes(jQuery(endElement));
-            var startNode = undefined;
-            var endNode = undefined;
-            var offs = range.startOffset;
-            jQuery.each(startNodes, function(_, node) {
-                if (offs > node.length) {
-                    offs -= node.length;
-                } else {
-                    startNode = node;
-                    return false;
-                }
-            });
-            var startOffset = offs;
-            offs = range.endOffset;
-            jQuery.each(endNodes, function(_, node) {
-                if (offs > node.length) {
-                    offs -= node.length;
-                } else {
-                    endNode = node;
-                    return false;
-                }
-            });
-            var endOffset = offs;
-
-            var normalizedRange = document.createRange();
-            normalizedRange.setStart(startNode, startOffset);
-            normalizedRange.setEnd(endNode, endOffset);
-            normalizedRanges.push(annotator.range.sniff(normalizedRange).normalize(elem));
+            var foundRange = annotator.range.sniff(range);
+            console.log(foundRange.normalize, JSON.stringify(elem));
+            normalizedRanges.push(foundRange.normalize(elem[0]));
         });
 
         return normalizedRanges;

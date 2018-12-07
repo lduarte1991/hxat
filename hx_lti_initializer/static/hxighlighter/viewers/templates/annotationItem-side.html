@@ -6,19 +6,19 @@
         <%= creator.name %>
         <% } else { %>
         <div class= "annotatedBy field side" aria-label="Annotation created by lduarte1991">
-        lduarte1991
+        lduarte19911
         <% } %>
     </div>
-    <% if( typeof(updated) !== 'undefined') { %>
-        <% var date = new Date(updated); %>
+    <% if( typeof(created) !== 'undefined') { %>
+        <% var date = new Date(created); %>
         <div class="annotatedAt field side" title="<% print(date) %>" aria-label="last updated <% print(jQuery.timeago(date)); %>">
-            last updated <% print(jQuery.timeago(date)); %>
+            created <% print(jQuery.timeago(date)); %>
         </div>
     <% } %>
     </div>
     <button class="edit" id="edit-<%= id %>" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fa fa-pencil"></i></button>
                 <button class="delete" id="delete-<%= id %>" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>
-    <% if (media === 'text') {%>
+    <% if (media === 'text' || media === "Text") {%>
         <div class="quote field side">
             <div class="quoteText" aria-label="Excerpt selected for this annotation:"><%= exact %></div>
         </div>

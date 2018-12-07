@@ -41,25 +41,39 @@
                 viewer.element = element;
             });
 
+            self.acc = new Hxighlighter.Accessibility({
+                mediaType: self.options.mediaType,
+                element: element,
+                username: self.options.username,
+                id: self.options.user_id
+
+            }, self.instance_id);
+            // connect keyboard selection to element
+            // self.keyinput = new HxKeyboardTextSelection();
+            // self.keyinput.init(jQuery(element).find('.content'));
+
+            // jQuery('#keyboard-input-toggle-text').click(function() {
+            //     self.keyinput.turnSelectionModeOn();
+            // });
+
             if (self.options.should_highlight) {
                 self.initHighlighter();
                 hxSubscribe('shouldHighlight', self.instance_id, function(_, annotation) {
-                    if (annotation.media !== "comment") {
+                    if (annotation.media !== "Annotation") {
                         self.highlighter.draw(annotation);
                     }
                     self.annotationDrawn(annotation);
                 });
 
                 hxSubscribe('shouldUpdateHighlight', self.instance_id, function(_, annotation, isNew) {
-                    if (annotation.media !== "comment") {
+                    if (annotation.media !== "Annotation") {
                         self.highlighter.redraw(annotation);
                     }
                     self.annotationDrawn(annotation);
                 });
 
                 hxSubscribe('shouldDeleteHighlight', self.instance_id, function(_, annotation) {
-                    if (annotation.media !== "comment") {
-                        console.log(annotation);
+                    if (annotation.media !== "Annotation") {
                         self.highlighter.undraw(annotation);
                     }
                     self.annotationRemoved(annotation);
@@ -110,6 +124,44 @@
             }
         });
 
+        hxSubscribe('searchTrigger', self.instance_id, function(_, options){
+            var default_options = options;
+            if (!jQuery.isArray(options)) {
+
+                if (options === "instructor"){
+                    default_options = {
+                        'userid': self.options.instructors
+                    }
+                } else if (options === "mynotes") {
+                    default_options = {
+                        'userid': self.options.user_id
+                    }
+                }
+            }
+
+            jQuery.each(self.viewers, function(_, viewer) {
+                if (viewer.clearAnnotations) {
+                    viewer.clearAnnotations();
+                }
+            });
+
+            jQuery.each(self.annotations, function(_, ann) {
+                self.highlighter.undraw(ann);
+            });
+
+            var all_annotations = [];
+            jQuery.each(self.storage, function(_, store) {
+                var anns = store.onLoad(self.element, default_options) || [];
+                jQuery.each(anns, function(_, ann) {
+                    hxPublish('shouldHighlight', self.instance_id, [ann]);
+                });
+                all_annotations = all_annotations.concat(anns);
+            });
+
+            self.annotations = all_annotations;
+            
+        });
+
         jQuery(self.options.hideAnnotationsButton).on('click', function() {
             if (jQuery(this).hasClass('hidden-annotations')) {
                 jQuery(this).removeClass('hidden-annotations');
@@ -123,6 +175,21 @@
                 });
             }
         });
+
+        hxSubscribe('searchRequestInitiated', self.instance_id, function(_, opts, callBack) {
+            var results = [];
+            jQuery.each(self.storage, function(_, store) {
+                 store.search(opts, function(results) {
+                    var anns_list = [];
+                    jQuery.each(results.rows, function(_, ann) {
+                        var anno = store.convertFromWebAnnotation(ann, self.element);
+                        anns_list.push(anno);
+                        self.annotationDrawn(anno);
+                    });
+                    callBack(anns_list);
+                 }) || [];
+            });
+        })
     };
 
     $.Core.prototype.setUpViewers = function() {
@@ -156,8 +223,18 @@
 
         hxSubscribe('finishedHighlighterSetup', self.instance_id, function(_) {
             var all_annotations = [];
+            var default_options = {}
+            if (self.options.sidebar_options.default_tab === "Instructor"){
+                default_options = {
+                    'userid': self.options.instructors
+                }
+            } else if (self.options.sidebar_options.default_tab === "MyNotes") {
+                default_options = {
+                    'userid': self.options.user_id
+                }
+            }
             jQuery.each(self.storage, function(_, store) {
-                var anns = store.onLoad(self.element) || [];
+                var anns = store.onLoad(self.element, default_options) || [];
                 jQuery.each(anns, function(_, ann) {
                     hxPublish('shouldHighlight', self.instance_id, [ann]);
                 });
@@ -175,6 +252,7 @@
     $.Core.prototype.setUpPlugins = function() {
         var self = this;
         if (typeof self.options.plugins !== undefined) {
+            console.log("LOOK HERE", self.options.plugins);
             jQuery.each(self.options.plugins, function(pluginName, pluginOptions) {
                 if (typeof window[pluginName] === "function") {
                     var plugin = new window[pluginName](pluginOptions, self.instance_id);

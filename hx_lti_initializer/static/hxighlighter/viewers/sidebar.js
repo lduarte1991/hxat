@@ -101,18 +101,19 @@
             self.currentSelection = annotation;
         });
 
-        hxSubscribe('showReplyEditor', self.instance_id, function(_, annotation) {
-            self.showEditor(annotation, false);
+        hxSubscribe('showReplyEditor', self.instance_id, function(_, annotation, updating) {
+            self.showEditor(annotation, updating);
         });
 
         hxSubscribe('shouldUpdateHighlight', self.instance_id, function(_, annotation, isNew) {
-            if (annotation.media !== "comment") {
+            if (annotation.media !== "Annotation") {
                 if (!isNew) {
                     jQuery('.annotationItem.item-' + annotation.id).remove();
                     self.annotation_tool.annotations = self.annotation_tool.annotations.filter(function(ann) {
                         return ann.id !== annotation.id
                     });
                 }
+                console.log(annotation);
                 jQuery('.annotationsHolder').prepend(self.options.TEMPLATES.annotationItem(jQuery.extend({}, annotation, {'index': 0})));
                 hxPublish('viewerShown', self.instance_id, [[annotation], jQuery('.annotationItem.item-' + annotation.id)]);
                 jQuery('#empty-alert').hide();
@@ -269,46 +270,90 @@
         });
 
         self.element.on('click', '#search-submit', function(event) {
-            jQuery('#tag-search-alert').remove();
+            var search_params = {};
             var query = jQuery('#srch-term').val();
             var type = jQuery('.search-bar select').val();
-            var filteredAnnotations = self.annotation_tool.annotations;
-            
             if(query.trim().length > 0) {
-                if(type === "User") {
-                    filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
-                        if (ann.username) {
-                            return ann.username === query;
-                        } else {
-                            return false;
+                if (type !== "Annotation") {
+                    var possible_multiple = query.trim().split(' ');
+                    if (possible_multiple.length > 1) {
+                        query = possible_multiple;
+                    } else {
+                        possible_multiple = query.trim().split(',');
+                        if (possible_multiple.length > 1) {
+                            query = possible_multiple;
                         }
-                    });
+                    }
+                }
+                if(type === "User") {
+                    search_params = {
+                        username: query
+                    }
                 } else if(type === "Annotation") {
-                    filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
-                        return ann.annotationText.indexOf(query) > -1;
-                    });
+                    search_params = {
+                        text: query
+                    }
                 } else if (type === "Tag") {
-                    filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
-                        var found = false;
-                        jQuery.each(ann.tags, function(_, tag) {
-                            if (tag === query) {
-                                found = true;
-                            }
-                        });
-                        return found;
-                    });
+                    search_params = {
+                        tag: query
+                    }
                 }
             }
 
-            var annotations_html = '';
+            hxPublish('searchTrigger', self.instance_id, [search_params]);
+            // jQuery('#tag-search-alert').remove();
+            // var query = jQuery('#srch-term').val();
+            // var type = jQuery('.search-bar select').val();
+            // var filteredAnnotations = self.annotation_tool.annotations;
+            
+            // if(query.trim().length > 0) {
+            //     if(type === "User") {
+            //         filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
+            //             if (ann.username) {
+            //                 return ann.username === query;
+            //             } else {
+            //                 return false;
+            //             }
+            //         });
+            //     } else if(type === "Annotation") {
+            //         filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
+            //             return ann.annotationText.indexOf(query) > -1;
+            //         });
+            //     } else if (type === "Tag") {
+            //         filteredAnnotations = self.annotation_tool.annotations.filter(function(ann) {
+            //             var found = false;
+            //             jQuery.each(ann.tags, function(_, tag) {
+            //                 if (tag === query) {
+            //                     found = true;
+            //                 }
+            //             });
+            //             return found;
+            //         });
+            //     }
+            // }
 
-            jQuery.each(filteredAnnotations, function(index, annotation) {
-                var annotationItem = jQuery.extend({}, annotation, {'index': index});
-                annotations_html += self.options.TEMPLATES.annotationItem(annotationItem);
-            });
+            // var annotations_html = '';
+            // jQuery.each(self.)
 
-            jQuery('.annotationsHolder').html(annotations_html);
-            hxPublish('viewerShown', self.instance_id, [self.annotation_tool.annotations, jQuery('.annotationsHolder')])
+            // jQuery.each(filteredAnnotations, function(index, annotation) {
+            //     var annotationItem = jQuery.extend({}, annotation, {'index': index});
+            //     annotations_html += self.options.TEMPLATES.annotationItem(annotationItem);
+            // });
+
+            // jQuery('.annotationsHolder').html(annotations_html);
+            // hxPublish('viewerShown', self.instance_id, [self.annotation_tool.annotations, jQuery('.annotationsHolder')])
+        });
+
+        self.element.on('click', '#mynotes', function() {
+            hxPublish('searchTrigger', self.instance_id, ['mynotes']);
+        });
+
+        self.element.on('click', '#instructor', function() {
+            hxPublish('searchTrigger', self.instance_id, ['instructor']);
+        });
+
+        self.element.on('click', '#public', function() {
+            hxPublish('searchTrigger', self.instance_id, [{}]);
         });
 
 
@@ -372,6 +417,13 @@
         delete self.annotation_tool.editor;
     };
 
+    $.Sidebar.prototype.clearAnnotations = function() {
+        var self = this;
+        jQuery('.annotationItem').remove();
+        jQuery('#empty-alert').show();
+        self.annotation_tool.annotations = [];
+    };
+
     $.Sidebar.prototype.onLoad = function(annotations1) {
         
         var self = this;
@@ -381,17 +433,18 @@
             return dateB < dateA;
         });
         if (annotations.length > 0) {
-            jQuery('#empty-alert').remove();
+            jQuery('#empty-alert').hide();
         }
+
+        jQuery('.annotationItem').remove();
 
         if (self.options.TEMPLATES.viewer) {
             var annotations_html = '';
 
             jQuery.each(annotations, function(index, annotation) {
-                if (annotation.media !== "comment") {
+                if (annotation.media !== "Annotation") {
                     var annotationItem = jQuery.extend({}, annotation, {'index': index});
                     annotations_html += self.options.TEMPLATES.annotationItem(annotationItem);
-                    self.annotation_tool.annotations.push(annotation)
                 }
             });
             // var annotations_html = self.options.TEMPLATES.viewer({
