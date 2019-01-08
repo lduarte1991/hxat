@@ -424,6 +424,7 @@ def access_annotation_target(
         'session': request.session.session_key,
         'org': settings.ORGANIZATION,
         'logger_url': settings.ANNOTATION_LOGGER_URL,
+        'accessibility': settings.ACCESSIBILITY
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
