@@ -72,7 +72,9 @@
             <div class="annotation-fullscreen clicking_allowed" tabindex="0" role="button" aria-label="Toggle Fullscreen Mode">
                 <i class="fa fa-expand"></i>
             </div>
+            {% if accessibility %}
             {% block keyboardinput %}{% endblock %}
+            {% endif %}
             {% if org == "HARVARDX" %}
                 <div class="logo" aria-label="HarvardX Logo">
                     <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" alt="HarvardX Logo" />
