@@ -121,7 +121,7 @@
             fontsize = 100;
         }
         fontsize = (fontsize + step) + "%";
-        $content.data('textsize', fontsize).css("font-size", fontsize);
+        $content.data('textsize', fontsize).find('*').css("font-size", fontsize);
     }
 
 }(Hxighlighter))
