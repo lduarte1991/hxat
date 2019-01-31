@@ -798,8 +798,10 @@
             placement: 'left',
             onConfirm: function (){
                 if(annotationItem.authToDeleteButton) {
-                    self.initOptions.endpoint.deleteAnnotation(annotation);
-                    jQuery('#hxat-alert').html('Annotation has been deleted');
+                    setTimeout(function() {
+                        self.initOptions.endpoint.deleteAnnotation(annotation);
+                        jQuery('#hxat-alert').html('Annotation has been deleted');
+                    }, 1);
                 }
             },
         });
