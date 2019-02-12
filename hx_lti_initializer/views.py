@@ -25,7 +25,10 @@ from hx_lti_initializer.utils import (debug_printer, retrieve_token, save_sessio
 from hx_lti_initializer import annotation_database
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-from django.contrib.sites.models import get_current_site
+try:
+    from django.contrib.sites.models import get_current_site
+except ImportError:
+    from django.contrib.sites.shortcuts import get_current_site
 from ims_lti_py.tool_provider import DjangoToolProvider
 
 from urlparse import urlparse

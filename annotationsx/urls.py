@@ -1,14 +1,11 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 admin.autodiscover()
 
 import django_app_lti.urls
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'annotationsx.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_initializer")),
     url(r'^annotation_store/', include('annotation_store.urls', namespace="annotation_store")),
@@ -20,4 +17,4 @@ urlpatterns = patterns('',
     # TODO: Check to see if this works without enabling django_app_lti
     # Include the lti app's urls
     url(r'^lti/', include(django_app_lti.urls, namespace="lti")),
-)
+]

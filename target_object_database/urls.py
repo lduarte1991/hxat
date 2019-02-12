@@ -1,21 +1,21 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from target_object_database import views
+from target_object_database.views import open_target_object, create_new_source, edit_source, newSource
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^source/(?P<collection_id>[^/]*)/(?P<target_obj_id>\d+)/',
-        'target_object_database.views.open_target_object',
+        open_target_object,
         name="open_target_object"
     ),
     url(
         r'^source/create_new_source/$',
-        'target_object_database.views.create_new_source',
+        create_new_source,
         name="create_new_source"
     ),
     url(
         r'^source/(?P<id>\d+)/edit/$',
-        'target_object_database.views.edit_source',
+        edit_source,
         name="edit_source"
     ),
     url(
@@ -25,7 +25,7 @@ urlpatterns = patterns(
     ),
     url(
         r'^source/add/target_object/?$',
-        'target_object_database.views.newSource',
+        newSource,
         name="popUpNewSource"
     ),
-)
+]

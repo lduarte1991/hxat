@@ -21,8 +21,6 @@ SECRET_KEY = SECURE_SETTINGS['django_secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = SECURE_SETTINGS.get('debug', True)
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = SECURE_SETTINGS.get('allowed_hosts', [])
 
 # Application definition
@@ -33,9 +31,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'django_extensions',
-    'django_jenkins',
     'bootstrap3',
     'crispy_forms',
     'ims_lti_py',
@@ -84,19 +82,27 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-    "annotationsx.context_processors.resource_link_id_processor",
-    "annotationsx.context_processors.utm_source_processor",
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors':[
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+                "annotationsx.context_processors.resource_link_id_processor",
+                "annotationsx.context_processors.utm_source_processor",
+            ],
+            'debug': True
+        }
+    }
+]
 
 MESSAGE_TAGS = {
             messages.SUCCESS: 'success success',
@@ -239,6 +245,8 @@ LTI_SETUP = {
 CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
 LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
 LTI_SECRET_DICT = SECURE_SETTINGS.get('LTI_SECRET_DICT', {})
+
+SITE_ID = 1
 
 ANNOTATION_MANUAL_URL = SECURE_SETTINGS.get("annotation_manual_url", None)
 ANNOTATION_MANUAL_TARGET = SECURE_SETTINGS.get("annotation_manual_target", None)
