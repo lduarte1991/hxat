@@ -9,13 +9,13 @@ class AssignmentTargets(models.Model):
     assignment = models.ForeignKey(
         "Assignment",
         verbose_name='Assignment',
-        on_delete=models.SET_NULL
+        on_delete=models.CASCADE
     )
     target_object = models.ForeignKey(
         TargetObject,
         verbose_name='Source Material',
         unique=False,
-        on_delete=models.SET_NULL
+        on_delete=models.CASCADE
     )
     order = models.IntegerField(
         verbose_name='Order',
@@ -181,7 +181,7 @@ class Assignment(models.Model):
         default="Public",
         max_length=20
     )
-    course = models.ForeignKey(LTICourse, related_name="assignments", on_delete=models.SET_NULL)
+    course = models.ForeignKey(LTICourse, related_name="assignments", null=True, on_delete=models.SET_NULL)
     hidden = models.BooleanField(default=False)
 
     class Meta:
