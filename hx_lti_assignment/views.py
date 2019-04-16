@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect, re
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core import serializers
 import uuid
 import json
