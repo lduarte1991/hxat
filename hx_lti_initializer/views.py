@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib import messages
 
@@ -31,7 +31,7 @@ except ImportError:
     from django.contrib.sites.shortcuts import get_current_site
 from ims_lti_py.tool_provider import DjangoToolProvider
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 import json
 import time
 import os.path
