@@ -8,7 +8,7 @@ from ims_lti_py.tool_provider import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
-from models import Annotation, AnnotationTags
+from .models import Annotation, AnnotationTags
 
 import json
 import requests

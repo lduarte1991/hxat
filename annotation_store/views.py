@@ -9,7 +9,7 @@ from hx_lti_initializer.models import LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 from hx_lti_initializer import annotation_database
-from store import AnnotationStore
+from .store import AnnotationStore
 
 import json
 import requests
