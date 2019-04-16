@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404, render_to_response, render, redirect  # noqa
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import RequestContext
 from django.http import Http404, HttpResponse
 from django.utils.html import escape
 from django.forms import ValidationError
-from models import *
-from serializers import *
-from forms import SourceForm
+from .models import *
+from .serializers import *
+from .forms import SourceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -102,7 +102,7 @@ def handlePopAdd(request, addForm, field):
         if form.is_valid():
             try:
                 newObject = form.save()
-            except ValidationError, error:
+            except (ValidationError, error):
                 newObject = None
             if newObject:
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s", "%s", "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject.target_title), escape(newObject.target_author), escape(newObject.target_created), escape(newObject.target_type)))  # noqa
