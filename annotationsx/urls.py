@@ -6,7 +6,7 @@ admin.autodiscover()
 import django_app_lti.urls
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^lti_init/', include('hx_lti_initializer.urls', namespace="hx_lti_initializer")),
     url(r'^annotation_store/', include('annotation_store.urls', namespace="annotation_store")),
     url(r'^lti_init/launch_lti/assignment/', include('hx_lti_assignment.urls', namespace="hx_lti_assignment")),
