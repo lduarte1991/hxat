@@ -25,6 +25,7 @@ class LTIProfile(models.Model):
         User,
         related_name='annotations_user_profile',
         null=True,
+        on_delete=models.CASCADE
     )
 
     # saves the list of roles attached to that user
