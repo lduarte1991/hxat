@@ -1,6 +1,6 @@
 from django.db import models
 from hx_lti_initializer.models import LTIProfile, LTICourse
-from urlparse import urlparse
+from urllib.parse import urlparse
 from os.path import splitext, basename
 
 
