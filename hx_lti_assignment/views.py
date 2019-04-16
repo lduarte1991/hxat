@@ -132,7 +132,6 @@ def edit_assignment(request, id):
         )
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
-            print targets_form
             assignment_targets = targets_form.save(commit=False)
             changed = False
             if len(targets_form.deleted_objects) > 0:
