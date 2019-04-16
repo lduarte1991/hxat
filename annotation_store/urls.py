@@ -1,5 +1,5 @@
 from django.conf.urls import url
-import views
+from . import views
 
 urlpatterns = [
     url( r'^api$', views.api_root, name="api_root"),
