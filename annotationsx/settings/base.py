@@ -12,16 +12,20 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 import logging
 from django.contrib import messages
-from .secure import SECURE_SETTINGS
+from ast import literal_eval
+try:
+    from .secure import SECURE_SETTINGS
+except Exception as e:
+    SECURE_SETTINGS = dict()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-SECRET_KEY = SECURE_SETTINGS['django_secret_key']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECURE_SETTINGS.get('django_secret_key', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = SECURE_SETTINGS.get('debug', True)
+DEBUG = literal_eval(os.environ.get('DEBUG', str(SECURE_SETTINGS.get('debug', True))))
 
-ALLOWED_HOSTS = SECURE_SETTINGS.get('allowed_hosts', [])
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', SECURE_SETTINGS.get('allowed_hosts', []))
 
 # Application definition
 INSTALLED_APPS = (
@@ -63,11 +67,11 @@ WSGI_APPLICATION = 'annotationsx.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': SECURE_SETTINGS.get('db_default_name', 'annotationsx'),
-        'USER': SECURE_SETTINGS.get('db_default_user', 'annotationsx'),
-        'PASSWORD': SECURE_SETTINGS.get('db_default_password'),
-        'HOST': SECURE_SETTINGS.get('db_default_host', 'localhost'),
-        'PORT': SECURE_SETTINGS.get('db_default_port', '5432'),
+        'NAME': os.environ.get('HXAT_DB_NAME', SECURE_SETTINGS.get('db_default_name', 'annotationsx')),
+        'USER': os.environ.get('HXAT_DB_USER', SECURE_SETTINGS.get('db_default_user', 'annotationsx')),
+        'PASSWORD': os.environ.get('HXAT_DB_PASSWORD', SECURE_SETTINGS.get('db_default_password')),
+        'HOST': os.environ.get('HXAT_DB_HOST', SECURE_SETTINGS.get('db_default_host', 'localhost')),
+        'PORT': os.environ.get('HXAT_DB_PORT', SECURE_SETTINGS.get('db_default_port', '5432')),
     }
 }
 
@@ -78,7 +82,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'http_static/')
+STATIC_ROOT = os.environ.get('HXAT_STATIC_ROOT', os.path.join(BASE_DIR, 'http_static/'))
 
 TEMPLATES = [
     {
@@ -121,10 +125,10 @@ JENKINS_TASKS = (
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
-_DEFAULT_LOG_LEVEL = SECURE_SETTINGS.get('log_level', SECURE_SETTINGS.get('django_log_level', 'DEBUG'))
-_LOG_QUERIES = SECURE_SETTINGS.get('log_queries', False)
-_LOG_ROOT = SECURE_SETTINGS.get('log_root', '')
-_LOG_FILENAME = SECURE_SETTINGS.get('log_filename', 'app.log')
+_DEFAULT_LOG_LEVEL = os.environ.get('LOG_LEVEL', SECURE_SETTINGS.get('log_level', SECURE_SETTINGS.get('django_log_level', 'DEBUG')))
+_LOG_QUERIES = os.environ.get('LOG_QUERIES', SECURE_SETTINGS.get('log_queries', False))
+_LOG_ROOT = os.environ.get('LOG_ROOT', SECURE_SETTINGS.get('log_root', ''))
+_LOG_FILENAME = os.environ.get('LOG_FILENAME', SECURE_SETTINGS.get('log_filename', 'app.log'))
 
 LOGGING = {
     'version': 1,
@@ -212,13 +216,13 @@ LTI_COURSE_ID = "context_id"
 LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
-LTI_DEBUG = SECURE_SETTINGS.get('debug', False)
-ADMIN_ROLES = SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'})
+LTI_DEBUG = os.environ.get('DEBUG', SECURE_SETTINGS.get('debug', False))
+ADMIN_ROLES = literal_eval(os.environ.get('ADMIN_ROLES', str(SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'}))))
 LTI_UNIQUE_RESOURCE_ID = 'resource_link_id'
-CONTENT_SECURITY_POLICY_DOMAIN = SECURE_SETTINGS.get('content_security_policy_domain', None)
+CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get('CONTENT_SECURITY_POLICY_DOMAIN', SECURE_SETTINGS.get('content_security_policy_domain', None))
 
-SERVER_NAME = SECURE_SETTINGS.get('SERVER_NAME')
-ORGANIZATION = SECURE_SETTINGS.get('ORGANIZATION')
+SERVER_NAME = os.environ.get('SERVER_NAME', SECURE_SETTINGS.get('SERVER_NAME', ''))
+ORGANIZATION = os.environ.get('ORGANIZATION', SECURE_SETTINGS.get('ORGANIZATION', ''))
 
 LTI_SETUP = {
     "TOOL_TITLE": "AnnotationsX",
@@ -240,23 +244,23 @@ LTI_SETUP = {
     }
 }
 
-CONSUMER_KEY = SECURE_SETTINGS['CONSUMER_KEY']
-LTI_SECRET = SECURE_SETTINGS['LTI_SECRET'] # ignored if using django_auth_lti
-LTI_SECRET_DICT = SECURE_SETTINGS.get('LTI_SECRET_DICT', {})
+CONSUMER_KEY = os.environ.get('CONSUMER_KEY', SECURE_SETTINGS.get('CONSUMER_KEY', ''))
+LTI_SECRET = os.environ.get('LTI_SECRET', SECURE_SETTINGS.get('LTI_SECRET', '')) # ignored if using django_auth_lti
+LTI_SECRET_DICT = literal_eval(os.environ.get('LTI_SECRET_DICT', str(SECURE_SETTINGS.get('LTI_SECRET_DICT', {}))))
 
 SITE_ID = 1
 
-ANNOTATION_MANUAL_URL = SECURE_SETTINGS.get("annotation_manual_url", None)
-ANNOTATION_MANUAL_TARGET = SECURE_SETTINGS.get("annotation_manual_target", None)
-ANNOTATION_DB_URL = SECURE_SETTINGS.get("annotation_database_url")
-ANNOTATION_DB_API_KEY = SECURE_SETTINGS.get("annotation_db_api_key")
-ANNOTATION_DB_SECRET_TOKEN = SECURE_SETTINGS.get("annotation_db_secret_token")
-ANNOTATION_PAGINATION_LIMIT_DEFAULT = SECURE_SETTINGS.get("annotation_pagination_limit_default", 20)
-ANNOTATION_TRANSCRIPT_LINK_DEFAULT = SECURE_SETTINGS.get("annotation_transcript_link_default", None)
-ANNOTATION_HTTPS_ONLY = SECURE_SETTINGS.get("https_only", False)
-ANNOTATION_LOGGER_URL = SECURE_SETTINGS.get("annotation_logger_url", "")
-ANNOTATION_STORE = SECURE_SETTINGS.get("annotation_store", {})
-ACCESSIBILITY = SECURE_SETTINGS.get('accessibility', True)
+ANNOTATION_MANUAL_URL = os.environ.get('MANUAL_URL', SECURE_SETTINGS.get("annotation_manual_url", None))
+ANNOTATION_MANUAL_TARGET = os.environ.get('MANUAL_TARGET', SECURE_SETTINGS.get("annotation_manual_target", None))
+ANNOTATION_DB_URL = os.environ.get('ANNOTATION_DB_URL', SECURE_SETTINGS.get("annotation_database_url", ''))
+ANNOTATION_DB_API_KEY = os.environ.get('ANNOTATION_DB_KEY', SECURE_SETTINGS.get("annotation_db_api_key", ''))
+ANNOTATION_DB_SECRET_TOKEN = os.environ.get('ANNOTATION_DB_SECRET', SECURE_SETTINGS.get("annotation_db_secret_token"))
+ANNOTATION_PAGINATION_LIMIT_DEFAULT = os.environ.get('ANNOTATION_LIMIT_DEFAULT', SECURE_SETTINGS.get("annotation_pagination_limit_default", 20))
+ANNOTATION_TRANSCRIPT_LINK_DEFAULT = os.environ.get('ANNOTATION_TRANSCRIPT_DEFAULT', SECURE_SETTINGS.get("annotation_transcript_link_default", None))
+ANNOTATION_HTTPS_ONLY = literal_eval(os.environ.get("HTTPS_ONLY", str(SECURE_SETTINGS.get("https_only", False))))
+ANNOTATION_LOGGER_URL = os.environ.get('ANNOTATION_LOGGER_URL', SECURE_SETTINGS.get("annotation_logger_url", ""))
+ANNOTATION_STORE = os.environ.get('ANNOTATION_STORE', SECURE_SETTINGS.get("annotation_store", {}))
+ACCESSIBILITY = literal_eval(os.environ.get('ACCESSIBILITY', str(SECURE_SETTINGS.get('accessibility', True))))
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
