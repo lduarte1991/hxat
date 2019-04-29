@@ -129,8 +129,7 @@ def retrieve_token(userid, apikey, secret):
       'issuedAt': _now(),
       'ttl': 86400
     }, secret)
-
-    return token
+    return str(token, 'utf-8')
 
 def get_admin_ids(context_id):
     """

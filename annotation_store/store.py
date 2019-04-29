@@ -91,7 +91,7 @@ class AnnotationStore(object):
         return response
 
     def create(self):
-        body = json.loads(self.request.body)
+        body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Create annotation: %s" % body)
         self._verify_course(body.get('contextId', None))
         self._verify_user(body.get('user', {}).get('id', None))
@@ -107,7 +107,7 @@ class AnnotationStore(object):
         pass
 
     def update(self, annotation_id):
-        body = json.loads(self.request.body)
+        body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
         self._verify_course(body.get('contextId', None))
         self._verify_user(body.get('user', {}).get('id', None))
@@ -161,7 +161,7 @@ class AnnotationStore(object):
         return DjangoToolProvider(CONSUMER_KEY, lti_secret)
 
     def lti_grade_passback(self, score=1.0):
-        if score < 0 or score > 1.0 or isinstance(score, basestring):
+        if score < 0 or score > 1.0 or isinstance(score, str):
             return
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
@@ -220,7 +220,7 @@ class StoreBackend(object):
             raise e
 
     def _get_request_body(self):
-        body = json.loads(self.request.body)
+        body = json.loads(str(self.request.body, 'utf-8'))
         if self.ADMIN_GROUP_ENABLED:
             return self._modify_permissions(body)
         return body
