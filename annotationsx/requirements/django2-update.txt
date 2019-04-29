@@ -8,9 +8,9 @@ django-extensions==2.1.6
 djangorestframework==3.9.2
 httplib2==0.12.1
 idna==2.8
-ims-lti-py==git+https://github.com/lduarte1991/ims_lti_py
+git+https://github.com/lduarte1991/ims_lti_py
 lxml==4.3.3
-oauth2==git+https://github.com/i-kiwamu/python3-oauth2
+git+https://github.com/i-kiwamu/python3-oauth2
 psycopg2-binary==2.8.2
 PyJWT==1.7.1
 python-dateutil==2.8.0
