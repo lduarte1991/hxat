@@ -41,16 +41,14 @@ INSTALLED_APPS = (
     'annotation_store',
     'hx_lti_assignment',
     'target_object_database',
-    'django_app_lti',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'annotationsx.middleware.CookielessSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'annotationsx.middleware.ContentSecurityPolicyMiddleware',
     'annotationsx.middleware.MultiLTILaunchMiddleware',

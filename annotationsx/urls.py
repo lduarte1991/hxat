@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 admin.autodiscover()
 
-import django_app_lti.urls
+# import django_app_lti.urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -16,5 +16,5 @@ urlpatterns = [
     url(r'^troubleshooting/', TemplateView.as_view(template_name="main/troubleshooting.html")),
     # TODO: Check to see if this works without enabling django_app_lti
     # Include the lti app's urls
-    url(r'^lti/', include((django_app_lti.urls, 'lti'), namespace="lti")),
+    #url(r'^lti/', include((django_app_lti.urls, 'lti'), namespace="lti")),
 ]
