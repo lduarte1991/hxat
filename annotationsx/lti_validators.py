@@ -4,7 +4,6 @@ import logging
 from oauthlib.oauth1 import RequestValidator
 from oauthlib.oauth1 import SIGNATURE_HMAC
 from oauthlib.common import to_unicode
-import redis
 
 from django.conf import settings
 from django.http import HttpRequest
