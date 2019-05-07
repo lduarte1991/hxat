@@ -117,9 +117,10 @@ def handlePopAdd(request, addForm, field):
         'org': settings.ORGANIZATION,
         'is_instructor': request.LTI['is_staff'],
     }
-    return render_to_response(
+    return render(
+        request,
         "target_object_database/source_form.html",
-        RequestContext(request, pageContext)
+        pageContext
     )
 
 
