@@ -45,7 +45,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrap3',
     'crispy_forms',
-    'ims_lti_py',
     'hx_lti_initializer',
     'annotation_store',
     'hx_lti_assignment',

@@ -40,7 +40,7 @@ setup(
     author="lduarte",
     author_email='luis_duarte@harvard.edu',
     url='https://github.com/lduarte1991/' + project_name,
-    packages=find_packages(exclude=['tests*']),
+    packages=find_packages(exclude=['test*']),
     entry_points={
         'console_scripts': [
             '{} = {}.manage:cli'.format(project_name, project_name),

@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import F, Q
-from ims_lti_py.tool_provider import DjangoToolProvider
+from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
@@ -157,8 +157,10 @@ class AnnotationStore(object):
 
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
-            return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
-        return DjangoToolProvider(CONSUMER_KEY, lti_secret)
+            return DjangoToolProvider.from_django_request(
+                lti_secret, request=self.request)
+        return DjangoToolProvider.from_django_request(
+            lti_secret, request=self.request)
 
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
