@@ -49,7 +49,7 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
     except User.DoesNotExist:
         user = User.objects.create_user(username)
         user.is_superuser = False
-        user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
+        user.is_staff = len(set(roles) & set(settings.ADMIN_ROLES)) > 0
         user.set_unusable_password()
         user.save()
     except User.MultipleObjectsReturned:
