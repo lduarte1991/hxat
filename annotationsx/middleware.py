@@ -136,7 +136,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 self.logger.info('Content-Security-Policy header set to: %s' % policy)
             else:
                 self.logger.warn('Content-Security-Policy header not set')
-                return response
+        return response
 
 class CookielessSessionMiddleware(MiddlewareMixin):
     '''
@@ -220,7 +220,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self._set_current_session(request, resource_link_id=request.POST.get('resource_link_id'), raise_exception=True)
         else:
             self._set_current_session(request, resource_link_id=request.GET.get('resource_link_id'), raise_exception=False)
-            return self.get_response(request)
+        return self.get_response(request)
 
     def _validate_request(self, request):
         '''
