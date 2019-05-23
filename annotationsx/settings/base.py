@@ -26,10 +26,14 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECURE_SETTINGS.get('django_sec
 DEBUG = literal_eval(os.environ.get('DEBUG', str(SECURE_SETTINGS.get('debug', True))))
 
 ALLOWED_HOSTS = ['localhost',  '127.0.0.1']
-allowed_hosts_other = os.environ.get(
-    'ALLOWED_HOSTS', SECURE_SETTINGS.get('allowed_hosts', ''))
+other_hosts = os.environ.get('ALLOWED_HOSTS', None)
+if other_hosts is None:  # no envvar, secure.py already has a list object
+    allowed_hosts_other = SECURE_SETTINGS.get('allowed_hosts', [])
+else:  # space as separator if envvar
+    allowed_hosts_other = other_hosts.split()
+
 if allowed_hosts_other:
-    ALLOWED_HOSTS.extend(allowed_hosts_other.split())
+    ALLOWED_HOSTS.extend(allowed_hosts_other)
 
 
 # Application definition
