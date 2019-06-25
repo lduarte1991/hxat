@@ -1,0 +1,79 @@
+{% extends 'hx_lti_initializer/hxighlighter_base.html' %}
+{% load staticfiles %}
+{% load list_of_ids %}
+
+{% block title %}
+Text Annotation Tool | {{ target_object.target_title }}
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'Hxighlighter/hxighlighter_text.css' %}">
+{% endblock %}
+
+{% block mainapplication %}
+    <div class="hxighlighter-container">
+        <div class='container1'>
+            <h3>{{ target_object.target_title | safe }}</h3>
+            <h4>{{ target_object.target_author | safe }}</h4>
+            <div class='annotations-section'>
+                {{ target_object.target_content | safe}}
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
+    <script>
+            var hxighlighter_object1 = {
+                "commonInfo": {
+                    "mediaType": "text",
+                    "context_id": "{{ course }}",
+                    "collection_id": "{{ collection }}",
+                    "object_id": "{{ object }}",
+                    "username": "{{ username }}",
+                    "user_id": "{{ user_id }}",
+                    "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
+                },
+                "targets": [{
+                    'mediaType': "text",
+                    'method': 'inline',
+                    'object_source': '.container1',
+                    "template_urls":  "{% static 'templates/dashboard/' %}",
+                    "DropdownTags": {
+                        'tags': ['parallelism', 'imagery'],
+                        'folksonomy': true,
+                    },
+                    {% if instructions and instructions != "" %}
+                    "InstructionPanel": {
+                        'instructions': "{{ instructions | escapejs }}"
+                    },
+                    {% endif %}
+                    "ColorTags": {
+                        'imagery': '#00FF00',
+                        'parallelism': '#0000FF'
+                    },
+                    "SidebarTagTokens": {
+                        'tagList': ['parallelism', 'imagery']
+                    },
+                    "HxPermissions": {
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                    },
+                    viewerOptions: {
+                        filterTabCount: 4,
+                        defaultTab: 'mine',
+                        tabsAvailable: ['search', 'mine', 'instructor', 'all'],
+                        sidebarversion: 'sidemenu'
+                    },
+                    storageOptions: {
+                        external_url: {
+                            catchpy: "{% url 'annotation_store:api_root' %}"
+                        },
+                        token: "{{ token }}",
+                        database_params: {
+                            resource_link_id: "{{ resource_link_id }}",
+                            utm_source: "{{ utm_source }}"
+                        }
+                    }
+                }],
+            };
+            Hxighlighter(hxighlighter_object1);
+        </script>
+{% endblock %}
