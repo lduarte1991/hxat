@@ -41,7 +41,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                         'tags': ['parallelism', 'imagery'],
                         'folksonomy': true,
                     },
-                    {% if instructions and instructions != "" %}
+                    {% if instructions is not None and instructions != "" %}
                     "InstructionPanel": {
                         'instructions': "{{ instructions | escapejs }}"
                     },
