@@ -155,6 +155,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
             'level': 'DEBUG',
+            'stream': 'ext://sys.stdout',
         },
         'default': {
             'class': 'logging.handlers.WatchedFileHandler',
