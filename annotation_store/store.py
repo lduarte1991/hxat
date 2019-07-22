@@ -157,6 +157,14 @@ class AnnotationStore(object):
 
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
+
+            # the middleware includes an LTI dict with all lti params for
+            # lti_grade_passback() -- an lti request that is not a lti-launch.
+            # py-lti only understands lti params that come directly in the POST
+            mutable_post = self.request.POST.copy()
+            mutable_post.update(params)
+            self.request.POST = mutable_post
+
             return DjangoToolProvider.from_django_request(
                 lti_secret, request=self.request)
         return DjangoToolProvider.from_django_request(
