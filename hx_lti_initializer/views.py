@@ -29,7 +29,6 @@ try:
     from django.contrib.sites.models import get_current_site
 except ImportError:
     from django.contrib.sites.shortcuts import get_current_site
-from ims_lti_py.tool_provider import DjangoToolProvider
 
 from urllib.parse import urlparse
 import json

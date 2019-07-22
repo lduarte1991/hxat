@@ -17,12 +17,14 @@ import collections
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.http import HttpResponse
-from ims_lti_py.tool_provider import DjangoToolProvider
+from lti.contrib.django import DjangoToolProvider
 import logging
 import time
 import json
 import importlib
 import oauth2
+
+from .lti_validators import LTIRequestValidator
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +142,7 @@ class CookielessSessionMiddleware(MiddlewareMixin):
     '''
     This middleware implements cookieless sessions by retrieving the session identifier 
     from  cookies (preferred, if available) or the request URL.
-    
+
     This must be added to INSTALLED_APPS prior to other middleware that uses the session.
     '''
     def __init__(self, get_response):
@@ -244,7 +246,9 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             raise LTILaunchError
 
         self.logger.debug('using key/secret %s/%s' % (request_key, secret))
-        tool_provider = DjangoToolProvider(request_key, secret, request.POST)
+        tool_provider = DjangoToolProvider.from_django_request(
+            secret, request=request)
+        validator = LTIRequestValidator()
 
         postparams = request.POST.dict()
         self.logger.debug('request is secure: %s' % request.is_secure())
@@ -267,7 +271,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             # the POST parameters like Canvas.
             qs = request.META.pop('QUERY_STRING', '')
             self.logger.debug('removed query string temporarily: %s' % qs)
-            request_is_valid = tool_provider.is_valid_request(request, parameters={}, handle_error=False)
+            request_is_valid = tool_provider.is_valid_request(validator)
             request.META['QUERY_STRING'] = qs  # restore the query string
             self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
         except oauth2.Error as e:

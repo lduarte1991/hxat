@@ -25,7 +25,16 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECURE_SETTINGS.get('django_sec
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = literal_eval(os.environ.get('DEBUG', str(SECURE_SETTINGS.get('debug', True))))
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', SECURE_SETTINGS.get('allowed_hosts', []))
+ALLOWED_HOSTS = ['localhost',  '127.0.0.1']
+other_hosts = os.environ.get('ALLOWED_HOSTS', None)
+if other_hosts is None:  # no envvar, secure.py already has a list object
+    allowed_hosts_other = SECURE_SETTINGS.get('allowed_hosts', [])
+else:  # space as separator if envvar
+    allowed_hosts_other = other_hosts.split()
+
+if allowed_hosts_other:
+    ALLOWED_HOSTS.extend(allowed_hosts_other)
+
 
 # Application definition
 INSTALLED_APPS = (
@@ -40,7 +49,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrap3',
     'crispy_forms',
-    'ims_lti_py',
     'hx_lti_initializer',
     'annotation_store',
     'hx_lti_assignment',
@@ -147,6 +155,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
             'level': 'DEBUG',
+            'stream': 'ext://sys.stdout',
         },
         'default': {
             'class': 'logging.handlers.WatchedFileHandler',
