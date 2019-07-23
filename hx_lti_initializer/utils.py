@@ -225,7 +225,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         "Content-Type":"application/json"
     }
     limit = kwargs.get('limit', -1) # Note: -1 means get everything there is
-    encoded_context_id = urllib.quote_plus(context_id)
+    encoded_context_id = urllib.parse.quote_plus(context_id)
     request_url = "%s/search?contextId=%s&limit=%s" % (annotation_db_url, encoded_context_id, limit)
 
     logger.debug("fetch_annotations_by_course(): url: %s" % request_url)
