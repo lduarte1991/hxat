@@ -166,7 +166,7 @@
 	                        'delete': [this.initOptions.user_id,],
 	                        'admin':  [this.initOptions.user_id,]
 	                },
-	                showViewPermissionsCheckbox: this.initOptions.showViewPermissionsCheckbox || true,
+	                showViewPermissionsCheckbox: this.initOptions.showViewPermissionsCheckbox,
 	                showEditPermissionsCheckbox: false,
 	                userString: function (user) {
 	                    if (user && user.name)

@@ -30769,7 +30769,7 @@ this._cbs.ontext(data)}};Tokenizer.prototype.reset=function(){Tokenizer.call(thi
           username : options.username ? options.username : undefined,
           text : options.text ? options.text : undefined,
           tag : options.tag ? options.tag : undefined,
-          parentid : options.parentid ? options.parentid : undefined,
+          parentid : options.parentid ? options.parentid : "",
           contextId: _this.context_id,
           collectionId: _this.collection_id,
           media: options.media ? options.media : "image",

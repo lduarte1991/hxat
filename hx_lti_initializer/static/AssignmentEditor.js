@@ -369,7 +369,7 @@ AssignmentEditor.prototype = {
                 selector.removeClass('open');
             }
             var input = event.currentTarget.value;
-            var result = window.getColorValues(input);
+            var result = self.getColorValues(input);
             var color = "rgba(" + result.red + ',' + result.green + ',' + result.blue + ',' + result.alpha + ')'; 
             jQuery(event.currentTarget).parent().find('.custom-tag-color').css('background-color', color);
 
