@@ -398,6 +398,11 @@ def access_annotation_target(
     if not is_instructor and not assignment.is_published:
         raise PermissionDenied('Permission to access unpublished assignment by a non-instructor is denied')
 
+    try:
+        hide_sidebar = request.LTI['launch_params']['custom_hide_sidebar_instance'].split(',')
+    except:
+        hide_sidebar = []
+
     save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
 
     # Dynamically pass in the address that the detail view will use to fetch annotations.
@@ -426,7 +431,8 @@ def access_annotation_target(
         'session': request.session.session_key,
         'org': settings.ORGANIZATION,
         'logger_url': settings.ANNOTATION_LOGGER_URL,
-        'accessibility': settings.ACCESSIBILITY
+        'accessibility': settings.ACCESSIBILITY,
+        'hide_sidebar_instance': hide_sidebar
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
