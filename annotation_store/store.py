@@ -296,7 +296,20 @@ class CatchStoreBackend(StoreBackend):
         self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
 
     def _get_database_url(self, path='/'):
-        base_url = str(ANNOTATION_DB_URL).strip()
+        try:
+            if self.request.method == "GET":
+                assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+            else:
+                body = self._get_request_body()
+                assignment_id = body.get('collectionId', body.get('collection_id', None))
+            if assignment_id:
+                    assignment = self._get_assignment(assignment_id)
+                    base_url = assignment.annotation_database_url
+            else:
+                base_url = str(ANNOTATION_DB_URL).strip()
+        except:
+            self.logger.info("Default annotation_database_url used as assignment could not be found.")
+            base_url = str(ANNOTATION_DB_URL).strip()
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
     def _retrieve_annotator_token(self, user_id):
