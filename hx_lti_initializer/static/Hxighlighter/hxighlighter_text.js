@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, July 19th, 2019, 2:13:35 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, July 25th, 2019, 2:26:03 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -39130,7 +39130,7 @@ __webpack_require__(21);
 
 __webpack_require__(22);
 
-__webpack_require__(64);
+__webpack_require__(65);
 
 /***/ }),
 /* 14 */
@@ -39382,29 +39382,29 @@ __webpack_require__(38);
 
 __webpack_require__(10);
 
-__webpack_require__(40);
+__webpack_require__(41);
 
-__webpack_require__(44);
+__webpack_require__(45);
 
-__webpack_require__(46);
+__webpack_require__(47);
 
-__webpack_require__(48);
+__webpack_require__(49);
 
-__webpack_require__(50);
+__webpack_require__(51);
 
-__webpack_require__(52);
+__webpack_require__(53);
 
-__webpack_require__(54);
+__webpack_require__(55);
 
-__webpack_require__(56);
-
-__webpack_require__(58);
+__webpack_require__(57);
 
 __webpack_require__(59);
 
-__webpack_require__(61);
+__webpack_require__(60);
 
-__webpack_require__(63);
+__webpack_require__(62);
+
+__webpack_require__(64);
 
 (function ($) {
   /**
@@ -40066,6 +40066,7 @@ __webpack_require__(63);
     jQuery('.hx-selector-img').remove();
     jQuery(this.element).on('keydown', jQuery.proxy(this.filterKeys, this));
     jQuery(this.element).on('keyup', jQuery.proxy(this.setSelection, this));
+    jQuery('aside.sr-only').removeClass('sr-only');
     this.start = undefined;
     this.currentSelection = undefined;
     this.element.innerHTML = this.saveHTML;
@@ -40086,6 +40087,7 @@ __webpack_require__(63);
     jQuery(this.element).attr('tabindex', '');
     jQuery(this.element).attr('aria-multiline', 'false');
     jQuery(this.element).attr('outline', '0px');
+    jQuery('aside').addClass('sr-only');
     jQuery('.hx-selector-img').remove();
     this.start = undefined;
     this.currentSelection = undefined;
@@ -40833,7 +40835,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
   $.Sidebar.prototype.setUpSidebar = function () {
     var self = this;
     var sidebarOptions = jQuery.extend({
-      'tabsAvailable': ['search', 'mine', 'instructor', 'peers']
+      'tabsAvailable': ['search', 'mine', 'instructor', 'peer']
     }, self.options.viewer_options, {
       annotationItems: []
     });
@@ -40872,12 +40874,36 @@ var annotator = annotator ? annotator : __webpack_require__(5);
         jQuery('.btn.user-filter').find('.far.fa-check-square').removeClass('fa-check-square').addClass('fa-square');
       } else {
         if (jQuery(this).hasClass('active')) {
-          if (jQuery('.btn.user-filter.active').length > 1) {
+          if (jQuery('.btn.user-filter.active').length == 1) {
             jQuery(this).removeClass('active');
             jQuery(this).find('.far').removeClass('fa-check-square').addClass('fa-square');
+            jQuery('.annotationsHolder.side').html('');
+            var messageVals = [];
+            var pluralMessage = '';
+            jQuery.each(jQuery('.btn.user-filter'), function (a, b) {
+              if (b.id == 'mynotes') {
+                messageVals.push("your annotations");
+              } else if (b.id == 'instructor') {
+                messageVals.push("instructor annotations");
+              } else if (b.id == 'public') {
+                messageVals.push("peer annotations");
+              }
+            });
+
+            if (messageVals.length > 1) {
+              messageVals.splice(messageVals.length - 1, 0, 'and/or,');
+              messageVals = messageVals.join(', ').replace(',,', '');
+              pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>';
+            }
+
+            jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
+            return;
           }
+
+          jQuery(this).removeClass('active');
+          jQuery(this).find('.far').removeClass('fa-check-square').addClass('fa-square');
         } else {
-          //jQuery('.btn.user-filter').removeClass('active');
+          console.log("NOT an active class");
           jQuery(this).addClass('active');
           jQuery(this).find('.far').removeClass('fa-square').addClass('fa-check-square');
         }
@@ -40919,6 +40945,17 @@ var annotator = annotator ? annotator : __webpack_require__(5);
         }
       } else {
         search_options['userid'] = possible_include;
+      }
+
+      if (self.options.instructors.indexOf(self.options.user_id) > -1) {
+        if (filteroptions.indexOf('public') > -1 && (filteroptions.indexOf('mynotes') > -1 && filteroptions.indexOf('instructor') == -1 || filteroptions.indexOf('mynotes') == -1 && filteroptions.indexOf('instructor') > -1)) {
+          jQuery('.btn.user-filter#instructor').addClass('active');
+          jQuery('.btn.user-filter#instructor').find('.far').removeClass('fa-square').addClass('fa-check-square');
+          jQuery('.btn.user-filter#mynotes').addClass('active');
+          jQuery('.btn.user-filter#mynotes').find('.far').removeClass('fa-square').addClass('fa-check-square');
+          search_options['exclude_userid'] = [];
+          search_options['userid'] = [];
+        }
       }
 
       self.search(search_options);
@@ -40996,7 +41033,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
   $.Sidebar.prototype.showSidebarTab = function (type) {
     // if (type === "smalltab") {
     jQuery(':root').css('--sidebar-width', '55px');
-    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button"><i class="fa fa-arrow-right"></i></div>'); // }
+    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button"><span class="fas fa-comments"></span></div>'); // }
 
     jQuery('.open-sidebar').click(function () {
       jQuery('.open-sidebar').remove();
@@ -41070,7 +41107,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       jQuery('.side.item-' + ann.id).find('.edit').click(function (event) {
         self.ViewerEditorOpen(event, ann, true);
       });
-      jQuery('.side.item-' + ann.id).find('.quoteText').click(function () {
+      jQuery('.side.item-' + ann.id).click(function () {
         if (ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
           var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
           jQuery(self.element).parent().animate({
@@ -41089,6 +41126,43 @@ var annotator = annotator ? annotator : __webpack_require__(5);
             });
           }, 350);
         }
+      });
+      jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
+        jQuery('.btn.user-filter').removeClass('active');
+        jQuery('.btn.user-filter').find('.far.fa-check-square').removeClass('fa-check-square').addClass('fa-square');
+
+        if (jQuery(this).text().trim() !== self.options.common_instructor_name) {
+          self.search(self.filterByType(jQuery(this).html().trim(), 'User', undefined));
+          jQuery('.annotationsHolder').addClass('search-opened');
+          jQuery('.search-toggle').show();
+          $.publishEvent('searchSelected', self.instance_id, []);
+          jQuery('#srch-term').val(jQuery(this).text().trim());
+          jQuery('.search-bar select').val('User');
+        } else {
+          // var options = {
+          //     type: self.options.mediaType,
+          // }
+          // options['userid'] = self.options.instructors;
+          // self.search(options);
+          jQuery('.btn.user-filter#instructor').trigger('click');
+        }
+
+        $.pauseEvent(e);
+      });
+      jQuery('.side.item-' + ann.id).find('.annotation-tag.side').click(function (e) {
+        jQuery('.btn.user-filter').removeClass('active');
+        jQuery('.btn.user-filter').find('.far.fa-check-square').removeClass('fa-check-square').addClass('fa-square');
+        jQuery('.annotationsHolder').addClass('search-opened');
+        jQuery('.search-toggle').show(jQuery(this).html().trim());
+        var options = {
+          type: self.options.mediaType
+        };
+        var tagSearched = jQuery(this).html().trim();
+        options['tag'] = tagSearched;
+        jQuery('#srch-term').val(tagSearched);
+        jQuery('.search-bar select').val('Tag');
+        self.search(options);
+        $.pauseEvent(e);
       });
       $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
       jQuery('#empty-alert').css('display', 'none');
@@ -41149,7 +41223,8 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     var editor = jQuery('.side.item-' + annotation.id);
     editor.find('.body').after('<div class="editor-area side"><textarea id="annotation-text-field")></textarea><div class="plugin-area"></div><button tabindex="0" class="btn btn-primary save action-button">Save</button><button tabindex="0" class="btn btn-default cancel action-button">Cancel</button></div>');
     editor.find('.body').hide();
-    editor.find('.tagList').hide(); // closes the editor tool and does not save annotation
+    editor.find('.tagList').hide();
+    jQuery('.edit').prop('disabled', true); // closes the editor tool and does not save annotation
 
     editor.find('.cancel').click(function () {
       self.ViewerEditorClose(annotation, true, false, editor);
@@ -41163,7 +41238,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       }
 
       annotation.annotationText.push(text);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, true, false]);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, false, false]);
       self.ViewerEditorClose(annotation, true, false, editor);
     });
     $.publishEvent('editorShown', self.instance_id, [editor, annotation]);
@@ -41171,6 +41246,8 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
   $.Sidebar.prototype.ViewerEditorClose = function (annotation, redraw, should_erase, editor) {
     jQuery('.editor-area.side').remove();
+    jQuery('.edit').prop('disabled', false);
+    $.publishEvent('editorHidden', self.instance_id, []);
 
     if (editor) {
       editor.find('.side.body').show();
@@ -41533,7 +41610,7 @@ obj || (obj = {});
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <button class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" aria-label="Make annotation using keyboard"><i class="fas fa-keyboard"></i></button>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar"><i class="fa fa-arrow-left"></i></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
+__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <button class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" aria-label="Make annotation using keyboard"><i class="fas fa-keyboard"></i></button>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar"><span class="fas fa-angle-double-left"></span></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
 ((__t = ( filterTabCount )) == null ? '' : __t) +
 '">\n            ';
  if (tabsAvailable.indexOf('search') > -1) {;
@@ -41556,8 +41633,20 @@ __p += 'check-';
 __p += 'square"></span>&nbsp;Mine</button>\n            ';
  } ;
 __p += '\n            ';
+ if (tabsAvailable.indexOf('peer') > -1 || tabsAvailable.indexOf('all') > -1) {;
+__p += '\n        	<button type="button" class="btn btn-default user-filter ';
+ if (defaultTab.indexOf('peer') > -1) {;
+__p += 'active';
+ } ;
+__p += '" id=\'public\' aria-label="View peers\' annotations" role="button"><span class="far fa-';
+ if (defaultTab.indexOf('peer') > -1) {;
+__p += 'check-';
+ } ;
+__p += 'square"></span>&nbsp;Peer</button>\n            ';
+ } ;
+__p += '\n            ';
  if (tabsAvailable.indexOf('instructor') > -1) {;
-__p += '\n            	<button type="button" class="btn btn-default user-filter ';
+__p += '\n                <button type="button" class="btn btn-default user-filter ';
  if (defaultTab.indexOf('instructor') > -1) {;
 __p += 'active';
  } ;
@@ -41566,18 +41655,6 @@ __p += '" id=\'instructor\' aria-label="View instructor annotations" role="butto
 __p += 'check-';
  } ;
 __p += 'square"></span>&nbsp;Instructor</button>\n            ';
- } ;
-__p += '\n            ';
- if (tabsAvailable.indexOf('peers') > -1 || tabsAvailable.indexOf('all') > -1) {;
-__p += '\n        	<button type="button" class="btn btn-default user-filter ';
- if (defaultTab.indexOf('peers') > -1) {;
-__p += 'active';
- } ;
-__p += '" id=\'public\' aria-label="View peers\' annotations" role="button"><span class="far fa-';
- if (defaultTab.indexOf('peers') > -1) {;
-__p += 'check-';
- } ;
-__p += 'square"></span>&nbsp;Peers</button>\n            ';
  } ;
 __p += '\n        </div>\n    </div>\n    <div class="separator-solid side"></div>\n    <!-- <div class="filter-options side search-toggle" style=\'display:none;\'>\n        <div class="search-label">Search by:</div>\n        <div class="btn-group">\n            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>\n            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>\n            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>\n        </div>\n    </div> -->\n    <div class="search-bar side search-toggle" style=\'display:none;\'>\n        <div id="search-info" style="display:none">The following allows you to search annotations. The default filter is to search for a username, but make sure to change filter to annotation text or tag for other types of searches.</div>\n    	<div class="input-group">\n            <label for="srch-term" id="searchlabel" class="hidden">Search annotations:</label>\n            <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" aria-describedby="search-info" aria-labeledby="searchlabel">\n            <div class="input-group-btn">\n                <select class="form-control">\n                    <option>User</option>\n                    <option>Annotation</option>\n                    <option>Tag</option>\n                </select>\n            </div>\n        </div>\n        <div class="input-group-btn">\n                <button title="Search" class="btn btn-default" type="submit" id="search-submit" role="button" aria-label="Submit search"><i class="glyphicon glyphicon-search"></i></button>\n                <button title="Clear" class="btn btn-default" type="clear" id="search-clear" role="button" aria-label="Clear search input"><i class="glyphicon glyphicon-ban-circle"></i></button>\n            </div>\n        <div id="timeRangeFilter" style="display:none; color:white; margin-top:15px; margin-bottom:-30px">\n            <label for="startTimeFilter">Start:</label> <input type="text" id="startTimeFilter" style="display:inline; width:20%; color: black;" value="0:00"/>\n            <label for="endTimeFilter">End:</label> <input type="text" id="endTimeFilter" style="display:inline;width:20%; color: black;" value="0:00"/>\n        </div>\n    </div>\n    <div class="handleAnnotations" style="display:none">\n        <div id="printAnnotations"> <i class="fa fa-print"></i>   Print My Notes</div>\n        <div id="exportAnnotations"> <i class="fa fa-cloud-download"></i> Export</div>\n        <div id="importAnnotations"> <i class="fa fa-cloud-upload"></i> Import</div>\n    </div>\n    <div class="annotationsHolder side" role="list" aria-label="Annotations" >\n		';
  _.each(annotationItems, function(item) { ;
@@ -41850,8 +41927,9 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       self.annotation_tool.isStatic = false;
       self.annotation_tool.updating = false;
       self.annotation_tool.editing = false;
-    } // set editing mode
+    }
 
+    jQuery('.edit').prop('disabled', true); // set editing mode
 
     self.annotation_tool.editing = true;
     self.annotation_tool.updating = updating; // actually set up and draw the Editor
@@ -41868,6 +41946,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     }); // closes the editor tool and does not save annotation
 
     self.annotation_tool.editor.find('.cancel').click(function () {
+      console.log("HERE", annotation, !updating, true);
       $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
     }); // closes the editor and does save annotations
 
@@ -41891,6 +41970,8 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
   $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
     var self = this;
+    jQuery('.edit').prop('disabled', false);
+    $.publishEvent('editorHidden', self.instance_id, []);
 
     if (self.annotation_tool.editor) {
       self.annotation_tool.editor.remove();
@@ -42269,6 +42350,8 @@ __webpack_require__(8);
 
 __webpack_require__(9);
 
+__webpack_require__(40);
+
 (function ($) {
   /**
    * @constructor
@@ -42277,12 +42360,16 @@ __webpack_require__(9);
   $.SummernoteRichText = function (options, instanceID) {
     var maxLength = 1000;
     this.options = jQuery.extend({
-      height: 100,
+      height: 150,
       focus: true,
       width: 398,
       placeholder: "Add annotation text...",
       maximumImageFileSize: 262144,
+      maxHeight: 400,
+      minHeight: 100,
       maxTextLength: maxLength,
+      dialogsInBody: true,
+      disableResizeEditor: true,
       callbacks: {
         onKeydown: function onKeydown(e) {
           var t = e.currentTarget.innerText;
@@ -42328,6 +42415,8 @@ __webpack_require__(9);
     // warns dev that they forgot to include summernote.js
     if (_typeof(jQuery.summernote) !== "object") {//console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
     }
+
+    this.annotationListeners();
   };
   /**
    * 
@@ -42339,9 +42428,9 @@ __webpack_require__(9);
   $.SummernoteRichText.prototype.addWYSIWYG = function (element, selector) {
     var self = this; // adds the summernote WYSIWIG to the editor to the selector's location
 
-    this.elementObj = element.find(selector);
-    this.options.width = this.elementObj.parent().width();
-    this.elementObj.summernote(this.options); // removes summernote's ability to tab within the editor so users can tab through items
+    self.elementObj = element.find(selector);
+    self.options.width = this.elementObj.parent().width();
+    self.elementObj.summernote(this.options); // removes summernote's ability to tab within the editor so users can tab through items
 
     delete jQuery.summernote.options.keyMap.pc.TAB;
     delete jQuery.summernote.options.keyMap.mac.TAB;
@@ -42349,6 +42438,39 @@ __webpack_require__(9);
     delete jQuery.summernote.options.keyMap.mac['SHIFT+TAB'];
     element.find('.note-editable').trigger('focus');
     jQuery('.note-editor button').attr('tabindex', '0');
+    jQuery('.note-statusbar').hide();
+    jQuery(document).on('mouseleave', function () {
+      jQuery('.note-statusbar').trigger('mouseup');
+
+      if (self.elementObj) {
+        var editorObj = self.elementObj.closest('.annotation-editor');
+        var newTop = parseInt(editorObj.css('top'), 10);
+        ;
+        var newLeft = parseInt(editorObj.css('left'), 10);
+        console.log(editorObj, newTop, newLeft);
+
+        if (newTop + editorObj.outerHeight() > window.innerHeight) {
+          newTop = window.innerHeight - editorObj.outerHeight();
+        }
+
+        if (newLeft + editorObj.outerWidth() > window.innerWidth) {
+          newLeft = window.innerWidth - editorObj.outerWidth();
+        }
+
+        if (newTop < 0) {
+          newTop = 0;
+        }
+
+        if (newLeft < 0) {
+          newLeft = 0;
+        }
+
+        editorObj.css({
+          top: newTop,
+          left: newLeft
+        });
+      }
+    });
   };
   /**
    * Returns the HTML value of the WYSIWYG. 
@@ -42376,7 +42498,8 @@ __webpack_require__(9);
 
 
   $.SummernoteRichText.prototype.destroy = function (element, selector) {
-    this.elementObj.summernote('destroy');
+    var self = this;
+    self.elementObj.summernote('destroy');
     jQuery('.tooltip.fade').remove();
   }; // Annotation specific functions
 
@@ -42387,9 +42510,12 @@ __webpack_require__(9);
 
   $.SummernoteRichText.prototype.annotationListeners = function () {
     var self = this;
-    hxSubscribe('editorToBeHidden', self.instanceID, function () {
+    $.subscribeEvent('editorToBeHidden', self.instanceID, function () {
       self.destroy();
-    }.bind(this));
+    }.bind(self));
+    $.subscribeEvent('editorHidden', self.instanceID, function () {
+      self.destroy();
+    }.bind(self));
   };
   /**
    * Code to run just before the annotation is saved to storage
@@ -42481,6 +42607,12 @@ module.exports = __webpack_amd_options__;
 /* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
  *  Dropdown (Predetermined) Tags Plugin
  *  
@@ -42491,11 +42623,11 @@ __webpack_require__(10);
 
 __webpack_require__(11);
 
-__webpack_require__(41);
-
 __webpack_require__(42);
 
 __webpack_require__(43);
+
+__webpack_require__(44);
 
 (function ($) {
   /**
@@ -42517,6 +42649,7 @@ __webpack_require__(43);
   $.DropdownTags.prototype.init = function () {
     var self = this;
     self.name = 'DropdownTags';
+    self.annotationListeners();
   };
   /**
    * Returns the HTML value of the WYSIWYG. 
@@ -42632,6 +42765,9 @@ __webpack_require__(43);
 
   $.DropdownTags.prototype.annotationListeners = function () {
     var self = this;
+    $.subscribeEvent('editorHidden', self.instanceID, function () {
+      self.destroy();
+    }.bind(this));
   };
   /**
    * Code to run just before the annotation is saved to storage
@@ -42672,10 +42808,11 @@ __webpack_require__(43);
       preventDuplicates: true,
       allowTabOut: true,
       hintText: 'Add a tag...',
+      placeholder: 'Add tags. Separate multiple by using "Enter".',
       allowFreeTagging: 'folksonomy' in self.options ? self.options.folksonomy : false,
       noResultsText: "Not Found. Hit ENTER to add a personal tag."
     });
-    jQuery('#token-input-tag-list').attr('aria-label', 'Input text for tag. Separate tags by using "Enter".');
+    jQuery('#token-input-tag-list').attr('aria-label', 'Add tags. Separate multiple by using "Enter".'); // jQuery('#token-input-tag-list').attr('placeholder', 'Tag:');
 
     if (annotation.tags && annotation.tags.length > 0) {
       annotation.tags.forEach(function (tag) {
@@ -42687,6 +42824,12 @@ __webpack_require__(43);
     }
   };
 
+  $.DropdownTags.prototype.destroy = function () {
+    var self = this;
+    self.field.tokenInput('destroy');
+    jQuery('.token-input-dropdown-facebook').remove();
+  };
+
   Object.defineProperty($.DropdownTags, 'name', {
     value: "DropdownTags"
   });
@@ -42695,13 +42838,13 @@ __webpack_require__(43);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/*! jquery.tokeninput 2019-05-06 */
@@ -42709,13 +42852,13 @@ __webpack_require__(43);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -42724,7 +42867,7 @@ __webpack_require__(43);
  *  Will create an area for inputting tags, just a textfield, no color
  *
  */
-__webpack_require__(45);
+__webpack_require__(46);
 
 (function ($) {
   /**
@@ -42887,13 +43030,13 @@ __webpack_require__(45);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -42913,7 +43056,7 @@ __webpack_require__(8);
 
 __webpack_require__(9);
 
-__webpack_require__(47);
+__webpack_require__(48);
 
 
 
@@ -42928,6 +43071,7 @@ __webpack_require__(47);
       height: 70,
       focus: true,
       width: 356,
+      dialogsInBody: true,
       // airMode: true,
       placeholder: "Reply to annotation...",
       toolbar: [['font', ['bold', 'italic', 'underline', 'link']]]
@@ -43238,13 +43382,13 @@ __webpack_require__(47);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43253,7 +43397,7 @@ __webpack_require__(47);
  *
  */
 //uncomment to add css file
-__webpack_require__(49);
+__webpack_require__(50);
 
 (function ($) {
   /**
@@ -43305,13 +43449,13 @@ __webpack_require__(49);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43319,7 +43463,7 @@ __webpack_require__(49);
  *  
  *
  */
-__webpack_require__(51);
+__webpack_require__(52);
 
 (function ($) {
   /**
@@ -43439,13 +43583,13 @@ __webpack_require__(51);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43453,7 +43597,7 @@ __webpack_require__(51);
  *  
  *
  */
-__webpack_require__(53);
+__webpack_require__(54);
 
 (function ($) {
   /**
@@ -43523,13 +43667,13 @@ __webpack_require__(53);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43539,7 +43683,7 @@ __webpack_require__(53);
  */
 var annotator = annotator ? annotator : __webpack_require__(5); //uncomment to add css file
 
-__webpack_require__(55);
+__webpack_require__(56);
 
 (function ($) {
   /**
@@ -43639,13 +43783,13 @@ __webpack_require__(55);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43654,7 +43798,7 @@ __webpack_require__(55);
  *
  */
 //uncomment to add css file
-__webpack_require__(57);
+__webpack_require__(58);
 
 (function ($) {
   /**
@@ -43676,17 +43820,10 @@ __webpack_require__(57);
     var self = this; // console.log(this);
 
     var search_button = jQuery('.btn.user-filter#search');
-
-    if (search_button.hasClass('active')) {
-      self.setUpTokens();
-    }
-
     search_button.click(function () {
       self.removeTokens();
       setTimeout(function () {
-        if (search_button.hasClass('active')) {
-          self.setUpTokens();
-        }
+        self.setUpTokens();
       }, 250);
     });
     jQuery('.search-bar.side #search-submit').click(function () {
@@ -43714,6 +43851,7 @@ __webpack_require__(57);
 
   $.SidebarTagTokens.prototype.setUpTokens = function () {
     var self = this;
+    console.log("SETTING UP TOKENS", self.options.tagList);
     var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
     self.options.tagList.forEach(function (tag) {
       tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
@@ -43726,6 +43864,15 @@ __webpack_require__(57);
     return annotation;
   };
 
+  $.SidebarTagTokens.prototype.setUpListeners = function () {
+    var self = this;
+    $.subscribeEvent('searchSelected', self.instanceID, function () {
+      setTimeout(function () {
+        self.setUpTokens();
+      }, 250);
+    });
+  };
+
   Object.defineProperty($.SidebarTagTokens, 'name', {
     value: "SidebarTagTokens"
   });
@@ -43734,13 +43881,13 @@ __webpack_require__(57);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43817,7 +43964,7 @@ __webpack_require__(57);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43826,7 +43973,7 @@ __webpack_require__(57);
  *
  */
 //uncomment to add css file
-__webpack_require__(60);
+__webpack_require__(61);
 
 (function ($) {
   /**
@@ -43937,13 +44084,13 @@ __webpack_require__(60);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43952,7 +44099,7 @@ __webpack_require__(60);
  *
  */
 //uncomment to add css file
-__webpack_require__(62);
+__webpack_require__(63);
 
 (function ($) {
   /**
@@ -44036,13 +44183,13 @@ __webpack_require__(62);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
@@ -44715,7 +44862,7 @@ var hrange = __webpack_require__(3);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
