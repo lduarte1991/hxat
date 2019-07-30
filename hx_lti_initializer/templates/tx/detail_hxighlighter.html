@@ -11,15 +11,44 @@ Text Annotation Tool | {{ target_object.target_title }}
 {% endblock %}
 
 {% block mainapplication %}
-    <div class="hxighlighter-container">
-        <div class='container1'>
-            <h3>{{ target_object.target_title | safe }}</h3>
+    <main class="hxighlighter-container" role="main">
+        <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
+            <aside role="complementary" class="sr-only" accesskey="h">
+                    <div class='sr-only'>
+                        <h3>Quick Navigation Links</h3>
+                        <ul>
+                            <li><a href="#to-title">Text to be Annotated</a></li>
+                            <li><a href="#annotationList">Annotation List</a></li>
+                        </ul>
+                    </div>
+                    <h3>Keyboard Shortcuts</h3>
+                    <ul>
+                        <li><strong>"Ctrl + 1"</strong>: Turn text to be editable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
+                        <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
+                        <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. (You can also use the "Turn Hint Text On/Off" button below)</li>
+                    </ul>
+
+                    <h3>Making Annotations via Keyboard Instructions</h3>
+                    <ol>
+                        <li>Hit the "Make Keyboard Annotation" Button (or use the shortcut) to make text editable.</li>
+                        <li>The button should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
+                        <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
+                        </li>
+                        <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
+                    </ol>
+                    <div class='sr-only'>
+                        <div class='sr-real-alert' aria-live='assertive'></div>
+                        <div class="sr-alert" aria-live="polite"></div>
+                        <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
+                    </div>
+                </aside>
+            <h3 id='to-title'>{{ target_object.target_title | safe }}</h3>
             <h4>{{ target_object.target_author | safe }}</h4>
             <div class='annotations-section'>
                 {{ target_object.target_content | safe}}
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
     <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
     <script>
             var hxighlighter_object1 = {
@@ -31,6 +60,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     "username": "{{ username }}",
                     "user_id": "{{ user_id }}",
                     "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
+                    "common_instructor_name": "HxStaff"
                 },
                 "targets": [{
                     'mediaType': "text",
@@ -60,13 +90,17 @@ Text Annotation Tool | {{ target_object.target_title }}
                         filterTabCount: 4,
                         defaultTab: 'mine',
                         tabsAvailable: ['search', 'mine', 'instructor', 'all'],
-                        sidebarversion: 'sidemenu'
+                        sidebarversion: 'sidemenu',
+                        pagination: {{ assignment.pagination_limit }}
+                    },
+                    Badges: {
                     },
                     storageOptions: {
                         external_url: {
                             catchpy: "{% url 'annotation_store:api_root' %}"
                         },
                         token: "{{ token }}",
+                        pagination: {{ assignment.pagination_limit }},
                         database_params: {
                             resource_link_id: "{{ resource_link_id }}",
                             utm_source: "{{ utm_source }}"
