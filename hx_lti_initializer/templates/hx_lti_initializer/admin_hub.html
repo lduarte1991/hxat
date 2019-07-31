@@ -7,7 +7,7 @@
     {% for course in courses %}
         <h2 class="course-name">{{ course.course_name }}</h2>
         {% if is_instructor %}
-            <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}?resource_link_id={{resource_link_id}}"><i class='fa fa-pencil' style='margin-right:4px'></i>Edit course settings</a>
+            <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}"><i class='fa fa-pencil' style='margin-right:4px'></i>Edit course settings</a>
             <div class='starting-resource'><strong>Starting Resource:</strong>
               <span class="starting-resource-object">{% if starter_object %}{{starter_object | safe}}{%else %}None{% endif %}</span>
               <span class="starting-resource-object-none" style="display:{% if starter_object %}none{% else %}inline{% endif %};">
@@ -39,7 +39,7 @@
                         </div>
                         <div style="float: left; min-width: 170px; width: 34%;">
                         {% if is_instructor %}
-                            <a class='edit-assignment-button' href="{% url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}?resource_link_id={{resource_link_id}}"'><i class='fa fa-pencil' style='margin-right:4px'></i> Edit assignment</a>
+                            <a class='edit-assignment-button' href="{% url 'hx_lti_assignment:edit_assignment' id=assignment.pk %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}"'><i class='fa fa-pencil' style='margin-right:4px'></i> Edit assignment</a>
                         {% endif %}
                         </div>
                     </div>
@@ -51,7 +51,7 @@
                         {% for file in assignment.assignment_objects.all|order_by:"assignmenttargets" %}
                             <div class='table-row'>
                                 {% if is_instructor %}
-                                <span href='#' class='make-starting-resource' data-url="{% url 'hx_lti_initializer:change_starting_resource' assignment_id=assignment.assignment_id object_id=file.id %}?resource_link_id={{resource_link_id}}" data-title='{{file.target_title}}'>
+                                <span href='#' class='make-starting-resource' data-url="{% url 'hx_lti_initializer:change_starting_resource' assignment_id=assignment.assignment_id object_id=file.id %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" data-title='{{file.target_title}}'>
                                     {% if assignment.assignment_id == starter_collection_id and file.id == starter_object_id %}
                                     <i class='fa fa-check-square'></i>
                                     {% else %}
@@ -68,7 +68,7 @@
                             </div>
                         {% endfor %}
                         {% if is_instructor %}
-                            <div class='table-footer table-row delete-assignment-button' data-id='{{assignment.pk}}' data-delete-url="{% url 'hx_lti_assignment:delete_assignment' id=assignment.pk %}?resource_link_id={{ resource_link_id }}" data-title="{{assignment.assignment_name|escape}}"><i class='fa fa-trash'></i> Delete assignment</div>
+                            <div class='table-footer table-row delete-assignment-button' data-id='{{assignment.pk}}' data-delete-url="{% url 'hx_lti_assignment:delete_assignment' id=assignment.pk %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}" data-title="{{assignment.assignment_name|escape}}"><i class='fa fa-trash'></i> Delete assignment</div>
                         {% endif %}
                     </div>
                 </div>
@@ -77,8 +77,8 @@
 
         {% if is_instructor %}
         <div id="new-assignment-section" style='top:25px; position: relative;'>
-            <a href="{% url 'hx_lti_assignment:create_new_assignment' %}?resource_link_id={{resource_link_id}}" id="new-assignment-button" role="button">Create new assignment</a>
-            or <a href="{% url 'hx_lti_assignment:import_assignment' %}?resource_link_id={{resource_link_id}}" style='margin-left: 10px;'>import from another course</a>
+            <a href="{% url 'hx_lti_assignment:create_new_assignment' %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" id="new-assignment-button" role="button">Create new assignment</a>
+            or <a href="{% url 'hx_lti_assignment:import_assignment' %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" style='margin-left: 10px;'>import from another course</a>
         </div>
         {% endif %}
     {% endfor %}
@@ -109,7 +109,7 @@
             var assignment_title = $this.data('title');
             var url = $this.data('delete-url');
 
-            var html='<div class="delete-popup-overlay"><div class="delete-popup-background"><h3>Delete this Assignment</h3><p>Are you sure you want to delete the assignment: <em>&quot;'+ assignment_title +'&quot;</em></p><p>Deleting this assignment will remove it from the course, and you will lose access to any annotations and instructions that were created.</p><p><input type="checkbox" id="delete-check"><label for="delete-check">I understand that deleting this assignment cannot be undone.</label></p><form action="'+url+'" method="post">'+"{% csrf_token %}"+'<div id="delete-popup-confirm" class="disabled" type="submit" role="button">Delete assignment</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';
+            var html='<div class="delete-popup-overlay"><div class="delete-popup-background"><h3>Delete this Assignment</h3><p>Are you sure you want to delete the assignment: <em>&quot;'+ assignment_title +'&quot;</em></p><p>Deleting this assignment will remove it from the course, and you will lose access to any annotations and instructions that were created.</p><p><input type="checkbox" id="delete-check"><label for="delete-check">I understand that deleting this assignment cannot be undone.</label></p><form action="'+url+'" method="post">'+'{% csrf_token %}'+'<div id="delete-popup-confirm" class="disabled" type="submit" role="button">Delete assignment</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';
             jQuery('body').append(html);
             jQuery('#delete-check').change(function(){
                 var isChecked = jQuery(this).prop('checked');

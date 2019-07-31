@@ -1,1 +1,1 @@
--r annotationsx/requirements/aws.txt
+-r annotationsx/requirements/django2-update.txt

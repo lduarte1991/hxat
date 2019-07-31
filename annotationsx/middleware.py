@@ -17,14 +17,23 @@ import collections
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.http import HttpResponse
-from ims_lti_py.tool_provider import DjangoToolProvider
+from lti.contrib.django import DjangoToolProvider
 import logging
 import time
 import json
 import importlib
 import oauth2
 
+from .lti_validators import LTIRequestValidator
+
 logger = logging.getLogger(__name__)
+
+# borrowed deliberately from: https://github.com/arteria/django-ar-organizations/commit/e890d9ab02053a626519ad151a2bb485fb0d9d8c
+try:
+    from django.utils.deprecation import MiddlewareMixin
+except ImportError:
+    class MiddlewareMixin(object):
+        pass
 
 def ip_address(request):
     ''' Returns the real IP address from a request, or if that fails, returns 1.2.3.4.'''
@@ -36,7 +45,7 @@ def ip_address(request):
 class LTILaunchError(Exception):
     pass
 
-class LTILaunchSession(object):
+class LTILaunchSession(MiddlewareMixin):
     '''
     Dict-like object that provides access to the session dict containing for the LTI Launch,
     which is keyed by the resource_link_id.
@@ -106,14 +115,15 @@ class LTILaunchSession(object):
 
 
 
-class ContentSecurityPolicyMiddleware(object):
+class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     '''
     Sets the Content-Security-Policy header to restrict webpages from being
     embedded on other domains. This is better supported and more flexible than X-Frame-Options.
 
     Expects the CONTENT_SECURITY_POLICY_DOMAIN to be set in the django.settings object.
     '''
-    def __init__(self):
+    def __init__(self, get_response):
+        self.get_response = get_response
         self.logger = logging.getLogger(__name__)
 
     def process_response(self, request, response):
@@ -128,14 +138,15 @@ class ContentSecurityPolicyMiddleware(object):
                 self.logger.warn('Content-Security-Policy header not set')
         return response
 
-class CookielessSessionMiddleware(object):
+class CookielessSessionMiddleware(MiddlewareMixin):
     '''
     This middleware implements cookieless sessions by retrieving the session identifier 
     from  cookies (preferred, if available) or the request URL.
-    
+
     This must be added to INSTALLED_APPS prior to other middleware that uses the session.
     '''
-    def __init__(self):
+    def __init__(self, get_response):
+        self.get_response = get_response
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Starting session engine %s" % settings.SESSION_ENGINE)
         engine = importlib.import_module(settings.SESSION_ENGINE)
@@ -177,7 +188,7 @@ class CookielessSessionMiddleware(object):
 
 
 
-class MultiLTILaunchMiddleware(object):
+class MultiLTILaunchMiddleware(MiddlewareMixin):
     '''
     This middleware detects an LTI launch request, validates it, and stores multiple LTI launches
     in a single session.
@@ -188,7 +199,8 @@ class MultiLTILaunchMiddleware(object):
     Note: this middleware is derived from django_auth_lti.middleware_patched with some changes for
     this application.
     '''
-    def __init__(self):
+    def __init__(self, get_response):
+        self.get_response = get_response
         self.logger = logging.getLogger(__name__)
 
     def process_exception(self, request, exception):
@@ -208,6 +220,7 @@ class MultiLTILaunchMiddleware(object):
             self._set_current_session(request, resource_link_id=request.POST.get('resource_link_id'), raise_exception=True)
         else:
             self._set_current_session(request, resource_link_id=request.GET.get('resource_link_id'), raise_exception=False)
+        return self.get_response(request)
 
     def _validate_request(self, request):
         '''
@@ -233,7 +246,9 @@ class MultiLTILaunchMiddleware(object):
             raise LTILaunchError
 
         self.logger.debug('using key/secret %s/%s' % (request_key, secret))
-        tool_provider = DjangoToolProvider(request_key, secret, request.POST)
+        tool_provider = DjangoToolProvider.from_django_request(
+            secret, request=request)
+        validator = LTIRequestValidator()
 
         postparams = request.POST.dict()
         self.logger.debug('request is secure: %s' % request.is_secure())
@@ -256,13 +271,13 @@ class MultiLTILaunchMiddleware(object):
             # the POST parameters like Canvas.
             qs = request.META.pop('QUERY_STRING', '')
             self.logger.debug('removed query string temporarily: %s' % qs)
-            request_is_valid = tool_provider.is_valid_request(request, parameters={}, handle_error=False)
+            request_is_valid = tool_provider.is_valid_request(validator)
             request.META['QUERY_STRING'] = qs  # restore the query string
             self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
         except oauth2.Error as e:
             self.logger.error("signature check failed")
             self.logger.exception(e)
-            raise LTILaunchError
+            raise LTILaunchError('Authorization Error')
 
         self.logger.info("signature verified")
 
@@ -344,7 +359,7 @@ class MultiLTILaunchMiddleware(object):
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
 
 
-class ExceptionLoggingMiddleware(object):
+class ExceptionLoggingMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         logging.exception('Exception logged for request: %s message: %s' % (request.path, str(exception)))

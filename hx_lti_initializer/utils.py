@@ -3,14 +3,13 @@ These functions will be used for the initializer module, but may also be
 helpful elsewhere.
 """
 import django.shortcuts
-from urlparse import urlparse
+from urllib.parse import urlparse
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from abstract_base_classes.target_object_database_api import *
-from models import *
+from .models import *
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from ims_lti_py.tool_provider import DjangoToolProvider
+from django.urls import reverse
 from os.path import splitext, basename
 import base64
 import sys
@@ -129,8 +128,7 @@ def retrieve_token(userid, apikey, secret):
       'issuedAt': _now(),
       'ttl': 86400
     }, secret)
-
-    return token
+    return str(token, 'utf-8')
 
 def get_admin_ids(context_id):
     """
@@ -227,7 +225,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         "Content-Type":"application/json"
     }
     limit = kwargs.get('limit', -1) # Note: -1 means get everything there is
-    encoded_context_id = urllib.quote_plus(context_id)
+    encoded_context_id = urllib.parse.quote_plus(context_id)
     request_url = "%s/search?contextId=%s&limit=%s" % (annotation_db_url, encoded_context_id, limit)
 
     logger.debug("fetch_annotations_by_course(): url: %s" % request_url)
