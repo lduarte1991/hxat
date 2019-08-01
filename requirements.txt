@@ -1,1 +1,1 @@
--r annotationsx/requirements/django2-update.txt
+-r annotationsx/requirements/base.txt
