@@ -264,7 +264,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         assignment.assignment_id = uuid.uuid4()
         assignment.save()
         result.update({'new_assignment_id': str(assignment.assignment_id)})
-        result.update({'assignment_name': unicode(assignment.assignment_name)})
+        result.update({'assignment_name': str(assignment.assignment_name)})
         
         pks = []
         for at in aTargets:
