@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, July 25th, 2019, 2:26:03 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, August 1st, 2019, 1:55:23 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -41116,13 +41116,15 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
           setTimeout(function () {
             ann._local.highlights.forEach(function (hl) {
-              jQuery(hl).css({
-                border: '0 solid black'
-              }).animate({
-                borderWidth: 2
-              }, 200).animate({
-                borderWidth: 0
-              }, 200);
+              if (jQuery(hl).text().trim().length > 0) {
+                jQuery(hl).css({
+                  border: '0 solid black'
+                }).animate({
+                  borderWidth: 2
+                }, 200).animate({
+                  borderWidth: 0
+                }, 200);
+              }
             });
           }, 350);
         }
@@ -42239,7 +42241,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     }
 
     if (newTop + elHeight > window.innerHeight) {
-      newTop = window.innerHeight - elHeight - 34; // 34 is the height of the save/cancel buttons that get cut off
+      newTop = window.innerHeight - elHeight - 34 - 75; // 34 is the height of the save/cancel buttons that get cut off 
     }
 
     if (newLeft + elWidth > window.innerWidth) {
@@ -44234,8 +44236,11 @@ var hrange = __webpack_require__(3);
       resource_link_id: self.options.storageOptions.database_params.resource_link_id,
       utm_source: self.options.storageOptions.database_params.utm_source
     }, options);
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
     jQuery.ajax({
-      url: self.url_base + '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id + '&utm_source=' + this.options.storageOptions.database_params.utm_source,
+      url: self.url_base + params,
       method: 'GET',
       data: data,
       headers: {
@@ -44295,8 +44300,11 @@ var hrange = __webpack_require__(3);
     }
 
     var save_ann = self.convertToWebAnnotation(ann_to_save, jQuery(elem).find('.annotator-wrapper'));
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
     jQuery.ajax({
-      url: self.url_base + save_ann['id'] + '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id + '&utm_source=' + this.options.storageOptions.database_params.utm_source,
+      url: self.url_base + save_ann['id'] + params,
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify(save_ann),
@@ -44328,8 +44336,11 @@ var hrange = __webpack_require__(3);
 
   $.CatchPy.prototype.StorageAnnotationDelete = function (ann_to_delete, elem) {
     var self = this;
+    var params = '&resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
     jQuery.ajax({
-      url: self.url_base + ann_to_delete['id'] + '?catchpy=true&resource_link_id=' + self.options.storageOptions.database_params.resource_link_id,
+      url: self.url_base + ann_to_delete['id'] + '?catchpy=true' + params,
       method: 'DELETE',
       headers: {
         'x-annotator-auth-token': self.options.storageOptions.token
@@ -44359,8 +44370,11 @@ var hrange = __webpack_require__(3);
   $.CatchPy.prototype.StorageAnnotationUpdate = function (ann_to_update, elem) {
     var self = this;
     var save_ann = self.convertToWebAnnotation(ann_to_update, jQuery(elem).find('.annotator-wrapper'));
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
     jQuery.ajax({
-      url: self.url_base + ann_to_update.id + '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id + '&utm_source=' + this.options.storageOptions.database_params.utm_source,
+      url: self.url_base + ann_to_update.id + params,
       method: 'PUT',
       contentType: 'application/json',
       data: JSON.stringify(save_ann),
