@@ -66,7 +66,7 @@ class AnnotationStore(object):
             version_requested = request.GET.get('version', None)
         else:
             body = json.loads(str(request.body, 'utf-8'))
-            version_requested = body.get('version', 'None')
+            version_requested = body.get('version', None)
         if version_requested is not None:
             try:
                 backend_instance = possible_backend_types[version_requested](request)
@@ -75,6 +75,8 @@ class AnnotationStore(object):
                 logger.info(e)
                 logger.info('version requested (%s) not in list of possible types' % version_requested)
                 raise e
+        else:
+            return cls(request, possible_backend_types['catch'](request))
         assert backend_type_setting in possible_backend_types
         backend_instance = possible_backend_types[backend_type](request)
         return cls(request, backend_instance)
