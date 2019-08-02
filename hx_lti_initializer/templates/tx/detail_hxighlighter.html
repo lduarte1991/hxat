@@ -51,6 +51,36 @@ Text Annotation Tool | {{ target_object.target_title }}
     </main>
     <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
     <script>
+            var tags = "{{ assignment.highlights_options }}".split(',');
+            var tagDict = {};
+            tags.forEach(function(tagval) {
+                var pair = tagval.split(':');
+                tagDict[pair[0]] = pair[1]
+            });
+            var tabsCounter = 1;
+            var tabsList = ['search'];
+            {% if assignment.include_mynotes_tab %}
+                tabsCounter += 1;
+                tabsList.push('mine');
+            {% endif %}
+
+            {% if assignment.include_instructor_tab %}
+                tabsCounter += 1;
+                tabsList.push('instructor');
+            {% endif %}
+
+            {% if assignment.include_public_tab %}
+                tabsCounter += 1;
+                tabsList.push('peer');
+            {% endif %}
+            var defTab = "{{ assignment.default_tab }}";
+            if (defTab == "Instructor") {
+                defTab = "instructor"
+            } else if (defTab == "MyNotes") {
+                defTab = "mine";
+            } else if (defTab == "Public") {
+                defTab = "peer"
+            }
             var hxighlighter_object1 = {
                 "commonInfo": {
                     "mediaType": "text",
@@ -60,7 +90,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     "username": "{{ username }}",
                     "user_id": "{{ user_id }}",
                     "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
-                    "common_instructor_name": "HxStaff"
+                    "common_instructor_name": "{{assignment.common_inst_name}}"
                 },
                 "targets": [{
                     'mediaType': "text",
@@ -68,28 +98,25 @@ Text Annotation Tool | {{ target_object.target_title }}
                     'object_source': '.container1',
                     "template_urls":  "{% static 'templates/dashboard/' %}",
                     "DropdownTags": {
-                        'tags': ['parallelism', 'imagery'],
+                        'tags': Object.keys(tagDict),
                         'folksonomy': true,
                     },
-                    {% if instructions is not None and instructions != "" %}
+                    {% if instructions != "" %}
                     "InstructionPanel": {
                         'instructions': "{{ instructions | escapejs }}"
                     },
                     {% endif %}
-                    "ColorTags": {
-                        'imagery': '#00FF00',
-                        'parallelism': '#0000FF'
-                    },
+                    "ColorTags": tagDict,
                     "SidebarTagTokens": {
-                        'tagList': ['parallelism', 'imagery']
+                        'tagList': Object.keys(tagDict),
                     },
                     "HxPermissions": {
                         has_staff_permissions: ("{{ is_instructor }}" === "True")
                     },
                     viewerOptions: {
-                        filterTabCount: 4,
-                        defaultTab: 'mine',
-                        tabsAvailable: ['search', 'mine', 'instructor', 'all'],
+                        filterTabCount: tabsCounter,
+                        defaultTab: defTab,
+                        tabsAvailable: tabsList,
                         sidebarversion: 'sidemenu',
                         pagination: {{ assignment.pagination_limit }}
                     },

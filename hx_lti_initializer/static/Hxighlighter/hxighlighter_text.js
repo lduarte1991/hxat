@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, August 1st, 2019, 1:55:23 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, August 2nd, 2019, 2:40:02 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -39670,7 +39670,12 @@ __webpack_require__(64);
         };
       } else if (self.options.viewerOptions.defaultTab === "instructor") {
         options = {
-          'username': self.options.instructors
+          'userid': self.options.instructors
+        };
+      } else {
+        var exclusion = [self.options.user_id].concat(self.options.instructors);
+        options = {
+          'exclude_userid': exclusion
         };
       }
 
@@ -43424,7 +43429,12 @@ __webpack_require__(50);
   };
 
   $.InstructionPanel.prototype.setUpInstructions = function () {
-    var self = this; // console.log(self.options.instructions, typeof(self.options.instructions));
+    var self = this;
+
+    if (!self.options.instructions || self.options.instructions.length == 0) {
+      return;
+    } // console.log(self.options.instructions, typeof(self.options.instructions));
+
 
     var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
     jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions

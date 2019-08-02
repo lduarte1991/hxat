@@ -608,7 +608,9 @@ AssignmentEditor.prototype = {
         var course = jQuery('#assignment-name-input').data('course-id');
         jQuery('#id_course').val(course);
         jQuery('#id_assignment_name').val(jQuery('#assignment-name-input').val());
+        jQuery('#id_common_inst_name').val(jQuery('#common_inst_name').val().trim());
         jQuery("#id_is_published").attr("checked", jQuery("#assignment-published").is(":checked") ? true : false);
+        jQuery('#id_use_hxighlighter').attr("checked", jQuery('#use_hxighlighter').is(":checked") ? true : false);
         jQuery('form').submit();
     },
     save_annotation_settings: function() {

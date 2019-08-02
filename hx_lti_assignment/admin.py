@@ -9,7 +9,7 @@ class AssignmentTargetsInline(admin.TabularInline):
 
 class AssignmentAdmin(admin.ModelAdmin):
     inlines = (AssignmentTargetsInline,)
-    list_display = ('assignment_name', 'course', 'is_published')
+    list_display = ('assignment_name', 'course', 'is_published', 'use_hxighlighter')
     search_fields = ('assignment_name',)
 
 admin.site.register(Assignment, AssignmentAdmin)
