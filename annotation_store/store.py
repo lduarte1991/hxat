@@ -59,10 +59,24 @@ class AnnotationStore(object):
 
     @classmethod
     def from_settings(cls, request):
-        backend_type = cls.SETTINGS.get('backend', 'catchpy')
-        backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
-        assert backend_type in backend_types
-        backend_instance = backend_types[backend_type](request)
+        backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
+        backend_types = backend_type_setting.split(',')
+        possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
+        if request.method == "GET":
+            version_requested = request.GET.get('version', None)
+        else:
+            body = json.loads(str(request.body, 'utf-8'))
+            version_requested = body.get('version', 'None')
+        if version_requested is not None:
+            try:
+                backend_instance = possible_backend_types[version_requested](request)
+                return cls(request, backend_instance)
+            except Exception as e:
+                logger.info(e)
+                logger.info('version requested (%s) not in list of possible types' % version_requested)
+                raise e
+        assert backend_type_setting in possible_backend_types
+        backend_instance = possible_backend_types[backend_type](request)
         return cls(request, backend_instance)
 
     @classmethod
@@ -294,6 +308,21 @@ class CatchStoreBackend(StoreBackend):
             'content-type': 'application/json',
         }
         self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
+
+    def root(self, annotation_id):
+        self.logger.info(u"MethodType: %s" % self.request.method)
+        if self.request.method == "GET":
+            self.before_search()
+            response = self.search()
+            self.after_search(response)
+            return response
+        elif self.request.method == "POST":
+            return self.create(annotation_id)
+        elif self.request.method == "PUT":
+            return self.update(annotation_id)
+        elif self.request.method == "DELETE":
+            return self.delete(annotation_id)
+        return self.BACKEND_NAME
 
     def _get_database_url(self, path='/'):
         try:
