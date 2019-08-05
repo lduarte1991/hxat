@@ -122,6 +122,16 @@ Text Annotation Tool | {{ target_object.target_title }}
                     },
                     Badges: {
                     },
+                    {% if is_instructor %}
+                    AdminButton: {
+                        homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                    },
+                    {% endif %}
+                    PrevNextButton: {
+                        prevUrl: "{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}",
+                        nextUrl: "{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}"
+                    },
                     storageOptions: {
                         external_url: {
                             catchpy: "{% url 'annotation_store:api_root' %}"
