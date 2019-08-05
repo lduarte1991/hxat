@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Monday, August 5th, 2019, 12:02:24 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, August 5th, 2019, 5:02:10 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -43505,7 +43505,7 @@ __webpack_require__(52);
 
   $.FontResize.prototype.setUpButtons = function () {
     var self = this;
-    jQuery(self.options.slot).prepend('<div class="btn-group" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label"></span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
+    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label"></span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
     jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
       self.toggleTextSize(1);
     });
@@ -44238,10 +44238,8 @@ __webpack_require__(65);
     if (self.options.AdminButton) {
       self.url = self.options.AdminButton.homeURL;
       self.allowed = self.options.AdminButton.has_staff_permissions;
-      console.log(self.url, self.allowed, self.allowed && self.url && self.url != '');
 
       if (self.allowed && self.url && self.url != '') {
-        console.log("Should set up buttons");
         self.setUpButtons();
       }
     }
@@ -44249,7 +44247,7 @@ __webpack_require__(65);
 
   $.AdminButton.prototype.setUpButtons = function () {
     var self = this;
-    jQuery(self.options.slot).prepend('<a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button>');
+    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
   };
 
   $.AdminButton.prototype.saving = function (annotation) {
@@ -44299,9 +44297,12 @@ __webpack_require__(67);
 
   $.PrevNextButton.prototype.init = function () {
     var self = this;
-    self.prevUrl = self.options.PrevNextButton.prevUrl;
-    self.nextUrl = self.options.PrevNextButton.nextUrl;
-    self.setUpButtons();
+
+    if (self.options.PrevNextButton) {
+      self.prevUrl = self.options.PrevNextButton.prevUrl;
+      self.nextUrl = self.options.PrevNextButton.nextUrl;
+      self.setUpButtons();
+    }
   };
 
   $.PrevNextButton.prototype.setUpButtons = function () {
