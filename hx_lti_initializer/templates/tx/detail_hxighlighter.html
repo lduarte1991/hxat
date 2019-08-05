@@ -52,6 +52,7 @@ Text Annotation Tool | {{ target_object.target_title }}
     <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
     <script>
             var tags = "{{ assignment.highlights_options }}".split(',');
+            var hide_sidebar = {{ hide_sidebar_instance | safe }};
             var tagDict = {};
             tags.forEach(function(tagval) {
                 var pair = tagval.split(':');
@@ -60,18 +61,24 @@ Text Annotation Tool | {{ target_object.target_title }}
             var tabsCounter = 1;
             var tabsList = ['search'];
             {% if assignment.include_mynotes_tab %}
-                tabsCounter += 1;
-                tabsList.push('mine');
+                if (hide_sidebar.indexOf('mine') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('mine');
+                }
             {% endif %}
 
             {% if assignment.include_instructor_tab %}
-                tabsCounter += 1;
-                tabsList.push('instructor');
+                if (hide_sidebar.indexOf('instructor') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('instructor');
+                }
             {% endif %}
 
             {% if assignment.include_public_tab %}
-                tabsCounter += 1;
-                tabsList.push('peer');
+                if (hide_sidebar.indexOf('peer') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('peer');
+            }
             {% endif %}
             var defTab = "{{ assignment.default_tab }}";
             if (defTab == "Instructor") {
