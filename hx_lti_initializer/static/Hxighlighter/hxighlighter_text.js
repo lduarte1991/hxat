@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, August 2nd, 2019, 2:40:02 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, August 5th, 2019, 12:02:24 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -39130,7 +39130,7 @@ __webpack_require__(21);
 
 __webpack_require__(22);
 
-__webpack_require__(65);
+__webpack_require__(69);
 
 /***/ }),
 /* 14 */
@@ -39405,6 +39405,10 @@ __webpack_require__(60);
 __webpack_require__(62);
 
 __webpack_require__(64);
+
+__webpack_require__(66);
+
+__webpack_require__(68);
 
 (function ($) {
   /**
@@ -44204,6 +44208,135 @@ __webpack_require__(63);
 /* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  AdminButton Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(65);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.AdminButton = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.AdminButton.prototype.init = function () {
+    var self = this;
+
+    if (self.options.AdminButton) {
+      self.url = self.options.AdminButton.homeURL;
+      self.allowed = self.options.AdminButton.has_staff_permissions;
+      console.log(self.url, self.allowed, self.allowed && self.url && self.url != '');
+
+      if (self.allowed && self.url && self.url != '') {
+        console.log("Should set up buttons");
+        self.setUpButtons();
+      }
+    }
+  };
+
+  $.AdminButton.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button>');
+  };
+
+  $.AdminButton.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.AdminButton, 'name', {
+    value: "AdminButton"
+  });
+  $.plugins.push($.AdminButton);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  PrevNextButton Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(67);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.PrevNextButton = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.PrevNextButton.prototype.init = function () {
+    var self = this;
+    self.prevUrl = self.options.PrevNextButton.prevUrl;
+    self.nextUrl = self.options.PrevNextButton.nextUrl;
+    self.setUpButtons();
+  };
+
+  $.PrevNextButton.prototype.setUpButtons = function () {
+    var self = this;
+
+    if (self.prevUrl && self.prevUrl != "") {
+      jQuery(self.options.slot).append('<a href="' + self.prevUrl + '" title="Previous Page" id="prevButton" role="button">Previous</button>');
+    }
+
+    if (self.nextUrl && self.nextUrl != "") {
+      jQuery(self.options.slot).append('<a href="' + self.nextUrl + '" title="Next Page" id="nextButton" role="button">Next</button>');
+    }
+  };
+
+  $.PrevNextButton.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.PrevNextButton, 'name', {
+    value: "PrevNextButton"
+  });
+  $.plugins.push($.PrevNextButton);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
 var hrange = __webpack_require__(3);
 
@@ -44886,7 +45019,7 @@ var hrange = __webpack_require__(3);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 65 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
