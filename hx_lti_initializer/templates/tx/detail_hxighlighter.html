@@ -1,4 +1,5 @@
 {% extends 'hx_lti_initializer/hxighlighter_base.html' %}
+
 {% load staticfiles %}
 {% load list_of_ids %}
 
@@ -42,9 +43,9 @@ Text Annotation Tool | {{ target_object.target_title }}
                         <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
                     </div>
                 </aside>
-            <h3 id='to-title'>{{ target_object.target_title | safe }}</h3>
-            <h4>{{ target_object.target_author | safe }}</h4>
             <div class='annotations-section'>
+                <h3 id='to-title'>{{ target_object.target_title | safe }}</h3>
+                <h4>{{ target_object.target_author | safe }}</h4>
                 {{ target_object.target_content | safe}}
             </div>
         </section>
@@ -136,8 +137,8 @@ Text Annotation Tool | {{ target_object.target_title }}
                     },
                     {% endif %}
                     PrevNextButton: {
-                        prevUrl: "{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}",
-                        nextUrl: "{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}"
+                        prevUrl: {% if prev_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
+                        nextUrl: {% if next_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %}
                     },
                     storageOptions: {
                         external_url: {

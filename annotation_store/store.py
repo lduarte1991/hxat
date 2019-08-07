@@ -62,11 +62,14 @@ class AnnotationStore(object):
         backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
         backend_types = backend_type_setting.split(',')
         possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
-        if request.method == "GET":
+        if request.method == "GET" or request.method == "DELETE":
             version_requested = request.GET.get('version', None)
         else:
             body = json.loads(str(request.body, 'utf-8'))
             version_requested = body.get('version', None)
+            if version_requested is None:
+                version_requested = request.GET.get('version')
+            logger.info('WebAnnotation version found %s' % request.GET.get('version'))
         if version_requested is not None:
             try:
                 backend_instance = possible_backend_types[version_requested](request)
