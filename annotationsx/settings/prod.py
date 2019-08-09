@@ -5,7 +5,6 @@ from .aws import *
 # remove log file to avoid crowding the disk: hx provision does not configure
 # rotation nor cleanup for app log files!
 #
-DEBUG = False
 LOGGING['loggers']['django']['handlers'] = ['console']
 LOGGING['loggers']['django.request']['handlers'] = ['console']
 LOGGING['loggers']['django.db.backends']['handlers'] = ['console']
