@@ -23,7 +23,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECURE_SETTINGS.get('django_secret_key', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = literal_eval(os.environ.get('DEBUG', str(SECURE_SETTINGS.get('debug', True))))
+
+# disambiguation when reading from env: env vars always strings so if
+# DEBUG=False, it's still evaluated as boolean True. Some ways to read a
+# boolean from a string source in this related thread:
+#   https://stackoverflow.com/questions/21732123/convert-true-false-value-read-from-file-to-boolean
+debug = os.environ.get('DEBUG', None)
+if debug is None:
+    DEBUG = SECURE_SETTINGS.get('debug', False)
+else:
+    DEBUG = debug.lower() == 'true'
 
 ALLOWED_HOSTS = ['localhost',  '127.0.0.1']
 other_hosts = os.environ.get('ALLOWED_HOSTS', None)
