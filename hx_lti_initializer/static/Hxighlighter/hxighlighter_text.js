@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Wednesday, August 7th, 2019, 1:55:22 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, August 8th, 2019, 3:46:27 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -39144,7 +39144,7 @@ __webpack_require__(23);
 
 __webpack_require__(24);
 
-__webpack_require__(69);
+__webpack_require__(70);
 
 /***/ }),
 /* 16 */
@@ -39424,6 +39424,8 @@ __webpack_require__(66);
 
 __webpack_require__(68);
 
+__webpack_require__(69);
+
 (function ($) {
   /**
    * { function_description }
@@ -39625,7 +39627,7 @@ __webpack_require__(68);
     var self = this;
     self.drawers = [];
     jQuery.each($.drawers, function (_, drawer) {
-      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector));
+      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector, self.options));
     });
   };
 
@@ -40515,6 +40517,16 @@ var hrange = __webpack_require__(3);
 
       self.onSelection(selectionRange, event);
     });
+    document.addEventListener('keyup', function (e) {
+      var allowedKeys = "ArrowUpArrowDownArrowLeftArrowRight";
+
+      if (allowedKeys.indexOf(e.key) > -1 && e.shiftKey) {
+        var selection = window.getSelection();
+        var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
+
+        self.onSelection(selectionRange, event);
+      }
+    });
   };
 
   $.MouseSelector.prototype.onSelection = function (range, event) {
@@ -40570,7 +40582,12 @@ var hrange = __webpack_require__(3);
 
   $.MouseSelector.prototype.loadButton = function (range, iP, event) {
     var self = this;
-    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + iP.top + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
+
+    if (iP.top <= 48) {
+      iP.top = 49;
+    }
+
+    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + (iP.top - 10) + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
     jQuery('body').append(confirmButtonTemplate);
     jQuery('.hx-confirm-button button').click(function () {
       $.publishEvent('drawTemp', self.instance_id, [[range]]);
@@ -40589,13 +40606,14 @@ var hrange = __webpack_require__(3);
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
 
 (function ($) {
-  $.XPathDrawer = function (element, inst_id, hClass) {
+  $.XPathDrawer = function (element, inst_id, hClass, options) {
     this.element = element;
     this.instance_id = inst_id;
     this.h_class = (hClass + ' annotator-hl').trim();
     this.init();
     this.drawnAnnotations = [];
     this.tempHighlights = [];
+    this.options = options || {};
   };
 
   $.XPathDrawer.prototype.init = function () {
@@ -40661,7 +40679,8 @@ var hrange = __webpack_require__(3);
   };
 
   $.XPathDrawer.prototype.draw = function (annotation) {
-    var self = this; // console.log("Annotation Being Drawn", annotation);
+    var self = this; // console.log(self.options, annotation);
+    // console.log("Annotation Being Drawn", annotation);
 
     self.tempHighlights.forEach(function (hl) {
       jQuery(hl).contents().unwrap();
@@ -40671,9 +40690,19 @@ var hrange = __webpack_require__(3);
     var textNodes = hrange.getTextNodesFromAnnotationRanges(annotation.ranges, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
 
     var spans = [];
+    var otherLabel = '';
+
+    if (self.options.user_id === annotation.creator.id) {
+      otherLabel += ' annotation-mine';
+    }
+
+    if (self.options.instructors.indexOf(annotation.creator.id) > -1) {
+      otherLabel += ' annotation-instructor';
+    }
+
     textNodes.forEach(function (node) {
       //console.log(node, jQuery(node));
-      jQuery(node).wrap('<span class="' + self.h_class + '"></span>');
+      jQuery(node).wrap('<span class="' + self.h_class + otherLabel + '"></span>');
       spans.push(jQuery(node).parent()[0]);
     }); // 3. In a _local.highlights value, we store the list of span tags generated for the annotation.
 
@@ -40729,7 +40758,9 @@ var hrange = __webpack_require__(3);
   $.XPathDrawer.prototype.getAnnotationsFromElement = function (event) {
     return jQuery(event.target).parents('.annotator-hl').addBack().map(function (_, elem) {
       return jQuery(elem).data('annotation');
-    }).toArray();
+    }).toArray().sort(function (a, b) {
+      return a.created - b.created;
+    });
   }; // found @ https://dev.to/saigowthamr/how-to-remove-duplicate-objects-from-an-array-javascript-48ok
 
 
@@ -40752,7 +40783,10 @@ var hrange = __webpack_require__(3);
     var self = this;
     var all = self.getUnique(jQuery('.annotator-hl').parents('.annotator-hl').addBack().map(function (_, elem) {
       return jQuery(elem).data('annotation');
-    }).toArray(), 'id'); //console.log(all);
+    }).toArray(), 'id');
+    all.sort(function (a, b) {
+      return b - a;
+    }); //console.log(all);
 
     return all;
   };
@@ -40826,6 +40860,13 @@ __webpack_require__(9);
     this.element = jQuery(this.options.element);
     this.hideTimer = null;
     this.load_more_open = false;
+
+    if (options && options.viewer_options && options.viewer_options.defaultTab) {
+      this.latestOpenedTabs = [options.viewer_options.defaultTab];
+    } else {
+      this.latestOpenedTabs = [];
+    }
+
     this.init();
   };
 
@@ -40883,6 +40924,9 @@ __webpack_require__(9);
     jQuery('#search').click(function () {
       jQuery('.search-bar.search-toggle').toggle();
       jQuery('.annotationsHolder').toggleClass('search-opened');
+      $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
+        return a;
+      }, true]);
     });
     jQuery('#sidebar-filter-options').click(function () {
       jQuery('.annotationsHolder').removeClass('search-opened');
@@ -40890,26 +40934,30 @@ __webpack_require__(9);
       jQuery('#sidebar-filter-options').hide();
       jQuery('.search-bar.search-toggle').hide();
       jQuery('.tag-token-list').hide();
-      jQuery('.annotationsHolder.side').html('');
-      var messageVals = [];
-      var pluralMessage = '';
-      jQuery.each(jQuery('.btn.user-filter'), function (a, b) {
-        if (b.id == 'mynotes') {
-          messageVals.push("your annotations");
-        } else if (b.id == 'instructor') {
-          messageVals.push("instructor annotations");
-        } else if (b.id == 'public') {
-          messageVals.push("peer annotations");
-        }
-      });
+      var doit = self.latestOpenedTabs;
+      self.latestOpenedTabs = [];
+      jQuery.each(doit, function (_, tab) {
+        console.log(tab);
+        jQuery('#' + tab).trigger('click');
+      }); // jQuery('.annotationsHolder.side').html('');
+      // var messageVals = [];
+      // var pluralMessage = '';
+      // jQuery.each(jQuery('.btn.user-filter'), function(a, b) {
+      //     if (b.id == 'mynotes') {
+      //         messageVals.push("your annotations")
+      //     } else if (b.id == 'instructor') {
+      //         messageVals.push("instructor annotations");
+      //     } else if (b.id == 'public') {
+      //         messageVals.push("peer annotations");
+      //     }
+      // })
+      // if (messageVals.length > 1) {
+      //     messageVals.splice(messageVals.length - 1, 0, 'and/or,')
+      //     messageVals = messageVals.join(', ').replace(',,', '');
+      //     pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>'
+      // }
+      // jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage)
 
-      if (messageVals.length > 1) {
-        messageVals.splice(messageVals.length - 1, 0, 'and/or,');
-        messageVals = messageVals.join(', ').replace(',,', '');
-        pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>';
-      }
-
-      jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
       return;
     });
     jQuery('#search-clear').click(function () {
@@ -40919,6 +40967,11 @@ __webpack_require__(9);
       }, function (results, converter) {
         $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows.reverse(), converter, true]);
       }, function () {}]);
+    });
+    jQuery('#srch-term').on('keydown', function (event) {
+      if (event.key == "Enter") {
+        jQuery('#search-submit').trigger('click');
+      }
     });
     jQuery('#search-submit').click(function () {
       var searchValue = jQuery('#srch-term').val().trim();
@@ -40933,19 +40986,23 @@ __webpack_require__(9);
         jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
       } else {
         if (jQuery(this).hasClass('active')) {
+          self.latestOpenedTabs.splice(self.latestOpenedTabs.indexOf(this.id), 1);
+
           if (jQuery('.btn.user-filter.active').length == 1) {
             jQuery(this).removeClass('active');
             jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');
-            ;
+            $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
+              return a;
+            }, true]);
             jQuery('.annotationsHolder.side').html('');
             var messageVals = [];
             var pluralMessage = '';
             jQuery.each(jQuery('.btn.user-filter'), function (a, b) {
-              if (b.id == 'mynotes') {
+              if (b.id == 'mine') {
                 messageVals.push("your annotations");
               } else if (b.id == 'instructor') {
                 messageVals.push("instructor annotations");
-              } else if (b.id == 'public') {
+              } else if (b.id == 'peer') {
                 messageVals.push("peer annotations");
               }
             });
@@ -40963,8 +41020,8 @@ __webpack_require__(9);
           jQuery(this).removeClass('active');
           jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //removeClass('fa-toggle-on').addClass('fa-toggle-off');
         } else {
-          console.log("NOT an active class");
           jQuery(this).addClass('active');
+          self.latestOpenedTabs.push(this.id);
           jQuery(this).find('.fas.fa-toggle-on').removeClass('fa-flip-horizontal'); //.removeClass('fa-toggle-off').addClass('fa-toggle-on');
         }
       }
@@ -40992,7 +41049,7 @@ __webpack_require__(9);
       var possible_exclude = [];
       var possible_include = []; //console.log(filteroptions);
 
-      if (filteroptions.indexOf('mynotes') > -1) {
+      if (filteroptions.indexOf('mine') > -1) {
         possible_include.push(self.options.user_id);
       } else {
         possible_exclude.push(self.options.user_id);
@@ -41004,7 +41061,7 @@ __webpack_require__(9);
         possible_exclude = possible_exclude.concat(self.options.instructors);
       }
 
-      if (filteroptions.indexOf('public') > -1) {
+      if (filteroptions.indexOf('peer') > -1) {
         if (possible_exclude.length > 0) {
           search_options['exclude_userid'] = possible_exclude;
         }
@@ -41013,7 +41070,7 @@ __webpack_require__(9);
       }
 
       if (self.options.instructors.indexOf(self.options.user_id) > -1) {
-        if (filteroptions.indexOf('public') > -1 && (filteroptions.indexOf('mynotes') > -1 && filteroptions.indexOf('instructor') == -1 || filteroptions.indexOf('mynotes') == -1 && filteroptions.indexOf('instructor') > -1)) {
+        if (filteroptions.indexOf('peer') > -1 && (filteroptions.indexOf('mine') > -1 && filteroptions.indexOf('instructor') == -1 || filteroptions.indexOf('mine') == -1 && filteroptions.indexOf('instructor') > -1)) {
           // jQuery('.btn.user-filter#instructor').addClass('active');
           // jQuery('.btn.user-filter#instructor').find('.fas').removeClass('fa-toggle-off').addClass('fa-toggle-on');
           // jQuery('.btn.user-filter#mynotes').addClass('active');
@@ -41055,7 +41112,7 @@ __webpack_require__(9);
                 return button.id;
               });
 
-              if (filteroptions.indexOf('mynotes') > -1) {
+              if (filteroptions.indexOf('mine') > -1) {
                 possible_include.push(self.options.user_id);
               } else {
                 possible_exclude.push(self.options.user_id);
@@ -41067,7 +41124,7 @@ __webpack_require__(9);
                 possible_exclude = possible_exclude.concat(self.options.instructors);
               }
 
-              if (filteroptions.indexOf('public') > -1) {
+              if (filteroptions.indexOf('peer') > -1) {
                 if (possible_exclude.length > 0) {
                   options['exclude_userid'] = possible_exclude;
                 }
@@ -41113,10 +41170,10 @@ __webpack_require__(9);
         return button.id;
       });
 
-      if (filteroptions.indexOf('mynotes') > -1) {
+      if (filteroptions.indexOf('mine') > -1) {
         self.addAnnotation(annotation, updating, false);
       } else {
-        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mynotes')]);
+        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
       }
     });
     $.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation, updating) {
@@ -41135,6 +41192,9 @@ __webpack_require__(9);
     });
     $.subscribeEvent('annotationLoaded', self.instance_id, function (_, annotation) {
       self.addAnnotation(annotation, false, true);
+    });
+    $.subscribeEvent('autosearch', self.instance_id, function (_, term, type) {
+      self.autosearch(term, type);
     });
   };
 
@@ -41194,49 +41254,27 @@ __webpack_require__(9);
         }
       });
       jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
-        jQuery('.btn.user-filter').removeClass('active');
-        jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
-
-        if (jQuery(this).text().trim() !== self.options.common_instructor_name) {
-          self.search(self.filterByType(jQuery(this).html().trim(), 'User', undefined));
-          jQuery('.annotationsHolder').addClass('search-opened');
-          jQuery('.search-toggle').show();
-          jQuery('.annotation-filter-buttons').hide();
-          jQuery('#sidebar-filter-options').show();
-          jQuery('.search-bar.search-toggle').show();
-          jQuery('.tag-token-list').show();
-          $.publishEvent('searchSelected', self.instance_id, []);
-          jQuery('#srch-term').val(jQuery(this).text().trim());
-          jQuery('.search-bar select').val('User');
-        } else {
-          // var options = {
-          //     type: self.options.mediaType,
-          // }
-          // options['userid'] = self.options.instructors;
-          // self.search(options);
-          jQuery('.btn.user-filter#instructor').trigger('click');
-        }
-
+        self.autosearch(jQuery(this).text().trim(), 'User');
         $.pauseEvent(e);
       });
       jQuery('.side.item-' + ann.id).find('.annotation-tag.side').click(function (e) {
-        jQuery('.btn.user-filter').removeClass('active');
-        jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+        self.autosearch(jQuery(this).text().trim(), 'Tag'); // jQuery('.btn.user-filter').removeClass('active');
+        // jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');//.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+        // jQuery('.annotationsHolder').addClass('search-opened');
+        // jQuery('.annotation-filter-buttons').hide();
+        // jQuery('#sidebar-filter-options').show();
+        // jQuery('.search-bar.search-toggle').show();
+        // jQuery('.tag-token-list').show();
+        // jQuery('.search-toggle').show(jQuery(this).html().trim());
+        // var options = {
+        //     type: self.options.mediaType,
+        // }
+        // var tagSearched = jQuery(this).html().trim();
+        // options['tag'] = tagSearched;
+        // jQuery('#srch-term').val(tagSearched)
+        // jQuery('.search-bar select').val('Tag');
+        // self.search(options);
 
-        jQuery('.annotationsHolder').addClass('search-opened');
-        jQuery('.annotation-filter-buttons').hide();
-        jQuery('#sidebar-filter-options').show();
-        jQuery('.search-bar.search-toggle').show();
-        jQuery('.tag-token-list').show();
-        jQuery('.search-toggle').show(jQuery(this).html().trim());
-        var options = {
-          type: self.options.mediaType
-        };
-        var tagSearched = jQuery(this).html().trim();
-        options['tag'] = tagSearched;
-        jQuery('#srch-term').val(tagSearched);
-        jQuery('.search-bar select').val('Tag');
-        self.search(options);
         $.pauseEvent(e);
       });
       $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
@@ -41340,6 +41378,28 @@ __webpack_require__(9);
   $.Sidebar.prototype.StorageAnnotationDelete = function (annotations) {};
 
   $.Sidebar.prototype.StorageAnnotationLoad = function (annotations) {};
+
+  $.Sidebar.prototype.autosearch = function (term, type) {
+    var self = this;
+    jQuery('.btn.user-filter').removeClass('active');
+    jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+    if (term !== self.options.common_instructor_name) {
+      self.search(self.filterByType(term, type, undefined));
+      jQuery('.annotationsHolder').addClass('search-opened');
+      jQuery('.search-toggle').show();
+      jQuery('.annotation-filter-buttons').hide();
+      jQuery('#sidebar-filter-options').show();
+      jQuery('.search-bar.search-toggle').show();
+      jQuery('.tag-token-list').show();
+      $.publishEvent('searchSelected', self.instance_id, []);
+      jQuery('#srch-term').val(term);
+      jQuery('.search-bar select').val(type);
+    } else {
+      jQuery('#sidebar-filter-options').trigger('click');
+      jQuery('.btn.user-filter#instructor').trigger('click');
+    }
+  };
 
   $.viewers.push($.Sidebar);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
@@ -41702,7 +41762,7 @@ __p += '\n        	<button type="button" class="btn btn-default user-filter ';
  if (defaultTab.indexOf('mine') > -1) {;
 __p += 'active';
  } ;
-__p += '" id=\'mynotes\' aria-label="View my annotations" role="button"><span class="fas fa-toggle-on ';
+__p += '" id=\'mine\' aria-label="View my annotations" role="button"><span class="fas fa-toggle-on ';
  if (defaultTab.indexOf('mine') == -1) {;
 __p += 'fa-flip-horizontal';
  } ;
@@ -41714,7 +41774,7 @@ __p += '\n        	<button type="button" class="btn btn-default user-filter ';
  if (defaultTab.indexOf('peer') > -1) {;
 __p += 'active';
  } ;
-__p += '" id=\'public\' aria-label="View peers\' annotations" role="button"><span class="fas fa-toggle-on ';
+__p += '" id=\'peer\' aria-label="View peers\' annotations" role="button"><span class="fas fa-toggle-on ';
  if (defaultTab.indexOf('peer')== -1) {;
 __p += 'fa-flip-horizontal';
  } ;
@@ -41958,6 +42018,12 @@ var annotator = annotator ? annotator : __webpack_require__(5);
         self.annotation_tool.isStatic = true;
       }
     });
+    jQuery('body').on('click', '.annotation-username', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'User']);
+    });
+    jQuery('body').on('click', '.annotation-tag', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'Tag']);
+    });
     this.setUpPinAndMove();
   };
 
@@ -42060,8 +42126,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
     delete self.annotation_tool.editor;
     self.annotation_tool.editing = false;
-    self.annotation_tool.updating = false;
-    jQuery('body').css('overflow-y', 'scroll');
+    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
   };
 
   $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
@@ -42102,8 +42167,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     self.annotation_tool.viewer.find('.cancel').click(function (event1) {
       self.annotation_tool.isStatic = false;
       self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-      jQuery('body').css('overflow-y', 'scroll');
+      delete self.annotation_tool.viewer; // jQuery('body').css('overflow-y', 'scroll');
     });
     self.annotation_tool.viewer.find('.edit').click(function (event1) {
       var annotation_id = jQuery(this).attr('id').replace('edit-', '');
@@ -42132,8 +42196,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
             delete self.annotation_tool.viewer;
             self.annotation_tool.isStatic = false;
             self.annotation_tool.updating = false;
-            self.annotation_tool.editing = false;
-            jQuery('body').css('overflow-y', 'scroll');
+            self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
           }
         },
         cancel: function cancel() {}
@@ -42151,9 +42214,12 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       return;
     }
 
+    console.log('should hide display');
     clearTimeout(self.hideTimer);
     self.hideTimer = setTimeout(function () {
       if (self.hideTimer) {
+        $.publishEvent('displayHidden', self.instance_id, []);
+
         if (self.annotation_tool.viewer) {
           self.annotation_tool.viewer.remove();
           delete self.annotation_tool.viewer;
@@ -42161,8 +42227,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
         self.annotation_tool.isStatic = false;
         self.annotation_tool.updating = false;
-        self.annotation_tool.editing = false;
-        jQuery('body').css('overflow-y', 'scroll');
+        self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
       }
     }, 500);
   };
@@ -42179,8 +42244,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 
     self.annotation_tool.isStatic = false;
     self.annotation_tool.updating = false;
-    self.annotation_tool.editing = false;
-    jQuery('body').css('overflow-y', 'scroll');
+    self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
   };
 
   $.FloatingViewer.prototype.StorageAnnotationDelete = function (annotation) {
@@ -42456,9 +42520,13 @@ __webpack_require__(42);
           var t = e.currentTarget.innerText;
 
           if (t.trim().length >= maxLength) {
-            // delete key
-            if (e.keyCode != 8) {
+            // prevents everything that could add a new character
+            var allowedKeys = 'ArrowLeftArrowRightArrowDownDeleteArrowUpMetaControlAltBackspace';
+            console.log(e.key);
+
+            if (allowedKeys.indexOf(e.key) == -1 || e.key == 'a' && !(e.ctrlKey || e.metaKey) || e.key == 'c' && !(e.ctrlKey || e.metaKey) || e.key == 'v' && !(e.ctrlKey || e.metaKey)) {
               e.preventDefault();
+              alert('You have reached the character limit for this annotation (max 1000 characters).');
             }
           }
         },
@@ -42477,11 +42545,12 @@ __webpack_require__(42);
               // wrap in a timer to prevent issues in Firefox
               document.execCommand('insertText', false, bufferTextAllowed);
               jQuery('#maxContentPost').text(maxLength - t.length);
+              alert('You have reached the character limit for this annotation (max 1000 characters). Your pasted text was trimmed to meet the 1000 character limit.');
             }, 10);
           }
         }
       },
-      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']], ['view', ['codeview']]]
+      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]]
     }, options);
     this.init();
     this.instanceID = instanceID;
@@ -42564,7 +42633,7 @@ __webpack_require__(42);
     var result = this.elementObj.summernote('code');
 
     if (result.indexOf('<script') >= 0) {
-      alert("I'm sorry Colin, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
+      alert("I'm sorry Dave, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
       return result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
     }
 
@@ -42604,7 +42673,6 @@ __webpack_require__(42);
       var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
       var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
       var regex = new RegExp(expression);
-      console.log(chosen, chosen.match(regex));
 
       if (chosen.match(regex)) {
         jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
@@ -43182,8 +43250,11 @@ __webpack_require__(48);
 
   $.Reply.prototype.init = function () {
     // warns dev that they forgot to include summernote.js
-    if (_typeof(jQuery.summernote) !== "object") {//console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
+    if (_typeof(jQuery.summernote) !== "object") {
+      console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
     }
+
+    this.annotationListeners();
   };
   /**
    * 
@@ -43201,6 +43272,7 @@ __webpack_require__(48);
 
 
     this.elementObj = element.find(selector);
+    console.log(this.elementObj);
     var newOptions = jQuery.extend({}, this.options, {
       'width': element.outerWidth() - 24
     });
@@ -43235,9 +43307,15 @@ __webpack_require__(48);
 
 
   $.Reply.prototype.destroy = function (element, selector) {
-    this.elementObj.val('');
-    this.elementObj.summernote('destroy');
-    this.elementObj = undefined;
+    console.log(jQuery('.summernote').each(function () {
+      jQuery(this).summernote('destroy');
+    }));
+
+    if (this.elementObj) {
+      this.elementObj.val('');
+      this.elementObj.summernote('destroy');
+      this.elementObj = undefined;
+    }
   }; // Annotation specific functions
 
   /**
@@ -43247,6 +43325,10 @@ __webpack_require__(48);
 
   $.Reply.prototype.annotationListeners = function () {
     var self = this;
+    $.subscribeEvent('displayHidden', self.instanceID, function () {
+      console.log('reached here, but nothing to destroy');
+      self.destroy();
+    });
   };
   /**
    * Code to run just before the annotation is saved to storage
@@ -43428,7 +43510,14 @@ __webpack_require__(48);
 
   $.Reply.prototype.addReplyToViewer = function (viewer, reply, prefix, annotation) {
     var self = this;
-    jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').append("<div class='reply reply-item-" + reply.id + "'><button class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button><strong>" + reply.creator.name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
+    console.log(annotation, self.options);
+    var delete_option = '';
+
+    if (self.options.HxPermissions && self.options.HxPermissions.has_staff_permissions || annotation.permissions && annotation.permissions.can_delete && annotation.permissions.can_delete.indexOf(self.options.user_id) > -1) {
+      delete_option = "<button class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button>";
+    }
+
+    jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').append("<div class='reply reply-item-" + reply.id + "'>" + delete_option + "<strong>" + reply.creator.name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
     jQuery('.reply.reply-item-' + reply.id + ' .delete-reply').confirm({
       'title': 'Delete Reply?',
       'content': 'Would you like to delete your reply? This is permanent.',
@@ -43940,6 +44029,8 @@ __webpack_require__(58);
         jQuery('.tag-token-tag').removeClass('active');
         var tagFound = jQuery(this).html().trim();
         $.publishEvent('searchTag', self.instanceID, [tagFound]);
+        jQuery('.search-bar #srch-term').val(tagFound);
+        jQuery('.search-bar select').val('Tag');
         jQuery(this).addClass('active');
       }
     });
@@ -44325,6 +44416,8 @@ __webpack_require__(65);
 
       if (self.allowed && self.url && self.url != '') {
         self.setUpButtons();
+      } else {
+        jQuery(self.options.slot).before('<div class="sidebar-navbar"></div>');
       }
     }
   };
@@ -44420,6 +44513,63 @@ __webpack_require__(67);
 
 /***/ }),
 /* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  HxStyleMine Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+//require('./filaname.css');
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.HxStyleMine = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.HxStyleMine.prototype.init = function () {
+    var self = this;
+    self.setUpButtons();
+  };
+
+  $.HxStyleMine.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<button class="hx-style-mine btn btn-default" style="margin-right: 10px; width: 150px;">Underline Mine</button>');
+    jQuery('.hx-style-mine').click(function () {
+      if (jQuery(this).text().trim() == "Underline Mine") {
+        jQuery('body').append('<style id="style-mine-underline">.annotation-mine { text-decoration: underline dashed; }</style>');
+        jQuery(this).html('Remove Underlines');
+      } else {
+        jQuery('#style-mine-underline').remove();
+        jQuery(this).html('Underline Mine');
+      }
+    });
+  };
+
+  $.HxStyleMine.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.HxStyleMine, 'name', {
+    value: "HxStyleMine"
+  });
+  $.plugins.push($.HxStyleMine);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
@@ -45104,7 +45254,7 @@ var hrange = __webpack_require__(3);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**

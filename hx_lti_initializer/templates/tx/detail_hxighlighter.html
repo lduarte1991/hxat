@@ -130,12 +130,13 @@ Text Annotation Tool | {{ target_object.target_title }}
                     },
                     Badges: {
                     },
-                    {% if is_instructor %}
+                    
                     AdminButton: {
+                        {% if is_instructor %}
                         homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",
                         has_staff_permissions: ("{{ is_instructor }}" === "True")
-                    },
-                    {% endif %}
+                        {% endif %}
+                    },  
                     PrevNextButton: {
                         prevUrl: {% if prev_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
                         nextUrl: {% if next_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %}
