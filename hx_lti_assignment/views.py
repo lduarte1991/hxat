@@ -53,9 +53,12 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
+                template_used = 'hx_lti_assignment/create_new_assignment2.html'
+                if assignment.use_hxighlighter:
+                    template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
                 return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment2.html',
+                    template_used,
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -102,7 +105,7 @@ def create_new_assignment(request):
         
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment2.html',
+        'hx_lti_assignment/create_new_assignment_hxighlighter.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -161,9 +164,12 @@ def edit_assignment(request, id):
             url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
         else:
+            template_used = 'hx_lti_assignment/create_new_assignment2.html'
+            if assignment.use_hxighlighter:
+                    template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
             return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment2.html',
+                    template_used,
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -187,9 +193,12 @@ def edit_assignment(request, id):
     except:
         course_name = None
 
+    template_used = 'hx_lti_assignment/create_new_assignment2.html'
+    if assignment.use_hxighlighter:
+        template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment2.html',
+        template_used,
         {
             'form': form,
             'targets_form': targets_form,

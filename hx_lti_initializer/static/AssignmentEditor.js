@@ -221,6 +221,7 @@ AssignmentEditor.prototype = {
                     }
                 }
             }
+            jQuery('#visible-tabs-explanation').prepend('<p><strong>Note:</strong> These checkboxes will be the default for all instances of this assignment. Custom parameters can overwrite these options.</p>')
         });
 
         this.source_list.on('click', '#add-source-button', function(event){

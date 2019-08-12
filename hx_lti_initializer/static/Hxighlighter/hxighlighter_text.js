@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, August 8th, 2019, 3:46:27 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, August 9th, 2019, 12:47:13 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -40913,13 +40913,13 @@ __webpack_require__(9);
     });
     self.element.append(self.options.TEMPLATES.annotationSection(sidebarOptions));
     self.sidebar = self.element.find('.annotationSection');
-    self.sidebar.parent().css('width', 'calc(100% - var(--sidebar-width))');
-    self.element.on('mouseover', '.annotationsHolder', function (event) {
-      jQuery('body').css('overflow-y', 'hidden');
-    });
-    self.element.on('mouseleave', '.annotationsHolder', function (event) {
-      jQuery('body').css('overflow-y', 'scroll');
-    }); // toggle search
+    self.sidebar.parent().css('width', 'calc(100% - var(--sidebar-width))'); // self.element.on('mouseover', '.annotationsHolder', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // self.element.on('mouseleave', '.annotationsHolder', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+    // toggle search
 
     jQuery('#search').click(function () {
       jQuery('.search-bar.search-toggle').toggle();
@@ -42279,19 +42279,19 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     });
     jQuery('body').on('mouseup', function (event) {
       self.finishedMoving(event);
-    });
-    jQuery('body').on('mouseover', '.annotation-editor', function (event) {
-      jQuery('body').css('overflow-y', 'hidden');
-    });
-    jQuery('body').on('mouseleave', '.annotation-editor', function (event) {
-      jQuery('body').css('overflow-y', 'scroll');
-    });
-    jQuery('body').on('mouseover', '.annotation-viewer', function (event) {
-      jQuery('body').css('overflow-y', 'hidden');
-    });
-    jQuery('body').on('mouseleave', '.annotation-viewer', function (event) {
-      jQuery('body').css('overflow-y', 'scroll');
-    });
+    }); // jQuery('body').on('mouseover', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+    // jQuery('body').on('mouseover', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+
     jQuery('body').on('mouseleave', function (event) {
       self.finishedMoving(event);
     });
@@ -43906,13 +43906,11 @@ __webpack_require__(56);
       jQuery(self.options.slot).on('mousemove', function (event) {
         self.stretch(event);
 
-        if (self.itemStretching) {
-          jQuery('body').css('overflow', 'hidden');
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
         }
       });
       jQuery(self.options.slot).on('mouseup', function (event) {
-        if (self.itemStretching) {
-          jQuery('body').css('overflow', 'inherit');
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
         }
 
         self.finishedStretching(event);
@@ -44717,6 +44715,7 @@ var hrange = __webpack_require__(3);
     var params = '&resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
     params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
     params += '&version=' + this.options.storageOptions.database_params.version;
+    params += '&collection_id=' + this.options.collection_id;
     jQuery.ajax({
       url: self.url_base + ann_to_delete['id'] + '?catchpy=true' + params,
       method: 'DELETE',
