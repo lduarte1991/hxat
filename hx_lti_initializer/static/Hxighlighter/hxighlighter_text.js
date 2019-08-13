@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, August 9th, 2019, 12:47:13 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Tuesday, August 13th, 2019, 2:45:50 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 61);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10686,7 +10686,7 @@ return jQuery;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(22);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_common_css__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * Hxighlighter is the superclass that will contain all instances of the tool.
@@ -27864,7 +27864,7 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
   else {}
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(29)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(28)(module)))
 
 /***/ }),
 /* 3 */
@@ -28332,7 +28332,8 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
     var normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
     normalizedRange.setEnd(endResult.node, endResult.offset); //console.log('HERE', _start, _startOffset, _end, _endOffset, startResult, endResult, getExactText(normalizedRange), serializedRange.text.exact);
-    //console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+
+    console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
   } //console.log(_start, _startOffset, startResult, endResult);
   //console.log(getPrefixAndSuffix(normalizedRange, root, ignoreSelector))
   // Way #2: if that doesn't match what we have stored as the quote, try global positioning from root
@@ -28346,7 +28347,8 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
 
     normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
-    normalizedRange.setEnd(endResult.node, endResult.offset); //console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+    normalizedRange.setEnd(endResult.node, endResult.offset);
+    console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
   } // Way #3: looks for an exact match of prefix, suffix, and exact
   // This is for the usecase where someone has added text/html before this
 
@@ -28364,7 +28366,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
       var toCheck = getPrefixAndSuffix(normalizedRange, root, ignoreSelector);
 
       if (serializedRange.text.prefix === toCheck.prefix && serializedRange.text.suffix === toCheck.suffix) {
-        //console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+        console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
         break;
       }
     }
@@ -31730,10 +31732,111 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// extracted by mini-css-extract-plugin
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Simple Tags Plugin
+ *  
+ *  Will create an area for inputting tags, just a textfield, no color
+ *
+ */
+__webpack_require__(11);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.SimpleTags = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.init();
+    this.instanceID = instanceID;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.SimpleTags.prototype.init = function () {
+    var self = this;
+    self.name = 'SimpleTags';
+    var ed = "<input type='text' name='tags' id='tag-list' class='hx-text-field' placeholder='Add tags...' />";
+    self.editorElement = 'editorElement' in self.options ? self.options.editorElement : ed;
+  };
+  /**
+   * Returns the HTML value of the WYSIWYG. 
+   *
+   * @return     {String}  HTML value found in the WYSIWYG
+   */
+
+
+  $.SimpleTags.prototype.returnValue = function () {
+    var self = this;
+    var delimiter = 'delimiter' in self.options ? self.options.delimiter : ',';
+    result = jQuery('#tag-list').val().split(delimiter);
+    return result;
+  }; // Annotation specific functions
+
+  /**
+   * Turns on the specific listeners when the plug in is initiated.
+   */
+
+
+  $.SimpleTags.prototype.annotationListeners = function () {
+    var self = this;
+  };
+  /**
+   * Code to run just before the annotation is saved to storage
+   *
+   * @param      {Annotation}  annotation  The annotation as it currently is saved.
+   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
+   */
+
+
+  $.SimpleTags.prototype.saving = function (annotation) {
+    var self = this;
+    annotation.tags = self.returnValue() || [];
+    return annotation;
+  };
+  /**
+   * Code that runs once the editor is shown on screen.
+   *
+   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
+   * @param      {HTMLElement}  editor      The editor element
+   */
+
+
+  $.SimpleTags.prototype.editorShown = function (editor, annotation) {
+    // console.log('Simple editorShown');
+    var self = this;
+    editor.find('.plugin-area').append(self.editorElement);
+
+    if (annotation.tags && annotation.tags.length > 0) {
+      var tagList = annotation.tags.join(',');
+      editor.find('#tag-list').val(tagList); //console.log(tagList);
+    }
+  };
+
+  Object.defineProperty($.SimpleTags, 'name', {
+    value: "SimpleTags"
+  });
+  $.plugins.push($.SimpleTags);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function($) {/**
@@ -32349,7 +32452,7 @@ var lists = {
     unique: unique
 };
 
-var isSupportAmd =  true && __webpack_require__(41); // eslint-disable-line
+var isSupportAmd =  true && __webpack_require__(22); // eslint-disable-line
 /**
  * returns whether font is installed or not.
  *
@@ -39007,144 +39110,16 @@ $$1.summernote = $$1.extend($$1.summernote, {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Simple Tags Plugin
- *  
- *  Will create an area for inputting tags, just a textfield, no color
- *
- */
-__webpack_require__(13);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.SimpleTags = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.init();
-    this.instanceID = instanceID;
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.SimpleTags.prototype.init = function () {
-    var self = this;
-    self.name = 'SimpleTags';
-    var ed = "<input type='text' name='tags' id='tag-list' class='hx-text-field' placeholder='Add tags...' />";
-    self.editorElement = 'editorElement' in self.options ? self.options.editorElement : ed;
-  };
-  /**
-   * Returns the HTML value of the WYSIWYG. 
-   *
-   * @return     {String}  HTML value found in the WYSIWYG
-   */
-
-
-  $.SimpleTags.prototype.returnValue = function () {
-    var self = this;
-    var delimiter = 'delimiter' in self.options ? self.options.delimiter : ',';
-    result = jQuery('#tag-list').val().split(delimiter);
-    return result;
-  }; // Annotation specific functions
-
-  /**
-   * Turns on the specific listeners when the plug in is initiated.
-   */
-
-
-  $.SimpleTags.prototype.annotationListeners = function () {
-    var self = this;
-  };
-  /**
-   * Code to run just before the annotation is saved to storage
-   *
-   * @param      {Annotation}  annotation  The annotation as it currently is saved.
-   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
-   */
-
-
-  $.SimpleTags.prototype.saving = function (annotation) {
-    var self = this;
-    annotation.tags = self.returnValue() || [];
-    return annotation;
-  };
-  /**
-   * Code that runs once the editor is shown on screen.
-   *
-   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
-   * @param      {HTMLElement}  editor      The editor element
-   */
-
-
-  $.SimpleTags.prototype.editorShown = function (editor, annotation) {
-    // console.log('Simple editorShown');
-    var self = this;
-    editor.find('.plugin-area').append(self.editorElement);
-
-    if (annotation.tags && annotation.tags.length > 0) {
-      var tagList = annotation.tags.join(',');
-      editor.find('#tag-list').val(tagList); //console.log(tagList);
-    }
-  };
-
-  Object.defineProperty($.SimpleTags, 'name', {
-    value: "SimpleTags"
-  });
-  $.plugins.push($.SimpleTags);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(15);
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
-/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
-/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
-/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(19);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
- // vendors
-
-__webpack_require__(20);
-
-__webpack_require__(21); // common Hxighlighter object
-
-
-__webpack_require__(1);
-
-__webpack_require__(23);
-
-__webpack_require__(24);
-
-__webpack_require__(70);
+// extracted by mini-css-extract-plugin
 
 /***/ }),
 /* 16 */
@@ -39162,18 +39137,6 @@ __webpack_require__(70);
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* WEBPACK VAR INJECTION */(function(jQuery) {/*!
  * Bootstrap v3.4.1 (https://getbootstrap.com/)
  * Copyright 2011-2019 Twitter, Inc.
@@ -39183,7 +39146,7 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/*! Tiny Pub/Sub - v0.7.0 - 2013-01-29
@@ -39193,13 +39156,13 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery, $) {(function ($$) {
@@ -39375,26 +39338,37 @@ if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires j
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(0)))
 
 /***/ }),
-/* 24 */
+/* 22 */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(this, {}))
+
+/***/ }),
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 //during deployment, this is what decides what gets instantiated, should be moved elsewhere
+__webpack_require__(24);
+
 __webpack_require__(25);
 
 __webpack_require__(26);
 
 __webpack_require__(27);
 
-__webpack_require__(28);
+__webpack_require__(35);
 
-__webpack_require__(36);
+__webpack_require__(39);
 
-__webpack_require__(40);
+__webpack_require__(10);
 
-__webpack_require__(12);
+__webpack_require__(41);
 
 __webpack_require__(43);
 
@@ -39412,19 +39386,7 @@ __webpack_require__(55);
 
 __webpack_require__(57);
 
-__webpack_require__(59);
-
-__webpack_require__(60);
-
-__webpack_require__(62);
-
-__webpack_require__(64);
-
-__webpack_require__(66);
-
-__webpack_require__(68);
-
-__webpack_require__(69);
+__webpack_require__(58);
 
 (function ($) {
   /**
@@ -39449,11 +39411,10 @@ __webpack_require__(69);
   $.TextTarget.prototype.init = function () {
     var self = this; // this target is only meant to work with text/html objects
 
-    this.media = "text"; // this where the target will be contained
+    this.media = "text";
+    this.setUpListeners(); // this where the target will be contained
 
     this.target_selector = this.options.target_selector; // sets up listeners from core and other places
-
-    this.setUpListeners();
 
     if (this.options.method == "url") {
       // if the text exists externally, this will load it into the DOM
@@ -39499,10 +39460,12 @@ __webpack_require__(69);
 
   $.TextTarget.prototype.createTextSlotFromURL = function (content, selector, instance_id) {
     this.guid = $.getUniqueId(); // each annotation target will be enclosed in a "slot"
+    //var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>";
+    // adds it to the page and turns on the wrapper
 
-    var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>"; // adds it to the page and turns on the wrapper
-
-    jQuery(selector).append(slot);
+    jQuery(selector + ' .annotations-section').append(content);
+    jQuery(selector).prop('id', this.guid);
+    jQuery(selector).addClass('annotation-slot');
     jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets Core know that the target has finished loading on screen
 
     $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
@@ -39576,7 +39539,10 @@ __webpack_require__(69);
       self.element.data('source_type', self.options.object_source);
       self.element.data('source_type', 'text'); // finish setting up selectors
 
-      self.setUpSelectors(self.element[0]);
+      if (!self.options.viewerOptions.readonly) {
+        self.setUpSelectors(self.element[0]);
+      }
+
       self.setUpDrawers(self.element[0]); // finish setting up viewers (which contain displays and editors)
 
       self.setUpViewers(self.element[0]); // finish setting up extra plugins
@@ -39954,7 +39920,7 @@ __webpack_require__(69);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
@@ -40482,7 +40448,7 @@ __webpack_require__(69);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -40600,7 +40566,7 @@ var hrange = __webpack_require__(3);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
@@ -40680,8 +40646,8 @@ var hrange = __webpack_require__(3);
 
   $.XPathDrawer.prototype.draw = function (annotation) {
     var self = this; // console.log(self.options, annotation);
-    // console.log("Annotation Being Drawn", annotation);
 
+    console.log("Annotation Being Drawn", annotation);
     self.tempHighlights.forEach(function (hl) {
       jQuery(hl).contents().unwrap();
     }); // the process for drawing is divided into 4 parts
@@ -40807,18 +40773,18 @@ var hrange = __webpack_require__(3);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(30);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(29);
 /* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(31);
+/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(timeago__WEBPACK_IMPORTED_MODULE_3__);
 /**
  * 
@@ -40840,15 +40806,16 @@ __webpack_require__(9);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(32),
-        viewer: __webpack_require__(33),
-        annotationSection: __webpack_require__(34),
-        annotationItem: __webpack_require__(35)
+        editor: __webpack_require__(31),
+        viewer: __webpack_require__(32),
+        annotationSection: __webpack_require__(33),
+        annotationItem: __webpack_require__(34)
       },
       template_suffix: "sidebar",
       template_urls: ""
     };
     this.options = jQuery.extend({}, defaultOptions, options);
+    console.log("Sidebar options", this.options);
     this.instance_id = inst_id;
     this.annotation_tool = {
       interactionPoint: null,
@@ -41166,6 +41133,7 @@ __webpack_require__(9);
   $.Sidebar.prototype.setUpListeners = function () {
     var self = this;
     $.subscribeEvent('StorageAnnotationSave', self.instance_id, function (_, annotation, updating) {
+      console.log("reached here!");
       var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
         return button.id;
       });
@@ -41207,6 +41175,10 @@ __webpack_require__(9);
       ann.instructor_ids = self.options.instructors;
       ann.common_name = self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ann.creator.name;
       var annHTML = self.options.TEMPLATES.annotationItem(ann);
+
+      if (self.options.viewer_options.readonly) {
+        annHTML = annHTML.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
+      }
 
       if (jQuery('.side.item-' + ann.id).length > 0) {
         jQuery('.item-' + ann.id).html(jQuery(annHTML).html());
@@ -41381,23 +41353,63 @@ __webpack_require__(9);
 
   $.Sidebar.prototype.autosearch = function (term, type) {
     var self = this;
-    jQuery('.btn.user-filter').removeClass('active');
-    jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
 
-    if (term !== self.options.common_instructor_name) {
-      self.search(self.filterByType(term, type, undefined));
-      jQuery('.annotationsHolder').addClass('search-opened');
-      jQuery('.search-toggle').show();
-      jQuery('.annotation-filter-buttons').hide();
-      jQuery('#sidebar-filter-options').show();
-      jQuery('.search-bar.search-toggle').show();
-      jQuery('.tag-token-list').show();
-      $.publishEvent('searchSelected', self.instance_id, []);
-      jQuery('#srch-term').val(term);
-      jQuery('.search-bar select').val(type);
+    if (self.options.viewer_options.readonly) {
+      $.publishEvent('dumpStore', self.instance_id, [function (annotations) {
+        self.tempAnnotationList = annotations;
+        jQuery('.ann-item').show();
+        $.publishEvent('undrawAll', self.instance_id, [function (annList) {
+          self.foundList = [];
+          self.tempAnnotationList.forEach(function (ann) {
+            if (type == "Tag") {
+              if (ann.tags.indexOf(term) > -1) {
+                self.foundList.push(ann);
+              } else {
+                jQuery('.ann-item.item-' + ann.id).hide();
+              }
+            } else if (type == "User") {
+              if (ann.creator.name === term) {
+                self.foundList.push(ann);
+              } else {
+                jQuery('.ann-item.item-' + ann.id).hide();
+              }
+            }
+          });
+          $.publishEvent('drawList', self.instance_id, [self.foundList, function () {
+            jQuery('#empty-alert').html('You are now viewing only annotations with ' + type.toLowerCase() + ' "' + term + '". Click here to view all annotations');
+            jQuery('#empty-alert').show();
+            jQuery('#empty-alert').css('cursor', 'pointer');
+            jQuery('#empty-alert').on('click', function () {
+              jQuery('#empty-alert').off('click');
+              jQuery('#empty-alert').hide();
+              jQuery('#empty-alert').css('cursor', 'default');
+              jQuery('.ann-item').show();
+              $.publishEvent('undrawAll', self.instance_id, [function (annList) {
+                $.publishEvent('drawList', self.instance_id, [self.tempAnnotationList, function () {}]);
+              }]);
+            });
+          }]);
+        }]);
+      }]);
     } else {
-      jQuery('#sidebar-filter-options').trigger('click');
-      jQuery('.btn.user-filter#instructor').trigger('click');
+      jQuery('.btn.user-filter').removeClass('active');
+      jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+      if (term !== self.options.common_instructor_name) {
+        self.search(self.filterByType(term, type, undefined));
+        jQuery('.annotationsHolder').addClass('search-opened');
+        jQuery('.search-toggle').show();
+        jQuery('.annotation-filter-buttons').hide();
+        jQuery('#sidebar-filter-options').show();
+        jQuery('.search-bar.search-toggle').show();
+        jQuery('.tag-token-list').show();
+        $.publishEvent('searchSelected', self.instance_id, []);
+        jQuery('#srch-term').val(term);
+        jQuery('.search-bar select').val(type);
+      } else {
+        jQuery('#sidebar-filter-options').trigger('click');
+        jQuery('.btn.user-filter#instructor').trigger('click');
+      }
     }
   };
 
@@ -41406,7 +41418,7 @@ __webpack_require__(9);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -41434,13 +41446,13 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -41676,7 +41688,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -41693,7 +41705,7 @@ return __p
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -41738,7 +41750,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -41817,7 +41829,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -41944,12 +41956,12 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(37);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(36);
 /* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
@@ -41970,13 +41982,14 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(38),
-        viewer: __webpack_require__(39)
+        editor: __webpack_require__(37),
+        viewer: __webpack_require__(38)
       },
       template_suffix: "floating",
       template_urls: ""
     };
     this.options = jQuery.extend({}, defaultOptions, options);
+    console.log("Floating options", this.options);
     this.instance_id = inst_id;
     this.annotation_tool = {
       interactionPoint: null,
@@ -42147,7 +42160,12 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       'annotations': annotations,
       'instructor_ids': self.options.instructors,
       'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
-    }); // add the viewer to the DOM
+    });
+
+    if (self.options.viewer_options.readonly) {
+      self.annotation_tool.viewerTemplate = self.annotation_tool.viewerTemplate.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
+    } // add the viewer to the DOM
+
 
     self.element.find('.annotator-wrapper').after(self.annotation_tool.viewerTemplate); // collect the object for manipulation and coordinates of where it should appear
 
@@ -42400,13 +42418,13 @@ var annotator = annotator ? annotator : __webpack_require__(5);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -42423,7 +42441,7 @@ return __p
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -42480,7 +42498,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -42491,11 +42509,11 @@ return __p
  *  Should be generic, but its main purpose is to be used in tandem with annotations.
  *
  */
-__webpack_require__(10);
+__webpack_require__(12);
 
-__webpack_require__(11);
+__webpack_require__(13);
 
-__webpack_require__(42);
+__webpack_require__(40);
 
 (function ($) {
   /**
@@ -42759,22 +42777,13 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 41 */
-/***/ (function(module, exports) {
-
-/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
-module.exports = __webpack_amd_options__;
-
-/* WEBPACK VAR INJECTION */}.call(this, {}))
-
-/***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 43 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -42783,15 +42792,15 @@ module.exports = __webpack_amd_options__;
  *  Will create an area for inputting tags, just a textfield, no color
  *
  */
-__webpack_require__(12);
+__webpack_require__(10);
 
-__webpack_require__(13);
+__webpack_require__(11);
 
 __webpack_require__(8);
 
 __webpack_require__(9);
 
-__webpack_require__(44);
+__webpack_require__(42);
 
 (function ($) {
   /**
@@ -43015,13 +43024,13 @@ __webpack_require__(44);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 44 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 45 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43030,7 +43039,7 @@ __webpack_require__(44);
  *  Will create an area for inputting tags, just a textfield, no color
  *
  */
-__webpack_require__(46);
+__webpack_require__(44);
 
 (function ($) {
   /**
@@ -43081,6 +43090,20 @@ __webpack_require__(46);
           }, 250);
         }
       }
+    });
+    $.subscribeEvent('drawList', self.instanceID, function (_, anns) {
+      anns.forEach(function (ann) {
+        // console.log('hello', ann.tags);
+        if (typeof ann.tags !== 'undefined' && ann.tags.length > 0) {
+          var color = self.getColorFromValue(ann.tags[ann.tags.length - 1]);
+
+          if (typeof color !== "undefined") {
+            setTimeout(function () {
+              $.publishEvent('changeDrawnColor', self.instanceID, [ann, color]);
+            }, 250);
+          }
+        }
+      });
     });
   };
 
@@ -43193,6 +43216,78 @@ __webpack_require__(46);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  InstructionPanel Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(46);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.InstructionPanel = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
+
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.InstructionPanel.prototype.init = function () {
+    var self = this;
+    self.setUpInstructions();
+  };
+
+  $.InstructionPanel.prototype.setUpInstructions = function () {
+    var self = this;
+
+    if (!self.options.instructions || self.options.instructions.length == 0) {
+      return;
+    } // console.log(self.options.instructions, typeof(self.options.instructions));
+
+
+    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
+    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
+
+    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
+    inst_area.click(function () {
+      if (inst_area.html() == "Collapse Instructions") {
+        inst_area.html('Expand Instructions');
+      } else {
+        inst_area.html('Collapse Instructions');
+      }
+    });
+  };
+
+  $.InstructionPanel.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.InstructionPanel, 'name', {
+    value: "InstructionPanel"
+  });
+  $.plugins.push($.InstructionPanel);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
 /* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -43200,6 +43295,893 @@ __webpack_require__(46);
 
 /***/ }),
 /* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  FontResize Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(48);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.FontResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.toggleTextSize(0);
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.FontResize.prototype.init = function () {
+    var self = this;
+    self.setUpButtons();
+  };
+
+  $.FontResize.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(default)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
+    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
+      self.toggleTextSize(1);
+    });
+    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
+      self.toggleTextSize(-1);
+    });
+  };
+
+  $.FontResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.FontResize.prototype.toggleTextSize = function (step) {
+    var self = this;
+    step = isNaN(Number(step)) ? 0 : Number(step);
+    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
+    var $label = jQuery("#annotations-text-size-label");
+    var nodes = [],
+        curnode,
+        stylesize,
+        styleunit,
+        computed;
+    var minsize = 8;
+    var sizediff = 0;
+
+    if (typeof this.defaultFontSize === "undefined") {
+      this.defaultFontSize = 14;
+    }
+
+    if (typeof this.targetFontSize === "undefined") {
+      this.targetFontSize = this.defaultFontSize;
+    }
+
+    this.targetFontSize += step;
+
+    if (this.targetFontSize < minsize) {
+      this.targetFontSize = minsize;
+    }
+
+    sizediff = this.targetFontSize - this.defaultFontSize;
+
+    if (sizediff === 0) {
+      $label.html("(default)");
+      $content.css('fontSize', '');
+    } else {
+      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
+      $content.css('fontSize', String(this.targetFontSize) + "px");
+      nodes.push($content[0]);
+    } // walk the dom and find custom fontStyle declarations and adust as necessary
+    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
+
+
+    while (nodes.length > 0) {
+      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
+
+      if (curnode.tagName.toLowerCase() == 'font') {
+        computed = window.getComputedStyle(curnode);
+        curnode.style.fontSize = computed['font-size'];
+        curnode.size = "";
+      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
+
+
+      if (curnode != $content[0] && curnode.className != "") {
+        curnode.style.fontSize = "inherit";
+      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
+
+
+      stylesize = parseInt(curnode.style.fontSize, 10);
+
+      if (!isNaN(stylesize)) {
+        styleunit = curnode.style.fontSize.replace(stylesize, '');
+        stylesize += step;
+        stylesize = stylesize < minsize ? minsize : stylesize;
+
+        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
+          curnode.style.fontSize = stylesize + styleunit;
+        }
+      }
+
+      for (var i = curnode.children.length; i > 0; i--) {
+        nodes.push(curnode.children[i - 1]);
+      }
+    }
+  };
+
+  Object.defineProperty($.FontResize, 'name', {
+    value: "FontResize"
+  });
+  $.plugins.push($.FontResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Toggle Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(50);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.ToggleAnnotations = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.on = true;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.ToggleAnnotations.prototype.init = function () {
+    var self = this;
+    self.setUpButton();
+  };
+
+  $.ToggleAnnotations.prototype.setUpButton = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
+    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
+      var toggleButton = jQuery(this);
+
+      if (!toggleButton.hasClass('should-show')) {
+        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
+          self.tempAnnotationList = annList;
+          self.on = false;
+          toggleButton.addClass('should-show');
+        }]);
+      } else {
+        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+          self.tempAnnotationList = [];
+          self.on = true;
+          toggleButton.removeClass('should-show');
+        }]);
+      }
+    });
+  };
+
+  $.ToggleAnnotations.prototype.editorShown = function () {
+    var self = this;
+
+    if (!self.on) {
+      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+        self.tempAnnotationList = [];
+        self.on = true;
+        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
+      }]);
+    }
+  };
+
+  $.ToggleAnnotations.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.ToggleAnnotations, 'name', {
+    value: "ToggleAnnotations"
+  });
+  $.plugins.push($.ToggleAnnotations);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  DisplayResize Annotations Plugin
+ *  
+ *
+ */
+var annotator = annotator ? annotator : __webpack_require__(5); //uncomment to add css file
+
+__webpack_require__(52);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.DisplayResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    self.itemStretching = false;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.DisplayResize.prototype.init = function () {
+    var self = this;
+    self.setUpListeners();
+  };
+
+  $.DisplayResize.prototype.setUpListeners = function () {
+    var self = this;
+    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
+      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
+        self.prepareToStretch(event);
+      });
+      jQuery(self.options.slot).on('mousemove', function (event) {
+        self.stretch(event);
+
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
+        }
+      });
+      jQuery(self.options.slot).on('mouseup', function (event) {
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
+        }
+
+        self.finishedStretching(event);
+      });
+      jQuery(self.options.slot).on('mouseleave', function (event) {
+        self.finishedStretching(event);
+      });
+    });
+  };
+
+  $.DisplayResize.prototype.prepareToStretch = function (event) {
+    var self = this;
+    self.itemStretching = true;
+    $.pauseEvent(event);
+    self.initialPoint = annotator.util.mousePosition(event);
+    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
+  };
+
+  $.DisplayResize.prototype.stretch = function (event) {
+    var self = this;
+
+    if (self.itemStretching) {
+      var newPoint = annotator.util.mousePosition(event);
+      var diff = newPoint.top - self.initialPoint.top;
+      var newHeight = self.initialHeight + diff;
+      var innerHeight = self.initialHeight + diff - 30;
+      self.currentViewer.css('height', newHeight);
+      self.currentViewer.find('.annotation-text-field').css({
+        'max-height': innerHeight,
+        'height': innerHeight
+      });
+    }
+  };
+
+  $.DisplayResize.prototype.finishedStretching = function (event) {
+    var self = this;
+    self.itemStretching = false;
+  };
+
+  $.DisplayResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
+    var self = this;
+
+    if (Array.isArray(annotations)) {
+      self.currentViewer = jQuery(viewer);
+    }
+  };
+
+  Object.defineProperty($.DisplayResize, 'name', {
+    value: "DisplayResize"
+  });
+  $.plugins.push($.DisplayResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  SidebarTagTokens Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(54);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.SidebarTagTokens = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.SidebarTagTokens.prototype.init = function () {
+    var self = this; // console.log(this);
+
+    var search_button = jQuery('.btn.user-filter#search');
+    search_button.click(function () {
+      self.removeTokens();
+      setTimeout(function () {
+        self.setUpTokens();
+      }, 250);
+    });
+    jQuery('.search-bar.side #search-submit').click(function () {
+      jQuery('.tag-token-tag').removeClass('active');
+    });
+    jQuery('.search-bar.side #search-clear').click(function () {
+      jQuery('.tag-token-tag').removeClass('active');
+    });
+    jQuery('.annotationSection.side').on('click', '.tag-token-tag', function () {
+      if (jQuery(this).hasClass('active')) {
+        jQuery('.tag-token-tag').removeClass('active');
+        jQuery('.search-bar.side #search-clear').trigger('click');
+      } else {
+        jQuery('.tag-token-tag').removeClass('active');
+        var tagFound = jQuery(this).html().trim();
+        $.publishEvent('searchTag', self.instanceID, [tagFound]);
+        jQuery('.search-bar #srch-term').val(tagFound);
+        jQuery('.search-bar select').val('Tag');
+        jQuery(this).addClass('active');
+      }
+    });
+    self.setUpListeners();
+  };
+
+  $.SidebarTagTokens.prototype.removeTokens = function () {
+    jQuery('.tag-token-list').remove();
+  };
+
+  $.SidebarTagTokens.prototype.setUpTokens = function () {
+    var self = this;
+    var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
+    self.options.tagList.forEach(function (tag) {
+      tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
+    });
+    tokenHTML += "</div>";
+    jQuery('.search-bar.side').after(tokenHTML);
+  };
+
+  $.SidebarTagTokens.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.SidebarTagTokens.prototype.setUpListeners = function () {
+    var self = this;
+    $.subscribeEvent('searchSelected', self.instanceID, function () {
+      setTimeout(function () {
+        self.setUpTokens();
+      }, 250);
+    });
+  };
+
+  Object.defineProperty($.SidebarTagTokens, 'name', {
+    value: "SidebarTagTokens"
+  });
+  $.plugins.push($.SidebarTagTokens);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  AdminButton Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(56);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.AdminButton = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.AdminButton.prototype.init = function () {
+    var self = this;
+    console.log("here");
+
+    if (self.options.AdminButton) {
+      self.url = self.options.AdminButton.homeURL;
+      self.allowed = self.options.AdminButton.has_staff_permissions;
+      console.log(self.url, self.allowed);
+
+      if (self.allowed && self.url && self.url != '') {
+        self.setUpButtons();
+      } else {
+        jQuery(self.options.slot).before('<div class="sidebar-navbar"></div>');
+      }
+    }
+  };
+
+  $.AdminButton.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
+  };
+
+  $.AdminButton.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.AdminButton, 'name', {
+    value: "AdminButton"
+  });
+  $.plugins.push($.AdminButton);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  HxPermissions Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+//require('./filaname.css');
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.HxPermissions = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.HxPermissions.prototype.init = function () {
+    var self = this;
+  };
+
+  $.HxPermissions.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.HxPermissions.prototype.editorShown = function (editor, annotation) {// console.log(annotation.permissions, self.options.user_id, editor);
+  };
+
+  $.HxPermissions.prototype.displayShown = function (display, annotation) {
+    var self = this;
+
+    if (Array.isArray(annotation)) {
+      annotation.forEach(function (ann) {
+        self.removeWithoutPermission(ann, display);
+      });
+    } else {
+      self.removeWithoutPermission(annotation, display);
+    } // console.log(annotation.permissions, self.options.user_id, display);
+
+  };
+
+  $.HxPermissions.prototype.removeWithoutPermission = function (ann, loc) {
+    var self = this;
+
+    if (!ann.permissions) {
+      // either permissions are not turned on or the annotation is fresh and person must have just made it.
+      return;
+    } // hide edit if the person does not have can_update permissions
+
+
+    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
+      loc.find('#edit-' + ann.id).remove();
+    } // hide delete if the person does not have can_delete permissions
+
+
+    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
+      loc.find('#delete-' + ann.id).remove();
+    }
+  };
+
+  Object.defineProperty($.HxPermissions, 'name', {
+    value: "HxPermissions"
+  });
+  $.plugins.push($.HxPermissions);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  HxAlert Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(59);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.HxAlert = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.HxAlert.prototype.init = function () {
+    var self = this; //console.log("Alert options", self.options);
+
+    self.defaultOptions = {
+      buttons: [{
+        title: 'OK',
+        action: function action() {
+          self.current_alert.remove();
+        }
+      }, {
+        title: 'Cancel',
+        action: function action() {
+          self.current_alert.remove();
+        }
+      }],
+      time: 0,
+      // 0 = unlimited, 1 = 1 second, 2 = 2 seconds, ... etc.
+      modal: false
+    };
+    jQuery('body').on('click', '.hx-notify .hx-notify-button.hx-close', function () {
+      self.current_alert.removeClass('opened');
+      setTimeout(function () {
+        self.current_alert.remove();
+      }, 1000);
+    });
+    $.subscribeEvent('HxAlert', self.instanceID, function (_, message, options) {
+      var theseOptions = jQuery.extend({}, self.defaultOptions, options);
+      constructedAlert = self.createNotification(message, theseOptions.modal, theseOptions.buttons);
+      jQuery('body').append(constructedAlert); // if (theseOptions.modal) {
+      //     self.current_alert = jQuery('.hx-modal');
+      // } else {
+
+      self.current_alert = jQuery('.hx-notify');
+      jQuery.each(self.current_alert.find('button'), function (idx, but) {
+        if (jQuery(but).hasClass('hx-close')) {
+          return;
+        }
+
+        var currTitle = jQuery(but).html().trim();
+        var onclick = theseOptions.buttons.find(function (b) {
+          if (b.title == currTitle) {
+            return b;
+          }
+        }).action;
+        jQuery(but).on('click', onclick);
+      });
+      setTimeout(function () {
+        self.current_alert.addClass('opened');
+      }, 500); // }
+
+      if (theseOptions.time !== 0) {
+        setTimeout(function () {
+          self.current_alert.removeClass('opened');
+        }, theseOptions.time * 1000);
+        setTimeout(function () {
+          self.current_alert.remove();
+        }, (theseOptions.time + 1) * 1000);
+      }
+
+      return;
+    });
+  };
+
+  $.HxAlert.prototype.createNotification = function (message, isModal, buttons) {
+    var buttonsHTML = "<button class='hx-notify-button hx-close'><span class='fa fa-close'></span></button>";
+
+    if (buttons.length > 0) {
+      buttonsHTML = "";
+      buttons.forEach(function (b) {
+        buttonsHTML += "<button class='hx-notify-button'>" + b.title + "</button>";
+      });
+    }
+
+    var notificationHTML = "<div class='hx-notify'>" + message + "<div class='hx-notify-button-group'>" + buttonsHTML + "</div></div>";
+    jQuery('.sr-real-alert').html(message); // if (isModal) {
+    //     notificationHTML = "<div class='hx-modal'>" + notificationHTML + "</div>";
+    // }
+
+    return notificationHTML;
+  };
+
+  $.HxAlert.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.HxAlert, 'name', {
+    value: "HxAlert"
+  });
+  $.plugins.push($.HxAlert);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ * 
+ */
+(function ($) {
+  /**
+   * Sets up components for Hxighlighte Core isntance
+   *
+   * @class      Core (name)
+   * @param      {Object}  options  The options
+   * @param      {string}  inst_id  The instance identifier
+   */
+  $.Core = function (options, inst_id) {
+    // options and instance ids are saved
+    this.options = options;
+    this.instance_id = inst_id; // keeps track of viewer/plugin modules for UI
+
+    this.viewers = [];
+    this.disabledViewers = [];
+    this.plugins = [];
+    this.disabledPlugins = []; // keeps track of annotations and storage modules for backend
+
+    this.annotations = [];
+    this.storage = [];
+    this.disabledStorage = []; // keeps track of object(s) being annotated
+
+    this.targets = []; // initializes tool
+
+    this.init();
+  };
+  /**
+   * initializer of core and its components
+   */
+
+
+  $.Core.prototype.init = function () {
+    this.setUpTargets();
+    this.setUpViewers(); // this.setUpListeners();
+    //this.setUpStorage();
+    // this.setUpPlugins();
+  };
+  /**
+   * sets up targets to be annotated
+   */
+
+
+  $.Core.prototype.setUpTargets = function () {
+    var targets = this.options.targets;
+
+    for (var i = 0; i < targets.length; i++) {
+      var mediaType = $.Core._capitalizeMedia(targets[i].mediaType) + "Target";
+
+      if (typeof Hxighlighter[mediaType] === "function") {
+        this.targets.push(new Hxighlighter[mediaType](jQuery.extend({}, targets[i], this.options.commonInfo), this.instance_id));
+      }
+    }
+  };
+
+  $.Core.prototype.setUpViewers = function () {};
+
+  $.Core.prototype.TargetSelectionMade = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetSelectionMade', [message[1], message[2]]);
+  };
+
+  $.Core.prototype.TargetAnnotationDraw = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
+  };
+
+  $.Core.prototype.ViewerEditorOpen = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerEditorOpen', message);
+  };
+
+  $.Core.prototype.ViewerDisplayOpen = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerDisplayOpen', message);
+  };
+
+  $.Core.prototype.ViewerEditorClose = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerEditorClose', message);
+  };
+
+  $.Core.prototype.ViewerDisplayClose = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerDisplayClose', message);
+  };
+
+  $.Core.prototype.StorageAnnotationSave = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationSave', message);
+  };
+
+  $.Core.prototype.StorageAnnotationDelete = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationDelete', message);
+  };
+
+  $.Core.prototype.StorageAnnotationLoad = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationLoad', message);
+  }; // $.Core.prototype.StorageAnnotationGetReplies = function(message) {
+  //     var self = this;
+  //     self.callFuncInList(this.targets, 'StorageAnnotationGetReplies', message);
+  // };
+
+
+  $.Core.prototype.StorageAnnotationSearch = function (message) {
+    var self = this; //console.log('Received here');
+
+    self.callFuncInList(this.targets, 'StorageAnnotationSearch', message);
+  }; // Util functions
+
+
+  $.Core.prototype.callFuncInList = function (objectList, funcName, params) {
+    var self = this;
+    jQuery.each(objectList, function (_, component) {
+      if (typeof component[funcName] === "function") {
+        component[funcName].apply(component, params);
+      }
+    });
+  };
+
+  $.Core._capitalizeMedia = function (media) {
+    var editedMedia = Hxighlighter.trim(media);
+    editedMedia = editedMedia.toLowerCase();
+    return editedMedia.charAt(0).toUpperCase() + editedMedia.slice(1);
+  };
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(62);
+
+
+/***/ }),
+/* 62 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
+/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(15);
+/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
+/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(17);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+ // vendors
+
+__webpack_require__(18);
+
+__webpack_require__(19); // common Hxighlighter object
+
+
+__webpack_require__(1);
+
+__webpack_require__(21);
+
+__webpack_require__(63);
+
+__webpack_require__(65);
+
+__webpack_require__(67);
+
+__webpack_require__(69);
+
+__webpack_require__(23);
+
+__webpack_require__(60);
+
+__webpack_require__(70);
+
+/***/ }),
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43215,11 +44197,11 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
  *  
  *
  */
-__webpack_require__(10);
+__webpack_require__(12);
 
-__webpack_require__(11);
+__webpack_require__(13);
 
-__webpack_require__(48);
+__webpack_require__(64);
 
 
 
@@ -43566,720 +44548,13 @@ __webpack_require__(48);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 48 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  InstructionPanel Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(50);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.InstructionPanel = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
-
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.InstructionPanel.prototype.init = function () {
-    var self = this;
-    self.setUpInstructions();
-  };
-
-  $.InstructionPanel.prototype.setUpInstructions = function () {
-    var self = this;
-
-    if (!self.options.instructions || self.options.instructions.length == 0) {
-      return;
-    } // console.log(self.options.instructions, typeof(self.options.instructions));
-
-
-    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
-    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
-
-    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
-    inst_area.click(function () {
-      if (inst_area.html() == "Collapse Instructions") {
-        inst_area.html('Expand Instructions');
-      } else {
-        inst_area.html('Collapse Instructions');
-      }
-    });
-  };
-
-  $.InstructionPanel.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.InstructionPanel, 'name', {
-    value: "InstructionPanel"
-  });
-  $.plugins.push($.InstructionPanel);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  FontResize Annotations Plugin
- *  
- *
- */
-__webpack_require__(52);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.FontResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.toggleTextSize(0);
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.FontResize.prototype.init = function () {
-    var self = this;
-    self.setUpButtons();
-  };
-
-  $.FontResize.prototype.setUpButtons = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(default)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
-    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
-      self.toggleTextSize(1);
-    });
-    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
-      self.toggleTextSize(-1);
-    });
-  };
-
-  $.FontResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.FontResize.prototype.toggleTextSize = function (step) {
-    var self = this;
-    step = isNaN(Number(step)) ? 0 : Number(step);
-    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
-    var $label = jQuery("#annotations-text-size-label");
-    var nodes = [],
-        curnode,
-        stylesize,
-        styleunit,
-        computed;
-    var minsize = 8;
-    var sizediff = 0;
-
-    if (typeof this.defaultFontSize === "undefined") {
-      this.defaultFontSize = 14;
-    }
-
-    if (typeof this.targetFontSize === "undefined") {
-      this.targetFontSize = this.defaultFontSize;
-    }
-
-    this.targetFontSize += step;
-
-    if (this.targetFontSize < minsize) {
-      this.targetFontSize = minsize;
-    }
-
-    sizediff = this.targetFontSize - this.defaultFontSize;
-
-    if (sizediff === 0) {
-      $label.html("(default)");
-      $content.css('fontSize', '');
-    } else {
-      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
-      $content.css('fontSize', String(this.targetFontSize) + "px");
-      nodes.push($content[0]);
-    } // walk the dom and find custom fontStyle declarations and adust as necessary
-    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
-
-
-    while (nodes.length > 0) {
-      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
-
-      if (curnode.tagName.toLowerCase() == 'font') {
-        computed = window.getComputedStyle(curnode);
-        curnode.style.fontSize = computed['font-size'];
-        curnode.size = "";
-      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
-
-
-      if (curnode != $content[0] && curnode.className != "") {
-        curnode.style.fontSize = "inherit";
-      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
-
-
-      stylesize = parseInt(curnode.style.fontSize, 10);
-
-      if (!isNaN(stylesize)) {
-        styleunit = curnode.style.fontSize.replace(stylesize, '');
-        stylesize += step;
-        stylesize = stylesize < minsize ? minsize : stylesize;
-
-        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
-          curnode.style.fontSize = stylesize + styleunit;
-        }
-      }
-
-      for (var i = curnode.children.length; i > 0; i--) {
-        nodes.push(curnode.children[i - 1]);
-      }
-    }
-  };
-
-  Object.defineProperty($.FontResize, 'name', {
-    value: "FontResize"
-  });
-  $.plugins.push($.FontResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Toggle Annotations Plugin
- *  
- *
- */
-__webpack_require__(54);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.ToggleAnnotations = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.on = true;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.ToggleAnnotations.prototype.init = function () {
-    var self = this;
-    self.setUpButton();
-  };
-
-  $.ToggleAnnotations.prototype.setUpButton = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
-    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
-      var toggleButton = jQuery(this);
-
-      if (!toggleButton.hasClass('should-show')) {
-        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
-          self.tempAnnotationList = annList;
-          self.on = false;
-          toggleButton.addClass('should-show');
-        }]);
-      } else {
-        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-          self.tempAnnotationList = [];
-          self.on = true;
-          toggleButton.removeClass('should-show');
-        }]);
-      }
-    });
-  };
-
-  $.ToggleAnnotations.prototype.editorShown = function () {
-    var self = this;
-
-    if (!self.on) {
-      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-        self.tempAnnotationList = [];
-        self.on = true;
-        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
-      }]);
-    }
-  };
-
-  $.ToggleAnnotations.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.ToggleAnnotations, 'name', {
-    value: "ToggleAnnotations"
-  });
-  $.plugins.push($.ToggleAnnotations);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  DisplayResize Annotations Plugin
- *  
- *
- */
-var annotator = annotator ? annotator : __webpack_require__(5); //uncomment to add css file
-
-__webpack_require__(56);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.DisplayResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    self.itemStretching = false;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.DisplayResize.prototype.init = function () {
-    var self = this;
-    self.setUpListeners();
-  };
-
-  $.DisplayResize.prototype.setUpListeners = function () {
-    var self = this;
-    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
-      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
-      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
-        self.prepareToStretch(event);
-      });
-      jQuery(self.options.slot).on('mousemove', function (event) {
-        self.stretch(event);
-
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
-        }
-      });
-      jQuery(self.options.slot).on('mouseup', function (event) {
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
-        }
-
-        self.finishedStretching(event);
-      });
-      jQuery(self.options.slot).on('mouseleave', function (event) {
-        self.finishedStretching(event);
-      });
-    });
-  };
-
-  $.DisplayResize.prototype.prepareToStretch = function (event) {
-    var self = this;
-    self.itemStretching = true;
-    $.pauseEvent(event);
-    self.initialPoint = annotator.util.mousePosition(event);
-    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
-  };
-
-  $.DisplayResize.prototype.stretch = function (event) {
-    var self = this;
-
-    if (self.itemStretching) {
-      var newPoint = annotator.util.mousePosition(event);
-      var diff = newPoint.top - self.initialPoint.top;
-      var newHeight = self.initialHeight + diff;
-      var innerHeight = self.initialHeight + diff - 30;
-      self.currentViewer.css('height', newHeight);
-      self.currentViewer.find('.annotation-text-field').css({
-        'max-height': innerHeight,
-        'height': innerHeight
-      });
-    }
-  };
-
-  $.DisplayResize.prototype.finishedStretching = function (event) {
-    var self = this;
-    self.itemStretching = false;
-  };
-
-  $.DisplayResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
-    var self = this;
-
-    if (Array.isArray(annotations)) {
-      self.currentViewer = jQuery(viewer);
-    }
-  };
-
-  Object.defineProperty($.DisplayResize, 'name', {
-    value: "DisplayResize"
-  });
-  $.plugins.push($.DisplayResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  SidebarTagTokens Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(58);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.SidebarTagTokens = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.SidebarTagTokens.prototype.init = function () {
-    var self = this; // console.log(this);
-
-    var search_button = jQuery('.btn.user-filter#search');
-    search_button.click(function () {
-      self.removeTokens();
-      setTimeout(function () {
-        self.setUpTokens();
-      }, 250);
-    });
-    jQuery('.search-bar.side #search-submit').click(function () {
-      jQuery('.tag-token-tag').removeClass('active');
-    });
-    jQuery('.search-bar.side #search-clear').click(function () {
-      jQuery('.tag-token-tag').removeClass('active');
-    });
-    jQuery('.annotationSection.side').on('click', '.tag-token-tag', function () {
-      if (jQuery(this).hasClass('active')) {
-        jQuery('.tag-token-tag').removeClass('active');
-        jQuery('.search-bar.side #search-clear').trigger('click');
-      } else {
-        jQuery('.tag-token-tag').removeClass('active');
-        var tagFound = jQuery(this).html().trim();
-        $.publishEvent('searchTag', self.instanceID, [tagFound]);
-        jQuery('.search-bar #srch-term').val(tagFound);
-        jQuery('.search-bar select').val('Tag');
-        jQuery(this).addClass('active');
-      }
-    });
-    self.setUpListeners();
-  };
-
-  $.SidebarTagTokens.prototype.removeTokens = function () {
-    jQuery('.tag-token-list').remove();
-  };
-
-  $.SidebarTagTokens.prototype.setUpTokens = function () {
-    var self = this;
-    var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
-    self.options.tagList.forEach(function (tag) {
-      tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
-    });
-    tokenHTML += "</div>";
-    jQuery('.search-bar.side').after(tokenHTML);
-  };
-
-  $.SidebarTagTokens.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.SidebarTagTokens.prototype.setUpListeners = function () {
-    var self = this;
-    $.subscribeEvent('searchSelected', self.instanceID, function () {
-      setTimeout(function () {
-        self.setUpTokens();
-      }, 250);
-    });
-  };
-
-  Object.defineProperty($.SidebarTagTokens, 'name', {
-    value: "SidebarTagTokens"
-  });
-  $.plugins.push($.SidebarTagTokens);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  HxPermissions Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-//require('./filaname.css');
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.HxPermissions = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.HxPermissions.prototype.init = function () {
-    var self = this;
-  };
-
-  $.HxPermissions.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.HxPermissions.prototype.editorShown = function (editor, annotation) {// console.log(annotation.permissions, self.options.user_id, editor);
-  };
-
-  $.HxPermissions.prototype.displayShown = function (display, annotation) {
-    var self = this;
-
-    if (Array.isArray(annotation)) {
-      annotation.forEach(function (ann) {
-        self.removeWithoutPermission(ann, display);
-      });
-    } else {
-      self.removeWithoutPermission(annotation, display);
-    } // console.log(annotation.permissions, self.options.user_id, display);
-
-  };
-
-  $.HxPermissions.prototype.removeWithoutPermission = function (ann, loc) {
-    var self = this;
-
-    if (!ann.permissions) {
-      // either permissions are not turned on or the annotation is fresh and person must have just made it.
-      return;
-    } // hide edit if the person does not have can_update permissions
-
-
-    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
-      loc.find('#edit-' + ann.id).remove();
-    } // hide delete if the person does not have can_delete permissions
-
-
-    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
-      loc.find('#delete-' + ann.id).remove();
-    }
-  };
-
-  Object.defineProperty($.HxPermissions, 'name', {
-    value: "HxPermissions"
-  });
-  $.plugins.push($.HxPermissions);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  HxAlert Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(61);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.HxAlert = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.HxAlert.prototype.init = function () {
-    var self = this; //console.log("Alert options", self.options);
-
-    self.defaultOptions = {
-      buttons: [{
-        title: 'OK',
-        action: function action() {
-          self.current_alert.remove();
-        }
-      }, {
-        title: 'Cancel',
-        action: function action() {
-          self.current_alert.remove();
-        }
-      }],
-      time: 0,
-      // 0 = unlimited, 1 = 1 second, 2 = 2 seconds, ... etc.
-      modal: false
-    };
-    jQuery('body').on('click', '.hx-notify .hx-notify-button.hx-close', function () {
-      self.current_alert.removeClass('opened');
-      setTimeout(function () {
-        self.current_alert.remove();
-      }, 1000);
-    });
-    $.subscribeEvent('HxAlert', self.instanceID, function (_, message, options) {
-      var theseOptions = jQuery.extend({}, self.defaultOptions, options);
-      constructedAlert = self.createNotification(message, theseOptions.modal, theseOptions.buttons);
-      jQuery('body').append(constructedAlert); // if (theseOptions.modal) {
-      //     self.current_alert = jQuery('.hx-modal');
-      // } else {
-
-      self.current_alert = jQuery('.hx-notify');
-      jQuery.each(self.current_alert.find('button'), function (idx, but) {
-        if (jQuery(but).hasClass('hx-close')) {
-          return;
-        }
-
-        var currTitle = jQuery(but).html().trim();
-        var onclick = theseOptions.buttons.find(function (b) {
-          if (b.title == currTitle) {
-            return b;
-          }
-        }).action;
-        jQuery(but).on('click', onclick);
-      });
-      setTimeout(function () {
-        self.current_alert.addClass('opened');
-      }, 500); // }
-
-      if (theseOptions.time !== 0) {
-        setTimeout(function () {
-          self.current_alert.removeClass('opened');
-        }, theseOptions.time * 1000);
-        setTimeout(function () {
-          self.current_alert.remove();
-        }, (theseOptions.time + 1) * 1000);
-      }
-
-      return;
-    });
-  };
-
-  $.HxAlert.prototype.createNotification = function (message, isModal, buttons) {
-    var buttonsHTML = "<button class='hx-notify-button hx-close'><span class='fa fa-close'></span></button>";
-
-    if (buttons.length > 0) {
-      buttonsHTML = "";
-      buttons.forEach(function (b) {
-        buttonsHTML += "<button class='hx-notify-button'>" + b.title + "</button>";
-      });
-    }
-
-    var notificationHTML = "<div class='hx-notify'>" + message + "<div class='hx-notify-button-group'>" + buttonsHTML + "</div></div>";
-    jQuery('.sr-real-alert').html(message); // if (isModal) {
-    //     notificationHTML = "<div class='hx-modal'>" + notificationHTML + "</div>";
-    // }
-
-    return notificationHTML;
-  };
-
-  $.HxAlert.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.HxAlert, 'name', {
-    value: "HxAlert"
-  });
-  $.plugins.push($.HxAlert);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44288,7 +44563,7 @@ __webpack_require__(61);
  *
  */
 //uncomment to add css file
-__webpack_require__(63);
+__webpack_require__(66);
 
 (function ($) {
   /**
@@ -44372,78 +44647,13 @@ __webpack_require__(63);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 63 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 64 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  AdminButton Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(65);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.AdminButton = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.AdminButton.prototype.init = function () {
-    var self = this;
-
-    if (self.options.AdminButton) {
-      self.url = self.options.AdminButton.homeURL;
-      self.allowed = self.options.AdminButton.has_staff_permissions;
-
-      if (self.allowed && self.url && self.url != '') {
-        self.setUpButtons();
-      } else {
-        jQuery(self.options.slot).before('<div class="sidebar-navbar"></div>');
-      }
-    }
-  };
-
-  $.AdminButton.prototype.setUpButtons = function () {
-    var self = this;
-    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
-  };
-
-  $.AdminButton.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.AdminButton, 'name', {
-    value: "AdminButton"
-  });
-  $.plugins.push($.AdminButton);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
 /* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44452,7 +44662,7 @@ __webpack_require__(65);
  *
  */
 //uncomment to add css file
-__webpack_require__(67);
+__webpack_require__(68);
 
 (function ($) {
   /**
@@ -44504,13 +44714,13 @@ __webpack_require__(67);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44567,7 +44777,7 @@ __webpack_require__(67);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
@@ -44906,18 +45116,19 @@ var hrange = __webpack_require__(3);
 
   $.CatchPy.prototype.getAnnotationTargetItems = function (webAnn) {
     try {
-      // console.log("reached getAnnotationTargetItems", webAnn);
+      console.log("reached getAnnotationTargetItems", webAnn);
+
       if (webAnn['target']['items'][0]['type'] == "Annotation") {
         // console.log([{'parent':webAnn['target']['items'][0]['source']}]);
         return [{
           'parent': webAnn['target']['items'][0]['source']
         }];
-      } // console.log("nope, something went wrong");
+      } //console.log("nope, something went wrong");
 
 
       return webAnn['target']['items'][0]['selector']['items'];
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       return [];
     }
   };
@@ -44933,6 +45144,7 @@ var hrange = __webpack_require__(3);
       jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
         if (!('parent' in targetItem)) {
           if (targetItem['type'] === "RangeSelector") {
+            console.log("Reached RangeSelector", targetItem);
             xpathRanges.push({
               start: targetItem['startSelector'] ? targetItem['startSelector'].value : targetItem['oa:start'].value,
               startOffset: targetItem['refinedBy'][0].start,
@@ -44946,9 +45158,9 @@ var hrange = __webpack_require__(3);
             });
           } else if (targetItem['type'] === "TextQuoteSelector") {
             textRanges.push({
-              prefix: targetItem['prefix'],
+              prefix: targetItem['prefix'] || '',
               exact: targetItem['exact'],
-              suffix: targetItem['suffix']
+              suffix: targetItem['suffix'] || ''
             });
           }
         } else {
@@ -44975,6 +45187,22 @@ var hrange = __webpack_require__(3);
           var serializedRange = hrange.serializeRange(normalizedRange, element, 'annotator-hl');
           ranges.push(serializedRange);
         }
+      } else {
+        var rangeFound = {};
+
+        if (xpathRanges.length >= 1) {
+          rangeFound['xpath'] = xpathRanges[0];
+        }
+
+        if (positionRanges.length >= 1) {
+          rangeFound['position'] = positionRanges[0];
+        }
+
+        if (textRanges.length >= 1) {
+          rangeFound['text'] = textRanges[0];
+        }
+
+        ranges.push(rangeFound);
       }
 
       if (webAnn['target']['items'][0]['type'] == "Annotation") {
@@ -45249,142 +45477,6 @@ var hrange = __webpack_require__(3);
   };
 
   $.storage.push($.CatchPy);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 70 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- * 
- */
-(function ($) {
-  /**
-   * Sets up components for Hxighlighte Core isntance
-   *
-   * @class      Core (name)
-   * @param      {Object}  options  The options
-   * @param      {string}  inst_id  The instance identifier
-   */
-  $.Core = function (options, inst_id) {
-    // options and instance ids are saved
-    this.options = options;
-    this.instance_id = inst_id; // keeps track of viewer/plugin modules for UI
-
-    this.viewers = [];
-    this.disabledViewers = [];
-    this.plugins = [];
-    this.disabledPlugins = []; // keeps track of annotations and storage modules for backend
-
-    this.annotations = [];
-    this.storage = [];
-    this.disabledStorage = []; // keeps track of object(s) being annotated
-
-    this.targets = []; // initializes tool
-
-    this.init();
-  };
-  /**
-   * initializer of core and its components
-   */
-
-
-  $.Core.prototype.init = function () {
-    this.setUpTargets();
-    this.setUpViewers(); // this.setUpListeners();
-    //this.setUpStorage();
-    // this.setUpPlugins();
-  };
-  /**
-   * sets up targets to be annotated
-   */
-
-
-  $.Core.prototype.setUpTargets = function () {
-    var targets = this.options.targets;
-
-    for (var i = 0; i < targets.length; i++) {
-      var mediaType = $.Core._capitalizeMedia(targets[i].mediaType) + "Target";
-
-      if (typeof Hxighlighter[mediaType] === "function") {
-        this.targets.push(new Hxighlighter[mediaType](jQuery.extend({}, targets[i], this.options.commonInfo), this.instance_id));
-      }
-    }
-  };
-
-  $.Core.prototype.setUpViewers = function () {};
-
-  $.Core.prototype.TargetSelectionMade = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'TargetSelectionMade', [message[1], message[2]]);
-  };
-
-  $.Core.prototype.TargetAnnotationDraw = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
-  };
-
-  $.Core.prototype.ViewerEditorOpen = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerEditorOpen', message);
-  };
-
-  $.Core.prototype.ViewerDisplayOpen = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerDisplayOpen', message);
-  };
-
-  $.Core.prototype.ViewerEditorClose = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerEditorClose', message);
-  };
-
-  $.Core.prototype.ViewerDisplayClose = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerDisplayClose', message);
-  };
-
-  $.Core.prototype.StorageAnnotationSave = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationSave', message);
-  };
-
-  $.Core.prototype.StorageAnnotationDelete = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationDelete', message);
-  };
-
-  $.Core.prototype.StorageAnnotationLoad = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationLoad', message);
-  }; // $.Core.prototype.StorageAnnotationGetReplies = function(message) {
-  //     var self = this;
-  //     self.callFuncInList(this.targets, 'StorageAnnotationGetReplies', message);
-  // };
-
-
-  $.Core.prototype.StorageAnnotationSearch = function (message) {
-    var self = this; //console.log('Received here');
-
-    self.callFuncInList(this.targets, 'StorageAnnotationSearch', message);
-  }; // Util functions
-
-
-  $.Core.prototype.callFuncInList = function (objectList, funcName, params) {
-    var self = this;
-    jQuery.each(objectList, function (_, component) {
-      if (typeof component[funcName] === "function") {
-        component[funcName].apply(component, params);
-      }
-    });
-  };
-
-  $.Core._capitalizeMedia = function (media) {
-    var editedMedia = Hxighlighter.trim(media);
-    editedMedia = editedMedia.toLowerCase();
-    return editedMedia.charAt(0).toUpperCase() + editedMedia.slice(1);
-  };
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
