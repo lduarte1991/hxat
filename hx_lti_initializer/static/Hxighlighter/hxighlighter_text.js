@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Tuesday, August 13th, 2019, 2:45:50 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Wednesday, August 14th, 2019, 3:33:24 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -43772,7 +43772,7 @@ __webpack_require__(56);
 
   $.AdminButton.prototype.setUpButtons = function () {
     var self = this;
-    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" title="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
+    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" aria-label="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
   };
 
   $.AdminButton.prototype.saving = function (annotation) {
