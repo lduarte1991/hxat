@@ -1,6 +1,7 @@
 from django.urls import include, path
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.urls import path
 admin.autodiscover()
 
 # import django_app_lti.urls
@@ -17,4 +18,7 @@ urlpatterns = [
     # TODO: Check to see if this works without enabling django_app_lti
     # Include the lti app's urls
     #url(r'^lti/', include((django_app_lti.urls, 'lti'), namespace="lti")),
+
+    # channels chat
+    path('chat/', include('chat.urls')),
 ]

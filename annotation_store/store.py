@@ -10,6 +10,9 @@ from hx_lti_initializer.utils import retrieve_token
 
 from .models import Annotation, AnnotationTags
 
+import channels.layers
+from asgiref.sync import async_to_sync
+
 import json
 import requests
 import datetime
@@ -56,6 +59,9 @@ class AnnotationStore(object):
         self.outcome = None
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
         assert self.backend is not None
+
+        self.channel_layer = channels.layers.get_channel_layer()
+
 
     @classmethod
     def from_settings(cls, request):
@@ -117,6 +123,31 @@ class AnnotationStore(object):
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
         response = self.backend.create(annotation_id)
+
+        ######### notification ##########################################
+        # TODO:
+        #   .define how the channel group will be named; if collection_id is
+        #    unique, then use it; otherwise have to remove special chars from
+        #    context_id to compound group_name
+        #   .have to read body of response to send in the ws message; what info
+        #    the ws client needs is tbd; some kind of action/operation to know
+        #    if it was a create or a delete
+        #   .does it need to know if the format is annotatorjs or webannotation
+        #    at this point? leave it to the ws client?
+        self.logger.info("###################### about to send notification")
+        if response.status_code == 200:
+            context_id = body.get('contextId', 'unknown_context')
+            collection_id = body.get('collectionId', 'unknown_collection')
+            group = '{}'.format(collection_id)
+            self.logger.info("###################### group({}) id({})".format(
+                group, body.get('id', 'unknown_id')))
+            async_to_sync(self.channel_layer.group_send)(group, {
+                'type':'chat_message',
+                'message': 'new annotation created ({})'.format(body.get(
+                    'id', 'unknown_id')),
+            })
+        self.logger.info("###################### done with notification")
+        ######### notification ##########################################
         return response
 
     def read(self, annotation_id):
