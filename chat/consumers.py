@@ -44,5 +44,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': 'name({}): {}'.format(self.channel_name, message)
         }))
+        
+    async def annotation_notification(self, event):
+        message = event['message']
+        action = event['action']
 
+        # send message to websocket
+        await self.send(text_data=json.dumps({
+            'type': action,
+            'message': '{}'.format(message)
+        }))
 
+    async def annotation_created(self, event):
+        message = event['message']
+
+        # send message to websocket
+        await self.send(text_data=json.dumps({
+            'type': 'annotation_created',
+            'message': '{}'.format(message)
+        }))
+
+    async def annotation_updated(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'type': 'annotation_updated',
+            'message': '{}'.format(message)
+        }))
+
+    async def annotation_deleted(self, event):
+        message = event["message"]
+        await self.send(text_data=json.dumps({
+            'type': 'annotation_deleted',
+            'message': '{}'.format(message)
+        }))

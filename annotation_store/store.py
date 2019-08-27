@@ -119,13 +119,18 @@ class AnnotationStore(object):
         if response.status_code == 200:
             context_id = body.get('contextId', 'unknown_context')
             collection_id = body.get('collectionId', 'unknown_collection')
+            cleaned_annotation = json.loads(response.content)
             group = '{}'.format(collection_id)
             self.logger.info("###################### group({}) id({})".format(
-                group, body.get('id', 'unknown_id')))
+                group, cleaned_annotation.get('id', 'unknown_id')))
+            #async_to_sync(self.channel_layer.group_send)(group, {
+            #    'type':'chat_message',
+            #    'message': 'new annotation created ({})'.format(body.get(
+            #        'id', 'unknown_id')),
+            #})
             async_to_sync(self.channel_layer.group_send)(group, {
-                'type':'chat_message',
-                'message': 'new annotation created ({})'.format(body.get(
-                    'id', 'unknown_id')),
+                'type':'annotation_created',
+                'message': cleaned_annotation,
             })
         self.logger.info("###################### done with notification")
         ######### notification ##########################################
@@ -146,6 +151,22 @@ class AnnotationStore(object):
             self.backend.before_update(annotation_id)
         response = self.backend.update(annotation_id)
         self.after_update(annotation_id, response)
+        if response.status_code == 200:
+            context_id = body.get('contextId', 'unknown_context')
+            collection_id = body.get('collectionId', 'unknown_collection')
+            cleaned_annotation = json.loads(response.content)
+            group = '{}'.format(collection_id)
+            self.logger.info("###################### group({}) id({})".format(
+                group, cleaned_annotation.get('id', 'unknown_id')))
+            #async_to_sync(self.channel_layer.group_send)(group, {
+            #    'type':'chat_message',
+            #    'message': 'new annotation created ({})'.format(body.get(
+            #        'id', 'unknown_id')),
+            #})
+            async_to_sync(self.channel_layer.group_send)(group, {
+                'type':'annotation_updated',
+                'message': cleaned_annotation,
+            })
         return response
 
     def after_update(self, annotation_id, response):
@@ -157,6 +178,21 @@ class AnnotationStore(object):
             self.backend.before_delete(annotation_id)
         response = self.backend.delete(annotation_id)
         self.after_delete(annotation_id, response)
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            collection_id = cleaned_annotation.get('collectionId', 'unknown_collection')
+            group = '{}'.format(collection_id)
+            self.logger.info("###################### group({}) id({})".format(
+                group, cleaned_annotation.get('id', 'unknown_id')))
+            #async_to_sync(self.channel_layer.group_send)(group, {
+            #    'type':'chat_message',
+            #    'message': 'new annotation created ({})'.format(body.get(
+            #        'id', 'unknown_id')),
+            #})
+            async_to_sync(self.channel_layer.group_send)(group, {
+                'type':'annotation_deleted',
+                'message': cleaned_annotation,
+            })
         return response
 
     def after_delete(self, annotation_id, response):
