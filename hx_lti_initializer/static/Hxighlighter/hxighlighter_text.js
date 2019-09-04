@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Wednesday, August 14th, 2019, 3:33:24 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Wednesday, September 4th, 2019, 1:00:01 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 61);
+/******/ 	return __webpack_require__(__webpack_require__.s = 59);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10686,7 +10686,7 @@ return jQuery;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 /* harmony import */ var _css_common_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_common_css__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * Hxighlighter is the superclass that will contain all instances of the tool.
@@ -27864,7 +27864,7 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
   else {}
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(28)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(4), __webpack_require__(25)(module)))
 
 /***/ }),
 /* 3 */
@@ -28332,8 +28332,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
     var normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
     normalizedRange.setEnd(endResult.node, endResult.offset); //console.log('HERE', _start, _startOffset, _end, _endOffset, startResult, endResult, getExactText(normalizedRange), serializedRange.text.exact);
-
-    console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
+    //console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
   } //console.log(_start, _startOffset, startResult, endResult);
   //console.log(getPrefixAndSuffix(normalizedRange, root, ignoreSelector))
   // Way #2: if that doesn't match what we have stored as the quote, try global positioning from root
@@ -28347,8 +28346,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
 
     normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
-    normalizedRange.setEnd(endResult.node, endResult.offset);
-    console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
+    normalizedRange.setEnd(endResult.node, endResult.offset); //console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
   } // Way #3: looks for an exact match of prefix, suffix, and exact
   // This is for the usecase where someone has added text/html before this
 
@@ -28366,7 +28364,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
       var toCheck = getPrefixAndSuffix(normalizedRange, root, ignoreSelector);
 
       if (serializedRange.text.prefix === toCheck.prefix && serializedRange.text.suffix === toCheck.suffix) {
-        console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
+        //console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
         break;
       }
     }
@@ -31839,6 +31837,5556 @@ __webpack_require__(11);
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/*!
+ * Bootstrap v3.4.1 (https://getbootstrap.com/)
+ * Copyright 2011-2019 Twitter, Inc.
+ * Licensed under the MIT license
+ */
+if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires jQuery");!function(t){"use strict";var e=jQuery.fn.jquery.split(" ")[0].split(".");if(e[0]<2&&e[1]<9||1==e[0]&&9==e[1]&&e[2]<1||3<e[0])throw new Error("Bootstrap's JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4")}(),function(n){"use strict";n.fn.emulateTransitionEnd=function(t){var e=!1,i=this;n(this).one("bsTransitionEnd",function(){e=!0});return setTimeout(function(){e||n(i).trigger(n.support.transition.end)},t),this},n(function(){n.support.transition=function o(){var t=document.createElement("bootstrap"),e={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"};for(var i in e)if(t.style[i]!==undefined)return{end:e[i]};return!1}(),n.support.transition&&(n.event.special.bsTransitionEnd={bindType:n.support.transition.end,delegateType:n.support.transition.end,handle:function(t){if(n(t.target).is(this))return t.handleObj.handler.apply(this,arguments)}})})}(jQuery),function(s){"use strict";var e='[data-dismiss="alert"]',a=function(t){s(t).on("click",e,this.close)};a.VERSION="3.4.1",a.TRANSITION_DURATION=150,a.prototype.close=function(t){var e=s(this),i=e.attr("data-target");i||(i=(i=e.attr("href"))&&i.replace(/.*(?=#[^\s]*$)/,"")),i="#"===i?[]:i;var o=s(document).find(i);function n(){o.detach().trigger("closed.bs.alert").remove()}t&&t.preventDefault(),o.length||(o=e.closest(".alert")),o.trigger(t=s.Event("close.bs.alert")),t.isDefaultPrevented()||(o.removeClass("in"),s.support.transition&&o.hasClass("fade")?o.one("bsTransitionEnd",n).emulateTransitionEnd(a.TRANSITION_DURATION):n())};var t=s.fn.alert;s.fn.alert=function o(i){return this.each(function(){var t=s(this),e=t.data("bs.alert");e||t.data("bs.alert",e=new a(this)),"string"==typeof i&&e[i].call(t)})},s.fn.alert.Constructor=a,s.fn.alert.noConflict=function(){return s.fn.alert=t,this},s(document).on("click.bs.alert.data-api",e,a.prototype.close)}(jQuery),function(s){"use strict";var n=function(t,e){this.$element=s(t),this.options=s.extend({},n.DEFAULTS,e),this.isLoading=!1};function i(o){return this.each(function(){var t=s(this),e=t.data("bs.button"),i="object"==typeof o&&o;e||t.data("bs.button",e=new n(this,i)),"toggle"==o?e.toggle():o&&e.setState(o)})}n.VERSION="3.4.1",n.DEFAULTS={loadingText:"loading..."},n.prototype.setState=function(t){var e="disabled",i=this.$element,o=i.is("input")?"val":"html",n=i.data();t+="Text",null==n.resetText&&i.data("resetText",i[o]()),setTimeout(s.proxy(function(){i[o](null==n[t]?this.options[t]:n[t]),"loadingText"==t?(this.isLoading=!0,i.addClass(e).attr(e,e).prop(e,!0)):this.isLoading&&(this.isLoading=!1,i.removeClass(e).removeAttr(e).prop(e,!1))},this),0)},n.prototype.toggle=function(){var t=!0,e=this.$element.closest('[data-toggle="buttons"]');if(e.length){var i=this.$element.find("input");"radio"==i.prop("type")?(i.prop("checked")&&(t=!1),e.find(".active").removeClass("active"),this.$element.addClass("active")):"checkbox"==i.prop("type")&&(i.prop("checked")!==this.$element.hasClass("active")&&(t=!1),this.$element.toggleClass("active")),i.prop("checked",this.$element.hasClass("active")),t&&i.trigger("change")}else this.$element.attr("aria-pressed",!this.$element.hasClass("active")),this.$element.toggleClass("active")};var t=s.fn.button;s.fn.button=i,s.fn.button.Constructor=n,s.fn.button.noConflict=function(){return s.fn.button=t,this},s(document).on("click.bs.button.data-api",'[data-toggle^="button"]',function(t){var e=s(t.target).closest(".btn");i.call(e,"toggle"),s(t.target).is('input[type="radio"], input[type="checkbox"]')||(t.preventDefault(),e.is("input,button")?e.trigger("focus"):e.find("input:visible,button:visible").first().trigger("focus"))}).on("focus.bs.button.data-api blur.bs.button.data-api",'[data-toggle^="button"]',function(t){s(t.target).closest(".btn").toggleClass("focus",/^focus(in)?$/.test(t.type))})}(jQuery),function(p){"use strict";var c=function(t,e){this.$element=p(t),this.$indicators=this.$element.find(".carousel-indicators"),this.options=e,this.paused=null,this.sliding=null,this.interval=null,this.$active=null,this.$items=null,this.options.keyboard&&this.$element.on("keydown.bs.carousel",p.proxy(this.keydown,this)),"hover"==this.options.pause&&!("ontouchstart"in document.documentElement)&&this.$element.on("mouseenter.bs.carousel",p.proxy(this.pause,this)).on("mouseleave.bs.carousel",p.proxy(this.cycle,this))};function r(n){return this.each(function(){var t=p(this),e=t.data("bs.carousel"),i=p.extend({},c.DEFAULTS,t.data(),"object"==typeof n&&n),o="string"==typeof n?n:i.slide;e||t.data("bs.carousel",e=new c(this,i)),"number"==typeof n?e.to(n):o?e[o]():i.interval&&e.pause().cycle()})}c.VERSION="3.4.1",c.TRANSITION_DURATION=600,c.DEFAULTS={interval:5e3,pause:"hover",wrap:!0,keyboard:!0},c.prototype.keydown=function(t){if(!/input|textarea/i.test(t.target.tagName)){switch(t.which){case 37:this.prev();break;case 39:this.next();break;default:return}t.preventDefault()}},c.prototype.cycle=function(t){return t||(this.paused=!1),this.interval&&clearInterval(this.interval),this.options.interval&&!this.paused&&(this.interval=setInterval(p.proxy(this.next,this),this.options.interval)),this},c.prototype.getItemIndex=function(t){return this.$items=t.parent().children(".item"),this.$items.index(t||this.$active)},c.prototype.getItemForDirection=function(t,e){var i=this.getItemIndex(e);if(("prev"==t&&0===i||"next"==t&&i==this.$items.length-1)&&!this.options.wrap)return e;var o=(i+("prev"==t?-1:1))%this.$items.length;return this.$items.eq(o)},c.prototype.to=function(t){var e=this,i=this.getItemIndex(this.$active=this.$element.find(".item.active"));if(!(t>this.$items.length-1||t<0))return this.sliding?this.$element.one("slid.bs.carousel",function(){e.to(t)}):i==t?this.pause().cycle():this.slide(i<t?"next":"prev",this.$items.eq(t))},c.prototype.pause=function(t){return t||(this.paused=!0),this.$element.find(".next, .prev").length&&p.support.transition&&(this.$element.trigger(p.support.transition.end),this.cycle(!0)),this.interval=clearInterval(this.interval),this},c.prototype.next=function(){if(!this.sliding)return this.slide("next")},c.prototype.prev=function(){if(!this.sliding)return this.slide("prev")},c.prototype.slide=function(t,e){var i=this.$element.find(".item.active"),o=e||this.getItemForDirection(t,i),n=this.interval,s="next"==t?"left":"right",a=this;if(o.hasClass("active"))return this.sliding=!1;var r=o[0],l=p.Event("slide.bs.carousel",{relatedTarget:r,direction:s});if(this.$element.trigger(l),!l.isDefaultPrevented()){if(this.sliding=!0,n&&this.pause(),this.$indicators.length){this.$indicators.find(".active").removeClass("active");var h=p(this.$indicators.children()[this.getItemIndex(o)]);h&&h.addClass("active")}var d=p.Event("slid.bs.carousel",{relatedTarget:r,direction:s});return p.support.transition&&this.$element.hasClass("slide")?(o.addClass(t),"object"==typeof o&&o.length&&o[0].offsetWidth,i.addClass(s),o.addClass(s),i.one("bsTransitionEnd",function(){o.removeClass([t,s].join(" ")).addClass("active"),i.removeClass(["active",s].join(" ")),a.sliding=!1,setTimeout(function(){a.$element.trigger(d)},0)}).emulateTransitionEnd(c.TRANSITION_DURATION)):(i.removeClass("active"),o.addClass("active"),this.sliding=!1,this.$element.trigger(d)),n&&this.cycle(),this}};var t=p.fn.carousel;p.fn.carousel=r,p.fn.carousel.Constructor=c,p.fn.carousel.noConflict=function(){return p.fn.carousel=t,this};var e=function(t){var e=p(this),i=e.attr("href");i&&(i=i.replace(/.*(?=#[^\s]+$)/,""));var o=e.attr("data-target")||i,n=p(document).find(o);if(n.hasClass("carousel")){var s=p.extend({},n.data(),e.data()),a=e.attr("data-slide-to");a&&(s.interval=!1),r.call(n,s),a&&n.data("bs.carousel").to(a),t.preventDefault()}};p(document).on("click.bs.carousel.data-api","[data-slide]",e).on("click.bs.carousel.data-api","[data-slide-to]",e),p(window).on("load",function(){p('[data-ride="carousel"]').each(function(){var t=p(this);r.call(t,t.data())})})}(jQuery),function(a){"use strict";var r=function(t,e){this.$element=a(t),this.options=a.extend({},r.DEFAULTS,e),this.$trigger=a('[data-toggle="collapse"][href="#'+t.id+'"],[data-toggle="collapse"][data-target="#'+t.id+'"]'),this.transitioning=null,this.options.parent?this.$parent=this.getParent():this.addAriaAndCollapsedClass(this.$element,this.$trigger),this.options.toggle&&this.toggle()};function n(t){var e,i=t.attr("data-target")||(e=t.attr("href"))&&e.replace(/.*(?=#[^\s]+$)/,"");return a(document).find(i)}function l(o){return this.each(function(){var t=a(this),e=t.data("bs.collapse"),i=a.extend({},r.DEFAULTS,t.data(),"object"==typeof o&&o);!e&&i.toggle&&/show|hide/.test(o)&&(i.toggle=!1),e||t.data("bs.collapse",e=new r(this,i)),"string"==typeof o&&e[o]()})}r.VERSION="3.4.1",r.TRANSITION_DURATION=350,r.DEFAULTS={toggle:!0},r.prototype.dimension=function(){return this.$element.hasClass("width")?"width":"height"},r.prototype.show=function(){if(!this.transitioning&&!this.$element.hasClass("in")){var t,e=this.$parent&&this.$parent.children(".panel").children(".in, .collapsing");if(!(e&&e.length&&(t=e.data("bs.collapse"))&&t.transitioning)){var i=a.Event("show.bs.collapse");if(this.$element.trigger(i),!i.isDefaultPrevented()){e&&e.length&&(l.call(e,"hide"),t||e.data("bs.collapse",null));var o=this.dimension();this.$element.removeClass("collapse").addClass("collapsing")[o](0).attr("aria-expanded",!0),this.$trigger.removeClass("collapsed").attr("aria-expanded",!0),this.transitioning=1;var n=function(){this.$element.removeClass("collapsing").addClass("collapse in")[o](""),this.transitioning=0,this.$element.trigger("shown.bs.collapse")};if(!a.support.transition)return n.call(this);var s=a.camelCase(["scroll",o].join("-"));this.$element.one("bsTransitionEnd",a.proxy(n,this)).emulateTransitionEnd(r.TRANSITION_DURATION)[o](this.$element[0][s])}}}},r.prototype.hide=function(){if(!this.transitioning&&this.$element.hasClass("in")){var t=a.Event("hide.bs.collapse");if(this.$element.trigger(t),!t.isDefaultPrevented()){var e=this.dimension();this.$element[e](this.$element[e]())[0].offsetHeight,this.$element.addClass("collapsing").removeClass("collapse in").attr("aria-expanded",!1),this.$trigger.addClass("collapsed").attr("aria-expanded",!1),this.transitioning=1;var i=function(){this.transitioning=0,this.$element.removeClass("collapsing").addClass("collapse").trigger("hidden.bs.collapse")};if(!a.support.transition)return i.call(this);this.$element[e](0).one("bsTransitionEnd",a.proxy(i,this)).emulateTransitionEnd(r.TRANSITION_DURATION)}}},r.prototype.toggle=function(){this[this.$element.hasClass("in")?"hide":"show"]()},r.prototype.getParent=function(){return a(document).find(this.options.parent).find('[data-toggle="collapse"][data-parent="'+this.options.parent+'"]').each(a.proxy(function(t,e){var i=a(e);this.addAriaAndCollapsedClass(n(i),i)},this)).end()},r.prototype.addAriaAndCollapsedClass=function(t,e){var i=t.hasClass("in");t.attr("aria-expanded",i),e.toggleClass("collapsed",!i).attr("aria-expanded",i)};var t=a.fn.collapse;a.fn.collapse=l,a.fn.collapse.Constructor=r,a.fn.collapse.noConflict=function(){return a.fn.collapse=t,this},a(document).on("click.bs.collapse.data-api",'[data-toggle="collapse"]',function(t){var e=a(this);e.attr("data-target")||t.preventDefault();var i=n(e),o=i.data("bs.collapse")?"toggle":e.data();l.call(i,o)})}(jQuery),function(a){"use strict";var r='[data-toggle="dropdown"]',o=function(t){a(t).on("click.bs.dropdown",this.toggle)};function l(t){var e=t.attr("data-target");e||(e=(e=t.attr("href"))&&/#[A-Za-z]/.test(e)&&e.replace(/.*(?=#[^\s]*$)/,""));var i="#"!==e?a(document).find(e):null;return i&&i.length?i:t.parent()}function s(o){o&&3===o.which||(a(".dropdown-backdrop").remove(),a(r).each(function(){var t=a(this),e=l(t),i={relatedTarget:this};e.hasClass("open")&&(o&&"click"==o.type&&/input|textarea/i.test(o.target.tagName)&&a.contains(e[0],o.target)||(e.trigger(o=a.Event("hide.bs.dropdown",i)),o.isDefaultPrevented()||(t.attr("aria-expanded","false"),e.removeClass("open").trigger(a.Event("hidden.bs.dropdown",i)))))}))}o.VERSION="3.4.1",o.prototype.toggle=function(t){var e=a(this);if(!e.is(".disabled, :disabled")){var i=l(e),o=i.hasClass("open");if(s(),!o){"ontouchstart"in document.documentElement&&!i.closest(".navbar-nav").length&&a(document.createElement("div")).addClass("dropdown-backdrop").insertAfter(a(this)).on("click",s);var n={relatedTarget:this};if(i.trigger(t=a.Event("show.bs.dropdown",n)),t.isDefaultPrevented())return;e.trigger("focus").attr("aria-expanded","true"),i.toggleClass("open").trigger(a.Event("shown.bs.dropdown",n))}return!1}},o.prototype.keydown=function(t){if(/(38|40|27|32)/.test(t.which)&&!/input|textarea/i.test(t.target.tagName)){var e=a(this);if(t.preventDefault(),t.stopPropagation(),!e.is(".disabled, :disabled")){var i=l(e),o=i.hasClass("open");if(!o&&27!=t.which||o&&27==t.which)return 27==t.which&&i.find(r).trigger("focus"),e.trigger("click");var n=i.find(".dropdown-menu li:not(.disabled):visible a");if(n.length){var s=n.index(t.target);38==t.which&&0<s&&s--,40==t.which&&s<n.length-1&&s++,~s||(s=0),n.eq(s).trigger("focus")}}}};var t=a.fn.dropdown;a.fn.dropdown=function e(i){return this.each(function(){var t=a(this),e=t.data("bs.dropdown");e||t.data("bs.dropdown",e=new o(this)),"string"==typeof i&&e[i].call(t)})},a.fn.dropdown.Constructor=o,a.fn.dropdown.noConflict=function(){return a.fn.dropdown=t,this},a(document).on("click.bs.dropdown.data-api",s).on("click.bs.dropdown.data-api",".dropdown form",function(t){t.stopPropagation()}).on("click.bs.dropdown.data-api",r,o.prototype.toggle).on("keydown.bs.dropdown.data-api",r,o.prototype.keydown).on("keydown.bs.dropdown.data-api",".dropdown-menu",o.prototype.keydown)}(jQuery),function(a){"use strict";var s=function(t,e){this.options=e,this.$body=a(document.body),this.$element=a(t),this.$dialog=this.$element.find(".modal-dialog"),this.$backdrop=null,this.isShown=null,this.originalBodyPad=null,this.scrollbarWidth=0,this.ignoreBackdropClick=!1,this.fixedContent=".navbar-fixed-top, .navbar-fixed-bottom",this.options.remote&&this.$element.find(".modal-content").load(this.options.remote,a.proxy(function(){this.$element.trigger("loaded.bs.modal")},this))};function r(o,n){return this.each(function(){var t=a(this),e=t.data("bs.modal"),i=a.extend({},s.DEFAULTS,t.data(),"object"==typeof o&&o);e||t.data("bs.modal",e=new s(this,i)),"string"==typeof o?e[o](n):i.show&&e.show(n)})}s.VERSION="3.4.1",s.TRANSITION_DURATION=300,s.BACKDROP_TRANSITION_DURATION=150,s.DEFAULTS={backdrop:!0,keyboard:!0,show:!0},s.prototype.toggle=function(t){return this.isShown?this.hide():this.show(t)},s.prototype.show=function(i){var o=this,t=a.Event("show.bs.modal",{relatedTarget:i});this.$element.trigger(t),this.isShown||t.isDefaultPrevented()||(this.isShown=!0,this.checkScrollbar(),this.setScrollbar(),this.$body.addClass("modal-open"),this.escape(),this.resize(),this.$element.on("click.dismiss.bs.modal",'[data-dismiss="modal"]',a.proxy(this.hide,this)),this.$dialog.on("mousedown.dismiss.bs.modal",function(){o.$element.one("mouseup.dismiss.bs.modal",function(t){a(t.target).is(o.$element)&&(o.ignoreBackdropClick=!0)})}),this.backdrop(function(){var t=a.support.transition&&o.$element.hasClass("fade");o.$element.parent().length||o.$element.appendTo(o.$body),o.$element.show().scrollTop(0),o.adjustDialog(),t&&o.$element[0].offsetWidth,o.$element.addClass("in"),o.enforceFocus();var e=a.Event("shown.bs.modal",{relatedTarget:i});t?o.$dialog.one("bsTransitionEnd",function(){o.$element.trigger("focus").trigger(e)}).emulateTransitionEnd(s.TRANSITION_DURATION):o.$element.trigger("focus").trigger(e)}))},s.prototype.hide=function(t){t&&t.preventDefault(),t=a.Event("hide.bs.modal"),this.$element.trigger(t),this.isShown&&!t.isDefaultPrevented()&&(this.isShown=!1,this.escape(),this.resize(),a(document).off("focusin.bs.modal"),this.$element.removeClass("in").off("click.dismiss.bs.modal").off("mouseup.dismiss.bs.modal"),this.$dialog.off("mousedown.dismiss.bs.modal"),a.support.transition&&this.$element.hasClass("fade")?this.$element.one("bsTransitionEnd",a.proxy(this.hideModal,this)).emulateTransitionEnd(s.TRANSITION_DURATION):this.hideModal())},s.prototype.enforceFocus=function(){a(document).off("focusin.bs.modal").on("focusin.bs.modal",a.proxy(function(t){document===t.target||this.$element[0]===t.target||this.$element.has(t.target).length||this.$element.trigger("focus")},this))},s.prototype.escape=function(){this.isShown&&this.options.keyboard?this.$element.on("keydown.dismiss.bs.modal",a.proxy(function(t){27==t.which&&this.hide()},this)):this.isShown||this.$element.off("keydown.dismiss.bs.modal")},s.prototype.resize=function(){this.isShown?a(window).on("resize.bs.modal",a.proxy(this.handleUpdate,this)):a(window).off("resize.bs.modal")},s.prototype.hideModal=function(){var t=this;this.$element.hide(),this.backdrop(function(){t.$body.removeClass("modal-open"),t.resetAdjustments(),t.resetScrollbar(),t.$element.trigger("hidden.bs.modal")})},s.prototype.removeBackdrop=function(){this.$backdrop&&this.$backdrop.remove(),this.$backdrop=null},s.prototype.backdrop=function(t){var e=this,i=this.$element.hasClass("fade")?"fade":"";if(this.isShown&&this.options.backdrop){var o=a.support.transition&&i;if(this.$backdrop=a(document.createElement("div")).addClass("modal-backdrop "+i).appendTo(this.$body),this.$element.on("click.dismiss.bs.modal",a.proxy(function(t){this.ignoreBackdropClick?this.ignoreBackdropClick=!1:t.target===t.currentTarget&&("static"==this.options.backdrop?this.$element[0].focus():this.hide())},this)),o&&this.$backdrop[0].offsetWidth,this.$backdrop.addClass("in"),!t)return;o?this.$backdrop.one("bsTransitionEnd",t).emulateTransitionEnd(s.BACKDROP_TRANSITION_DURATION):t()}else if(!this.isShown&&this.$backdrop){this.$backdrop.removeClass("in");var n=function(){e.removeBackdrop(),t&&t()};a.support.transition&&this.$element.hasClass("fade")?this.$backdrop.one("bsTransitionEnd",n).emulateTransitionEnd(s.BACKDROP_TRANSITION_DURATION):n()}else t&&t()},s.prototype.handleUpdate=function(){this.adjustDialog()},s.prototype.adjustDialog=function(){var t=this.$element[0].scrollHeight>document.documentElement.clientHeight;this.$element.css({paddingLeft:!this.bodyIsOverflowing&&t?this.scrollbarWidth:"",paddingRight:this.bodyIsOverflowing&&!t?this.scrollbarWidth:""})},s.prototype.resetAdjustments=function(){this.$element.css({paddingLeft:"",paddingRight:""})},s.prototype.checkScrollbar=function(){var t=window.innerWidth;if(!t){var e=document.documentElement.getBoundingClientRect();t=e.right-Math.abs(e.left)}this.bodyIsOverflowing=document.body.clientWidth<t,this.scrollbarWidth=this.measureScrollbar()},s.prototype.setScrollbar=function(){var t=parseInt(this.$body.css("padding-right")||0,10);this.originalBodyPad=document.body.style.paddingRight||"";var n=this.scrollbarWidth;this.bodyIsOverflowing&&(this.$body.css("padding-right",t+n),a(this.fixedContent).each(function(t,e){var i=e.style.paddingRight,o=a(e).css("padding-right");a(e).data("padding-right",i).css("padding-right",parseFloat(o)+n+"px")}))},s.prototype.resetScrollbar=function(){this.$body.css("padding-right",this.originalBodyPad),a(this.fixedContent).each(function(t,e){var i=a(e).data("padding-right");a(e).removeData("padding-right"),e.style.paddingRight=i||""})},s.prototype.measureScrollbar=function(){var t=document.createElement("div");t.className="modal-scrollbar-measure",this.$body.append(t);var e=t.offsetWidth-t.clientWidth;return this.$body[0].removeChild(t),e};var t=a.fn.modal;a.fn.modal=r,a.fn.modal.Constructor=s,a.fn.modal.noConflict=function(){return a.fn.modal=t,this},a(document).on("click.bs.modal.data-api",'[data-toggle="modal"]',function(t){var e=a(this),i=e.attr("href"),o=e.attr("data-target")||i&&i.replace(/.*(?=#[^\s]+$)/,""),n=a(document).find(o),s=n.data("bs.modal")?"toggle":a.extend({remote:!/#/.test(i)&&i},n.data(),e.data());e.is("a")&&t.preventDefault(),n.one("show.bs.modal",function(t){t.isDefaultPrevented()||n.one("hidden.bs.modal",function(){e.is(":visible")&&e.trigger("focus")})}),r.call(n,s,this)})}(jQuery),function(g){"use strict";var o=["sanitize","whiteList","sanitizeFn"],a=["background","cite","href","itemtype","longdesc","poster","src","xlink:href"],t={"*":["class","dir","id","lang","role",/^aria-[\w-]*$/i],a:["target","href","title","rel"],area:[],b:[],br:[],col:[],code:[],div:[],em:[],hr:[],h1:[],h2:[],h3:[],h4:[],h5:[],h6:[],i:[],img:["src","alt","title","width","height"],li:[],ol:[],p:[],pre:[],s:[],small:[],span:[],sub:[],sup:[],strong:[],u:[],ul:[]},r=/^(?:(?:https?|mailto|ftp|tel|file):|[^&:/?#]*(?:[/?#]|$))/gi,l=/^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[a-z0-9+/]+=*$/i;function u(t,e){var i=t.nodeName.toLowerCase();if(-1!==g.inArray(i,e))return-1===g.inArray(i,a)||Boolean(t.nodeValue.match(r)||t.nodeValue.match(l));for(var o=g(e).filter(function(t,e){return e instanceof RegExp}),n=0,s=o.length;n<s;n++)if(i.match(o[n]))return!0;return!1}function n(t,e,i){if(0===t.length)return t;if(i&&"function"==typeof i)return i(t);if(!document.implementation||!document.implementation.createHTMLDocument)return t;var o=document.implementation.createHTMLDocument("sanitization");o.body.innerHTML=t;for(var n=g.map(e,function(t,e){return e}),s=g(o.body).find("*"),a=0,r=s.length;a<r;a++){var l=s[a],h=l.nodeName.toLowerCase();if(-1!==g.inArray(h,n))for(var d=g.map(l.attributes,function(t){return t}),p=[].concat(e["*"]||[],e[h]||[]),c=0,f=d.length;c<f;c++)u(d[c],p)||l.removeAttribute(d[c].nodeName);else l.parentNode.removeChild(l)}return o.body.innerHTML}var m=function(t,e){this.type=null,this.options=null,this.enabled=null,this.timeout=null,this.hoverState=null,this.$element=null,this.inState=null,this.init("tooltip",t,e)};m.VERSION="3.4.1",m.TRANSITION_DURATION=150,m.DEFAULTS={animation:!0,placement:"top",selector:!1,template:'<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,container:!1,viewport:{selector:"body",padding:0},sanitize:!0,sanitizeFn:null,whiteList:t},m.prototype.init=function(t,e,i){if(this.enabled=!0,this.type=t,this.$element=g(e),this.options=this.getOptions(i),this.$viewport=this.options.viewport&&g(document).find(g.isFunction(this.options.viewport)?this.options.viewport.call(this,this.$element):this.options.viewport.selector||this.options.viewport),this.inState={click:!1,hover:!1,focus:!1},this.$element[0]instanceof document.constructor&&!this.options.selector)throw new Error("`selector` option must be specified when initializing "+this.type+" on the window.document object!");for(var o=this.options.trigger.split(" "),n=o.length;n--;){var s=o[n];if("click"==s)this.$element.on("click."+this.type,this.options.selector,g.proxy(this.toggle,this));else if("manual"!=s){var a="hover"==s?"mouseenter":"focusin",r="hover"==s?"mouseleave":"focusout";this.$element.on(a+"."+this.type,this.options.selector,g.proxy(this.enter,this)),this.$element.on(r+"."+this.type,this.options.selector,g.proxy(this.leave,this))}}this.options.selector?this._options=g.extend({},this.options,{trigger:"manual",selector:""}):this.fixTitle()},m.prototype.getDefaults=function(){return m.DEFAULTS},m.prototype.getOptions=function(t){var e=this.$element.data();for(var i in e)e.hasOwnProperty(i)&&-1!==g.inArray(i,o)&&delete e[i];return(t=g.extend({},this.getDefaults(),e,t)).delay&&"number"==typeof t.delay&&(t.delay={show:t.delay,hide:t.delay}),t.sanitize&&(t.template=n(t.template,t.whiteList,t.sanitizeFn)),t},m.prototype.getDelegateOptions=function(){var i={},o=this.getDefaults();return this._options&&g.each(this._options,function(t,e){o[t]!=e&&(i[t]=e)}),i},m.prototype.enter=function(t){var e=t instanceof this.constructor?t:g(t.currentTarget).data("bs."+this.type);if(e||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e)),t instanceof g.Event&&(e.inState["focusin"==t.type?"focus":"hover"]=!0),e.tip().hasClass("in")||"in"==e.hoverState)e.hoverState="in";else{if(clearTimeout(e.timeout),e.hoverState="in",!e.options.delay||!e.options.delay.show)return e.show();e.timeout=setTimeout(function(){"in"==e.hoverState&&e.show()},e.options.delay.show)}},m.prototype.isInStateTrue=function(){for(var t in this.inState)if(this.inState[t])return!0;return!1},m.prototype.leave=function(t){var e=t instanceof this.constructor?t:g(t.currentTarget).data("bs."+this.type);if(e||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e)),t instanceof g.Event&&(e.inState["focusout"==t.type?"focus":"hover"]=!1),!e.isInStateTrue()){if(clearTimeout(e.timeout),e.hoverState="out",!e.options.delay||!e.options.delay.hide)return e.hide();e.timeout=setTimeout(function(){"out"==e.hoverState&&e.hide()},e.options.delay.hide)}},m.prototype.show=function(){var t=g.Event("show.bs."+this.type);if(this.hasContent()&&this.enabled){this.$element.trigger(t);var e=g.contains(this.$element[0].ownerDocument.documentElement,this.$element[0]);if(t.isDefaultPrevented()||!e)return;var i=this,o=this.tip(),n=this.getUID(this.type);this.setContent(),o.attr("id",n),this.$element.attr("aria-describedby",n),this.options.animation&&o.addClass("fade");var s="function"==typeof this.options.placement?this.options.placement.call(this,o[0],this.$element[0]):this.options.placement,a=/\s?auto?\s?/i,r=a.test(s);r&&(s=s.replace(a,"")||"top"),o.detach().css({top:0,left:0,display:"block"}).addClass(s).data("bs."+this.type,this),this.options.container?o.appendTo(g(document).find(this.options.container)):o.insertAfter(this.$element),this.$element.trigger("inserted.bs."+this.type);var l=this.getPosition(),h=o[0].offsetWidth,d=o[0].offsetHeight;if(r){var p=s,c=this.getPosition(this.$viewport);s="bottom"==s&&l.bottom+d>c.bottom?"top":"top"==s&&l.top-d<c.top?"bottom":"right"==s&&l.right+h>c.width?"left":"left"==s&&l.left-h<c.left?"right":s,o.removeClass(p).addClass(s)}var f=this.getCalculatedOffset(s,l,h,d);this.applyPlacement(f,s);var u=function(){var t=i.hoverState;i.$element.trigger("shown.bs."+i.type),i.hoverState=null,"out"==t&&i.leave(i)};g.support.transition&&this.$tip.hasClass("fade")?o.one("bsTransitionEnd",u).emulateTransitionEnd(m.TRANSITION_DURATION):u()}},m.prototype.applyPlacement=function(t,e){var i=this.tip(),o=i[0].offsetWidth,n=i[0].offsetHeight,s=parseInt(i.css("margin-top"),10),a=parseInt(i.css("margin-left"),10);isNaN(s)&&(s=0),isNaN(a)&&(a=0),t.top+=s,t.left+=a,g.offset.setOffset(i[0],g.extend({using:function(t){i.css({top:Math.round(t.top),left:Math.round(t.left)})}},t),0),i.addClass("in");var r=i[0].offsetWidth,l=i[0].offsetHeight;"top"==e&&l!=n&&(t.top=t.top+n-l);var h=this.getViewportAdjustedDelta(e,t,r,l);h.left?t.left+=h.left:t.top+=h.top;var d=/top|bottom/.test(e),p=d?2*h.left-o+r:2*h.top-n+l,c=d?"offsetWidth":"offsetHeight";i.offset(t),this.replaceArrow(p,i[0][c],d)},m.prototype.replaceArrow=function(t,e,i){this.arrow().css(i?"left":"top",50*(1-t/e)+"%").css(i?"top":"left","")},m.prototype.setContent=function(){var t=this.tip(),e=this.getTitle();this.options.html?(this.options.sanitize&&(e=n(e,this.options.whiteList,this.options.sanitizeFn)),t.find(".tooltip-inner").html(e)):t.find(".tooltip-inner").text(e),t.removeClass("fade in top bottom left right")},m.prototype.hide=function(t){var e=this,i=g(this.$tip),o=g.Event("hide.bs."+this.type);function n(){"in"!=e.hoverState&&i.detach(),e.$element&&e.$element.removeAttr("aria-describedby").trigger("hidden.bs."+e.type),t&&t()}if(this.$element.trigger(o),!o.isDefaultPrevented())return i.removeClass("in"),g.support.transition&&i.hasClass("fade")?i.one("bsTransitionEnd",n).emulateTransitionEnd(m.TRANSITION_DURATION):n(),this.hoverState=null,this},m.prototype.fixTitle=function(){var t=this.$element;(t.attr("title")||"string"!=typeof t.attr("data-original-title"))&&t.attr("data-original-title",t.attr("title")||"").attr("title","")},m.prototype.hasContent=function(){return this.getTitle()},m.prototype.getPosition=function(t){var e=(t=t||this.$element)[0],i="BODY"==e.tagName,o=e.getBoundingClientRect();null==o.width&&(o=g.extend({},o,{width:o.right-o.left,height:o.bottom-o.top}));var n=window.SVGElement&&e instanceof window.SVGElement,s=i?{top:0,left:0}:n?null:t.offset(),a={scroll:i?document.documentElement.scrollTop||document.body.scrollTop:t.scrollTop()},r=i?{width:g(window).width(),height:g(window).height()}:null;return g.extend({},o,a,r,s)},m.prototype.getCalculatedOffset=function(t,e,i,o){return"bottom"==t?{top:e.top+e.height,left:e.left+e.width/2-i/2}:"top"==t?{top:e.top-o,left:e.left+e.width/2-i/2}:"left"==t?{top:e.top+e.height/2-o/2,left:e.left-i}:{top:e.top+e.height/2-o/2,left:e.left+e.width}},m.prototype.getViewportAdjustedDelta=function(t,e,i,o){var n={top:0,left:0};if(!this.$viewport)return n;var s=this.options.viewport&&this.options.viewport.padding||0,a=this.getPosition(this.$viewport);if(/right|left/.test(t)){var r=e.top-s-a.scroll,l=e.top+s-a.scroll+o;r<a.top?n.top=a.top-r:l>a.top+a.height&&(n.top=a.top+a.height-l)}else{var h=e.left-s,d=e.left+s+i;h<a.left?n.left=a.left-h:d>a.right&&(n.left=a.left+a.width-d)}return n},m.prototype.getTitle=function(){var t=this.$element,e=this.options;return t.attr("data-original-title")||("function"==typeof e.title?e.title.call(t[0]):e.title)},m.prototype.getUID=function(t){for(;t+=~~(1e6*Math.random()),document.getElementById(t););return t},m.prototype.tip=function(){if(!this.$tip&&(this.$tip=g(this.options.template),1!=this.$tip.length))throw new Error(this.type+" `template` option must consist of exactly 1 top-level element!");return this.$tip},m.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".tooltip-arrow")},m.prototype.enable=function(){this.enabled=!0},m.prototype.disable=function(){this.enabled=!1},m.prototype.toggleEnabled=function(){this.enabled=!this.enabled},m.prototype.toggle=function(t){var e=this;t&&((e=g(t.currentTarget).data("bs."+this.type))||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e))),t?(e.inState.click=!e.inState.click,e.isInStateTrue()?e.enter(e):e.leave(e)):e.tip().hasClass("in")?e.leave(e):e.enter(e)},m.prototype.destroy=function(){var t=this;clearTimeout(this.timeout),this.hide(function(){t.$element.off("."+t.type).removeData("bs."+t.type),t.$tip&&t.$tip.detach(),t.$tip=null,t.$arrow=null,t.$viewport=null,t.$element=null})},m.prototype.sanitizeHtml=function(t){return n(t,this.options.whiteList,this.options.sanitizeFn)};var e=g.fn.tooltip;g.fn.tooltip=function i(o){return this.each(function(){var t=g(this),e=t.data("bs.tooltip"),i="object"==typeof o&&o;!e&&/destroy|hide/.test(o)||(e||t.data("bs.tooltip",e=new m(this,i)),"string"==typeof o&&e[o]())})},g.fn.tooltip.Constructor=m,g.fn.tooltip.noConflict=function(){return g.fn.tooltip=e,this}}(jQuery),function(n){"use strict";var s=function(t,e){this.init("popover",t,e)};if(!n.fn.tooltip)throw new Error("Popover requires tooltip.js");s.VERSION="3.4.1",s.DEFAULTS=n.extend({},n.fn.tooltip.Constructor.DEFAULTS,{placement:"right",trigger:"click",content:"",template:'<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),((s.prototype=n.extend({},n.fn.tooltip.Constructor.prototype)).constructor=s).prototype.getDefaults=function(){return s.DEFAULTS},s.prototype.setContent=function(){var t=this.tip(),e=this.getTitle(),i=this.getContent();if(this.options.html){var o=typeof i;this.options.sanitize&&(e=this.sanitizeHtml(e),"string"===o&&(i=this.sanitizeHtml(i))),t.find(".popover-title").html(e),t.find(".popover-content").children().detach().end()["string"===o?"html":"append"](i)}else t.find(".popover-title").text(e),t.find(".popover-content").children().detach().end().text(i);t.removeClass("fade top bottom left right in"),t.find(".popover-title").html()||t.find(".popover-title").hide()},s.prototype.hasContent=function(){return this.getTitle()||this.getContent()},s.prototype.getContent=function(){var t=this.$element,e=this.options;return t.attr("data-content")||("function"==typeof e.content?e.content.call(t[0]):e.content)},s.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".arrow")};var t=n.fn.popover;n.fn.popover=function e(o){return this.each(function(){var t=n(this),e=t.data("bs.popover"),i="object"==typeof o&&o;!e&&/destroy|hide/.test(o)||(e||t.data("bs.popover",e=new s(this,i)),"string"==typeof o&&e[o]())})},n.fn.popover.Constructor=s,n.fn.popover.noConflict=function(){return n.fn.popover=t,this}}(jQuery),function(s){"use strict";function n(t,e){this.$body=s(document.body),this.$scrollElement=s(t).is(document.body)?s(window):s(t),this.options=s.extend({},n.DEFAULTS,e),this.selector=(this.options.target||"")+" .nav li > a",this.offsets=[],this.targets=[],this.activeTarget=null,this.scrollHeight=0,this.$scrollElement.on("scroll.bs.scrollspy",s.proxy(this.process,this)),this.refresh(),this.process()}function e(o){return this.each(function(){var t=s(this),e=t.data("bs.scrollspy"),i="object"==typeof o&&o;e||t.data("bs.scrollspy",e=new n(this,i)),"string"==typeof o&&e[o]()})}n.VERSION="3.4.1",n.DEFAULTS={offset:10},n.prototype.getScrollHeight=function(){return this.$scrollElement[0].scrollHeight||Math.max(this.$body[0].scrollHeight,document.documentElement.scrollHeight)},n.prototype.refresh=function(){var t=this,o="offset",n=0;this.offsets=[],this.targets=[],this.scrollHeight=this.getScrollHeight(),s.isWindow(this.$scrollElement[0])||(o="position",n=this.$scrollElement.scrollTop()),this.$body.find(this.selector).map(function(){var t=s(this),e=t.data("target")||t.attr("href"),i=/^#./.test(e)&&s(e);return i&&i.length&&i.is(":visible")&&[[i[o]().top+n,e]]||null}).sort(function(t,e){return t[0]-e[0]}).each(function(){t.offsets.push(this[0]),t.targets.push(this[1])})},n.prototype.process=function(){var t,e=this.$scrollElement.scrollTop()+this.options.offset,i=this.getScrollHeight(),o=this.options.offset+i-this.$scrollElement.height(),n=this.offsets,s=this.targets,a=this.activeTarget;if(this.scrollHeight!=i&&this.refresh(),o<=e)return a!=(t=s[s.length-1])&&this.activate(t);if(a&&e<n[0])return this.activeTarget=null,this.clear();for(t=n.length;t--;)a!=s[t]&&e>=n[t]&&(n[t+1]===undefined||e<n[t+1])&&this.activate(s[t])},n.prototype.activate=function(t){this.activeTarget=t,this.clear();var e=this.selector+'[data-target="'+t+'"],'+this.selector+'[href="'+t+'"]',i=s(e).parents("li").addClass("active");i.parent(".dropdown-menu").length&&(i=i.closest("li.dropdown").addClass("active")),i.trigger("activate.bs.scrollspy")},n.prototype.clear=function(){s(this.selector).parentsUntil(this.options.target,".active").removeClass("active")};var t=s.fn.scrollspy;s.fn.scrollspy=e,s.fn.scrollspy.Constructor=n,s.fn.scrollspy.noConflict=function(){return s.fn.scrollspy=t,this},s(window).on("load.bs.scrollspy.data-api",function(){s('[data-spy="scroll"]').each(function(){var t=s(this);e.call(t,t.data())})})}(jQuery),function(r){"use strict";var a=function(t){this.element=r(t)};function e(i){return this.each(function(){var t=r(this),e=t.data("bs.tab");e||t.data("bs.tab",e=new a(this)),"string"==typeof i&&e[i]()})}a.VERSION="3.4.1",a.TRANSITION_DURATION=150,a.prototype.show=function(){var t=this.element,e=t.closest("ul:not(.dropdown-menu)"),i=t.data("target");if(i||(i=(i=t.attr("href"))&&i.replace(/.*(?=#[^\s]*$)/,"")),!t.parent("li").hasClass("active")){var o=e.find(".active:last a"),n=r.Event("hide.bs.tab",{relatedTarget:t[0]}),s=r.Event("show.bs.tab",{relatedTarget:o[0]});if(o.trigger(n),t.trigger(s),!s.isDefaultPrevented()&&!n.isDefaultPrevented()){var a=r(document).find(i);this.activate(t.closest("li"),e),this.activate(a,a.parent(),function(){o.trigger({type:"hidden.bs.tab",relatedTarget:t[0]}),t.trigger({type:"shown.bs.tab",relatedTarget:o[0]})})}}},a.prototype.activate=function(t,e,i){var o=e.find("> .active"),n=i&&r.support.transition&&(o.length&&o.hasClass("fade")||!!e.find("> .fade").length);function s(){o.removeClass("active").find("> .dropdown-menu > .active").removeClass("active").end().find('[data-toggle="tab"]').attr("aria-expanded",!1),t.addClass("active").find('[data-toggle="tab"]').attr("aria-expanded",!0),n?(t[0].offsetWidth,t.addClass("in")):t.removeClass("fade"),t.parent(".dropdown-menu").length&&t.closest("li.dropdown").addClass("active").end().find('[data-toggle="tab"]').attr("aria-expanded",!0),i&&i()}o.length&&n?o.one("bsTransitionEnd",s).emulateTransitionEnd(a.TRANSITION_DURATION):s(),o.removeClass("in")};var t=r.fn.tab;r.fn.tab=e,r.fn.tab.Constructor=a,r.fn.tab.noConflict=function(){return r.fn.tab=t,this};var i=function(t){t.preventDefault(),e.call(r(this),"show")};r(document).on("click.bs.tab.data-api",'[data-toggle="tab"]',i).on("click.bs.tab.data-api",'[data-toggle="pill"]',i)}(jQuery),function(l){"use strict";var h=function(t,e){this.options=l.extend({},h.DEFAULTS,e);var i=this.options.target===h.DEFAULTS.target?l(this.options.target):l(document).find(this.options.target);this.$target=i.on("scroll.bs.affix.data-api",l.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",l.proxy(this.checkPositionWithEventLoop,this)),this.$element=l(t),this.affixed=null,this.unpin=null,this.pinnedOffset=null,this.checkPosition()};function i(o){return this.each(function(){var t=l(this),e=t.data("bs.affix"),i="object"==typeof o&&o;e||t.data("bs.affix",e=new h(this,i)),"string"==typeof o&&e[o]()})}h.VERSION="3.4.1",h.RESET="affix affix-top affix-bottom",h.DEFAULTS={offset:0,target:window},h.prototype.getState=function(t,e,i,o){var n=this.$target.scrollTop(),s=this.$element.offset(),a=this.$target.height();if(null!=i&&"top"==this.affixed)return n<i&&"top";if("bottom"==this.affixed)return null!=i?!(n+this.unpin<=s.top)&&"bottom":!(n+a<=t-o)&&"bottom";var r=null==this.affixed,l=r?n:s.top;return null!=i&&n<=i?"top":null!=o&&t-o<=l+(r?a:e)&&"bottom"},h.prototype.getPinnedOffset=function(){if(this.pinnedOffset)return this.pinnedOffset;this.$element.removeClass(h.RESET).addClass("affix");var t=this.$target.scrollTop(),e=this.$element.offset();return this.pinnedOffset=e.top-t},h.prototype.checkPositionWithEventLoop=function(){setTimeout(l.proxy(this.checkPosition,this),1)},h.prototype.checkPosition=function(){if(this.$element.is(":visible")){var t=this.$element.height(),e=this.options.offset,i=e.top,o=e.bottom,n=Math.max(l(document).height(),l(document.body).height());"object"!=typeof e&&(o=i=e),"function"==typeof i&&(i=e.top(this.$element)),"function"==typeof o&&(o=e.bottom(this.$element));var s=this.getState(n,t,i,o);if(this.affixed!=s){null!=this.unpin&&this.$element.css("top","");var a="affix"+(s?"-"+s:""),r=l.Event(a+".bs.affix");if(this.$element.trigger(r),r.isDefaultPrevented())return;this.affixed=s,this.unpin="bottom"==s?this.getPinnedOffset():null,this.$element.removeClass(h.RESET).addClass(a).trigger(a.replace("affix","affixed")+".bs.affix")}"bottom"==s&&this.$element.offset({top:n-t-o})}};var t=l.fn.affix;l.fn.affix=i,l.fn.affix.Constructor=h,l.fn.affix.noConflict=function(){return l.fn.affix=t,this},l(window).on("load",function(){l('[data-spy="affix"]').each(function(){var t=l(this),e=t.data();e.offset=e.offset||{},null!=e.offsetBottom&&(e.offset.bottom=e.offsetBottom),null!=e.offsetTop&&(e.offset.top=e.offsetTop),i.call(t,e)})})}(jQuery);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/*! Tiny Pub/Sub - v0.7.0 - 2013-01-29
+* https://github.com/cowboy/jquery-tiny-pubsub
+* Copyright (c) 2013 "Cowboy" Ben Alman; Licensed MIT */
+(function(n){var u=n({});n.subscribe=function(){u.on.apply(u,arguments)},n.unsubscribe=function(){u.off.apply(u,arguments)},n.publish=function(){u.trigger.apply(u,arguments)}})(jQuery);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery, $) {(function ($$) {
+  /**
+   * Gets the current top/left position for an event (in particular your mouse pointer)
+   *
+   * @param      {Object}  event   The event
+   * @return     {Object}  { description_of_the_return_value }
+   */
+  $$.mouseFixedPosition = function (event, annotation) {
+    var body = window.document.body;
+    var offset = {
+      top: 0,
+      left: 0
+    };
+
+    if (jQuery(body).css('position') !== "static") {
+      offset = $(body).offset();
+    }
+
+    try {
+      var top = event.pageY - offset.top;
+      var left = event.pageX - offset.left; // in case user is selecting via keyboard, this sets the adder to top-left corner
+
+      if (event.type.indexOf("mouse") === -1 && event.type.indexOf('key') > -1) {
+        var boundingBox = window.getSelection().getRangeAt(0).getBoundingClientRect();
+        top = boundingBox.top - offset.top + boundingBox.height;
+        left = boundingBox.left - offset.left + boundingBox.width;
+      }
+
+      return {
+        top: top,
+        left: left
+      };
+    } catch (e) {
+      return $$.mouseFixedPositionFromRange(event);
+    }
+  };
+
+  $$.mouseFixedPositionFromRange = function (boundingBox) {
+    return {
+      top: boundingBox.top,
+      left: boundingBox.left
+    };
+  };
+
+  $$.getQuoteFromHighlights = function (ranges) {
+    var text = [];
+    var exactText = [];
+
+    for (var i = 0, len = ranges.length; i < len; i++) {
+      text = [];
+      var r = ranges[i];
+
+      try {
+        text.push(Hxighlighter.trim(r.text()));
+      } catch (e) {
+        text.push(Hxighlighter.trim(r.toString()));
+
+        if (r.toString === "[object Object]") {
+          text.pop();
+          text.push(r.exact);
+        }
+      }
+
+      var exact = text.join(' / ').replace(/[\n\r]/g, '<br>');
+      exactText.push(exact);
+    }
+
+    return {
+      'exact': exactText,
+      'exactNoHtml': text
+    };
+  };
+  /**
+   * Gets the unique identifier.
+   * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+   * @return     {string} Unique identifier
+   */
+
+
+  $$.getUniqueId = function () {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  };
+  /**
+   * Function to determine if value exists or not
+   *
+   * @param      {Object}  obj     The object
+   * @return     {boolean}  returns whether item exists or not
+   */
+
+
+  $$.exists = function (obj) {
+    return typeof obj !== 'undefined';
+  };
+  /**
+   * trims whitespace from strings
+   *
+   * @param      {string}  s       original string
+   * @return     {string}  trimmed string
+   */
+
+
+  $$.trim = function (s) {
+    if (typeof String.prototype.trim === 'function') {
+      return String.prototype.trim.call(s);
+    } else {
+      return s.replace(/^[\s\xA0]+|[\s\xA0]+$/g, '');
+    }
+  };
+  /**
+   * Publishes Event to a specific instance, if no instanceID or '' is sent, the
+   * event will be published to all instances
+   *
+   * @param      {string}  eventName   The event name
+   * @param      {string}  instanceID  The instance id
+   * @param      {array}  list        The list
+   */
+
+
+  $$.publishEvent = function (eventName, instanceID, list) {
+    // console.log(eventName, list);
+    if (!$$.exists(instanceID) || instanceID === "") {
+      jQuery.each($$._instanceIDs, function (_, inst_id) {
+        // some of the events require the core to handle calling the components in a certain order
+        if ($$.requiredEvents.indexOf(eventName) >= 0) {
+          $$._instances[inst_id].core[eventName](list);
+        }
+
+        jQuery.publish(eventName + '.' + inst_id, list);
+      });
+    } else {
+      // some of the events require the core to handle calling the components in a certain order
+      if ($$.requiredEvents.indexOf(eventName) >= 0) {
+        $$._instances[instanceID].core[eventName](list);
+      }
+
+      jQuery.publish(eventName + '.' + instanceID, list);
+    }
+  };
+  /**
+   * Subscribes Event to a specific instance, if no instanceID or '' is sent, all
+   * instances will be subscribed to event
+   *
+   * @param      {string}  eventName   The event name
+   * @param      {string}  instanceID  The instance id
+   * @param      {<type>}  callBack    The call back
+   */
+
+
+  $$.subscribeEvent = function (eventName, instanceID, callBack) {
+    if (!$$.exists(instanceID) || instanceID === "") {
+      jQuery.each($$._instanceIDs, function (_, inst_id) {
+        jQuery.subscribe(eventName + '.' + inst_id, callBack);
+      });
+    } else {
+      jQuery.subscribe(eventName + '.' + instanceID, callBack);
+    }
+  };
+
+  $$.pauseEvent = function (e) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.preventDefault) e.preventDefault();
+    e.cancelBubble = true;
+    e.returnValue = false;
+    return false;
+  };
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(0)))
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ * 
+ */
+//during deployment, this is what decides what gets instantiated, should be moved elsewhere
+__webpack_require__(22);
+
+__webpack_require__(23);
+
+__webpack_require__(24);
+
+__webpack_require__(32);
+
+__webpack_require__(36);
+
+__webpack_require__(10);
+
+__webpack_require__(38);
+
+__webpack_require__(40);
+
+__webpack_require__(42);
+
+__webpack_require__(44);
+
+__webpack_require__(46);
+
+__webpack_require__(47);
+
+__webpack_require__(49);
+
+__webpack_require__(51);
+
+__webpack_require__(53);
+
+__webpack_require__(55);
+
+__webpack_require__(56);
+
+(function ($) {
+  /**
+   * { function_description }
+   *
+   * @class      TextTarget (name)
+   * @param      {<type>}  options  The options
+   * @param      {<type>}  inst_id  The instance identifier
+   */
+  $.TextTarget = function (options, inst_id) {
+    this.options = options;
+    this.instance_id = inst_id;
+    this.guid = undefined;
+    this.annotation_selector = 'hx-annotation-hl';
+    this.init();
+  };
+  /**
+   * { function_description }
+   */
+
+
+  $.TextTarget.prototype.init = function () {
+    var self = this; // this target is only meant to work with text/html objects
+
+    this.media = "text";
+    this.setUpListeners(); // this where the target will be contained
+
+    this.target_selector = this.options.target_selector; // sets up listeners from core and other places
+
+    if (this.options.method == "url") {
+      // if the text exists externally, this will load it into the DOM
+      this.makeQuery(this.options.object_source, this.createTextSlotFromURL.bind(this), this.target_selector);
+    } else if (this.options.method == "inline") {
+      // if the text is already in the DOM, this sets up what is left
+      // console.log('Loading Target via Inline');
+      this.createTextSlotFromSelector(this.options.object_source, this.instance_id);
+    }
+
+    function areScrollbarsVisible() {
+      var scrollableElem = document.createElement('div'),
+          innerElem = document.createElement('div');
+      scrollableElem.style.width = '30px';
+      scrollableElem.style.height = '30px';
+      scrollableElem.style.overflow = 'scroll';
+      scrollableElem.style.borderWidth = '0';
+      innerElem.style.width = '30px';
+      innerElem.style.height = '60px';
+      scrollableElem.appendChild(innerElem);
+      document.body.appendChild(scrollableElem); // Elements only have width if they're in the layout
+
+      var diff = scrollableElem.offsetWidth - scrollableElem.clientWidth;
+      document.body.removeChild(scrollableElem);
+      return diff > 0;
+    }
+
+    window.addEventListener('load', function () {
+      // Show scrollbars if they're hidden.
+      if (!areScrollbarsVisible()) {
+        document.body.classList.add('force-show-scrollbars');
+      }
+    });
+  };
+  /**
+   * Creates a text slot from url.
+   *
+   * @param      {string}  content      The content
+   * @param      {<type>}  selector     The selector
+   * @param      {<type>}  instance_id  The instance identifier
+   */
+
+
+  $.TextTarget.prototype.createTextSlotFromURL = function (content, selector, instance_id) {
+    this.guid = $.getUniqueId(); // each annotation target will be enclosed in a "slot"
+    //var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>";
+    // adds it to the page and turns on the wrapper
+
+    jQuery(selector + ' .annotations-section').append(content);
+    jQuery(selector).prop('id', this.guid);
+    jQuery(selector).addClass('annotation-slot');
+    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets Core know that the target has finished loading on screen
+
+    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
+  };
+  /**
+   * Creates a text slot from selector.
+   *
+   * @param      {<type>}  selector     The selector
+   * @param      {<type>}  instance_id  The instance identifier
+   */
+
+
+  $.TextTarget.prototype.createTextSlotFromSelector = function (selector, instance_id) {
+    // each annotation target will be enclosed in a "slot" with a temporary unique id
+    this.guid = $.getUniqueId();
+    var slot = jQuery(selector);
+    slot.addClass('annotation-slot');
+    slot.attr('id', this.guid);
+    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets core know that the target has finished loading on screen
+    // console.log("Publishing TargetLoaded");
+
+    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
+  };
+  /**
+   * Makes a query.
+   *
+   * @param      {<type>}    url       The url
+   * @param      {Function}  callback  The callback
+   * @param      {<type>}    selector  The selector
+   * @return     {<type>}    { description_of_the_return_value }
+   */
+
+
+  $.TextTarget.prototype.makeQuery = function (url, callback, selector) {
+    var self = this; // retrieves the text to be loaded onto the page and passes it to callback function
+
+    var defer = jQuery.ajax({
+      url: url,
+      type: 'GET',
+      contentType: 'charset=utf-8',
+      success: function success(data) {
+        callback(data, selector, self.instance_id);
+      },
+      async: true
+    });
+    return defer;
+  };
+  /**
+   * { function_description }
+   */
+
+
+  $.TextTarget.prototype.setUpListeners = function () {
+    var self = this;
+    jQuery('.toggle-alerts').click(function () {
+      if (jQuery(this).hasClass('on')) {
+        jQuery(this).html('Turn Alerts On');
+        jQuery(this).removeClass('on');
+        jQuery('.sr-alert').attr('aria-live', 'off');
+      } else {
+        jQuery(this).html('Turn Alerts Off');
+        jQuery(this).addClass('on');
+        jQuery('.sr-alert').attr('aria-live', 'polite');
+      }
+    }); // once the target has been loaded, the selector can be instantiated
+
+    $.subscribeEvent('targetLoaded', self.instance_id, function (_, element) {
+      // console.log("LOADING TARGET");
+      //annotation element gets data that may be needed later
+      self.element = element;
+      self.element.data('source_type', self.options.object_source);
+      self.element.data('source_type', 'text'); // finish setting up selectors
+
+      self.setUpDrawers(self.element[0]); // finish setting up viewers (which contain displays and editors)
+
+      self.setUpViewers(self.element[0]); // finish setting up extra plugins
+
+      self.setUpPlugins(self.element[0]); // finish setting up the storage containers
+
+      self.setUpStorage(self.element[0]);
+
+      if (!self.options.viewerOptions.readonly) {
+        self.setUpSelectors(self.element[0]);
+      }
+    });
+    $.subscribeEvent('editorShown', self.instance_id, function (_, editor, annotation) {
+      jQuery.each(self.plugins, function (_, plugin) {
+        if (typeof plugin.editorShown === "function") {
+          plugin.editorShown(editor, annotation);
+        }
+      });
+    });
+    $.subscribeEvent('displayShown', self.instance_id, function (_, display, annotations) {
+      jQuery.each(self.plugins, function (_, plugin) {
+        if (typeof plugin.displayShown === "function") {
+          plugin.displayShown(display, annotations);
+        }
+      });
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @param      {<type>}  element  The element
+   */
+
+
+  $.TextTarget.prototype.setUpSelectors = function (element) {
+    var self = this;
+    self.selectors = [];
+    jQuery.each($.selectors, function (_, selector) {
+      self.selectors.push(new selector(element, self.instance_id, {
+        'confirm': true
+      }));
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @param      {<type>}  element  The element
+   */
+
+
+  $.TextTarget.prototype.setUpDrawers = function (element) {
+    var self = this;
+    self.drawers = [];
+    jQuery.each($.drawers, function (_, drawer) {
+      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector, self.options));
+    });
+  };
+
+  $.TextTarget.prototype.setUpViewers = function (element) {
+    var self = this;
+    self.viewers = [];
+    jQuery.each($.viewers, function (_, viewer) {
+      self.viewers.push(new viewer({
+        element: element,
+        template_urls: self.options.template_urls,
+        viewer_options: self.options.viewerOptions,
+        username: self.options.username,
+        user_id: self.options.user_id,
+        common_instructor_name: self.options.common_instructor_name,
+        instructors: self.options.instructors,
+        mediaType: self.media
+      }, self.instance_id));
+    });
+  };
+
+  $.TextTarget.prototype.setUpPlugins = function (element) {
+    var self = this;
+    self.plugins = [];
+    jQuery.each($.plugins, function (_, plugin) {
+      var optionsForPlugin;
+
+      try {
+        optionsForPlugin = jQuery.extend({
+          'slot': element
+        }, self.options, self.options[plugin.name]) || {
+          'slot': element
+        };
+      } catch (e) {
+        optionsForPlugin = {
+          'slot': element
+        };
+      }
+
+      self.plugins.push(new plugin(optionsForPlugin, self.instance_id));
+    });
+  };
+
+  $.TextTarget.prototype.setUpStorage = function (element, options) {
+    var self = this;
+    self.storage = [];
+    jQuery.each($.storage, function (idx, storage) {
+      var optionsForStorage;
+
+      try {
+        optionsForStorage = jQuery.extend({}, self.options, self.options[storage.name]) || {};
+      } catch (e) {
+        optionsForStorage = {};
+      }
+
+      self.storage.push(new storage(optionsForStorage, self.instance_id));
+
+      if (self.options.viewerOptions.defaultTab === "mine") {
+        options = {
+          'username': self.options.username
+        };
+      } else if (self.options.viewerOptions.defaultTab === "instructor") {
+        options = {
+          'userid': self.options.instructors
+        };
+      } else {
+        var exclusion = [self.options.user_id].concat(self.options.instructors);
+        options = {
+          'exclude_userid': exclusion
+        };
+      }
+
+      self.storage[idx].onLoad(element, options);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ComponentEnable (name)
+   */
+
+
+  $.TextTarget.prototype.ComponentEnable = function () {
+    // Targets cannot technically be enabled/disabled, but 
+    // there might be cases in which the target needs to be hidden/shown
+    jQuery('#' + this.guid).show();
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ComponentDisable (name)
+   */
+
+
+  $.TextTarget.prototype.ComponentDisable = function () {
+    jQuery('#') + this.guid.hide();
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetSelectionMade (name)
+   */
+
+
+  $.TextTarget.prototype.TargetSelectionMade = function (range, event) {
+    var range = Array.isArray(range) ? range : [range];
+    var self = this;
+    var annotation = {
+      annotationText: [""],
+      ranges: range,
+      id: $.getUniqueId(),
+      exact: range.map(function (r) {
+        return r.text.exact.replace(/[\n\r]/g, '<br>').replace(/    /g, '&nbsp;');
+      }),
+      media: "text",
+      totalReplies: 0,
+      creator: {
+        name: self.options.username,
+        id: self.options.user_id
+      }
+    };
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.TargetSelectionMade(annotation, event);
+    }); //self.TargetAnnotationDraw(annotation);
+    // jQuery('.annotator-wrapper')[0].focus();
+    //$.publishEvent('ViewerEditorOpen', self.instance_id, [annotation]);
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetAnnotationDraw (name)
+   */
+
+
+  $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
+    var self = this;
+    jQuery.each(self.drawers, function (_, drawer) {
+      drawer.draw(annotation);
+    });
+    jQuery.each(self.viewers, function (_, viewer) {
+      if ($.exists(viewer.TargetAnnotationDraw)) {
+        viewer.TargetAnnotationDraw(annotation);
+      }
+    });
+    jQuery.each(self.plugins, function (_, plugin) {
+      if ($.exists(plugin.TargetAnnotationDraw)) {
+        plugin.TargetAnnotationDraw(annotation);
+      }
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetAnnotationUndraw (name)
+   */
+
+
+  $.TextTarget.prototype.TargetAnnotationUndraw = function (annotation) {
+    var self = this;
+    jQuery.each(self.drawers, function (_, drawer) {
+      drawer.undraw(annotation);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerEditorOpen (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerEditorOpen = function (event, annotation) {
+    return annotation;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerEditorClose (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerEditorClose = function (annotation, is_new_annotation, hit_cancel) {
+    var self = this; //console.log(annotation, 'New?:', is_new_annotation, 'Hit Cancel', hit_cancel);
+
+    if (hit_cancel) {
+      if (is_new_annotation) {
+        self.TargetAnnotationUndraw(annotation);
+      } // else, the annotation was already drawn, so don't touch it.
+
+    } else if (is_new_annotation) {
+      annotation = self.plugins.reduce(function (ann, plugin) {
+        return plugin.saving(ann);
+      }, annotation);
+      self.TargetAnnotationDraw(annotation);
+      jQuery('.sr-alert').html('');
+      jQuery('.sr-real-alert').html('Your annotation was saved. Your annotation has been added to the top of the annotation list.');
+      $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, false]);
+    } else {
+      jQuery.each(self.drawers, function (_, drawer) {
+        self.TargetAnnotationUndraw(annotation);
+        annotation = self.plugins.reduce(function (ann, plugin) {
+          return plugin.saving(ann);
+        }, annotation);
+        $.publishEvent('TargetAnnotationDraw', self.instance_id, [annotation]);
+        jQuery('.sr-alert').html('');
+        jQuery('.sr-real-alert').html('Your annotation was updated. You can find your annotation in the annotation list.');
+        $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, true]);
+      });
+    }
+
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerEditorClose(annotation);
+    });
+    return annotation;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerDisplayOpen (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerDisplayOpen = function (event, annotations) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerDisplayOpen(event, annotations);
+    });
+    return annotations;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerDisplayClose (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerDisplayClose = function (annotations) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerDisplayClose(annotations);
+    });
+    return annotations;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationSave (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationSave = function (annotations, redraw) {
+    var self = this; // console.log(annotations, redraw);
+
+    jQuery.each(self.storage, function (_, store) {
+      store.StorageAnnotationSave(annotations, self.element, redraw);
+    });
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.StorageAnnotationSave(annotations);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationLoad (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationLoad = function (annotations, converter, undrawOld) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      if (typeof viewer.StorageAnnotationLoad === "function") {
+        viewer.StorageAnnotationLoad(annotations);
+      }
+    });
+
+    if (undrawOld) {
+      $.publishEvent('GetAnnotationsData', self.instance_id, [function (anns) {
+        anns.forEach(function (ann) {
+          self.TargetAnnotationUndraw(ann);
+        });
+      }]);
+    }
+
+    annotations.forEach(function (ann) {
+      var converted_ann = converter(ann, jQuery(self.element).find('.annotator-wrapper'));
+      self.TargetAnnotationDraw(converted_ann);
+      $.publishEvent('annotationLoaded', self.instance_id, [converted_ann]);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationEdit (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationEdit = function () {};
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationDelete (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.StorageAnnotationDelete();
+    });
+    jQuery.each(self.storage, function (_, store) {
+      store.StorageAnnotationDelete(annotation);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationGetReplies (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationSearch = function (search_options, callback, errfun) {
+    var self = this;
+    jQuery.each(self.storage, function (_, store) {
+      store.search(search_options, callback, errfun);
+    });
+  };
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Should be listening for ways to select a text and then return an xpath 
+ * object with the range that was selected.
+ */
+var jQuery = __webpack_require__(0);
+
+var hrange = __webpack_require__(3);
+
+(function ($) {
+  $.MouseSelector = function (element, inst_id) {
+    var defaultOpts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    this.element = element;
+    this.instance_id = inst_id;
+    this.adder = null;
+    this.wrapperSelector = '.annotator-wrapper';
+    this.mustConfirm = !!defaultOpts.confirm;
+    this.init();
+  };
+
+  $.MouseSelector.prototype.init = function () {
+    var self = this;
+    self.setUpListeners();
+  };
+
+  $.MouseSelector.prototype.setUpListeners = function () {
+    var self = this;
+    this.element.addEventListener('mouseup', function (event) {
+      var selection = window.getSelection();
+      var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
+
+      self.onSelection(selectionRange, event);
+    });
+    document.addEventListener('keyup', function (e) {
+      var allowedKeys = "ArrowUpArrowDownArrowLeftArrowRight";
+
+      if (allowedKeys.indexOf(e.key) > -1 && e.shiftKey) {
+        var selection = window.getSelection();
+        var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
+
+        self.onSelection(selectionRange, event);
+      }
+    });
+  };
+
+  $.MouseSelector.prototype.onSelection = function (range, event) {
+    var self = this; //console.log('onSelection Ran: ', range, event);
+
+    if (range instanceof Range) {
+      //console.log('range is instance of Range', range.toString());
+      var result = self.shouldBeAnnotated(range);
+
+      if (result && (range.toString().length > 0 || range.cloneContents().querySelectorAll('img').length > 0)) {
+        if (self.mustConfirm) {
+          //console.log("Confirming...")
+          self.confirm(range, event);
+        } else {
+          //console.log("Sending TargetSelection to Hxighlighter");
+          //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
+          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [hrange.serializeRange(range, self.element, 'annotator-hl')], event]);
+        }
+      } else {
+        // send message to erase confirm button
+        //console.log('Either result is false or toString() returned 0')
+        self.hideConfirm();
+      }
+    }
+  };
+
+  $.MouseSelector.prototype.shouldBeAnnotated = function (range) {
+    var self = this;
+    var wrapper = self.element.querySelector(self.wrapperSelector);
+    var testingNode = range.commonAncestorContainer;
+
+    while (testingNode !== wrapper && testingNode !== null) {
+      testingNode = testingNode.parentNode;
+    }
+
+    return testingNode === wrapper;
+  };
+
+  $.MouseSelector.prototype.confirm = function (range, event) {
+    var self = this;
+    self.hideConfirm();
+
+    if (self.element.querySelectorAll('.annotation-editor-nav-bar').length == 0 && self.element.querySelectorAll('.annotation-viewer-nav-bar').length == 0) {
+      self.interactionPoint = $.mouseFixedPosition(event); //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
+
+      self.loadButton(hrange.serializeRange(range, self.element, 'annotator-hl'), self.interactionPoint, event); //console.log("Should have loaded button to confirm annotation");
+    } else {
+      $.publishEvent('HxAlert', self.instance_id, ["You have a pinned annotation window. Close it to make a new annotation.", {
+        buttons: [],
+        time: 5
+      }]);
+    }
+  };
+
+  $.MouseSelector.prototype.hideConfirm = function () {
+    jQuery('.hx-confirm-button').remove();
+  };
+
+  $.MouseSelector.prototype.loadButton = function (range, iP, event) {
+    var self = this;
+
+    if (iP.top <= 48) {
+      iP.top = 49;
+    }
+
+    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + (iP.top - 10) + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
+    jQuery('body').append(confirmButtonTemplate);
+    jQuery('.hx-confirm-button button').click(function () {
+      $.publishEvent('drawTemp', self.instance_id, [[range]]);
+      $.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [range], event]);
+      jQuery('.hx-confirm-button').remove();
+    });
+  };
+
+  $.selectors.push($.MouseSelector);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
+
+(function ($) {
+  $.XPathDrawer = function (element, inst_id, hClass, options) {
+    this.element = element;
+    this.instance_id = inst_id;
+    this.h_class = (hClass + ' annotator-hl').trim();
+    this.init();
+    this.drawnAnnotations = [];
+    this.tempHighlights = [];
+    this.options = options || {};
+  };
+
+  $.XPathDrawer.prototype.init = function () {
+    var self = this; // this.highlighter = new annotator.ui.highlighter.Highlighter(this.element, {
+    //     highlightClass: (self.h_class + ' annotator-hl')
+    // });
+
+    jQuery(self.element).on('mouseover', '.' + self.h_class.replace(' ', '.'), function (event) {
+      $.pauseEvent(event);
+      var annotations = self.getAnnotationsFromElement(event); //console.log("MOUSEOVER", annotations);
+
+      Hxighlighter.publishEvent('ViewerDisplayOpen', self.instance_id, [event, annotations]);
+    });
+    jQuery(self.element).on('mouseleave', '.' + self.h_class.replace(' ', '.'), function (event) {
+      Hxighlighter.publishEvent('ViewerDisplayClose', self.instance_id, [event]);
+    });
+    jQuery(self.element).on('click', '.' + self.h_class.replace(' ', '.'), function (event) {
+      var annotations = self.getAnnotationsFromElement(event);
+      Hxighlighter.publishEvent('DrawnSelectionClicked', self.instance_id, [event, annotations]);
+    });
+    Hxighlighter.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation) {
+      self.undraw(annotation);
+    });
+    Hxighlighter.subscribeEvent('GetAnnotationsData', self.instance_id, function (_, callback) {
+      callback(self.getAnnotationsData());
+    });
+    Hxighlighter.subscribeEvent('GetSpecificAnnotationData', self.instance_id, function (_, annotation_id, callback) {
+      callback(self.getSpecificAnnotationData(annotation_id));
+    });
+    Hxighlighter.subscribeEvent('changeDrawnColor', self.instance_id, function (_, annotation, color) {
+      if (annotation._local) {
+        jQuery.each(annotation._local.highlights, function (_, hl) {
+          setTimeout(function () {
+            jQuery(hl).css('background-color', color);
+          }, 250);
+        });
+      }
+    });
+    Hxighlighter.subscribeEvent('undrawAll', self.instance_id, function (_, callBack) {
+      var annotations = self.getAnnotationsData();
+      annotations.forEach(function (ann) {
+        self.undraw(ann);
+      });
+      callBack(annotations);
+    });
+    Hxighlighter.subscribeEvent('drawList', self.instance_id, function (_, annotations, callBack) {
+      annotations.forEach(function (ann) {
+        self.draw(ann);
+      });
+      callBack(annotations);
+    });
+    Hxighlighter.subscribeEvent('drawTemp', self.instance_id, function (_, range, callBack) {
+      var textNodes = hrange.getTextNodesFromAnnotationRanges(range, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
+
+      var spans = [];
+      textNodes.forEach(function (node) {
+        //console.log(node, jQuery(node));
+        jQuery(node).wrap('<span class="temp-ann ' + self.h_class + '"></span>');
+        spans.push(jQuery(node).parent()[0]);
+      });
+      self.tempHighlights = self.tempHighlights.concat(spans);
+    });
+  };
+
+  $.XPathDrawer.prototype.draw = function (annotation) {
+    var self = this; // console.log(self.options, annotation);
+    // console.log("Annotation Being Drawn", annotation);
+
+    self.tempHighlights.forEach(function (hl) {
+      jQuery(hl).contents().unwrap();
+    }); // the process for drawing is divided into 4 parts
+    // 1. Retrieve all discrete text nodes associated with annotation
+
+    var textNodes = hrange.getTextNodesFromAnnotationRanges(annotation.ranges, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
+
+    var spans = [];
+    var otherLabel = '';
+
+    if (self.options.user_id === annotation.creator.id) {
+      otherLabel += ' annotation-mine';
+    }
+
+    if (self.options.instructors.indexOf(annotation.creator.id) > -1) {
+      otherLabel += ' annotation-instructor';
+    }
+
+    var labelIt = true;
+    textNodes.forEach(function (node) {
+      //console.log(node, jQuery(node));
+      var node_id = "";
+
+      if (labelIt) {
+        labelIt = false;
+        node_id = ' id="first-node-' + annotation.id + '" ';
+      }
+
+      jQuery(node).wrap('<span' + node_id + ' class="' + self.h_class + otherLabel + '"></span>');
+      spans.push(jQuery(node).parent()[0]);
+    }); // 3. In a _local.highlights value, we store the list of span tags generated for the annotation.
+
+    annotation['_local'] = {
+      'highlights': spans
+    }; // 3. Store in each span tag the value of the annotation post-saving _local.highlights
+
+    spans.forEach(function (span) {
+      jQuery(span).data('annotation', annotation);
+    }); //console.log(annotation);
+
+    $.publishEvent('annotationDrawn', self.instance_id, [annotation]); // the annotation is then saved to the current list
+
+    self.drawnAnnotations.push(annotation); // code below allows you to undraw annotations by clicking on them, should this ever be needed in the future
+    // jQuery.each(annotation._local.highlights, function(_, high) {
+    //     jQuery(high).on('mouseover', function() {
+    //          $.publishEvent('toggleViewer')
+    //     });
+    // });
+  };
+
+  $.XPathDrawer.prototype.undraw = function (annotation) {
+    var self = this; //this.highlighter.undraw(annotation);
+
+    if (annotation._local) {
+      //console.log('Undrawing...', annotation._local.highlights)
+      annotation._local.highlights.forEach(function (hl) {
+        jQuery(hl).contents().unwrap();
+      });
+
+      annotation._local.highlights = [];
+    }
+
+    self.tempHighlights.forEach(function (hl) {
+      jQuery(hl).contents().unwrap();
+    });
+    self.drawnAnnotations = self.drawnAnnotations.filter(function (ann) {
+      if (ann.id !== annotation.id) {
+        return ann;
+      }
+    }); //console.log(self.drawnAnnotations);
+
+    $.publishEvent('annotationUndrawn', self.instance_id, [annotation]);
+  };
+
+  $.XPathDrawer.prototype.redraw = function (annotation) {
+    var self = this;
+    self.undraw(annotation);
+    self.draw(annotation); //this.highlighter.redraw(annotation);
+    //$.publishEvent('annotationRedrawn', self.instance_id, [annotation]);
+  };
+
+  $.XPathDrawer.prototype.getAnnotationsFromElement = function (event) {
+    return jQuery(event.target).parents('.annotator-hl').addBack().map(function (_, elem) {
+      return jQuery(elem).data('annotation');
+    }).toArray().sort(function (a, b) {
+      return a.created - b.created;
+    });
+  }; // found @ https://dev.to/saigowthamr/how-to-remove-duplicate-objects-from-an-array-javascript-48ok
+
+
+  $.XPathDrawer.prototype.getUnique = function (arr, comp) {
+    var unique = arr.map(function (e) {
+      return e[comp];
+    }) // store the keys of the unique objects
+    .map(function (e, i, _final) {
+      return _final.indexOf(e) === i && i;
+    }) // eliminate the dead keys & store unique objects
+    .filter(function (e) {
+      return arr[e];
+    }).map(function (e) {
+      return arr[e];
+    });
+    return unique;
+  };
+
+  $.XPathDrawer.prototype.getAnnotationsData = function () {
+    var self = this;
+    var all = self.getUnique(jQuery('.annotator-hl').parents('.annotator-hl').addBack().map(function (_, elem) {
+      return jQuery(elem).data('annotation');
+    }).toArray(), 'id');
+    all.sort(function (a, b) {
+      return b - a;
+    }); //console.log(all);
+
+    return all;
+  };
+
+  $.XPathDrawer.prototype.getSpecificAnnotationData = function (annotation_id) {
+    var self = this;
+    var currentAnnotations = self.getAnnotationsData();
+    var foundAnnotation = currentAnnotations.find(function (ann) {
+      if (ann.id === annotation_id) {
+        return ann;
+      }
+    });
+    return foundAnnotation;
+  };
+
+  $.drawers.push($.XPathDrawer);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(26);
+/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(27);
+/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(timeago__WEBPACK_IMPORTED_MODULE_3__);
+/**
+ * 
+ */
+var annotator = annotator ? annotator : __webpack_require__(5);
+
+
+
+
+
+__webpack_require__(8);
+
+__webpack_require__(9);
+
+(function ($) {
+  $.Sidebar = function (options, inst_id) {
+    // sets default options
+    var defaultOptions = {
+      // set up template names that will be pulled
+      TEMPLATENAMES: ["editor", "viewer"],
+      TEMPLATES: {
+        editor: __webpack_require__(28),
+        viewer: __webpack_require__(29),
+        annotationSection: __webpack_require__(30),
+        annotationItem: __webpack_require__(31)
+      },
+      template_suffix: "sidebar",
+      template_urls: ""
+    };
+    this.options = jQuery.extend({}, defaultOptions, options);
+    this.instance_id = inst_id;
+    this.annotation_tool = {
+      interactionPoint: null,
+      editing: false,
+      updating: false,
+      editor: null,
+      viewer: null
+    };
+    this.element = jQuery(this.options.element);
+    this.hideTimer = null;
+    this.load_more_open = false;
+
+    if (options && options.viewer_options && options.viewer_options.defaultTab) {
+      this.latestOpenedTabs = [options.viewer_options.defaultTab];
+    } else {
+      this.latestOpenedTabs = [];
+    }
+
+    this.init();
+  };
+
+  $.Sidebar.prototype.init = function () {
+    var self = this;
+    self.setUpTemplates(self.options.template_suffix);
+    self.setUpSidebar();
+    self.setUpListeners();
+  };
+
+  $.Sidebar.prototype.setUpTemplates = function (suffix) {
+    var self = this;
+    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
+      if (templateName in self.options.TEMPLATES) {
+        return;
+      }
+
+      var options = {
+        url: self.options.template_urls + templateName + '-' + suffix + '.html',
+        type: "GET",
+        contentType: "charset=utf-8",
+        success: function success(data) {
+          var template = _.template(data);
+
+          self.options.TEMPLATES[templateName] = template;
+        },
+        async: true
+      };
+      return jQuery.ajax(options);
+    });
+    jQuery.when.apply(jQuery, deferreds).done(function () {
+      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
+        editorid: self.instance_id.replace(/:/g, '-')
+      });
+    });
+  };
+
+  $.Sidebar.prototype.setUpSidebar = function () {
+    var self = this;
+    var sidebarOptions = jQuery.extend({
+      'tabsAvailable': ['search', 'mine', 'instructor', 'peer']
+    }, self.options.viewer_options, {
+      annotationItems: []
+    });
+    self.element.append(self.options.TEMPLATES.annotationSection(sidebarOptions));
+    self.sidebar = self.element.find('.annotationSection');
+    self.sidebar.parent().css('width', 'calc(100% - var(--sidebar-width))'); // self.element.on('mouseover', '.annotationsHolder', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // self.element.on('mouseleave', '.annotationsHolder', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+    // toggle search
+
+    jQuery('#search').click(function () {
+      jQuery('.search-bar.search-toggle').toggle();
+      jQuery('.annotationsHolder').toggleClass('search-opened');
+      $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
+        return a;
+      }, true]);
+    });
+    jQuery('#sidebar-filter-options').click(function () {
+      jQuery('.annotationsHolder').removeClass('search-opened');
+      jQuery('.annotation-filter-buttons').show();
+      jQuery('#sidebar-filter-options').hide();
+      jQuery('.search-bar.search-toggle').hide();
+      jQuery('.tag-token-list').hide();
+      var doit = self.latestOpenedTabs;
+      self.latestOpenedTabs = [];
+      jQuery.each(doit, function (_, tab) {
+        console.log(tab);
+        jQuery('#' + tab).trigger('click');
+      }); // jQuery('.annotationsHolder.side').html('');
+      // var messageVals = [];
+      // var pluralMessage = '';
+      // jQuery.each(jQuery('.btn.user-filter'), function(a, b) {
+      //     if (b.id == 'mynotes') {
+      //         messageVals.push("your annotations")
+      //     } else if (b.id == 'instructor') {
+      //         messageVals.push("instructor annotations");
+      //     } else if (b.id == 'public') {
+      //         messageVals.push("peer annotations");
+      //     }
+      // })
+      // if (messageVals.length > 1) {
+      //     messageVals.splice(messageVals.length - 1, 0, 'and/or,')
+      //     messageVals = messageVals.join(', ').replace(',,', '');
+      //     pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>'
+      // }
+      // jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage)
+
+      return;
+    });
+    jQuery('#search-clear').click(function () {
+      jQuery('#srch-term').val('');
+      $.publishEvent('StorageAnnotationSearch', self.instance_id, [{
+        type: self.options.mediaType
+      }, function (results, converter) {
+        $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows.reverse(), converter, true]);
+      }, function () {}]);
+    });
+    jQuery('#srch-term').on('keydown', function (event) {
+      if (event.key == "Enter") {
+        jQuery('#search-submit').trigger('click');
+      }
+    });
+    jQuery('#search-submit').click(function () {
+      var searchValue = jQuery('#srch-term').val().trim();
+      var searchType = jQuery('.search-bar select').val();
+      var ops = self.filterByType(searchValue, searchType, undefined);
+      self.search(ops);
+    }); // trigger new filter tab
+
+    jQuery('.btn.user-filter').click(function () {
+      if (this.id === "search") {
+        jQuery('.btn.user-filter').removeClass('active');
+        jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+      } else {
+        if (jQuery(this).hasClass('active')) {
+          self.latestOpenedTabs.splice(self.latestOpenedTabs.indexOf(this.id), 1);
+
+          if (jQuery('.btn.user-filter.active').length == 1) {
+            jQuery(this).removeClass('active');
+            jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');
+            jQuery(this).attr('aria-pressed', 'false');
+            $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
+              return a;
+            }, true]);
+            jQuery('.annotationsHolder.side').html('');
+            var messageVals = [];
+            var pluralMessage = '';
+            jQuery.each(jQuery('.btn.user-filter'), function (a, b) {
+              if (b.id == 'mine') {
+                messageVals.push("your annotations");
+              } else if (b.id == 'instructor') {
+                messageVals.push("instructor annotations");
+              } else if (b.id == 'peer') {
+                messageVals.push("peer annotations");
+              }
+            });
+
+            if (messageVals.length > 1) {
+              messageVals.splice(messageVals.length - 1, 0, 'and/or,');
+              messageVals = messageVals.join(', ').replace(',,', '');
+              pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>';
+            }
+
+            jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
+            return;
+          }
+
+          jQuery(this).removeClass('active');
+          jQuery(this).attr('aria-pressed', 'false');
+          jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //removeClass('fa-toggle-on').addClass('fa-toggle-off');
+        } else {
+          jQuery(this).addClass('active');
+          jQuery(this).attr('aria-pressed', 'true');
+          self.latestOpenedTabs.push(this.id);
+          jQuery(this).find('.fas.fa-toggle-on').removeClass('fa-flip-horizontal'); //.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+        }
+      }
+
+      jQuery('.annotationsHolder').removeClass('search-opened');
+      jQuery('.search-bar.search-toggle').hide();
+      var search_options = {
+        type: self.media
+      };
+      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+        return button.id;
+      });
+
+      if (this.id === "search") {
+        jQuery('.annotationsHolder').addClass('search-opened');
+        jQuery('.annotation-filter-buttons').hide();
+        jQuery('#sidebar-filter-options').show();
+        jQuery('.search-bar.search-toggle').show();
+        jQuery('.tag-token-list').show();
+        jQuery('.annotationsHolder.side').html('');
+        jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;">Search annotations with options above.</div>');
+        return;
+      }
+
+      var possible_exclude = [];
+      var possible_include = []; //console.log(filteroptions);
+
+      if (filteroptions.indexOf('mine') > -1) {
+        possible_include.push(self.options.user_id);
+      } else {
+        possible_exclude.push(self.options.user_id);
+      }
+
+      if (filteroptions.indexOf('instructor') > -1) {
+        possible_include = possible_include.concat(self.options.instructors);
+      } else {
+        possible_exclude = possible_exclude.concat(self.options.instructors);
+      }
+
+      if (filteroptions.indexOf('peer') > -1) {
+        if (possible_exclude.length > 0) {
+          search_options['exclude_userid'] = possible_exclude;
+        }
+      } else {
+        search_options['userid'] = possible_include;
+      }
+
+      if (self.options.instructors.indexOf(self.options.user_id) > -1) {
+        if (filteroptions.indexOf('peer') > -1 && (filteroptions.indexOf('mine') > -1 && filteroptions.indexOf('instructor') == -1 || filteroptions.indexOf('mine') == -1 && filteroptions.indexOf('instructor') > -1)) {
+          // jQuery('.btn.user-filter#instructor').addClass('active');
+          // jQuery('.btn.user-filter#instructor').find('.fas').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+          // jQuery('.btn.user-filter#mynotes').addClass('active');
+          // jQuery('.btn.user-filter#mynotes').find('.fas').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+          search_options['exclude_userid'] = []; //search_options['userid'] = [];
+        }
+      }
+
+      self.search(search_options);
+    });
+    jQuery('.sidebar-button#hide_label').click(function () {
+      jQuery(':root').css('--sidebar-width', '0px');
+      jQuery('.annotationSection').hide();
+      self.showSidebarTab(self.options.viewer_options.sidebarversion);
+    });
+    jQuery('.side.annotationsHolder').on('scroll', function () {
+      if (jQuery(this).scrollTop() + jQuery(this).innerHeight() >= jQuery(this)[0].scrollHeight) {
+        var total_left = $.totalAnnotations - jQuery('.side.ann-item').length;
+
+        if (total_left > 0 && jQuery('.load-more').length == 0) {
+          jQuery('.side.annotationsHolder').css('padding-bottom', '40px');
+          jQuery('.side.annotationsHolder').after('<div role="button" tabindex="0" class="load-more side make-jiggle">Load Next ' + self.options.viewer_options.pagination + ' Annotations</div>');
+          self.load_more_open = true;
+          jQuery('.side.load-more').click(function () {
+            var options = {
+              type: self.options.mediaType,
+              limit: self.options.viewer_options.pagination,
+              offset: jQuery('.side.ann-item').length
+            };
+
+            if (jQuery('.search-toggle:visible').length > 0) {
+              var searchValue = jQuery('#srch-term').val().trim();
+              var searchType = jQuery('.search-bar select').val();
+              options = self.filterByType(searchValue, searchType, options);
+            } else {
+              var possible_exclude = [];
+              var possible_include = [];
+              var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+                return button.id;
+              });
+
+              if (filteroptions.indexOf('mine') > -1) {
+                possible_include.push(self.options.user_id);
+              } else {
+                possible_exclude.push(self.options.user_id);
+              }
+
+              if (filteroptions.indexOf('instructor') > -1) {
+                possible_include = possible_include.concat(self.options.instructors);
+              } else {
+                possible_exclude = possible_exclude.concat(self.options.instructors);
+              }
+
+              if (filteroptions.indexOf('peer') > -1) {
+                if (possible_exclude.length > 0) {
+                  options['exclude_userid'] = possible_exclude;
+                }
+              } else {
+                options['userid'] = possible_include;
+              }
+            }
+
+            jQuery(this).html('<span class="fa fa-spinner make-spin"></span>'); //console.log(options);
+
+            $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
+              jQuery('.side.load-more').remove();
+              jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
+              $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, false]);
+            }, function () {}]);
+          });
+        }
+      } else if (self.load_more_open && jQuery(this).scrollTop() + jQuery(this).innerHeight() <= jQuery(this)[0].scrollHeight - 50) {
+        //console.log('should remove it');
+        self.load_more_open = false;
+        jQuery('.side.load-more').remove();
+        jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
+      }
+    });
+  };
+
+  $.Sidebar.prototype.showSidebarTab = function (type) {
+    // if (type === "smalltab") {
+    jQuery(':root').css('--sidebar-width', '55px');
+    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button" id="sidebaropen" aria-pressed="false" aria-label="Toggle sidebar" title="Toggle Sidebar"><span class="fas fa-comments"></span></div>'); // }
+
+    jQuery('.open-sidebar').click(function () {
+      jQuery('.open-sidebar').remove();
+      jQuery('.annotationSection').show();
+      jQuery(':root').css('--sidebar-width', '300px');
+    });
+  };
+
+  $.Sidebar.prototype.setUpListeners = function () {
+    var self = this;
+    $.subscribeEvent('StorageAnnotationSave', self.instance_id, function (_, annotation, updating) {
+      console.log("reached here!");
+      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+        return button.id;
+      });
+
+      if (filteroptions.indexOf('mine') > -1) {
+        self.addAnnotation(annotation, updating, false);
+      } else {
+        jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
+        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+      }
+    });
+    $.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation, updating) {
+      jQuery('.item-' + annotation.id).remove();
+
+      if (jQuery('.annotationItem').length == 0) {
+        jQuery('#empty-alert').css('display', 'block');
+      }
+    });
+    $.subscribeEvent('searchTag', self.instance_id, function (_, tag) {
+      var options = {
+        'type': self.options.mediaType,
+        'tag': tag
+      };
+      self.search(options);
+    });
+    $.subscribeEvent('annotationLoaded', self.instance_id, function (_, annotation) {
+      self.addAnnotation(annotation, false, true);
+    });
+    $.subscribeEvent('autosearch', self.instance_id, function (_, term, type) {
+      self.autosearch(term, type);
+    });
+  };
+
+  $.Sidebar.prototype.addAnnotation = function (annotation, updating, shouldAppend) {
+    var self = this;
+
+    if (annotation.media !== "comment" && annotation.text !== "" && $.exists(annotation.tags)) {
+      var ann = annotation;
+      ann.index = jQuery('.ann-item').length;
+      ann.instructor_ids = self.options.instructors;
+      ann.common_name = self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ann.creator.name;
+      var annHTML = self.options.TEMPLATES.annotationItem(ann);
+
+      if (self.options.viewer_options.readonly) {
+        annHTML = annHTML.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
+      }
+
+      if (jQuery('.side.item-' + ann.id).length > 0) {
+        jQuery('.item-' + ann.id).html(jQuery(annHTML).html());
+      } else {
+        if (shouldAppend) {
+          jQuery('.annotationsHolder').append(annHTML);
+        } else {
+          jQuery('.annotationsHolder').prepend(annHTML);
+        }
+      }
+
+      jQuery('.item-' + ann.id).find('.delete').confirm({
+        title: 'Delete Annotation?',
+        content: 'Would you like to delete your annotation? This is permanent.',
+        buttons: {
+          confirm: function confirm() {
+            $.publishEvent('StorageAnnotationDelete', self.instance_id, [annotation]);
+          },
+          cancel: function cancel() {}
+        }
+      });
+      jQuery('.side.item-' + ann.id).find('.edit').click(function (event) {
+        self.ViewerEditorOpen(event, ann, true);
+      });
+      jQuery('.side.item-' + ann.id).click(function () {
+        if (ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
+          var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
+          jQuery(self.element).parent().animate({
+            scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 40
+          }); //jQuery(ann._local.highlights).animate({'outline': '2px solid black'}, 1000)
+
+          setTimeout(function () {
+            ann._local.highlights.forEach(function (hl) {
+              if (jQuery(hl).text().trim().length > 0) {
+                jQuery(hl).css({
+                  border: '0 solid black'
+                }).animate({
+                  borderWidth: 2
+                }, 200).animate({
+                  borderWidth: 0
+                }, 200);
+              }
+            });
+
+            jQuery('#first-node-' + ann.id)[0].focus();
+            $.publishEvent('focusOnContext', self.instance_id, [ann]);
+          }, 350);
+        }
+      });
+      jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
+        self.autosearch(jQuery(this).text().trim(), 'User');
+        $.pauseEvent(e);
+      });
+      jQuery('.side.item-' + ann.id).find('.annotation-tag.side').click(function (e) {
+        self.autosearch(jQuery(this).text().trim(), 'Tag'); // jQuery('.btn.user-filter').removeClass('active');
+        // jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');//.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+        // jQuery('.annotationsHolder').addClass('search-opened');
+        // jQuery('.annotation-filter-buttons').hide();
+        // jQuery('#sidebar-filter-options').show();
+        // jQuery('.search-bar.search-toggle').show();
+        // jQuery('.tag-token-list').show();
+        // jQuery('.search-toggle').show(jQuery(this).html().trim());
+        // var options = {
+        //     type: self.options.mediaType,
+        // }
+        // var tagSearched = jQuery(this).html().trim();
+        // options['tag'] = tagSearched;
+        // jQuery('#srch-term').val(tagSearched)
+        // jQuery('.search-bar select').val('Tag');
+        // self.search(options);
+
+        $.pauseEvent(e);
+      });
+      $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
+      jQuery('#empty-alert').css('display', 'none');
+    }
+  };
+
+  $.Sidebar.prototype.filterByType = function (searchValue, type, options) {
+    var self = this;
+    searchValue = searchValue.trim();
+    var options = options ? options : {
+      'type': self.options.mediaType
+    };
+
+    if (searchValue === "") {
+      jQuery('.annotationsHolder .annotationItem').show();
+      return;
+    }
+
+    if (type === "User") {
+      options['username'] = searchValue;
+    } else if (type === "Annotation") {
+      options['text'] = searchValue;
+    } else if (type === "Tag") {
+      options['tag'] = searchValue;
+    }
+
+    return options;
+  };
+
+  $.Sidebar.prototype.search = function (options) {
+    jQuery('.annotationsHolder').prepend('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
+    $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
+      jQuery('.annotationsHolder.side').html('');
+      $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, true]);
+      jQuery('.loading-obj').remove();
+      jQuery('.side.annotationsHolder').scrollTop(0);
+      self.load_more_open = false;
+      jQuery('.side.load-more').remove();
+      jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
+
+      if (results.rows.length == 0) {
+        jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;">No annotations to show! Create an annotation by highlighting a portion of the text to the right.</div>');
+      }
+    }, function (err) {
+      jQuery('.loading-obj').remove();
+
+      if (jQuery('.ann-item').length == 0) {
+        jQuery('#empty-alert').remove();
+        jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;">No annotations to show! Create an annotation by highlighting a portion of the text to the right.</div>');
+      }
+    }]);
+  };
+
+  $.Sidebar.prototype.TargetSelectionMade = function (annotation, event) {
+    var self = this;
+    self.currentSelection = annotation;
+  };
+
+  $.Sidebar.prototype.TargetAnnotationDraw = function (annotation) {};
+
+  $.Sidebar.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
+    var self = this;
+    var editor = jQuery('.side.item-' + annotation.id);
+    editor.find('.body').after('<div class="editor-area side"><textarea id="annotation-text-field")></textarea><div class="plugin-area"></div><button tabindex="0" class="btn btn-primary save action-button">Save</button><button tabindex="0" class="btn btn-default cancel action-button">Cancel</button></div>');
+    editor.find('.body').hide();
+    editor.find('.tagList').hide();
+    jQuery('.edit').prop('disabled', true); // closes the editor tool and does not save annotation
+
+    editor.find('.cancel').click(function () {
+      self.ViewerEditorClose(annotation, true, false, editor);
+    }); // closes the editor and does save annotations
+
+    editor.find('.save').click(function () {
+      var text = editor.find('#annotation-text-field').val();
+
+      if (updating) {
+        annotation.annotationText.pop();
+      }
+
+      annotation.annotationText.push(text);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, false, false]);
+      self.ViewerEditorClose(annotation, true, false, editor);
+    });
+    $.publishEvent('editorShown', self.instance_id, [editor, annotation]);
+  };
+
+  $.Sidebar.prototype.ViewerEditorClose = function (annotation, redraw, should_erase, editor) {
+    jQuery('.editor-area.side').remove();
+    jQuery('.edit').prop('disabled', false);
+    jQuery('.note-link-popover').remove();
+    $.publishEvent('editorHidden', self.instance_id, []);
+
+    if (editor) {
+      editor.find('.side.body').show();
+      editor.find('.tagList.side').show();
+    }
+  };
+
+  $.Sidebar.prototype.ViewerDisplayOpen = function (event, annotations) {};
+
+  $.Sidebar.prototype.ViewerDisplayClose = function (annotations) {};
+
+  $.Sidebar.prototype.StorageAnnotationSave = function (annotations) {};
+
+  $.Sidebar.prototype.StorageAnnotationDelete = function (annotations) {};
+
+  $.Sidebar.prototype.StorageAnnotationLoad = function (annotations) {};
+
+  $.Sidebar.prototype.autosearch = function (term, type) {
+    var self = this;
+
+    if (self.options.viewer_options.readonly) {
+      $.publishEvent('dumpStore', self.instance_id, [function (annotations) {
+        self.tempAnnotationList = annotations;
+        jQuery('.ann-item').show();
+        $.publishEvent('undrawAll', self.instance_id, [function (annList) {
+          self.foundList = [];
+          self.tempAnnotationList.forEach(function (ann) {
+            if (type == "Tag") {
+              if (ann.tags.indexOf(term) > -1) {
+                self.foundList.push(ann);
+              } else {
+                jQuery('.ann-item.item-' + ann.id).hide();
+              }
+            } else if (type == "User") {
+              if (ann.creator.name === term) {
+                self.foundList.push(ann);
+              } else {
+                jQuery('.ann-item.item-' + ann.id).hide();
+              }
+            }
+          });
+          $.publishEvent('drawList', self.instance_id, [self.foundList, function () {
+            jQuery('#empty-alert').html('You are now viewing only annotations with ' + type.toLowerCase() + ' "' + term + '". Click here to view all annotations');
+            jQuery('#empty-alert').show();
+            jQuery('#empty-alert').css('cursor', 'pointer');
+            jQuery('#empty-alert').on('click', function () {
+              jQuery('#empty-alert').off('click');
+              jQuery('#empty-alert').hide();
+              jQuery('#empty-alert').css('cursor', 'default');
+              jQuery('.ann-item').show();
+              $.publishEvent('undrawAll', self.instance_id, [function (annList) {
+                $.publishEvent('drawList', self.instance_id, [self.tempAnnotationList, function () {}]);
+              }]);
+            });
+          }]);
+        }]);
+      }]);
+    } else {
+      jQuery('.btn.user-filter').removeClass('active');
+      jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+      if (term !== self.options.common_instructor_name) {
+        self.search(self.filterByType(term, type, undefined));
+        jQuery('.annotationsHolder').addClass('search-opened');
+        jQuery('.search-toggle').show();
+        jQuery('.annotation-filter-buttons').hide();
+        jQuery('#sidebar-filter-options').show();
+        jQuery('.search-bar.search-toggle').show();
+        jQuery('.tag-token-list').show();
+        $.publishEvent('searchSelected', self.instance_id, []);
+        jQuery('#srch-term').val(term);
+        jQuery('.search-bar select').val(type);
+      } else {
+        jQuery('#sidebar-filter-options').trigger('click');
+        jQuery('.btn.user-filter#instructor').trigger('click');
+      }
+    }
+  };
+
+  $.viewers.push($.Sidebar);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
+ * Timeago is a jQuery plugin that makes it easy to support automatically
+ * updating fuzzy timestamps (e.g. "4 minutes ago" or "about 1 day ago").
+ *
+ * @name timeago
+ * @version 1.6.7
+ * @requires jQuery >=1.5.0 <4.0
+ * @author Ryan McGeary
+ * @license MIT License - http://www.opensource.org/licenses/mit-license.php
+ *
+ * For usage and examples, visit:
+ * http://timeago.yarp.com/
+ *
+ * Copyright (c) 2008-2019, Ryan McGeary (ryan -[at]- mcgeary [*dot*] org)
+ */
+
+(function (factory) {
+  if (true) {
+    // AMD. Register as an anonymous module.
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {}
+}(function ($) {
+  $.timeago = function(timestamp) {
+    if (timestamp instanceof Date) {
+      return inWords(timestamp);
+    } else if (typeof timestamp === "string") {
+      return inWords($.timeago.parse(timestamp));
+    } else if (typeof timestamp === "number") {
+      return inWords(new Date(timestamp));
+    } else {
+      return inWords($.timeago.datetime(timestamp));
+    }
+  };
+  var $t = $.timeago;
+
+  $.extend($.timeago, {
+    settings: {
+      refreshMillis: 60000,
+      allowPast: true,
+      allowFuture: false,
+      localeTitle: false,
+      cutoff: 0,
+      autoDispose: true,
+      strings: {
+        prefixAgo: null,
+        prefixFromNow: null,
+        suffixAgo: "ago",
+        suffixFromNow: "from now",
+        inPast: 'any moment now',
+        seconds: "less than a minute",
+        minute: "about a minute",
+        minutes: "%d minutes",
+        hour: "about an hour",
+        hours: "about %d hours",
+        day: "a day",
+        days: "%d days",
+        month: "about a month",
+        months: "%d months",
+        year: "about a year",
+        years: "%d years",
+        wordSeparator: " ",
+        numbers: []
+      }
+    },
+
+    inWords: function(distanceMillis) {
+      if (!this.settings.allowPast && ! this.settings.allowFuture) {
+          throw 'timeago allowPast and allowFuture settings can not both be set to false.';
+      }
+
+      var $l = this.settings.strings;
+      var prefix = $l.prefixAgo;
+      var suffix = $l.suffixAgo;
+      if (this.settings.allowFuture) {
+        if (distanceMillis < 0) {
+          prefix = $l.prefixFromNow;
+          suffix = $l.suffixFromNow;
+        }
+      }
+
+      if (!this.settings.allowPast && distanceMillis >= 0) {
+        return this.settings.strings.inPast;
+      }
+
+      var seconds = Math.abs(distanceMillis) / 1000;
+      var minutes = seconds / 60;
+      var hours = minutes / 60;
+      var days = hours / 24;
+      var years = days / 365;
+
+      function substitute(stringOrFunction, number) {
+        var string = $.isFunction(stringOrFunction) ? stringOrFunction(number, distanceMillis) : stringOrFunction;
+        var value = ($l.numbers && $l.numbers[number]) || number;
+        return string.replace(/%d/i, value);
+      }
+
+      var words = seconds < 45 && substitute($l.seconds, Math.round(seconds)) ||
+        seconds < 90 && substitute($l.minute, 1) ||
+        minutes < 45 && substitute($l.minutes, Math.round(minutes)) ||
+        minutes < 90 && substitute($l.hour, 1) ||
+        hours < 24 && substitute($l.hours, Math.round(hours)) ||
+        hours < 42 && substitute($l.day, 1) ||
+        days < 30 && substitute($l.days, Math.round(days)) ||
+        days < 45 && substitute($l.month, 1) ||
+        days < 365 && substitute($l.months, Math.round(days / 30)) ||
+        years < 1.5 && substitute($l.year, 1) ||
+        substitute($l.years, Math.round(years));
+
+      var separator = $l.wordSeparator || "";
+      if ($l.wordSeparator === undefined) { separator = " "; }
+      return $.trim([prefix, words, suffix].join(separator));
+    },
+
+    parse: function(iso8601) {
+      var s = $.trim(iso8601);
+      s = s.replace(/\.\d+/,""); // remove milliseconds
+      s = s.replace(/-/,"/").replace(/-/,"/");
+      s = s.replace(/T/," ").replace(/Z/," UTC");
+      s = s.replace(/([\+\-]\d\d)\:?(\d\d)/," $1$2"); // -04:00 -> -0400
+      s = s.replace(/([\+\-]\d\d)$/," $100"); // +09 -> +0900
+      return new Date(s);
+    },
+    datetime: function(elem) {
+      var iso8601 = $t.isTime(elem) ? $(elem).attr("datetime") : $(elem).attr("title");
+      return $t.parse(iso8601);
+    },
+    isTime: function(elem) {
+      // jQuery's `is()` doesn't play well with HTML5 in IE
+      return $(elem).get(0).tagName.toLowerCase() === "time"; // $(elem).is("time");
+    }
+  });
+
+  // functions that can be called via $(el).timeago('action')
+  // init is default when no action is given
+  // functions are called with context of a single element
+  var functions = {
+    init: function() {
+      functions.dispose.call(this);
+      var refresh_el = $.proxy(refresh, this);
+      refresh_el();
+      var $s = $t.settings;
+      if ($s.refreshMillis > 0) {
+        this._timeagoInterval = setInterval(refresh_el, $s.refreshMillis);
+      }
+    },
+    update: function(timestamp) {
+      var date = (timestamp instanceof Date) ? timestamp : $t.parse(timestamp);
+      $(this).data('timeago', { datetime: date });
+      if ($t.settings.localeTitle) {
+        $(this).attr("title", date.toLocaleString());
+      }
+      refresh.apply(this);
+    },
+    updateFromDOM: function() {
+      $(this).data('timeago', { datetime: $t.parse( $t.isTime(this) ? $(this).attr("datetime") : $(this).attr("title") ) });
+      refresh.apply(this);
+    },
+    dispose: function () {
+      if (this._timeagoInterval) {
+        window.clearInterval(this._timeagoInterval);
+        this._timeagoInterval = null;
+      }
+    }
+  };
+
+  $.fn.timeago = function(action, options) {
+    var fn = action ? functions[action] : functions.init;
+    if (!fn) {
+      throw new Error("Unknown function name '"+ action +"' for timeago");
+    }
+    // each over objects here and call the requested function
+    this.each(function() {
+      fn.call(this, options);
+    });
+    return this;
+  };
+
+  function refresh() {
+    var $s = $t.settings;
+
+    //check if it's still visible
+    if ($s.autoDispose && !$.contains(document.documentElement,this)) {
+      //stop if it has been removed
+      $(this).timeago("dispose");
+      return this;
+    }
+
+    var data = prepareData(this);
+
+    if (!isNaN(data.datetime)) {
+      if ( $s.cutoff === 0 || Math.abs(distance(data.datetime)) < $s.cutoff) {
+        $(this).text(inWords(data.datetime));
+      } else {
+        if ($(this).attr('title').length > 0) {
+            $(this).text($(this).attr('title'));
+        }
+      }
+    }
+    return this;
+  }
+
+  function prepareData(element) {
+    element = $(element);
+    if (!element.data("timeago")) {
+      element.data("timeago", { datetime: $t.datetime(element) });
+      var text = $.trim(element.text());
+      if ($t.settings.localeTitle) {
+        element.attr("title", element.data('timeago').datetime.toLocaleString());
+      } else if (text.length > 0 && !($t.isTime(element) && element.attr("title"))) {
+        element.attr("title", text);
+      }
+    }
+    return element.data("timeago");
+  }
+
+  function inWords(date) {
+    return $t.inWords(distance(date));
+  }
+
+  function distance(date) {
+    return (new Date().getTime() - date.getTime());
+  }
+
+  // fix for IE6 suckage
+  document.createElement("abbr");
+  document.createElement("time");
+}));
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '';
+with (obj) {
+__p += '<div class="annotation-editor" id="annotation-editor-' +
+((__t = ( editorid )) == null ? '' : __t) +
+'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fa fa-close"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
+
+}
+return __p
+};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="annotation-viewer-side" id="annotation-viewer-' +
+((__t = ( viewerid )) == null ? '' : __t) +
+'">\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
+ _.each(annotations, function(ann){ ;
+__p += '\n            <div class="ann-item" id="annotation-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'">\n                <div class="annotation-username">TEST: ' +
+((__t = ( ann.creator.name )) == null ? '' : __t) +
+'</div>\n                <div class="annotation-date">last updated 2 hours ago</div>\n                <button class="edit" id="edit-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fa fa-pencil"></i></button>\n                <button class="delete" id="delete-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
+((__t = ( ann.exact )) == null ? '' : __t) +
+'</div>\n                <div class="annotation-quote-focus sr-only"><a href="#first-node-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'">View quote in context</a></div>\n                <div class="annotation-text">' +
+((__t = ( ann.annotationText )) == null ? '' : __t) +
+'</div>\n                ';
+ if (ann.tags && ann.tags.length > 0) { ;
+__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
+ _.each(ann.tags, function(tag){ ;
+__p += '\n                            <div class="annotation-tag">' +
+((__t = ( tag )) == null ? '' : __t) +
+'</div>\n                        ';
+ }); ;
+__p += '\n                    </div>\n                ';
+ } ;
+__p += '\n            </div>\n        ';
+ }); ;
+__p += '\n    </div>\n    <div class="plugin-area-bottom">\n    </div>\n</div>\n';
+
+}
+return __p
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <a href="#key-help" class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" title="Keyboard Help" aria-label="Keyboard Help"><span class="fas fa-keyboard"></span><span class="fas fa-question" style="margin-left: -16px; color: rgba(255, 255, 255, 0.8); -webkit-text-stroke: 1px #595959; "></span></a>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar" title="Toggle sidebar"><span class="fas fa-angle-double-left" aria-pressed="true"></span></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
+((__t = ( filterTabCount )) == null ? '' : __t) +
+'">\n            ';
+ if (tabsAvailable.indexOf('search') > -1) {;
+__p += '\n            <button type="button" class="btn btn-default inverted user-filter ';
+ if (defaultTab.indexOf('search') > -1) {;
+__p += 'active';
+ } ;
+__p += '" id="search" id="sidebar-search" aria-label="Toggle Search Region" aria-pressed="';
+ if (defaultTab.indexOf('search') > -1) {;
+__p += 'true';
+ } else { ;
+__p += 'false';
+ } ;
+__p += '"><span class="fa fa-search"></span><br>Search</button>\n            ';
+ } ;
+__p += '\n            ';
+ if (tabsAvailable.indexOf('mine') > -1) {;
+__p += '\n        	<button type="button" class="btn btn-default user-filter ';
+ if (defaultTab.indexOf('mine') > -1) {;
+__p += 'active';
+ } ;
+__p += '" id=\'mine\' aria-label="View my annotations" role="button" aria-pressed="';
+ if (defaultTab.indexOf('mine') > -1) {;
+__p += 'true';
+ } else { ;
+__p += 'false';
+ } ;
+__p += '"><span class="fas fa-toggle-on ';
+ if (defaultTab.indexOf('mine') == -1) {;
+__p += 'fa-flip-horizontal';
+ } ;
+__p += '"></span><br>Mine</button>\n            ';
+ } ;
+__p += '\n            ';
+ if (tabsAvailable.indexOf('peer') > -1 || tabsAvailable.indexOf('all') > -1) {;
+__p += '\n        	<button type="button" class="btn btn-default user-filter ';
+ if (defaultTab.indexOf('peer') > -1) {;
+__p += 'active';
+ } ;
+__p += '" id=\'peer\' aria-label="View peers\' annotations" role="button" aria-pressed="';
+ if (defaultTab.indexOf('peer') > -1) {;
+__p += 'true';
+ } else { ;
+__p += 'false';
+ } ;
+__p += '"><span class="fas fa-toggle-on ';
+ if (defaultTab.indexOf('peer')== -1) {;
+__p += 'fa-flip-horizontal';
+ } ;
+__p += '"></span><br>Peer</button>\n            ';
+ } ;
+__p += '\n            ';
+ if (tabsAvailable.indexOf('instructor') > -1) {;
+__p += '\n                <button type="button" class="btn btn-default user-filter ';
+ if (defaultTab.indexOf('instructor') > -1) {;
+__p += 'active';
+ } ;
+__p += '" id=\'instructor\' aria-label="View instructor annotations" role="button" aria-pressed="';
+ if (defaultTab.indexOf('instructor') > -1) {;
+__p += 'true';
+ } else { ;
+__p += 'false';
+ } ;
+__p += '"><span class="fas fa-toggle-on ';
+ if (defaultTab.indexOf('instructor') == -1) {;
+__p += 'fa-flip-horizontal';
+ } ;
+__p += '"></span><br>Instructor</button>\n            ';
+ } ;
+__p += '\n        </div>\n    </div>\n    <div class="separator-solid side"></div>\n    <!-- <div class="filter-options side search-toggle" style=\'display:none;\'>\n        <div class="search-label">Search by:</div>\n        <div class="btn-group">\n            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>\n            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>\n            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>\n        </div>\n    </div> -->\n    ';
+ if (tabsAvailable.indexOf('search') > -1) {;
+__p += '\n            <button type="button" class="btn btn-default" id="sidebar-filter-options" aria-label="Hide search options"><i class="fas fa-times"></i></button>\n        ';
+ } ;
+__p += '\n    <div class="search-bar side search-toggle" style=\'display:none;\'>\n        <div id="search-info" style="display:none">The following allows you to search annotations. The default filter is to search for a username, but make sure to change filter to annotation text or tag for other types of searches.</div>\n    	<div class="input-group">\n            <label for="srch-term" id="searchlabel" class="hidden">Search annotations:</label>\n            <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" aria-describedby="search-info" aria-labeledby="searchlabel" list="tag-list-options">\n            <div class="input-group-btn">\n                <select class="form-control">\n                    <option>Annotation</option>\n                    <option>User</option>\n                    <option>Tag</option>\n                </select>\n            </div>\n        </div>\n        <div class="input-group-btn">\n                <button title="Search" class="btn btn-default" type="submit" id="search-submit" role="button" aria-label="Submit search"><i class="glyphicon glyphicon-search"></i></button>\n                <button title="Clear Search Input" class="btn btn-default" type="clear" id="search-clear" role="button" aria-label="Clear search input"><i class="fas fa-backspace"></i></button>\n            </div>\n        <div id="timeRangeFilter" style="display:none; color:white; margin-top:15px; margin-bottom:-30px">\n            <label for="startTimeFilter">Start:</label> <input type="text" id="startTimeFilter" style="display:inline; width:20%; color: black;" value="0:00"/>\n            <label for="endTimeFilter">End:</label> <input type="text" id="endTimeFilter" style="display:inline;width:20%; color: black;" value="0:00"/>\n        </div>\n    </div>\n    <div class="handleAnnotations" style="display:none">\n        <div id="printAnnotations"> <i class="fa fa-print"></i>   Print My Notes</div>\n        <div id="exportAnnotations"> <i class="fa fa-cloud-download"></i> Export</div>\n        <div id="importAnnotations"> <i class="fa fa-cloud-upload"></i> Import</div>\n    </div>\n    <ul class="annotationsHolder side" role="list" aria-label="Annotations" id=\'annotationsHolder\'>\n		';
+ _.each(annotationItems, function(item) { ;
+__p += '\n			' +
+((__t = ( item )) == null ? '' : __t) +
+'\n		';
+ }); ;
+__p += '\n        ';
+ if (annotationItems.length == 0) { ;
+__p += '\n            <li id=\'empty-alert\' style="padding:20px;text-align:center;">Create an annotation by highlighting a portion of the text to the right.</li>\n        ';
+ } else {;
+__p += '\n            <li>\n                <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>\n            </li>\n        ';
+ } ;
+__p += '\n	</ul>\n    <datalist id="tag-list-options">\n    </datalist>\n</section>';
+
+}
+return __p
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<li class="ann-item annotationItem item-' +
+((__t = ( id )) == null ? '' : __t) +
+' side ';
+ if (instructor_ids.indexOf(creator.id) > -1) {;
+__p += 'inst';
+};
+__p += '" role="listitem" aria-label="Annotation #' +
+((__t = (index)) == null ? '' : __t) +
+'">\n    <div style="overflow:auto;">\n    <span class="idAnnotation" style="display:none;">' +
+((__t = ( id )) == null ? '' : __t) +
+'</span>\n    ';
+ if (typeof(creator) !== 'undefined') { ;
+__p += '\n    <div class= "annotatedBy field side" aria-label="Annotation created by ';
+ if (instructor_ids.indexOf(creator.id) > -1) { print(common_name);} else {print(creator.name);} ;
+__p += '">\n        ';
+ if (instructor_ids.indexOf(creator.id) > -1) { print(common_name);;
+__p += '&nbsp;<span class="fas fa-certificate"></span>';
+} else {print(creator.name);} ;
+__p += '     \n        ';
+ } else { ;
+__p += '\n        <div class= "annotatedBy field side" aria-label="Annotation created by lduarte1991">\n        lduarte19911\n        ';
+ } ;
+__p += '\n    </div>\n    ';
+ if( typeof(created) !== 'undefined') { ;
+__p += '\n        ';
+ var date = new Date(created); ;
+__p += '\n        <div class="annotatedAt field side" title="';
+ print(date) ;
+__p += '" aria-label="last updated ';
+ print(date); ;
+__p += '">\n            created ';
+ print(jQuery.timeago(date)); ;
+__p += '\n        </div>\n    ';
+ } ;
+__p += '\n    </div>\n    <button class="edit" id="edit-' +
+((__t = ( id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
+((__t = ( id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n    ';
+ if (media === 'text' || media === "Text") {;
+__p += '\n        <div class="quote field side">\n            <div class="quoteText" aria-label="Excerpt selected for this annotation:">' +
+((__t = ( exact )) == null ? '' : __t) +
+'</div>\n        </div>\n        <div class="annotation-quote-focus sr-only"><a href="#first-node-' +
+((__t = ( id )) == null ? '' : __t) +
+'">Jump to quote in context</a></div>\n    ';
+ } else if (media === 'image' && thumbnail) {;
+__p += '\n        <div class="zoomToImageBounds" style=\'position:relative;\'>\n            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="' +
+((__t = ( thumbnail )) == null ? '' : __t) +
+'" onError="this.onerror=null;this.src=\'/static/css/images/image-error.png\';" data-svg=".thumbnail-' +
+((__t = ( id )) == null ? '' : __t) +
+'" alt="Thumbnail Preview"/>\n            ';
+ if (typeof(svg) !== "undefined") { ;
+__p += '\n                ' +
+((__t = ( svg )) == null ? '' : __t) +
+'\n            ';
+ } ;
+__p += '\n            <span class="idAnnotation" style="display:none">' +
+((__t = ( id )) == null ? '' : __t) +
+'</span>\n            <span class="uri" style="display:none">' +
+((__t = ( uri )) == null ? '' : __t) +
+'</span>\n        </div>\n    ';
+ } else if (media === "video") {;
+__p += '\n        <div class="playMediaButton" style="text-align:center;">\n            <div class="btn btn-default" style="text-align:center;margin-top:20px;">\n                Segment ' +
+((__t = ( rangeTime.start )) == null ? '' : __t) +
+' - ' +
+((__t = ( rangeTime.end )) == null ? '' : __t) +
+'\n            </div>\n            <span class="idAnnotation" style="display:none">' +
+((__t = ( id )) == null ? '' : __t) +
+'</span>\n            <span class="uri" style="display:none">' +
+((__t = ( uri )) == null ? '' : __t) +
+'</span>\n        </div>\n    ';
+ } ;
+__p += '\n    <div style="display:none;" id="annotationTextLabel">Annotation text</div>\n    <div class="body field side" aria-label="Comment: ' +
+__e( annotationText[0].replace(/"/g, '&quot;') ) +
+'">\n        ';
+ if (typeof annotationText !== 'undefined') {;
+__p += '\n            ' +
+((__t = ( annotationText[0] )) == null ? '' : __t) +
+'\n        ';
+ } ;
+__p += '\n    </div>\n    ';
+ if (typeof tags !== "undefined") { ;
+__p += '\n        <div class="tagList field side">\n            ';
+ _.each(tags, function(tagItem){ ;
+__p += '\n                <div class="annotation-tag side" aria-label="tag: ' +
+__e( tagItem.replace(/"/g, '&quot;') ) +
+'">\n                    ' +
+((__t = ( tagItem )) == null ? '' : __t) +
+'\n                </div>\n            ';
+ }); ;
+__p += '\n        </div>\n    ';
+ } ;
+__p += '\n\n    <div class="plugin-area-bottom"></div>\n        <!-- ';
+ if (typeof(totalReplies) == "undefined" || totalReplies === 0) { ;
+__p += '\n            <button class=\'create-reply\'>Reply to Annotation</button>\n        ';
+ } else { ;
+__p += '\n            <button class=\'view-replies\'>View ' +
+((__t = ( totalReplies )) == null ? '' : __t) +
+' Replies</button>\n        ';
+ } ;
+__p += ' -->\n    <!-- <div class="totalreplies field side clicking_allowed" tabindex="0" role="button" aria-label="Make or view replies Annotation #' +
+((__t = (index )) == null ? '' : __t) +
+'">\n        <span class="glyphicon glyphicon-comment"></span>\n        ';
+ if (typeof(totalReplies) == "undefined") { ;
+__p += '\n        <span class="replyNum"> 0 </span>\n        ';
+ } else { ;
+__p += '\n        <span class="replyNum"> ' +
+((__t = ( totalReplies )) == null ? '' : __t) +
+' </span>\n        ';
+ } ;
+__p += '\n    </div> -->\n    <script>\n        // jQuery(\'.annotationItem.item-' +
+((__t = ( id )) == null ? '' : __t) +
+'.side\').data(\'annotation\')\n    </script>\n</li>\n';
+
+}
+return __p
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
+
+/***/ }),
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(33);
+/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
+/**
+ * 
+ */
+var annotator = annotator ? annotator : __webpack_require__(5);
+
+
+
+
+(function ($) {
+  $.FloatingViewer = function (options, inst_id) {
+    // sets default options
+    var defaultOptions = {
+      // set up template names that will be pulled
+      TEMPLATENAMES: ["editor", "viewer"],
+      TEMPLATES: {
+        editor: __webpack_require__(34),
+        viewer: __webpack_require__(35)
+      },
+      template_suffix: "floating",
+      template_urls: ""
+    };
+    this.options = jQuery.extend({}, defaultOptions, options);
+    console.log("Floating options", this.options);
+    this.instance_id = inst_id;
+    this.annotation_tool = {
+      interactionPoint: null,
+      editing: false,
+      updating: false,
+      editor: null,
+      viewer: null
+    };
+    this.element = jQuery(this.options.element);
+    this.hideTimer = null;
+    this.init();
+  };
+
+  $.FloatingViewer.prototype.init = function () {
+    var self = this;
+    self.setUpTemplates(self.options.template_suffix); // make sure the viewer doesn't disappear when the person moves their mouse over it
+
+    self.element.on('mouseover', '.annotation-viewer', function (event1) {
+      clearTimeout(self.hideTimer);
+    }); // once they leave the viewer hide it
+
+    self.element.on('mouseleave', '.annotation-viewer', function (event1) {
+      if (self.annotation_tool.isStatic) {
+        return;
+      }
+
+      clearTimeout(self.hideTimer);
+      self.ViewerDisplayClose();
+    });
+    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      clearTimeout(self.hideTimer);
+
+      try {
+        self.annotation_tool.viewer.addClass('static');
+        self.annotation_tool.isStatic = true;
+      } catch (e) {
+        self.ViewerDisplayOpen(event1, annotations);
+        self.annotation_tool.viewer.addClass('static');
+        self.annotation_tool.isStatic = true;
+      }
+    });
+    jQuery('body').on('click', '.annotation-username', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'User']);
+    });
+    jQuery('body').on('click', '.annotation-tag', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'Tag']);
+    });
+    this.setUpPinAndMove();
+  };
+
+  $.FloatingViewer.prototype.setUpTemplates = function (suffix) {
+    var self = this;
+    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
+      if (templateName in self.options.TEMPLATES) {
+        return;
+      }
+
+      var options = {
+        url: self.options.template_urls + templateName + '-' + suffix + '.html',
+        type: "GET",
+        contentType: "charset=utf-8",
+        success: function success(data) {
+          var template = _.template(data);
+
+          self.options.TEMPLATES[templateName] = template;
+        },
+        async: true
+      };
+      return jQuery.ajax(options);
+    });
+    jQuery.when.apply(jQuery, deferreds).done(function () {
+      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
+        editorid: self.instance_id.replace(/:/g, '-')
+      });
+    });
+  };
+
+  $.FloatingViewer.prototype.TargetSelectionMade = function (annotation, event) {
+    // if (event && event instanceof MouseEvent) {
+    this.ViewerEditorOpen(event, annotation, false, $.mouseFixedPosition(event, annotation)); // }
+  };
+
+  $.FloatingViewer.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
+    var self = this;
+
+    if (self.annotation_tool.editing && self.annotation_tool.updating && self.annotation_tool.isStatic && !updating) {
+      // there's already an open editor window for this instance so don't do anything
+      return;
+    }
+
+    if (self.annotation_tool.viewer) {
+      jQuery('.annotation-viewer').remove();
+      delete self.annotation_tool.viewer;
+      self.annotation_tool.isStatic = false;
+      self.annotation_tool.updating = false;
+      self.annotation_tool.editing = false;
+    }
+
+    jQuery('.edit').prop('disabled', true); // set editing mode
+
+    self.annotation_tool.editing = true;
+    self.annotation_tool.updating = updating; // actually set up and draw the Editor
+
+    var wrapperElement = self.element.find('.annotator-wrapper');
+    wrapperElement.after(self.annotation_tool.editorTemplate); // save the element to call upon later
+
+    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/:/g, '-'));
+    var intPt = interactionPoint; // situate it on its proper location
+
+    self.annotation_tool.editor.css({
+      'top': intPt.top - jQuery(window).scrollTop(),
+      'left': intPt.left
+    }); // closes the editor tool and does not save annotation
+
+    self.annotation_tool.editor.find('.cancel').click(function () {
+      console.log("HERE", annotation, !updating, true);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
+    }); // closes the editor and does save annotations
+
+    self.annotation_tool.editor.find('.save').click(function () {
+      var text = self.annotation_tool.editor.find('#annotation-text-field').val();
+
+      if (updating) {
+        annotation.annotationText.pop();
+      }
+
+      annotation.annotationText.push(text);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, false]);
+    });
+    self.annotation_tool.editor.find('#annotation-text-field').val(annotation.annotationText);
+    setTimeout(function () {
+      self.annotation_tool.editor.find('#annotation-text-field')[0].focus();
+    }, 250);
+    self.checkOrientation(self.annotation_tool.editor);
+    $.publishEvent('editorShown', self.instance_id, [self.annotation_tool.editor, annotation]);
+  };
+
+  $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
+    var self = this;
+    jQuery('.edit').prop('disabled', false);
+    jQuery('.note-link-popover').remove();
+    $.publishEvent('editorHidden', self.instance_id, []);
+
+    if (self.annotation_tool.editor) {
+      self.annotation_tool.editor.remove();
+    }
+
+    delete self.annotation_tool.editor;
+    self.annotation_tool.editing = false;
+    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
+  };
+
+  $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
+    var self = this;
+    var annotations = anns.reverse(); // if the timer is set for the tool to be hidden, this intercepts it
+
+    if (self.hideTimer !== undefined) {
+      clearTimeout(self.hideTimer);
+    }
+
+    if (jQuery('.annotation-editor').is(':visible') || jQuery('.hx-confirm-button').is(':visible') || self.annotation_tool.editing || self.annotation_tool.updating || self.annotation_tool.isStatic && Hxighlighter.exists(self.annotation_tool.viewer)) {
+      // there's already an open editor window for this instance so don't do anything
+      return;
+    }
+
+    self.annotation_tool.viewerTemplate = self.options.TEMPLATES['viewer']({
+      'viewerid': self.instance_id.replace(/:/g, '-'),
+      'annotations': annotations,
+      'instructor_ids': self.options.instructors,
+      'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
+    });
+
+    if (self.options.viewer_options.readonly) {
+      self.annotation_tool.viewerTemplate = self.annotation_tool.viewerTemplate.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
+    } // add the viewer to the DOM
+
+
+    self.element.find('.annotator-wrapper').after(self.annotation_tool.viewerTemplate); // collect the object for manipulation and coordinates of where it should appear
+
+    if (self.annotation_tool.viewer) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+
+    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/:/g, '-'));
+    var newTop = annotator.util.mousePosition(event).top - jQuery(window).scrollTop() + 20;
+    var newLeft = annotator.util.mousePosition(event).left + 30;
+    self.annotation_tool.viewer.css({
+      'top': newTop,
+      'left': newLeft
+    });
+    self.annotation_tool.viewer.data('annotations', annotations);
+    self.annotation_tool.viewer.find('.cancel').click(function (event1) {
+      self.annotation_tool.isStatic = false;
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer; // jQuery('body').css('overflow-y', 'scroll');
+    });
+    self.annotation_tool.viewer.find('.edit').click(function (event1) {
+      var annotation_id = jQuery(this).attr('id').replace('edit-', '');
+      var filtered_annotation = annotations.find(function (ann) {
+        if (ann.id === annotation_id) return ann;
+      });
+      self.ViewerEditorOpen(event1, filtered_annotation, true, {
+        top: parseInt(self.annotation_tool.viewer.css('top'), 10),
+        left: parseInt(self.annotation_tool.viewer.css('left'), 10)
+      }); //StorageAnnotationSave
+    });
+    self.annotation_tool.viewer.find('.delete').confirm({
+      title: 'Delete Annotation?',
+      content: 'Would you like to delete your annotation? This is permanent.',
+      buttons: {
+        confirm: function confirm() {
+          var annotation_id = this.$target[0].id.replace('delete-', '');
+          var filtered_annotation = annotations.find(function (ann) {
+            if (ann.id === annotation_id) return ann;
+          });
+          $.publishEvent('StorageAnnotationDelete', self.instance_id, [filtered_annotation]);
+          self.ViewerDisplayClose();
+
+          if (self.annotation_tool.viewer) {
+            jQuery('.annotation-viewer').remove();
+            delete self.annotation_tool.viewer;
+            self.annotation_tool.isStatic = false;
+            self.annotation_tool.updating = false;
+            self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+          }
+        },
+        cancel: function cancel() {}
+      }
+    }); // console.log(annotations);        
+
+    $.publishEvent('displayShown', self.instance_id, [self.annotation_tool.viewer, annotations]);
+    self.checkOrientation(self.annotation_tool.viewer);
+  };
+
+  $.FloatingViewer.prototype.ViewerDisplayClose = function (annotations) {
+    var self = this;
+
+    if (self.annotation_tool.isStatic) {
+      return;
+    }
+
+    console.log('should hide display');
+    clearTimeout(self.hideTimer);
+    self.hideTimer = setTimeout(function () {
+      if (self.hideTimer) {
+        $.publishEvent('displayHidden', self.instance_id, []);
+
+        if (self.annotation_tool.viewer) {
+          self.annotation_tool.viewer.remove();
+          delete self.annotation_tool.viewer;
+        }
+
+        self.annotation_tool.isStatic = false;
+        self.annotation_tool.updating = false;
+        self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+      }
+    }, 500);
+  };
+
+  $.FloatingViewer.prototype.StorageAnnotationSave = function (annotations) {};
+
+  $.FloatingViewer.prototype.StorageAnnotationLoad = function (first_argument) {
+    var self = this;
+
+    if (self.annotation_tool.viewer) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+
+    self.annotation_tool.isStatic = false;
+    self.annotation_tool.updating = false;
+    self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+  };
+
+  $.FloatingViewer.prototype.StorageAnnotationDelete = function (annotation) {
+    var self = this;
+    jQuery('.annotation-viewer').remove();
+    delete self.annotation_tool.viewer;
+    self.annotation_tool.isStatic = false;
+    self.annotation_tool.updating = false;
+    self.annotation_tool.editing = false;
+  };
+
+  $.FloatingViewer.prototype.setUpPinAndMove = function () {
+    var self = this; // keeps track of when mouse button is pressed
+
+    jQuery('body').on('mousedown', function (event) {
+      self.buttonDown = true;
+    }); // keeps track of when mouse button is let go
+
+    jQuery('body').on('mouseup', function (event) {
+      self.buttonDown = false;
+    }); // handles moving the editor by clicking and dragging
+
+    jQuery('body').on('mousedown', '.annotation-editor-nav-bar', function (event) {
+      self.prepareToMove(true, event);
+    }); // handles moving the viewer by clicking and dragging
+
+    jQuery('body').on('mousedown', '.annotation-viewer-nav-bar', function (event) {
+      self.prepareToMove(false, event);
+    });
+    jQuery('body').on('mousemove', function (event) {
+      self.moving(event);
+    });
+    jQuery('body').on('mouseup', function (event) {
+      self.finishedMoving(event);
+    }); // jQuery('body').on('mouseover', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+    // jQuery('body').on('mouseover', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+
+    jQuery('body').on('mouseleave', function (event) {
+      self.finishedMoving(event);
+    });
+  };
+
+  $.FloatingViewer.prototype.prepareToMove = function (isEditor, event) {
+    var self = this;
+    self.itemMoving = isEditor ? self.annotation_tool.editor : self.annotation_tool.viewer;
+
+    if (self.itemMoving) {
+      $.pauseEvent(event); //turns on moving mode
+
+      self.itemMoving.moving = true; // set initial mouse position offset by where on the editor the user clicked
+
+      var move = annotator.util.mousePosition(event);
+      var editorTop = parseInt(self.itemMoving.css('top'), 10);
+      var editorLeft = parseInt(self.itemMoving.css('left'), 10);
+      self.itemMoving.offsetTopBy = move.top - editorTop;
+      self.itemMoving.offsetLeftBy = move.left - editorLeft;
+    }
+  };
+
+  $.FloatingViewer.prototype.moving = function (event) {
+    var self = this;
+
+    if (self.itemMoving && self.itemMoving.moving) {
+      $.pauseEvent(event); // gets the userlocation (where they've dragged to)
+
+      var move = annotator.util.mousePosition(event);
+      var newTop = move.top - self.itemMoving.offsetTopBy;
+      var newLeft = move.left - self.itemMoving.offsetLeftBy; // var borderBox = self.element[0].getBoundingClientRect();
+
+      if (newTop < 0) {
+        newTop = 0;
+      }
+
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+
+      if (newTop + self.itemMoving.outerHeight() > window.innerHeight) {
+        newTop = window.innerHeight - self.itemMoving.outerHeight();
+      }
+
+      if (newLeft + self.itemMoving.outerWidth() > window.innerWidth) {
+        newLeft = window.innerWidth - self.itemMoving.outerWidth();
+      }
+      /* TODO: Set boundaries for far right and far down */
+      // sets the editor to that location (fixing offset)
+
+
+      self.itemMoving.css({
+        top: newTop,
+        left: newLeft
+      });
+    } else if (self.buttonDown && self.annotation_tool.viewer && !self.annotation_tool.viewer.hasClass('static')) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+  };
+
+  $.FloatingViewer.prototype.finishedMoving = function (event) {
+    var self = this;
+
+    if (self.itemMoving) {
+      $.pauseEvent(event); //turns on moving mode
+
+      self.itemMoving.moving = false;
+      var move = annotator.util.mousePosition(event);
+      self.annotation_tool.interactionPoint = {
+        top: move.top - self.itemMoving.offsetTopBy,
+        left: move.left - self.itemMoving.offsetLeftBy
+      };
+    }
+  };
+
+  $.FloatingViewer.prototype.checkOrientation = function (viewerElement) {
+    var self = this;
+    var newTop = parseInt(jQuery(viewerElement).css('top'), 10);
+    var newLeft = parseInt(jQuery(viewerElement).css('left'), 10);
+    var elWidth = parseInt(jQuery(viewerElement).outerWidth());
+    var elHeight = parseInt(jQuery(viewerElement).outerHeight());
+
+    if (newTop < 0) {
+      newTop = 0;
+    }
+
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+
+    if (newTop + elHeight > window.innerHeight) {
+      newTop = window.innerHeight - elHeight - 34 - 75; // 34 is the height of the save/cancel buttons that get cut off 
+    }
+
+    if (newLeft + elWidth > window.innerWidth) {
+      newLeft = window.innerWidth - elWidth - 12; // 12 is the width of the scroll bar
+    }
+
+    jQuery(viewerElement).css('top', newTop);
+    jQuery(viewerElement).css('left', newLeft);
+  };
+
+  $.viewers.push($.FloatingViewer);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '';
+with (obj) {
+__p += '<div class="annotation-editor" id="annotation-editor-' +
+((__t = ( editorid )) == null ? '' : __t) +
+'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
+
+}
+return __p
+};
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="annotation-viewer" id="annotation-viewer-' +
+((__t = ( viewerid )) == null ? '' : __t) +
+'">\n    <nav class=\'annotation-viewer-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close Viewer" tile="Close Viewer"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
+ _.each(annotations, function(ann){ ;
+__p += '\n            <div class="ann-item item-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+' floating ';
+ if (instructor_ids.indexOf(ann.creator.id) > -1) {;
+__p += 'inst';
+};
+__p += '" id="annotation-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'">\n                <div class="annotation-username">';
+ if (instructor_ids.indexOf(ann.creator.id) > -1 && common_name !== "") { print(common_name);;
+__p += '&nbsp;<span class="fas fa-certificate-cap"></span>';
+} else {print(ann.creator.name);} ;
+__p += '</div>\n                <div class="annotation-date" title="' +
+((__t = ( ann.created )) == null ? '' : __t) +
+'">';
+ if (ann.created){print(jQuery.timeago(ann.created));} else {print(jQuery.timeago(new Date()))} ;
+__p += '</div>\n                <button class="edit" id="edit-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
+((__t = ( ann.exact )) == null ? '' : __t) +
+'</div>\n                <div class="annotation-text">' +
+((__t = ( ann.annotationText )) == null ? '' : __t) +
+'</div>\n                ';
+ if (ann.tags && ann.tags.length > 0) { ;
+__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
+ _.each(ann.tags, function(tag){ ;
+__p += '\n                            <div class="annotation-tag">' +
+((__t = ( tag )) == null ? '' : __t) +
+'</div>\n                        ';
+ }); ;
+__p += '\n                    </div>\n                ';
+ } ;
+__p += '\n                <div class="plugin-area-bottom">\n                </div>\n            </div>\n        ';
+ }); ;
+__p += '\n    </div>\n</div>\n';
+
+}
+return __p
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/**
+ *  Summernote RichText Plugin
+ *  
+ *  Should be generic, but its main purpose is to be used in tandem with annotations.
+ *
+ */
+__webpack_require__(12); // require('bs4-summersnote/dist/summernote-bs4.js');
+
+
+__webpack_require__(37);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.SummernoteRichText = function (options, instanceID) {
+    var self = this;
+    var maxLength = 1000;
+    this.options = jQuery.extend({
+      height: 150,
+      focus: true,
+      width: 398,
+      placeholder: "Add annotation text...",
+      maximumImageFileSize: 262144,
+      maxHeight: 400,
+      minHeight: 100,
+      maxTextLength: maxLength,
+      dialogsInBody: true,
+      disableResizeEditor: true,
+      callbacks: {
+        onKeydown: function onKeydown(e) {
+          var t = e.currentTarget.innerText;
+
+          if ('Escape' === e.key) {
+            $.publishEvent('ViewerEditorClose', self.instanceID, [self.currentAnnotation, true, true]);
+            jQuery('.sr-real-alert').html('You have closed the editor and unselected text for annotation.');
+          } else if (t.trim().length >= maxLength) {
+            // prevents everything that could add a new character
+            var allowedKeys = 'ArrowLeftArrowRightArrowDownDeleteArrowUpMetaControlAltBackspace';
+
+            if (allowedKeys.indexOf(e.key) == -1 || e.key == 'a' && !(e.ctrlKey || e.metaKey) || e.key == 'c' && !(e.ctrlKey || e.metaKey) || e.key == 'v' && !(e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              alert('You have reached the character limit for this annotation (max 1000 characters).');
+            }
+          }
+        },
+        onKeyup: function onKeyup(e) {
+          var t = e.currentTarget.innerText;
+          jQuery('#maxContentPost').text(maxLength - t.trim().length);
+        },
+        onPaste: function onPaste(e) {
+          var t = e.currentTarget.innerText;
+          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+
+          if (t.length + bufferText.length >= maxLength) {
+            e.preventDefault();
+            var bufferTextAllowed = bufferText.trim().substring(0, maxLength - t.length);
+            setTimeout(function () {
+              // wrap in a timer to prevent issues in Firefox
+              document.execCommand('insertText', false, bufferTextAllowed);
+              jQuery('#maxContentPost').text(maxLength - t.length);
+              alert('You have reached the character limit for this annotation (max 1000 characters). Your pasted text was trimmed to meet the 1000 character limit.');
+            }, 10);
+          }
+        },
+        onFocus: function onFocus(e) {
+          $.publishEvent('wysiwygOpened', self.instanceID, [e]);
+        }
+      },
+      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]]
+    }, options);
+    this.init();
+    this.instanceID = instanceID;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.SummernoteRichText.prototype.init = function () {
+    // warns dev that they forgot to include summernote.js
+    if (_typeof(jQuery.summernote) !== "object") {//console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
+    }
+
+    this.annotationListeners();
+  };
+  /**
+   * 
+   * @param element {HTMLElement} - where the annotation will be added
+   * @param selector {String} - selector to find input it is replacing
+   */
+
+
+  $.SummernoteRichText.prototype.addWYSIWYG = function (element, selector) {
+    var self = this; // adds the summernote WYSIWIG to the editor to the selector's location
+
+    self.elementObj = element.find(selector);
+    self.options.width = this.elementObj.parent().width();
+    self.elementObj.summernote(this.options); // removes summernote's ability to tab within the editor so users can tab through items
+
+    delete jQuery.summernote.options.keyMap.pc.TAB;
+    delete jQuery.summernote.options.keyMap.mac.TAB;
+    delete jQuery.summernote.options.keyMap.pc['SHIFT+TAB'];
+    delete jQuery.summernote.options.keyMap.mac['SHIFT+TAB'];
+    element.find('.note-editable').trigger('focus');
+    jQuery('.note-editor button').attr('tabindex', '0');
+    jQuery('.note-statusbar').hide();
+    jQuery(document).on('mouseleave', function () {
+      jQuery('.note-statusbar').trigger('mouseup');
+
+      if (self.elementObj) {
+        var editorObj = self.elementObj.closest('.annotation-editor');
+        var newTop = parseInt(editorObj.css('top'), 10);
+        ;
+        var newLeft = parseInt(editorObj.css('left'), 10);
+        console.log(editorObj, newTop, newLeft);
+
+        if (newTop + editorObj.outerHeight() > window.innerHeight) {
+          newTop = window.innerHeight - editorObj.outerHeight();
+        }
+
+        if (newLeft + editorObj.outerWidth() > window.innerWidth) {
+          newLeft = window.innerWidth - editorObj.outerWidth();
+        }
+
+        if (newTop < 0) {
+          newTop = 0;
+        }
+
+        if (newLeft < 0) {
+          newLeft = 0;
+        }
+
+        editorObj.css({
+          top: newTop,
+          left: newLeft
+        });
+      }
+    });
+  };
+  /**
+   * Returns the HTML value of the WYSIWYG. 
+   *
+   * @return     {String}  HTML value found in the WYSIWYG
+   */
+
+
+  $.SummernoteRichText.prototype.returnValue = function () {
+    var result = this.elementObj.summernote('code');
+
+    if (result.indexOf('<script') >= 0) {
+      alert("I'm sorry Dave, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
+      return result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
+    }
+
+    result = result.replace(/<p><\/p>/g, '').replace(/<p><br><\/p>/g, '');
+    return result;
+  };
+  /**
+   * Deletes the Summernote instance.
+   *
+   * @param      {HTMLElement}  element   The editor element
+   * @param      {String}  selector  The selector containing the area in the editor where to insert the WYSIWYG
+   */
+
+
+  $.SummernoteRichText.prototype.destroy = function (element, selector) {
+    var self = this;
+    self.elementObj.summernote('destroy');
+    jQuery('.tooltip.fade').remove();
+  }; // Annotation specific functions
+
+  /**
+   * Turns on the specific listeners when the plug in is initiated.
+   */
+
+
+  $.SummernoteRichText.prototype.annotationListeners = function () {
+    var self = this;
+    $.subscribeEvent('editorToBeHidden', self.instanceID, function () {
+      self.destroy();
+    }.bind(self));
+    $.subscribeEvent('editorHidden', self.instanceID, function () {
+      self.destroy();
+    }.bind(self));
+    jQuery('body').on('mouseover', '.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function () {
+      var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
+      input.prop('type', 'url');
+      var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
+      var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+      var regex = new RegExp(expression);
+
+      if (chosen.match(regex)) {
+        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
+      } else {
+        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
+      }
+    });
+  };
+  /**
+   * Code to run just before the annotation is saved to storage
+   *
+   * @param      {Annotation}  annotation  The annotation as it currently is saved.
+   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
+   */
+
+
+  $.SummernoteRichText.prototype.saving = function (annotation) {
+    var self = this;
+
+    try {
+      var annotationText = this.returnValue();
+
+      if (typeof this.options.validator === "function") {
+        annotationText = this.options.validator(annotationText);
+      }
+
+      annotation['annotationText'] = [annotationText];
+    } catch (e) {//console.log('plugin was never started');
+    }
+
+    self.destroy();
+    return annotation;
+  };
+  /**
+   * Code that runs once the editor is shown on screen.
+   *
+   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
+   * @param      {HTMLElement}  editor      The editor element
+   */
+
+
+  $.SummernoteRichText.prototype.editorShown = function (editor, annotation) {
+    var self = this;
+    self.addWYSIWYG(editor, '#annotation-text-field');
+    self.currentAnnotation = annotation;
+    var annotationText = "";
+
+    if (annotation.annotationText) {
+      annotationText = annotation.annotationText;
+      self.elementObj.summernote('code', annotation.annotationText);
+    } else if (annotation.schema_version && annotation.schema_version === "catch_v2") {
+      annotationText = returnWAText(annotation);
+
+      if (typeof annotationText !== "undefined") {
+        self.elementObj.summernote('code', annotationText);
+        self.updating = true;
+        self.updatingText = annotationText;
+      }
+    }
+
+    if (typeof annotationText === "string" ? annotationText.length > 0 : annotationText.join('').length > 0) {
+      editor.find('.note-editable').attr('aria-label', 'Your current annotation text: <em>' + annotationText + "</em>. You are now in a text box. Edit your annotation.");
+    }
+  };
+
+  $.SummernoteRichText.prototype.setUpEditor = function (type) {
+    var type = type.toLowerCase();
+
+    if (!type || type === "default" || type === "") {
+      return [['font', ['bold', 'italic', 'underline', 'clear']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]];
+    }
+
+    if (type === "simple") {
+      return [['font', ['bold', 'italic', 'underline', 'clear']]];
+    }
+
+    var fullsetup = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['height', ['height']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
+
+    if (type === "instructor") {
+      return fullsetup;
+    }
+
+    if (type.indexOf('no-style')) {}
+  };
+
+  Object.defineProperty($.SummernoteRichText, 'name', {
+    value: "SummernoteRichText"
+  });
+  $.plugins.push($.SummernoteRichText);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Dropdown (Predetermined) Tags Plugin
+ *  
+ *  Will create an area for inputting tags, just a textfield, no color
+ *
+ */
+__webpack_require__(10);
+
+__webpack_require__(11);
+
+__webpack_require__(8);
+
+__webpack_require__(9);
+
+__webpack_require__(39);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.DropdownTags = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.init();
+    this.name;
+    this.instanceID = instanceID;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.DropdownTags.prototype.init = function () {
+    var self = this;
+    self.name = 'DropdownTags';
+    self.annotationListeners();
+    var tags = 'tags' in self.options ? self.options.tags : []; // jQuery.each(tags, function(_, tag) {
+    //   jQuery('#tag-list-options').append('<option value="' + tag + '" />');
+    // });
+
+    jQuery('.search-bar select').on('change', function () {
+      if (jQuery(this).val() == "Tag") {
+        jQuery.each(tags, function (_, tag) {
+          jQuery('#tag-list-options').append('<option value="' + tag + '" />');
+        });
+      } else {
+        jQuery('#tag-list-options').html('');
+      }
+    });
+  };
+  /**
+   * Returns the HTML value of the WYSIWYG. 
+   *
+   * @return     {String}  HTML value found in the WYSIWYG
+   */
+
+
+  $.DropdownTags.prototype.returnValue = function () {
+    var self = this;
+    var tags = jQuery('.token-input-token-facebook p').map(function (_, token) {
+      return jQuery(token).html();
+    }); // Thanks to https://stackoverflow.com/questions/36810940/array-from-on-the-internet-explorer
+
+    if (!Array.from) {
+      Array.from = function () {
+        var toStr = Object.prototype.toString;
+
+        var isCallable = function isCallable(fn) {
+          return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+        };
+
+        var toInteger = function toInteger(value) {
+          var number = Number(value);
+
+          if (isNaN(number)) {
+            return 0;
+          }
+
+          if (number === 0 || !isFinite(number)) {
+            return number;
+          }
+
+          return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+        };
+
+        var maxSafeInteger = Math.pow(2, 53) - 1;
+
+        var toLength = function toLength(value) {
+          var len = toInteger(value);
+          return Math.min(Math.max(len, 0), maxSafeInteger);
+        }; // The length property of the from method is 1.
+
+
+        return function from(arrayLike
+        /*, mapFn, thisArg */
+        ) {
+          // 1. Let C be the this value.
+          var C = this; // 2. Let items be ToObject(arrayLike).
+
+          var items = Object(arrayLike); // 3. ReturnIfAbrupt(items).
+
+          if (arrayLike == null) {
+            throw new TypeError("Array.from requires an array-like object - not null or undefined");
+          } // 4. If mapfn is undefined, then let mapping be false.
+
+
+          var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+          var T;
+
+          if (typeof mapFn !== 'undefined') {
+            // 5. else
+            // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+            if (!isCallable(mapFn)) {
+              throw new TypeError('Array.from: when provided, the second argument must be a function');
+            } // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+
+
+            if (arguments.length > 2) {
+              T = arguments[2];
+            }
+          } // 10. Let lenValue be Get(items, "length").
+          // 11. Let len be ToLength(lenValue).
+
+
+          var len = toLength(items.length); // 13. If IsConstructor(C) is true, then
+          // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+          // 14. a. Else, Let A be ArrayCreate(len).
+
+          var A = isCallable(C) ? Object(new C(len)) : new Array(len); // 16. Let k be 0.
+
+          var k = 0; // 17. Repeat, while k < len… (also steps a - h)
+
+          var kValue;
+
+          while (k < len) {
+            kValue = items[k];
+
+            if (mapFn) {
+              A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+            } else {
+              A[k] = kValue;
+            }
+
+            k += 1;
+          } // 18. Let putStatus be Put(A, "length", len, true).
+
+
+          A.length = len; // 20. Return A.
+
+          return A;
+        };
+      }();
+    }
+
+    return Array.from(tags);
+  }; // Annotation specific functions
+
+  /**
+   * Turns on the specific listeners when the plug in is initiated.
+   */
+
+
+  $.DropdownTags.prototype.annotationListeners = function () {
+    var self = this;
+    $.subscribeEvent('editorHidden', self.instanceID, function () {
+      self.destroy();
+    }.bind(this));
+  };
+  /**
+   * Code to run just before the annotation is saved to storage
+   *
+   * @param      {Annotation}  annotation  The annotation as it currently is saved.
+   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
+   */
+
+
+  $.DropdownTags.prototype.saving = function (annotation) {
+    var self = this;
+    annotation.tags = self.returnValue() || [];
+    return annotation;
+  };
+  /**
+   * Code that runs once the editor is shown on screen.
+   *
+   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
+   * @param      {HTMLElement}  editor      The editor element
+   */
+
+
+  $.DropdownTags.prototype.editorShown = function (editor, annotation) {
+    // console.log('DropdownTags editorShown');
+    var self = this;
+    editor.find('#tag-list').addClass('token-tag-field');
+    self.field = editor.find('.token-tag-field');
+    var tags = 'tags' in self.options ? self.options.tags : [];
+    var preDTags = [];
+    tags.forEach(function (tag) {
+      preDTags.push({
+        name: tag,
+        id: tag
+      });
+    });
+    self.field.tokenInput(preDTags, {
+      theme: 'facebook',
+      preventDuplicates: true,
+      allowTabOut: true,
+      hintText: 'Add a tag...',
+      placeholder: 'Add tags. Separate multiple by using "Enter".',
+      allowFreeTagging: 'folksonomy' in self.options ? self.options.folksonomy : false,
+      noResultsText: "Not Found. Hit ENTER to add a personal tag."
+    });
+    jQuery('#token-input-tag-list').attr('aria-label', 'Add tags. Separate multiple by using "Enter".'); // jQuery('#token-input-tag-list').attr('placeholder', 'Tag:');
+
+    if (annotation.tags && annotation.tags.length > 0) {
+      annotation.tags.forEach(function (tag) {
+        self.field.tokenInput('add', {
+          'name': tag,
+          'id': tag
+        });
+      });
+    }
+  };
+
+  $.DropdownTags.prototype.destroy = function () {
+    var self = this;
+    self.field.tokenInput('destroy');
+    jQuery('.token-input-dropdown-facebook').remove();
+  };
+
+  Object.defineProperty($.DropdownTags, 'name', {
+    value: "DropdownTags"
+  });
+  $.plugins.push($.DropdownTags);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Color (Predetermined) Tags Plugin
+ *  
+ *  Will create an area for inputting tags, just a textfield, no color
+ *
+ */
+__webpack_require__(41);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.ColorTags = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.init();
+    this.name;
+    this.instanceID = instanceID;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.ColorTags.prototype.init = function () {
+    var self = this;
+    self.name = 'ColorTags';
+    self.annotationListeners();
+  };
+  /**
+   * Returns the HTML value of the WYSIWYG. 
+   *
+   * @return     {String}  HTML value found in the WYSIWYG
+   */
+
+
+  $.ColorTags.prototype.returnValue = function () {}; // Annotation specific functions
+
+  /**
+   * Turns on the specific listeners when the plug in is initiated.
+   */
+
+
+  $.ColorTags.prototype.annotationListeners = function () {
+    var self = this;
+    $.subscribeEvent('annotationLoaded', self.instanceID, function (_, ann) {
+      // console.log('hello', ann.tags);
+      if (typeof ann.tags !== 'undefined' && ann.tags.length > 0) {
+        var color = self.getColorFromValue(ann.tags[ann.tags.length - 1]);
+
+        if (typeof color !== "undefined") {
+          setTimeout(function () {
+            $.publishEvent('changeDrawnColor', self.instanceID, [ann, color]);
+          }, 250);
+        }
+      }
+    });
+    $.subscribeEvent('drawList', self.instanceID, function (_, anns) {
+      anns.forEach(function (ann) {
+        // console.log('hello', ann.tags);
+        if (typeof ann.tags !== 'undefined' && ann.tags.length > 0) {
+          var color = self.getColorFromValue(ann.tags[ann.tags.length - 1]);
+
+          if (typeof color !== "undefined") {
+            setTimeout(function () {
+              $.publishEvent('changeDrawnColor', self.instanceID, [ann, color]);
+            }, 250);
+          }
+        }
+      });
+    });
+  };
+
+  $.ColorTags.prototype.getColorFromValue = function (value) {
+    var self = this;
+
+    if ('allTags' in self.options) {
+      var rgbaColor = self.hexToRGBa(self.options.allTags);
+      var rgbaVal = 'rgba(' + rgbaColor.join(',') + ')';
+      return rgbaVal;
+    }
+
+    if (value in self.options) {
+      var rgbaColor = self.hexToRGBa(self.options[value]);
+      var rgbaVal = 'rgba(' + rgbaColor.join(',') + ')';
+      return rgbaVal;
+    }
+
+    return undefined;
+  };
+  /* Following function taken from
+   * https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+   */
+
+
+  $.ColorTags.prototype.hexToRGBa = function (hex) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16), 0.3] : null;
+  };
+  /**
+   * Code to run just before the annotation is saved to storage
+   *
+   * @param      {Annotation}  annotation  The annotation as it currently is saved.
+   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
+   */
+
+
+  $.ColorTags.prototype.saving = function (annotation) {
+    var self = this;
+
+    if (typeof annotation.tags !== 'undefined' && annotation.tags.length > 0) {
+      var color = self.getColorFromValue(annotation.tags[annotation.tags.length - 1]);
+
+      if (typeof color !== "undefined") {
+        setTimeout(function () {
+          $.publishEvent('changeDrawnColor', self.instanceID, [annotation, color]);
+        }, 250);
+      }
+    }
+
+    return annotation;
+  };
+  /**
+   * Code that runs once the editor is shown on screen.
+   *
+   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
+   * @param      {HTMLElement}  editor      The editor element
+   */
+
+
+  $.ColorTags.prototype.editorShown = function (editor, annotation) {
+    var self = this; // console.log('ColorTags editorShown');
+
+    var listNode = editor.find('.token-input-list-facebook')[0];
+
+    if (listNode.addEventListener) {
+      listNode.addEventListener('DOMNodeInserted', function (event) {
+        if (event.target.className === "token-input-token-facebook") {
+          var color = self.getColorFromValue(jQuery(event.target).find('p').text().trim());
+
+          if (typeof color !== "undefined") {
+            jQuery(event.target).css('background', color);
+          }
+        }
+      }, false);
+    }
+
+    jQuery.each(jQuery(listNode).find('.token-input-token-facebook p'), function (_, el) {
+      var tag = jQuery(el).text();
+      var color = self.getColorFromValue(tag);
+
+      if (typeof color !== "undefined") {
+        jQuery(el).parent().css('background', color);
+      }
+    });
+  };
+
+  $.ColorTags.prototype.displayShown = function (viewer, annotation) {
+    var self = this;
+    jQuery.each(jQuery(viewer).find('.annotation-tag'), function (_, el) {
+      var tag = jQuery(el).text().trim();
+      var color = self.getColorFromValue(tag);
+
+      if (typeof color !== "undefined") {
+        jQuery(el).css('background', color);
+      }
+    });
+  };
+
+  Object.defineProperty($.ColorTags, 'name', {
+    value: "ColorTags"
+  });
+  $.plugins.push($.ColorTags);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  InstructionPanel Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(43);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.InstructionPanel = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
+
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.InstructionPanel.prototype.init = function () {
+    var self = this;
+    self.setUpInstructions();
+  };
+
+  $.InstructionPanel.prototype.setUpInstructions = function () {
+    var self = this;
+
+    if (!self.options.instructions || self.options.instructions.length == 0) {
+      return;
+    } // console.log(self.options.instructions, typeof(self.options.instructions));
+
+
+    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
+    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
+
+    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
+    inst_area.click(function () {
+      if (inst_area.html() == "Collapse Instructions") {
+        inst_area.html('Expand Instructions');
+      } else {
+        inst_area.html('Collapse Instructions');
+      }
+    });
+  };
+
+  $.InstructionPanel.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.InstructionPanel, 'name', {
+    value: "InstructionPanel"
+  });
+  $.plugins.push($.InstructionPanel);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  FontResize Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(45);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.FontResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.toggleTextSize(0);
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.FontResize.prototype.init = function () {
+    var self = this;
+    self.setUpButtons();
+  };
+
+  $.FontResize.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(+0)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
+    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
+      self.toggleTextSize(1);
+    });
+    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
+      self.toggleTextSize(-1);
+    });
+  };
+
+  $.FontResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.FontResize.prototype.toggleTextSize = function (step) {
+    var self = this;
+    step = isNaN(Number(step)) ? 0 : Number(step);
+    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
+    var $label = jQuery("#annotations-text-size-label");
+    var nodes = [],
+        curnode,
+        stylesize,
+        styleunit,
+        computed;
+    var minsize = 8;
+    var sizediff = 0;
+
+    if (typeof this.defaultFontSize === "undefined") {
+      this.defaultFontSize = 14;
+    }
+
+    if (typeof this.targetFontSize === "undefined") {
+      this.targetFontSize = this.defaultFontSize;
+    }
+
+    this.targetFontSize += step;
+
+    if (this.targetFontSize < minsize) {
+      this.targetFontSize = minsize;
+    }
+
+    sizediff = this.targetFontSize - this.defaultFontSize;
+
+    if (sizediff === 0) {
+      $label.html("(+0)");
+      $content.css('fontSize', '');
+    } else {
+      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
+      $content.css('fontSize', String(this.targetFontSize) + "px");
+      nodes.push($content[0]);
+    } // walk the dom and find custom fontStyle declarations and adust as necessary
+    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
+
+
+    while (nodes.length > 0) {
+      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
+
+      if (curnode.tagName.toLowerCase() == 'font') {
+        computed = window.getComputedStyle(curnode);
+        curnode.style.fontSize = computed['font-size'];
+        curnode.size = "";
+      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
+
+
+      if (curnode != $content[0] && curnode.className != "") {
+        curnode.style.fontSize = "inherit";
+      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
+
+
+      stylesize = parseInt(curnode.style.fontSize, 10);
+
+      if (!isNaN(stylesize)) {
+        styleunit = curnode.style.fontSize.replace(stylesize, '');
+        stylesize += step;
+        stylesize = stylesize < minsize ? minsize : stylesize;
+
+        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
+          curnode.style.fontSize = stylesize + styleunit;
+        }
+      }
+
+      for (var i = curnode.children.length; i > 0; i--) {
+        nodes.push(curnode.children[i - 1]);
+      }
+    }
+  };
+
+  Object.defineProperty($.FontResize, 'name', {
+    value: "FontResize"
+  });
+  $.plugins.push($.FontResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
+
+(function ($) {
+  $.KeyboardSelector = function (element, inst_id) {
+    this.element = element;
+
+    if (!jQuery(element).hasClass('annotator-wrapper')) {
+      this.element = jQuery(element).find('.annotator-wrapper');
+    }
+
+    this.instance_id = inst_id;
+    this.delimiter_list = ['*', '+', '#', '^'];
+    this.keyMaps = {
+      'BACKSPACE': 8,
+      'TAB': 9,
+      'ENTER': 13,
+      'SHIFT': 16,
+      'CTRL': 17,
+      'ALT': 18,
+      'ESC': 27,
+      'SPACE': 32,
+      'LEFT': 37,
+      'UP': 38,
+      'RIGHT': 39,
+      'DOWN': 40,
+      'DELETE': 46,
+      'MULTIPLY': 106,
+      'ADD': 107,
+      'PIPE': 220,
+      '*': 56,
+      '+': 187,
+      'HOME': 36,
+      'END': 35
+    };
+    this.init();
+  };
+
+  $.KeyboardSelector.prototype.init = function () {
+    var self = this;
+    this.delimiter = this.checkDelimiter(self.element);
+
+    if (!this.delimiter) {//console.log('Error in delimiter...no suitable delimiter found!');
+    }
+
+    this.start = undefined;
+    this.setUpButton();
+  };
+
+  $.KeyboardSelector.prototype.checkDelimiter = function (element) {
+    var textSearch = jQuery(element).text();
+
+    for (var i = 0; i < this.delimiter_list.length; i++) {
+      var testDelimiter = this.delimiter_list[i];
+
+      if (textSearch.indexOf(testDelimiter) == -1) {
+        return testDelimiter;
+      }
+    }
+
+    return undefined;
+  };
+
+  $.KeyboardSelector.prototype.setUpButton = function () {
+    var self = this;
+    jQuery(document).on('keydown', function (event) {
+      if (event.key == '1' && (event.altKey || event.ctrlKey) || event.key == '\'' && (event.altKey || event.ctrlKey)) {
+        event.preventDefault(); //move this to external button
+
+        if (!event.target.isContentEditable && !jQuery(event.target).hasClass('form-control')) {
+          self.turnSelectionModeOn();
+        }
+
+        return false;
+      } else if (event.key == 'Escape') {
+        //console.log("hello");
+        self.turnSelectionModeOff(); // } else if (event.key == ' ') {
+        //     event.preventDefault();
+        //     return false;
+      }
+
+      if (event.key == '2' && (event.altKey || event.ctrlKey)) {
+        event.preventDefault();
+        var currentInst = jQuery('.sr-alert').html();
+
+        if (currentInst.trim() === "") {
+          currentInst = 'Hit "Ctrl + 1" to beginning annotating the text by marking them with apostrophes.';
+        }
+
+        jQuery('.sr-alert').html('');
+        setTimeout(function () {
+          jQuery('.sr-alert').html(currentInst);
+        }, 250);
+      }
+
+      if (event.key == '3' && (event.altKey || event.ctrlKey)) {
+        var currVal = jQuery('#hx-sr-notifications').attr('aria-live');
+        var newVal = currVal == "off" ? 'assertive' : 'off';
+        var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
+
+        if (newVal == "off") {
+          jQuery('.sr-real-alert').html(newAlert);
+          setTimeout(function () {
+            jQuery('#hx-sr-notifications').attr('aria-live', newVal);
+            jQuery('.sr-real-alert').html('');
+          }, 500);
+          var currVal = jQuery('.sr-alert').html();
+          jQuery('.sr-alert').html('');
+          jQuery('.sr-alert').data('old', currVal);
+        } else {
+          jQuery('.sr-alert').html(jQuery('.sr-alert').data('old'));
+          jQuery('#hx-sr-notifications').attr('aria-live', newVal);
+          jQuery('.sr-real-alert').html(newAlert);
+        }
+
+        event.preventDefault();
+      }
+    });
+    jQuery(document).on('keyup', '*[role="button"]', function (evt) {
+      if (evt.key == 'Enter' || evt.key == ' ') {
+        jQuery(evt.currentTarget).click();
+        return $.pauseEvent(evt);
+        ;
+      }
+    }); // var slot = self.element;
+    // if (!self.element.hasClass('annotation-slot')) {
+    //     slot = self.element.find('.annotation-slot');
+    // }
+    // if (slot.length === 0) {
+    //     slot = self.element.closest('.annotation-slot');
+    // }
+    // jQuery(slot).prepend('<button class="hx-keyboard-toggle btn btn-default" style="margin-right: 10px;">Toggle Keyboard Input</button>');
+
+    jQuery(document).on('click', 'a[class*="keyboard-toggle"]', function (evt) {
+      jQuery('#key-help').toggleClass('sr-only');
+      jQuery(this).toggleClass('selected');
+      jQuery(self.element).closest('main').animate({
+        scrollTop: jQuery(self.element).closest('main').scrollTop() + jQuery('#key-help').offset().top - 50
+      }); // if (jQuery(this).hasClass('selection-mode-on')) {
+      // self.turnSelectionModeOff();
+      //jQuery(this).removeClass('selection-mode-on');
+      // } else {
+      // self.turnSelectionModeOn();
+      //jQuery(this).addClass('selection-mode-on');
+      // }
+    });
+    jQuery(document).on('click', 'button[class*="make-annotation-button"]', function (evt) {
+      if (jQuery(this).hasClass('selection-mode-on')) {
+        self.turnSelectionModeOff();
+        jQuery(this).removeClass('selection-mode-on');
+      } else {
+        self.turnSelectionModeOn();
+        jQuery(this).addClass('selection-mode-on');
+      }
+    });
+    $.subscribeEvent('wysiwygOpened', self.instance_id, function (e) {
+      if (self.currentSelection) {
+        var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
+        jQuery('.note-editable.card-block').attr('aria-label', 'The quote you have selected is: <em>' + ser.text.exact + '</em>. You are now in a text box. Add your annotation.');
+      }
+    });
+    $.subscribeEvent('focusOnContext', self.instance_id, function (_, ann) {
+      self.addMarkers(ann.ranges);
+    });
+  };
+
+  $.KeyboardSelector.prototype.turnSelectionModeOn = function () {
+    this.saveHTML = this.element.innerHTML;
+    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
+
+    if (!toggleButton.hasClass('should-show')) {
+      toggleButton.click();
+    }
+
+    if (window.navigator.platform.indexOf('Mac') !== -1) {
+      jQuery('.sr-alert').html('Enter the text box until editing text (usually VoiceOver Keys + Down Arrow) then move around using arrow keys without VoiceOver keys held down.');
+    }
+
+    jQuery(this.element).attr('contenteditable', 'true');
+    jQuery(this.element).attr('role', 'textbox');
+    jQuery(this.element).attr('tabindex', "0");
+    jQuery(this.element).attr('aria-label', 'You are now in the text to be annotated. Mark selection with asterisks.');
+    jQuery(this.element).attr('aria-multiline', 'true');
+    jQuery(this.element).attr('accesskey', 't');
+    jQuery('.hx-selector-img').remove();
+    jQuery(this.element).on('keydown', jQuery.proxy(this.filterKeys, this));
+    jQuery(this.element).on('keyup', jQuery.proxy(this.setSelection, this));
+    this.start = undefined;
+    this.currentSelection = undefined;
+    this.element.innerHTML = this.saveHTML;
+    this.element.focus();
+  };
+
+  $.KeyboardSelector.prototype.turnSelectionModeOff = function () {
+    var self = this;
+    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
+
+    if (toggleButton.hasClass('should-show')) {
+      toggleButton.click();
+    }
+
+    jQuery(this.element).off('keydown');
+    jQuery(this.element).off('keyup');
+    jQuery(this.element).attr('contenteditable', 'false');
+    jQuery(this.element).attr('role', '');
+    jQuery(this.element).attr('tabindex', '');
+    jQuery(this.element).attr('aria-multiline', 'false');
+    jQuery(this.element).attr('outline', '0px');
+    jQuery('.hx-selector-img').remove();
+    this.start = undefined;
+    this.currentSelection = undefined;
+    setTimeout(function () {
+      self.element.blur();
+    }, 250);
+  };
+  /* Credit to Rich Caloggero
+   * https://github.com/RichCaloggero/annotator/blob/master/annotator.html
+   */
+
+
+  $.KeyboardSelector.prototype.filterKeys = function (keyPressed) {
+    var self = this;
+    var key = keyPressed.key || keypressed.keyCode;
+
+    switch (key) {
+      case self.delimiter:
+        return false;
+
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "Up":
+      case "Down":
+      case "Left":
+      case "Right":
+      case 37:
+      case 38:
+      case 39:
+      case 40:
+      case "Home":
+      case "End":
+      case "Tab":
+        return true;
+
+      case "Backspace":
+        if (self.verifyBackspace()) {
+          self.start = undefined;
+          return true;
+        }
+
+      case "Escape":
+        self.turnSelectionModeOff();
+        keyPressed.preventDefault();
+        jQuery('.sr-real-alert').html("Keyboard Selection Mode is off.");
+        return false;
+
+      case "2":
+        if (keyPressed.altKey || keyPressed.ctrlKey) {
+          jQuery('.sr-alert').html(jQuery('.sr-alert').html());
+        }
+
+        keyPressed.preventDefault();
+        return false;
+
+      case "3":
+        if (keyPressed.altKey || keyPressed.ctrlKey) {
+          var currVal = jQuery('.sr-alert').attr('aria-live');
+          var newVal = currVal == "off" ? 'polite' : 'off';
+          jQuery('.sr-alert').attr('aria-live', newVal);
+          var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
+          jQuery('.sr-real-alert').html(newAlert);
+        }
+
+        keyPressed.preventDefault();
+        return false;
+
+      default:
+        keyPressed.preventDefault();
+        return false;
+    } // switch
+
+  };
+
+  $.KeyboardSelector.prototype.getBoundingClientRect = function (range) {
+    var newRange = range.cloneRange();
+
+    try {
+      newRange.setStart(range.startContainer, range.startOffset);
+      newRange.setEnd(range.startContainer, range.startOffset + 1);
+      return {
+        top: newRange.getBoundingClientRect().top,
+        left: newRange.getBoundingClientRect().left
+      };
+    } catch (e) {
+      newRange.setStart(range.startContainer, range.startOffset - 1);
+      newRange.setEnd(range.startContainer, range.startOffset);
+      return {
+        top: newRange.getBoundingClientRect().top,
+        left: newRange.getBoundingClientRect().right
+      };
+    }
+  };
+
+  $.KeyboardSelector.prototype.setSelection = function (keyPressed) {
+    var self = this;
+    var key = keyPressed.key || keyPressed.keyCode;
+
+    switch (key) {
+      case self.delimiter:
+        if (!self.start || typeof self.start == "undefined") {
+          self.start = self.copySelection(getSelection());
+          var bcr = self.getBoundingClientRect(self.start); //console.log($.mouseFixedPositionFromRange(self.start), bcr, jQuery(window).scrollTop());
+
+          jQuery('body').append('<div class="hx-selector-img"></div>');
+          jQuery('.hx-selector-img').css({
+            top: bcr.top + jQuery(window).scrollTop() - 5,
+            left: bcr.left - 5
+          });
+          jQuery('.sr-alert').html();
+          jQuery('.sr-alert').html('Move to end of text to be annotated and press "*" again.');
+        } else {
+          var end = self.copySelection(getSelection());
+          jQuery('.hx-selector-img').remove(); //console.log("Found end", end);
+
+          if (self.currentSelection) {//console.log(hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl'), self.currentSelection.toString());
+          } else {
+            var end = self.copySelection(getSelection());
+            var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
+            var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
+            var boundingBox = undefined;
+            self.currentSelection = document.createRange();
+
+            if (posStart.startOffset < posEnd.startOffset) {
+              self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
+              self.currentSelection.setEnd(end.startContainer, end.startOffset);
+            } else {
+              self.currentSelection.setStart(end.startContainer, end.startOffset);
+              self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
+            }
+          }
+
+          boundingBox = {
+            top: self.currentSelection.getBoundingClientRect().top + jQuery(window).scrollTop() - 5,
+            left: self.currentSelection.getBoundingClientRect().left - 5
+          };
+          var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
+          jQuery('.sr-alert').html(''); //jQuery('.sr-alert').html('You are now in a text box. Add your annotation. The quote you have selected is: <em>' + ser.text.exact + "</em>");
+
+          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [ser], boundingBox]); //console.log("Active Element", document.activeElement.className);
+
+          if (document.activeElement.className.indexOf('note-editable') == -1) {
+            //console.log("BLURRING");
+            self.element.blur();
+          } else {
+            setTimeout(function () {
+              jQuery('.note-editable.card-block')[0].focus(); //console.log("should be focusing on", document.activeElement);
+            }, 250);
+          }
+
+          self.turnSelectionModeOff(); // var startComesAfter = self.startComesAfter(self.start, end);
+          // console.log("Found other", startComesAfter);
+          // self.start = startComesAfter[0];
+          // self.processSelection(startComesAfter[0], startComesAfter[1]);
+        }
+
+        break;
+
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "Up":
+      case "Down":
+      case "Left":
+      case "Right":
+      case 37:
+      case 38:
+      case 39:
+      case 40:
+        if (self.start) {
+          var end = self.copySelection(getSelection());
+          var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
+          var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
+          self.currentSelection = document.createRange();
+
+          if (posStart.startOffset < posEnd.startOffset) {
+            self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
+            self.currentSelection.setEnd(end.startContainer, end.startOffset);
+          } else {
+            self.currentSelection.setStart(end.startContainer, end.startOffset);
+            self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
+          } // console.log(self.start, end);
+          // console.log(self.currentSelection, self.currentSelection.toString());
+          // var sel = window.getSelection();
+          // sel.removeAllRanges();
+          // sel.addRange(self.currentSelection);
+
+        }
+
+    }
+  };
+
+  $.KeyboardSelector.prototype.copySelection = function (selection) {
+    // const sel = {
+    //     anchorNode: selection.anchorNode,
+    //     anchorOffset: selection.anchorOffset,
+    //     focusNode: selection.focusNode,
+    //     focusOffset: selection.focusOffset,
+    //     parentElement: selection.anchorNode.parentElement
+    // };
+    return selection.getRangeAt(0);
+  };
+
+  $.KeyboardSelector.prototype.processSelection = function (start, end) {
+    var self = this;
+    var s = getSelection(); //console.log("LOOK HERE", start, end);
+
+    var r = this.removeMarkers(start, end);
+    self.start = undefined; //console.log("R!", r);
+
+    try {
+      var boundingBox = r.end.parentElement.getBoundingClientRect();
+    } catch (e) {
+      var boundingBox = r.endContainer.parentElement.getBoundingClientRect();
+    } //console.log(boundingBox);
+    // publish selection made
+
+
+    Hxighlighter.publishEvent('TargetSelectionMade', this.instance_id, [this.element, [hrange.serializeRange(r, self.element, 'annotator-hl')], boundingBox]); //console.log("Element Focused", document.activeElement);
+
+    if (document.activeElement.className.indexOf('note-editable') == -1) {
+      self.element.blur();
+    }
+
+    self.turnSelectionModeOff(); // this.element.focus();
+  };
+
+  $.KeyboardSelector.prototype.startComesAfter = function (start, end) {
+    if (start.anchorNode == end.anchorNode) {
+      if (start.anchorOffset > end.anchorOffset) {
+        start.anchorOffset += 1;
+        return [end, start];
+      } else {
+        return [start, end];
+      }
+    } // TODO: Handle other use cases (i.e. starting several nodes instead of within the same one)
+
+
+    var commonAncestor = this.getCommonAncestor(start.anchorNode, end.anchorNode);
+    var children = jQuery(commonAncestor).children();
+    var startCounter = 0;
+    jQuery.each(children, function (_, el) {
+      if (el == start.parentElement) {
+        startCounter += start.anchorOffset;
+        return false;
+      } else {
+        startCounter += jQuery(el).text().length;
+      }
+    });
+    var endCounter = 0;
+    jQuery.each(children, function (_, el) {
+      if (el == end.parentElement) {
+        endCounter += end.anchorOffset;
+        return false;
+      } else {
+        endCounter += jQuery(el).text().length;
+      }
+    });
+
+    if (startCounter > endCounter) {
+      return [end, start];
+    } else {
+      return [start, end];
+    }
+  };
+  /**
+   * Gets the common ancestor.
+   * Credit: https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
+   *
+   * @param      {<type>}  a       { parameter_description }
+   * @param      {<type>}  b       { parameter_description }
+   * @return     {Object}  The common ancestor.
+   */
+
+
+  $.KeyboardSelector.prototype.getCommonAncestor = function (a, b) {
+    $parentsa = jQuery(a).parents();
+    $parentsb = jQuery(b).parents();
+    var found = null;
+    $parentsa.each(function () {
+      var thisa = this;
+      $parentsb.each(function () {
+        if (thisa == this) {
+          found = this;
+          return false;
+        }
+      });
+      if (found) return false;
+    });
+    return found;
+  };
+
+  $.KeyboardSelector.prototype.removeMarkers = function (start, end) {
+    var self = this;
+    var _start = start.anchorNode;
+
+    var _startOffset = start.anchorOffset - 1;
+
+    var _end = end.anchorNode;
+
+    var _endOffset = end.anchorOffset - 1; //console.log(_start, _startOffset, _end, _endOffset);
+
+
+    var t2 = this.removeCharacter(_end.textContent, _endOffset);
+    _end.textContent = t2;
+    var t1 = this.removeCharacter(_start.textContent, _startOffset);
+    _start.textContent = t1;
+    var r = document.createRange();
+    r.setStart(_start, _startOffset);
+    var realRange = {
+      startContainer: _start,
+      startOffset: _startOffset,
+      endContainer: _end
+    };
+
+    if (start.anchorNode === end.anchorNode) {
+      realRange['endOffset'] = _endOffset - 1;
+      r.setEnd(_start, _endOffset - 1);
+    } else {
+      realRange['endOffset'] = _endOffset;
+      r.setEnd(_start, _endOffset);
+    } // getting common ancestors
+    // lonesomeday @ https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
+
+
+    realRange['commonAncestorContainer'] = jQuery(_start).parents().has(_end).first()[0];
+    realRange['exact'] = [r.toString()];
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r); // convert to xpath and then back to a range
+    // var sR = hrange.serializeRange(r, self.element, 'annotator-hl');
+    //var nR = hrange.normalizeRange(sR, self.element, 'annotator-hl');
+    // console.log(sR, nR);
+
+    return r;
+  };
+
+  $.KeyboardSelector.prototype.addMarkers = function (ranges) {
+    console.log(ranges);
+  };
+
+  $.KeyboardSelector.prototype.removeCharacter = function (s, offset) {
+    if (offset === 0) {
+      s = s.slice(1);
+    } else if (offset === s.length - 1) {
+      s = s.slice(0, -1);
+    } else {
+      s = s.slice(0, offset) + s.slice(offset + 1);
+    }
+
+    return s;
+  };
+
+  $.KeyboardSelector.prototype.verifyBackspace = function () {
+    var s = getSelection();
+    var r = document.createRange();
+    var startOffset = s.anchorOffset;
+
+    if (startOffset > 0) {
+      startOffset -= 1;
+    }
+
+    r.setStart(s.anchorNode, startOffset);
+    r.setEnd(s.anchorNode, startOffset + 1);
+    return r.toString() == this.delimiter;
+  };
+
+  $.selectors.push($.KeyboardSelector);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Toggle Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(48);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.ToggleAnnotations = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.on = true;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.ToggleAnnotations.prototype.init = function () {
+    var self = this;
+    self.setUpButton();
+  };
+
+  $.ToggleAnnotations.prototype.setUpButton = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
+    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
+      var toggleButton = jQuery(this);
+
+      if (!toggleButton.hasClass('should-show')) {
+        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
+          self.tempAnnotationList = annList;
+          self.on = false;
+          toggleButton.addClass('should-show');
+        }]);
+      } else {
+        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+          self.tempAnnotationList = [];
+          self.on = true;
+          toggleButton.removeClass('should-show');
+        }]);
+      }
+    });
+  };
+
+  $.ToggleAnnotations.prototype.editorShown = function () {
+    var self = this;
+
+    if (!self.on) {
+      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+        self.tempAnnotationList = [];
+        self.on = true;
+        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
+      }]);
+    }
+  };
+
+  $.ToggleAnnotations.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.ToggleAnnotations, 'name', {
+    value: "ToggleAnnotations"
+  });
+  $.plugins.push($.ToggleAnnotations);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  DisplayResize Annotations Plugin
+ *  
+ *
+ */
+var annotator = annotator ? annotator : __webpack_require__(5); //uncomment to add css file
+
+__webpack_require__(50);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.DisplayResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    self.itemStretching = false;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.DisplayResize.prototype.init = function () {
+    var self = this;
+    self.setUpListeners();
+  };
+
+  $.DisplayResize.prototype.setUpListeners = function () {
+    var self = this;
+    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
+      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
+        self.prepareToStretch(event);
+      });
+      jQuery(self.options.slot).on('mousemove', function (event) {
+        self.stretch(event);
+
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
+        }
+      });
+      jQuery(self.options.slot).on('mouseup', function (event) {
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
+        }
+
+        self.finishedStretching(event);
+      });
+      jQuery(self.options.slot).on('mouseleave', function (event) {
+        self.finishedStretching(event);
+      });
+    });
+  };
+
+  $.DisplayResize.prototype.prepareToStretch = function (event) {
+    var self = this;
+    self.itemStretching = true;
+    $.pauseEvent(event);
+    self.initialPoint = annotator.util.mousePosition(event);
+    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
+  };
+
+  $.DisplayResize.prototype.stretch = function (event) {
+    var self = this;
+
+    if (self.itemStretching) {
+      var newPoint = annotator.util.mousePosition(event);
+      var diff = newPoint.top - self.initialPoint.top;
+      var newHeight = self.initialHeight + diff;
+      var innerHeight = self.initialHeight + diff - 30;
+      self.currentViewer.css('height', newHeight);
+      self.currentViewer.find('.annotation-text-field').css({
+        'max-height': innerHeight,
+        'height': innerHeight
+      });
+    }
+  };
+
+  $.DisplayResize.prototype.finishedStretching = function (event) {
+    var self = this;
+    self.itemStretching = false;
+  };
+
+  $.DisplayResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
+    var self = this;
+
+    if (Array.isArray(annotations)) {
+      self.currentViewer = jQuery(viewer);
+    }
+  };
+
+  Object.defineProperty($.DisplayResize, 'name', {
+    value: "DisplayResize"
+  });
+  $.plugins.push($.DisplayResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  SidebarTagTokens Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(52);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.SidebarTagTokens = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.SidebarTagTokens.prototype.init = function () {
+    var self = this; // console.log(this);
+
+    var search_button = jQuery('.btn.user-filter#search');
+    search_button.click(function () {
+      self.removeTokens();
+      setTimeout(function () {
+        self.setUpTokens();
+      }, 250);
+    });
+    jQuery('.search-bar.side #search-submit').click(function () {
+      jQuery('.tag-token-tag').removeClass('active');
+    });
+    jQuery('.search-bar.side #search-clear').click(function () {
+      jQuery('.tag-token-tag').removeClass('active');
+    });
+    jQuery('.annotationSection.side').on('click', '.tag-token-tag', function () {
+      if (jQuery(this).hasClass('active')) {
+        jQuery('.tag-token-tag').removeClass('active');
+        jQuery('.search-bar.side #search-clear').trigger('click');
+      } else {
+        jQuery('.tag-token-tag').removeClass('active');
+        var tagFound = jQuery(this).html().trim();
+        $.publishEvent('searchTag', self.instanceID, [tagFound]);
+        jQuery('.search-bar #srch-term').val(tagFound);
+        jQuery('.search-bar select').val('Tag');
+        jQuery(this).addClass('active');
+      }
+    });
+    self.setUpListeners();
+  };
+
+  $.SidebarTagTokens.prototype.removeTokens = function () {
+    jQuery('.tag-token-list').remove();
+  };
+
+  $.SidebarTagTokens.prototype.setUpTokens = function () {
+    var self = this;
+    var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
+    self.options.tagList.forEach(function (tag) {
+      tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
+    });
+    tokenHTML += "</div>";
+    jQuery('.search-bar.side').after(tokenHTML);
+  };
+
+  $.SidebarTagTokens.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.SidebarTagTokens.prototype.setUpListeners = function () {
+    var self = this;
+    $.subscribeEvent('searchSelected', self.instanceID, function () {
+      setTimeout(function () {
+        self.setUpTokens();
+      }, 250);
+    });
+  };
+
+  Object.defineProperty($.SidebarTagTokens, 'name', {
+    value: "SidebarTagTokens"
+  });
+  $.plugins.push($.SidebarTagTokens);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  AdminButton Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(54);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.AdminButton = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.AdminButton.prototype.init = function () {
+    var self = this;
+    console.log("here");
+
+    if (self.options.AdminButton) {
+      self.url = self.options.AdminButton.homeURL;
+      self.allowed = self.options.AdminButton.has_staff_permissions;
+      console.log(self.url, self.allowed);
+
+      if (self.allowed && self.url && self.url != '') {
+        self.setUpButtons();
+      } else {
+        jQuery(self.options.slot).before('<div class="sidebar-navbar"></div>');
+      }
+    }
+  };
+
+  $.AdminButton.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" title="Admin Hub" aria-label="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
+  };
+
+  $.AdminButton.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.AdminButton, 'name', {
+    value: "AdminButton"
+  });
+  $.plugins.push($.AdminButton);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  HxPermissions Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+//require('./filaname.css');
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.HxPermissions = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.HxPermissions.prototype.init = function () {
+    var self = this;
+  };
+
+  $.HxPermissions.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.HxPermissions.prototype.editorShown = function (editor, annotation) {// console.log(annotation.permissions, self.options.user_id, editor);
+  };
+
+  $.HxPermissions.prototype.displayShown = function (display, annotation) {
+    var self = this;
+
+    if (Array.isArray(annotation)) {
+      annotation.forEach(function (ann) {
+        self.removeWithoutPermission(ann, display);
+      });
+    } else {
+      self.removeWithoutPermission(annotation, display);
+    } // console.log(annotation.permissions, self.options.user_id, display);
+
+  };
+
+  $.HxPermissions.prototype.removeWithoutPermission = function (ann, loc) {
+    var self = this;
+
+    if (!ann.permissions) {
+      // either permissions are not turned on or the annotation is fresh and person must have just made it.
+      return;
+    } // hide edit if the person does not have can_update permissions
+
+
+    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
+      loc.find('#edit-' + ann.id).remove();
+    } // hide delete if the person does not have can_delete permissions
+
+
+    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
+      loc.find('#delete-' + ann.id).remove();
+    }
+  };
+
+  Object.defineProperty($.HxPermissions, 'name', {
+    value: "HxPermissions"
+  });
+  $.plugins.push($.HxPermissions);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  HxAlert Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(57);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.HxAlert = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.HxAlert.prototype.init = function () {
+    var self = this; //console.log("Alert options", self.options);
+
+    self.defaultOptions = {
+      buttons: [{
+        title: 'OK',
+        action: function action() {
+          self.current_alert.remove();
+        }
+      }, {
+        title: 'Cancel',
+        action: function action() {
+          self.current_alert.remove();
+        }
+      }],
+      time: 0,
+      // 0 = unlimited, 1 = 1 second, 2 = 2 seconds, ... etc.
+      modal: false
+    };
+    jQuery('body').on('click', '.hx-notify .hx-notify-button.hx-close', function () {
+      self.current_alert.removeClass('opened');
+      setTimeout(function () {
+        self.current_alert.remove();
+      }, 1000);
+    });
+    $.subscribeEvent('HxAlert', self.instanceID, function (_, message, options) {
+      var theseOptions = jQuery.extend({}, self.defaultOptions, options);
+      constructedAlert = self.createNotification(message, theseOptions.modal, theseOptions.buttons);
+      jQuery('body').append(constructedAlert); // if (theseOptions.modal) {
+      //     self.current_alert = jQuery('.hx-modal');
+      // } else {
+
+      self.current_alert = jQuery('.hx-notify');
+      jQuery.each(self.current_alert.find('button'), function (idx, but) {
+        if (jQuery(but).hasClass('hx-close')) {
+          return;
+        }
+
+        var currTitle = jQuery(but).html().trim();
+        var onclick = theseOptions.buttons.find(function (b) {
+          if (b.title == currTitle) {
+            return b;
+          }
+        }).action;
+        jQuery(but).on('click', onclick);
+      });
+      setTimeout(function () {
+        self.current_alert.addClass('opened');
+      }, 500); // }
+
+      if (theseOptions.time !== 0) {
+        setTimeout(function () {
+          self.current_alert.removeClass('opened');
+        }, theseOptions.time * 1000);
+        setTimeout(function () {
+          self.current_alert.remove();
+        }, (theseOptions.time + 1) * 1000);
+      }
+
+      return;
+    });
+  };
+
+  $.HxAlert.prototype.createNotification = function (message, isModal, buttons) {
+    var buttonsHTML = "<button class='hx-notify-button hx-close'><span class='fa fa-close'></span></button>";
+
+    if (buttons.length > 0) {
+      buttonsHTML = "";
+      buttons.forEach(function (b) {
+        buttonsHTML += "<button class='hx-notify-button'>" + b.title + "</button>";
+      });
+    }
+
+    var notificationHTML = "<div class='hx-notify'>" + message + "<div class='hx-notify-button-group'>" + buttonsHTML + "</div></div>";
+    jQuery('.sr-real-alert').html(message); // if (isModal) {
+    //     notificationHTML = "<div class='hx-modal'>" + notificationHTML + "</div>";
+    // }
+
+    return notificationHTML;
+  };
+
+  $.HxAlert.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.HxAlert, 'name', {
+    value: "HxAlert"
+  });
+  $.plugins.push($.HxAlert);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ * 
+ */
+(function ($) {
+  /**
+   * Sets up components for Hxighlighte Core isntance
+   *
+   * @class      Core (name)
+   * @param      {Object}  options  The options
+   * @param      {string}  inst_id  The instance identifier
+   */
+  $.Core = function (options, inst_id) {
+    // options and instance ids are saved
+    this.options = options;
+    this.instance_id = inst_id; // keeps track of viewer/plugin modules for UI
+
+    this.viewers = [];
+    this.disabledViewers = [];
+    this.plugins = [];
+    this.disabledPlugins = []; // keeps track of annotations and storage modules for backend
+
+    this.annotations = [];
+    this.storage = [];
+    this.disabledStorage = []; // keeps track of object(s) being annotated
+
+    this.targets = []; // initializes tool
+
+    this.init();
+  };
+  /**
+   * initializer of core and its components
+   */
+
+
+  $.Core.prototype.init = function () {
+    this.setUpTargets();
+    this.setUpViewers(); // this.setUpListeners();
+    //this.setUpStorage();
+    // this.setUpPlugins();
+  };
+  /**
+   * sets up targets to be annotated
+   */
+
+
+  $.Core.prototype.setUpTargets = function () {
+    var targets = this.options.targets;
+
+    for (var i = 0; i < targets.length; i++) {
+      var mediaType = $.Core._capitalizeMedia(targets[i].mediaType) + "Target";
+
+      if (typeof Hxighlighter[mediaType] === "function") {
+        this.targets.push(new Hxighlighter[mediaType](jQuery.extend({}, targets[i], this.options.commonInfo), this.instance_id));
+      }
+    }
+  };
+
+  $.Core.prototype.setUpViewers = function () {};
+
+  $.Core.prototype.TargetSelectionMade = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetSelectionMade', [message[1], message[2]]);
+  };
+
+  $.Core.prototype.TargetAnnotationDraw = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
+  };
+
+  $.Core.prototype.ViewerEditorOpen = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerEditorOpen', message);
+  };
+
+  $.Core.prototype.ViewerDisplayOpen = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerDisplayOpen', message);
+  };
+
+  $.Core.prototype.ViewerEditorClose = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerEditorClose', message);
+  };
+
+  $.Core.prototype.ViewerDisplayClose = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'ViewerDisplayClose', message);
+  };
+
+  $.Core.prototype.StorageAnnotationSave = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationSave', message);
+  };
+
+  $.Core.prototype.StorageAnnotationDelete = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationDelete', message);
+  };
+
+  $.Core.prototype.StorageAnnotationLoad = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'StorageAnnotationLoad', message);
+  }; // $.Core.prototype.StorageAnnotationGetReplies = function(message) {
+  //     var self = this;
+  //     self.callFuncInList(this.targets, 'StorageAnnotationGetReplies', message);
+  // };
+
+
+  $.Core.prototype.StorageAnnotationSearch = function (message) {
+    var self = this; //console.log('Received here');
+
+    self.callFuncInList(this.targets, 'StorageAnnotationSearch', message);
+  }; // Util functions
+
+
+  $.Core.prototype.callFuncInList = function (objectList, funcName, params) {
+    var self = this;
+    jQuery.each(objectList, function (_, component) {
+      if (typeof component[funcName] === "function") {
+        component[funcName].apply(component, params);
+      }
+    });
+  };
+
+  $.Core._capitalizeMedia = function (media) {
+    var editedMedia = Hxighlighter.trim(media);
+    editedMedia = editedMedia.toLowerCase();
+    return editedMedia.charAt(0).toUpperCase() + editedMedia.slice(1);
+  };
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(60);
+
+
+/***/ }),
+/* 60 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(13);
+/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
+/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
+/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(16);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+ // vendors
+
+__webpack_require__(17);
+
+__webpack_require__(18); // common Hxighlighter object
+
+
+__webpack_require__(1);
+
+__webpack_require__(20);
+
+__webpack_require__(61);
+
+__webpack_require__(65);
+
+__webpack_require__(67);
+
+__webpack_require__(21);
+
+__webpack_require__(69);
+
+__webpack_require__(58);
+
+__webpack_require__(70);
+
+/***/ }),
+/* 61 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/**
+ *  Reply Plugin
+ *  
+ *
+ */
+__webpack_require__(12);
+
+__webpack_require__(62);
+
+__webpack_require__(64);
+
+
+
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.Reply = function (options, instanceID) {
+    this.options = jQuery.extend({
+      height: 70,
+      focus: true,
+      width: 356,
+      dialogsInBody: true,
+      // airMode: true,
+      placeholder: "Reply to annotation...",
+      toolbar: [['font', ['bold', 'italic', 'underline', 'link']]]
+    }, options);
+    this.init();
+    this.instanceID = instanceID;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.Reply.prototype.init = function () {
+    // warns dev that they forgot to include summernote.js
+    if (_typeof(jQuery.summernote) !== "object") {
+      console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
+    }
+
+    this.annotationListeners();
+  };
+  /**
+   * 
+   * @param element {HTMLElement} - where the annotation will be added
+   * @param selector {String} - selector to find input it is replacing
+   */
+
+
+  $.Reply.prototype.addWYSIWYG = function (element, selector) {
+    var self = this;
+
+    if (this.elementObj != undefined) {
+      return;
+    } // adds the summernote WYSIWIG to the editor to the selector's location
+
+
+    this.elementObj = element.find(selector);
+    var newOptions = jQuery.extend({}, this.options, {
+      'width': element.outerWidth() - 24
+    });
+    this.elementObj.summernote(newOptions); // removes summernote's ability to tab within the editor so users can tab through items
+
+    delete jQuery.summernote.options.keyMap.pc.TAB;
+    delete jQuery.summernote.options.keyMap.mac.TAB;
+  };
+  /**
+   * Returns the HTML value of the WYSIWYG. 
+   *
+   * @return     {String}  HTML value found in the WYSIWYG
+   */
+
+
+  $.Reply.prototype.returnValue = function () {
+    var result = this.elementObj.summernote('code');
+
+    if (result.indexOf('<script') >= 0) {
+      alert("I'm sorry Colin, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
+      return result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
+    }
+
+    return result;
+  };
+  /**
+   * Deletes the Summernote instance.
+   *
+   * @param      {HTMLElement}  element   The editor element
+   * @param      {String}  selector  The selector containing the area in the editor where to insert the WYSIWYG
+   */
+
+
+  $.Reply.prototype.destroy = function (element, selector) {
+    console.log(jQuery('.summernote').each(function () {
+      jQuery(this).summernote('destroy');
+    }));
+
+    if (this.elementObj) {
+      this.elementObj.val('');
+      this.elementObj.summernote('destroy');
+      this.elementObj = undefined;
+    }
+  }; // Annotation specific functions
+
+  /**
+   * Turns on the specific listeners when the plug in is initiated.
+   */
+
+
+  $.Reply.prototype.annotationListeners = function () {
+    var self = this;
+    $.subscribeEvent('displayHidden', self.instanceID, function () {
+      console.log('reached here, but nothing to destroy');
+      self.destroy();
+    });
+  };
+  /**
+   * Code to run just before the annotation is saved to storage
+   *
+   * @param      {Annotation}  annotation  The annotation as it currently is saved.
+   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
+   */
+
+
+  $.Reply.prototype.saving = function (annotation) {
+    return annotation;
+  };
+  /**
+   * Code that runs once the display is shown on screen.
+   *
+   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
+   * @param      {HTMLElement}  editor      The editor element
+   */
+
+
+  $.Reply.prototype.displayShown = function (viewer, annotations) {
+    var self = this;
+
+    if (Array.isArray(annotations)) {
+      jQuery.each(annotations, function (_, annotation) {
+        var ann_display = viewer.find('.item-' + annotation.id);
+        self.annotationShown(viewer.find('.item-' + annotation.id), annotation, false);
+      });
+    } else {
+      self.annotationShown(viewer, annotations, true);
+    }
+  };
+
+  $.Reply.prototype.annotationShown = function (viewer, annotation, isSidebar) {
+    var self = this;
+    var prefix = isSidebar ? "sidebar-" : "other-";
+    jQuery(viewer).find('.plugin-area-bottom').append('<div style="display: none;" class="reply-menu reply-menu-' + annotation.id + '"><button aria-label="Close Reply List" title="Close Reply List" class="close-list-reply"><span class="fa fa-times-circle"></span></button><button aria-label="Toggle Visual Order of Replies" title="Reverse Replies Order" class="sort-list-reply"><span class="fa fa-sort"></span></button></div><div class="reply-area-' + annotation.id + '"><button class="view-replies" style="display:none;" id="' + prefix + 'replies-' + annotation.id + '">View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies') + '</button><div class="' + prefix + 'reply-list" style="display:none;"></div><div class="create-reply-area" id="' + prefix + 'create-reply-area-' + annotation.id + '" style="display:none;"><textarea id="' + prefix + 'reply-textarea-' + annotation.id + '"></textarea><button id="' + prefix + 'save-reply-' + annotation.id + '">Save</button><button id="' + prefix + 'cancel-reply-' + annotation.id + '">Cancel</button></div><button class="create-reply" id="' + prefix + 'reply-' + annotation.id + '">Reply to Annotation</button></div>');
+
+    if ('totalReplies' in annotation && annotation.totalReplies > 0) {
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").show();
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").hide();
+    }
+
+    jQuery(viewer).find('.plugin-area-bottom #' + prefix + 'reply-' + annotation.id).click(function () {
+      if (jQuery('.note-editor.card').length > 0) {
+        return;
+      }
+
+      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).show();
+      self.addWYSIWYG(viewer, '#' + prefix + 'reply-textarea-' + annotation.id);
+      jQuery(this).hide();
+    });
+    jQuery(viewer).find('.plugin-area-bottom .reply-area-' + annotation.id + ' .view-replies').click(function () {
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").hide();
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").show();
+      jQuery(viewer).find('.' + prefix + 'reply-list').html('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
+      $.publishEvent('GetSpecificAnnotationData', self.instanceID, [annotation.id, function (ann) {
+        self.viewRepliesToAnnotation(ann, viewer, prefix);
+      }]);
+    });
+    jQuery(viewer).find('.plugin-area-bottom .reply-menu-' + annotation.id + ' .close-list-reply').click(function () {
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").show();
+      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").hide();
+      jQuery(viewer).find('.' + prefix + 'reply-list').hide();
+      jQuery(viewer).find('.reply-menu').hide();
+    });
+    jQuery(viewer).find('.plugin-area-bottom .reply-menu-' + annotation.id + ' .sort-list-reply').click(function () {
+      jQuery(viewer).find('.plugin-area-bottom .reply-area-' + annotation.id + ' div[class*=reply-list]').toggleClass('reversed');
+    });
+    jQuery('#' + prefix + 'cancel-reply-' + annotation.id).click(function () {
+      self.destroy();
+      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).hide();
+      jQuery('#' + prefix + 'reply-' + annotation.id).show();
+    });
+    jQuery('#' + prefix + 'save-reply-' + annotation.id).click(function () {
+      var result = self.elementObj.summernote('code');
+
+      if (result.indexOf('<script') >= 0) {
+        alert('content contains javascript code that will be removed.');
+        result = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
+      }
+
+      var reply = {
+        annotationText: [result],
+        ranges: {
+          'type': 'Annotation',
+          'format': 'text/html',
+          'source': annotation.id
+        },
+        id: $.getUniqueId(),
+        exact: '',
+        created: new Date(),
+        media: 'comment',
+        creator: {
+          name: self.options.username,
+          id: self.options.user_id
+        }
+      };
+      $.publishEvent('StorageAnnotationSave', self.instanceID, [reply, false]);
+      annotation.totalReplies++;
+      typeof annotation.replies == "undefined" ? annotation.replies = [reply] : annotation.replies.push(reply);
+
+      annotation._local.highlights.forEach(function (high) {
+        jQuery(high).data('annotation', annotation);
+      });
+
+      self.addReplyToViewer(viewer, reply, prefix, annotation);
+      self.destroy();
+
+      if (prefix === "other-") {
+        if (jQuery('.ann-item.item-' + annotation.id + ' .create-reply').length === 2) {
+          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
+          jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').hide();
+          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').show();
+          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
+          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
+        }
+
+        jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
+      } else {
+        if (jQuery('.ann-item.item-' + annotation.id + ' .create-reply').length === 2) {
+          jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
+          jQuery('.floating.ann-item.item-' + annotation.id + ' .create-reply').hide();
+          jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').show();
+          jQuery('.floating.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
+          jQuery('.floating.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
+        }
+
+        jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
+      }
+
+      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).hide();
+      jQuery(viewer).find('.create-reply').show();
+      jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').show();
+      jQuery(viewer).find('.plugin-area-bottom .reply-menu').show(); //jQuery('.ann-item.item-'+annotation.id+' div[class*=reply-list]').show();
+    });
+  };
+
+  $.Reply.prototype.viewRepliesToAnnotation = function (annotation, viewer, prefix) {
+    var self = this;
+
+    if (annotation.totalReplies > 0) {
+      if (annotation.replies && annotation.totalReplies == annotation.replies.length) {
+        annotation.replies.forEach(function (rep) {
+          self.addReplyToViewer(viewer, rep, prefix, annotation);
+        });
+        jQuery('.loading-obj').remove();
+      } else {
+        self.retrieveRepliesForAnnotation(annotation, viewer, prefix);
+      }
+    }
+
+    jQuery(viewer).find('.' + prefix + 'reply-list').show();
+    jQuery(viewer).find('.reply-menu').show();
+  };
+
+  $.Reply.prototype.retrieveRepliesForAnnotation = function (annotation, viewer, prefix) {
+    var self = this;
+    $.publishEvent('StorageAnnotationSearch', self.instanceID, [{
+      'source_id': annotation.id,
+      'media': 'Annotation'
+    }, function (results, converter) {
+      jQuery('.loading-obj').remove();
+      results.rows.reverse().forEach(function (reply) {
+        var rep = converter(reply);
+        self.addReplyToViewer(viewer, rep, prefix, annotation);
+        annotation.replies ? annotation.replies.push(rep) : annotation.replies = [rep];
+      });
+
+      if (annotation.totalReplies !== results.rows.length) {
+        annotation.totalReplies = results.rows.length;
+      }
+
+      annotation._local.highlights.forEach(function (high) {
+        jQuery(high).data('annotation', annotation);
+      });
+    }, function () {}]);
+  };
+
+  $.Reply.prototype.addReplyToViewer = function (viewer, reply, prefix, annotation) {
+    var self = this;
+    console.log(annotation, self.options);
+    var delete_option = '';
+
+    if (self.options.HxPermissions && self.options.HxPermissions.has_staff_permissions || annotation.permissions && annotation.permissions.can_delete && annotation.permissions.can_delete.indexOf(self.options.user_id) > -1) {
+      delete_option = "<button aria-label='delete reply' title='Delete Reply' class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button>";
+    }
+
+    jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').append("<div class='reply reply-item-" + reply.id + "'>" + delete_option + "<strong>" + reply.creator.name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
+    jQuery('.reply.reply-item-' + reply.id + ' .delete-reply').confirm({
+      'title': 'Delete Reply?',
+      'content': 'Would you like to delete your reply? This is permanent.',
+      'buttons': {
+        confirm: function confirm() {
+          $.publishEvent('StorageAnnotationDelete', self.instanceID, [reply]);
+          annotation.replies = annotation.replies.filter(function (ann) {
+            if (ann.id !== reply.id) {
+              return ann;
+            }
+          });
+          annotation.totalReplies--;
+
+          annotation._local.highlights.forEach(function (high) {
+            jQuery(high).data('annotation', annotation);
+          });
+
+          jQuery('.reply.reply-item-' + reply.id).remove();
+          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
+
+          if (annotation.totalReplies == 0) {
+            jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').show();
+            jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').hide();
+          } else {
+            jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').hide();
+            jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').show();
+          }
+
+          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
+          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
+        },
+        cancel: function cancel() {}
+      }
+    });
+  };
+
+  $.Reply.prototype.pluralize = function (num, singular, plural) {
+    return num == 1 ? '1 ' + singular : num + ' ' + plural;
+  };
+
+  Object.defineProperty($.Reply, 'name', {
+    value: "Reply"
+  });
+  $.plugins.push($.Reply);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function($) {/**
  * Super simple wysiwyg editor v0.8.9
  * https://summernote.org
@@ -31914,7 +37462,7 @@ var editor = renderer.create('<div class="note-editor note-frame card"/>');
 var toolbar = renderer.create('<div class="note-toolbar-wrapper"><div class="note-toolbar card-header"></div></div>');
 var editingArea = renderer.create('<div class="note-editing-area"/>');
 var codable = renderer.create('<textarea class="note-codable"/>');
-var editable = renderer.create('<div class="note-editable card-block" contentEditable="true"/>');
+var editable = renderer.create('<div class="note-editable card-block" aria-label="Add annotation text" contentEditable="true"/>');
 var statusbar = renderer.create([
     '<div class="note-statusbar">',
     '  <div class="note-resizebar">',
@@ -32047,7 +37595,9 @@ var ui = {
         return renderer.create('<button type="button" class="note-btn btn btn-light btn-sm" tabindex="-1">', function ($node, options) {
             if (options && options.tooltip) {
                 $node.attr({
-                    title: options.tooltip
+                    title: options.tooltip,
+                    "aria-label": options.tooltip,
+                    role: "button"
                 }).tooltip({
                     container: options.container,
                     trigger: 'hover',
@@ -32452,7 +38002,7 @@ var lists = {
     unique: unique
 };
 
-var isSupportAmd =  true && __webpack_require__(22); // eslint-disable-line
+var isSupportAmd =  true && __webpack_require__(63); // eslint-disable-line
 /**
  * returns whether font is installed or not.
  *
@@ -39110,5442 +44660,13 @@ $$1.summernote = $$1.extend($$1.summernote, {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/*!
- * Bootstrap v3.4.1 (https://getbootstrap.com/)
- * Copyright 2011-2019 Twitter, Inc.
- * Licensed under the MIT license
- */
-if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires jQuery");!function(t){"use strict";var e=jQuery.fn.jquery.split(" ")[0].split(".");if(e[0]<2&&e[1]<9||1==e[0]&&9==e[1]&&e[2]<1||3<e[0])throw new Error("Bootstrap's JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4")}(),function(n){"use strict";n.fn.emulateTransitionEnd=function(t){var e=!1,i=this;n(this).one("bsTransitionEnd",function(){e=!0});return setTimeout(function(){e||n(i).trigger(n.support.transition.end)},t),this},n(function(){n.support.transition=function o(){var t=document.createElement("bootstrap"),e={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"};for(var i in e)if(t.style[i]!==undefined)return{end:e[i]};return!1}(),n.support.transition&&(n.event.special.bsTransitionEnd={bindType:n.support.transition.end,delegateType:n.support.transition.end,handle:function(t){if(n(t.target).is(this))return t.handleObj.handler.apply(this,arguments)}})})}(jQuery),function(s){"use strict";var e='[data-dismiss="alert"]',a=function(t){s(t).on("click",e,this.close)};a.VERSION="3.4.1",a.TRANSITION_DURATION=150,a.prototype.close=function(t){var e=s(this),i=e.attr("data-target");i||(i=(i=e.attr("href"))&&i.replace(/.*(?=#[^\s]*$)/,"")),i="#"===i?[]:i;var o=s(document).find(i);function n(){o.detach().trigger("closed.bs.alert").remove()}t&&t.preventDefault(),o.length||(o=e.closest(".alert")),o.trigger(t=s.Event("close.bs.alert")),t.isDefaultPrevented()||(o.removeClass("in"),s.support.transition&&o.hasClass("fade")?o.one("bsTransitionEnd",n).emulateTransitionEnd(a.TRANSITION_DURATION):n())};var t=s.fn.alert;s.fn.alert=function o(i){return this.each(function(){var t=s(this),e=t.data("bs.alert");e||t.data("bs.alert",e=new a(this)),"string"==typeof i&&e[i].call(t)})},s.fn.alert.Constructor=a,s.fn.alert.noConflict=function(){return s.fn.alert=t,this},s(document).on("click.bs.alert.data-api",e,a.prototype.close)}(jQuery),function(s){"use strict";var n=function(t,e){this.$element=s(t),this.options=s.extend({},n.DEFAULTS,e),this.isLoading=!1};function i(o){return this.each(function(){var t=s(this),e=t.data("bs.button"),i="object"==typeof o&&o;e||t.data("bs.button",e=new n(this,i)),"toggle"==o?e.toggle():o&&e.setState(o)})}n.VERSION="3.4.1",n.DEFAULTS={loadingText:"loading..."},n.prototype.setState=function(t){var e="disabled",i=this.$element,o=i.is("input")?"val":"html",n=i.data();t+="Text",null==n.resetText&&i.data("resetText",i[o]()),setTimeout(s.proxy(function(){i[o](null==n[t]?this.options[t]:n[t]),"loadingText"==t?(this.isLoading=!0,i.addClass(e).attr(e,e).prop(e,!0)):this.isLoading&&(this.isLoading=!1,i.removeClass(e).removeAttr(e).prop(e,!1))},this),0)},n.prototype.toggle=function(){var t=!0,e=this.$element.closest('[data-toggle="buttons"]');if(e.length){var i=this.$element.find("input");"radio"==i.prop("type")?(i.prop("checked")&&(t=!1),e.find(".active").removeClass("active"),this.$element.addClass("active")):"checkbox"==i.prop("type")&&(i.prop("checked")!==this.$element.hasClass("active")&&(t=!1),this.$element.toggleClass("active")),i.prop("checked",this.$element.hasClass("active")),t&&i.trigger("change")}else this.$element.attr("aria-pressed",!this.$element.hasClass("active")),this.$element.toggleClass("active")};var t=s.fn.button;s.fn.button=i,s.fn.button.Constructor=n,s.fn.button.noConflict=function(){return s.fn.button=t,this},s(document).on("click.bs.button.data-api",'[data-toggle^="button"]',function(t){var e=s(t.target).closest(".btn");i.call(e,"toggle"),s(t.target).is('input[type="radio"], input[type="checkbox"]')||(t.preventDefault(),e.is("input,button")?e.trigger("focus"):e.find("input:visible,button:visible").first().trigger("focus"))}).on("focus.bs.button.data-api blur.bs.button.data-api",'[data-toggle^="button"]',function(t){s(t.target).closest(".btn").toggleClass("focus",/^focus(in)?$/.test(t.type))})}(jQuery),function(p){"use strict";var c=function(t,e){this.$element=p(t),this.$indicators=this.$element.find(".carousel-indicators"),this.options=e,this.paused=null,this.sliding=null,this.interval=null,this.$active=null,this.$items=null,this.options.keyboard&&this.$element.on("keydown.bs.carousel",p.proxy(this.keydown,this)),"hover"==this.options.pause&&!("ontouchstart"in document.documentElement)&&this.$element.on("mouseenter.bs.carousel",p.proxy(this.pause,this)).on("mouseleave.bs.carousel",p.proxy(this.cycle,this))};function r(n){return this.each(function(){var t=p(this),e=t.data("bs.carousel"),i=p.extend({},c.DEFAULTS,t.data(),"object"==typeof n&&n),o="string"==typeof n?n:i.slide;e||t.data("bs.carousel",e=new c(this,i)),"number"==typeof n?e.to(n):o?e[o]():i.interval&&e.pause().cycle()})}c.VERSION="3.4.1",c.TRANSITION_DURATION=600,c.DEFAULTS={interval:5e3,pause:"hover",wrap:!0,keyboard:!0},c.prototype.keydown=function(t){if(!/input|textarea/i.test(t.target.tagName)){switch(t.which){case 37:this.prev();break;case 39:this.next();break;default:return}t.preventDefault()}},c.prototype.cycle=function(t){return t||(this.paused=!1),this.interval&&clearInterval(this.interval),this.options.interval&&!this.paused&&(this.interval=setInterval(p.proxy(this.next,this),this.options.interval)),this},c.prototype.getItemIndex=function(t){return this.$items=t.parent().children(".item"),this.$items.index(t||this.$active)},c.prototype.getItemForDirection=function(t,e){var i=this.getItemIndex(e);if(("prev"==t&&0===i||"next"==t&&i==this.$items.length-1)&&!this.options.wrap)return e;var o=(i+("prev"==t?-1:1))%this.$items.length;return this.$items.eq(o)},c.prototype.to=function(t){var e=this,i=this.getItemIndex(this.$active=this.$element.find(".item.active"));if(!(t>this.$items.length-1||t<0))return this.sliding?this.$element.one("slid.bs.carousel",function(){e.to(t)}):i==t?this.pause().cycle():this.slide(i<t?"next":"prev",this.$items.eq(t))},c.prototype.pause=function(t){return t||(this.paused=!0),this.$element.find(".next, .prev").length&&p.support.transition&&(this.$element.trigger(p.support.transition.end),this.cycle(!0)),this.interval=clearInterval(this.interval),this},c.prototype.next=function(){if(!this.sliding)return this.slide("next")},c.prototype.prev=function(){if(!this.sliding)return this.slide("prev")},c.prototype.slide=function(t,e){var i=this.$element.find(".item.active"),o=e||this.getItemForDirection(t,i),n=this.interval,s="next"==t?"left":"right",a=this;if(o.hasClass("active"))return this.sliding=!1;var r=o[0],l=p.Event("slide.bs.carousel",{relatedTarget:r,direction:s});if(this.$element.trigger(l),!l.isDefaultPrevented()){if(this.sliding=!0,n&&this.pause(),this.$indicators.length){this.$indicators.find(".active").removeClass("active");var h=p(this.$indicators.children()[this.getItemIndex(o)]);h&&h.addClass("active")}var d=p.Event("slid.bs.carousel",{relatedTarget:r,direction:s});return p.support.transition&&this.$element.hasClass("slide")?(o.addClass(t),"object"==typeof o&&o.length&&o[0].offsetWidth,i.addClass(s),o.addClass(s),i.one("bsTransitionEnd",function(){o.removeClass([t,s].join(" ")).addClass("active"),i.removeClass(["active",s].join(" ")),a.sliding=!1,setTimeout(function(){a.$element.trigger(d)},0)}).emulateTransitionEnd(c.TRANSITION_DURATION)):(i.removeClass("active"),o.addClass("active"),this.sliding=!1,this.$element.trigger(d)),n&&this.cycle(),this}};var t=p.fn.carousel;p.fn.carousel=r,p.fn.carousel.Constructor=c,p.fn.carousel.noConflict=function(){return p.fn.carousel=t,this};var e=function(t){var e=p(this),i=e.attr("href");i&&(i=i.replace(/.*(?=#[^\s]+$)/,""));var o=e.attr("data-target")||i,n=p(document).find(o);if(n.hasClass("carousel")){var s=p.extend({},n.data(),e.data()),a=e.attr("data-slide-to");a&&(s.interval=!1),r.call(n,s),a&&n.data("bs.carousel").to(a),t.preventDefault()}};p(document).on("click.bs.carousel.data-api","[data-slide]",e).on("click.bs.carousel.data-api","[data-slide-to]",e),p(window).on("load",function(){p('[data-ride="carousel"]').each(function(){var t=p(this);r.call(t,t.data())})})}(jQuery),function(a){"use strict";var r=function(t,e){this.$element=a(t),this.options=a.extend({},r.DEFAULTS,e),this.$trigger=a('[data-toggle="collapse"][href="#'+t.id+'"],[data-toggle="collapse"][data-target="#'+t.id+'"]'),this.transitioning=null,this.options.parent?this.$parent=this.getParent():this.addAriaAndCollapsedClass(this.$element,this.$trigger),this.options.toggle&&this.toggle()};function n(t){var e,i=t.attr("data-target")||(e=t.attr("href"))&&e.replace(/.*(?=#[^\s]+$)/,"");return a(document).find(i)}function l(o){return this.each(function(){var t=a(this),e=t.data("bs.collapse"),i=a.extend({},r.DEFAULTS,t.data(),"object"==typeof o&&o);!e&&i.toggle&&/show|hide/.test(o)&&(i.toggle=!1),e||t.data("bs.collapse",e=new r(this,i)),"string"==typeof o&&e[o]()})}r.VERSION="3.4.1",r.TRANSITION_DURATION=350,r.DEFAULTS={toggle:!0},r.prototype.dimension=function(){return this.$element.hasClass("width")?"width":"height"},r.prototype.show=function(){if(!this.transitioning&&!this.$element.hasClass("in")){var t,e=this.$parent&&this.$parent.children(".panel").children(".in, .collapsing");if(!(e&&e.length&&(t=e.data("bs.collapse"))&&t.transitioning)){var i=a.Event("show.bs.collapse");if(this.$element.trigger(i),!i.isDefaultPrevented()){e&&e.length&&(l.call(e,"hide"),t||e.data("bs.collapse",null));var o=this.dimension();this.$element.removeClass("collapse").addClass("collapsing")[o](0).attr("aria-expanded",!0),this.$trigger.removeClass("collapsed").attr("aria-expanded",!0),this.transitioning=1;var n=function(){this.$element.removeClass("collapsing").addClass("collapse in")[o](""),this.transitioning=0,this.$element.trigger("shown.bs.collapse")};if(!a.support.transition)return n.call(this);var s=a.camelCase(["scroll",o].join("-"));this.$element.one("bsTransitionEnd",a.proxy(n,this)).emulateTransitionEnd(r.TRANSITION_DURATION)[o](this.$element[0][s])}}}},r.prototype.hide=function(){if(!this.transitioning&&this.$element.hasClass("in")){var t=a.Event("hide.bs.collapse");if(this.$element.trigger(t),!t.isDefaultPrevented()){var e=this.dimension();this.$element[e](this.$element[e]())[0].offsetHeight,this.$element.addClass("collapsing").removeClass("collapse in").attr("aria-expanded",!1),this.$trigger.addClass("collapsed").attr("aria-expanded",!1),this.transitioning=1;var i=function(){this.transitioning=0,this.$element.removeClass("collapsing").addClass("collapse").trigger("hidden.bs.collapse")};if(!a.support.transition)return i.call(this);this.$element[e](0).one("bsTransitionEnd",a.proxy(i,this)).emulateTransitionEnd(r.TRANSITION_DURATION)}}},r.prototype.toggle=function(){this[this.$element.hasClass("in")?"hide":"show"]()},r.prototype.getParent=function(){return a(document).find(this.options.parent).find('[data-toggle="collapse"][data-parent="'+this.options.parent+'"]').each(a.proxy(function(t,e){var i=a(e);this.addAriaAndCollapsedClass(n(i),i)},this)).end()},r.prototype.addAriaAndCollapsedClass=function(t,e){var i=t.hasClass("in");t.attr("aria-expanded",i),e.toggleClass("collapsed",!i).attr("aria-expanded",i)};var t=a.fn.collapse;a.fn.collapse=l,a.fn.collapse.Constructor=r,a.fn.collapse.noConflict=function(){return a.fn.collapse=t,this},a(document).on("click.bs.collapse.data-api",'[data-toggle="collapse"]',function(t){var e=a(this);e.attr("data-target")||t.preventDefault();var i=n(e),o=i.data("bs.collapse")?"toggle":e.data();l.call(i,o)})}(jQuery),function(a){"use strict";var r='[data-toggle="dropdown"]',o=function(t){a(t).on("click.bs.dropdown",this.toggle)};function l(t){var e=t.attr("data-target");e||(e=(e=t.attr("href"))&&/#[A-Za-z]/.test(e)&&e.replace(/.*(?=#[^\s]*$)/,""));var i="#"!==e?a(document).find(e):null;return i&&i.length?i:t.parent()}function s(o){o&&3===o.which||(a(".dropdown-backdrop").remove(),a(r).each(function(){var t=a(this),e=l(t),i={relatedTarget:this};e.hasClass("open")&&(o&&"click"==o.type&&/input|textarea/i.test(o.target.tagName)&&a.contains(e[0],o.target)||(e.trigger(o=a.Event("hide.bs.dropdown",i)),o.isDefaultPrevented()||(t.attr("aria-expanded","false"),e.removeClass("open").trigger(a.Event("hidden.bs.dropdown",i)))))}))}o.VERSION="3.4.1",o.prototype.toggle=function(t){var e=a(this);if(!e.is(".disabled, :disabled")){var i=l(e),o=i.hasClass("open");if(s(),!o){"ontouchstart"in document.documentElement&&!i.closest(".navbar-nav").length&&a(document.createElement("div")).addClass("dropdown-backdrop").insertAfter(a(this)).on("click",s);var n={relatedTarget:this};if(i.trigger(t=a.Event("show.bs.dropdown",n)),t.isDefaultPrevented())return;e.trigger("focus").attr("aria-expanded","true"),i.toggleClass("open").trigger(a.Event("shown.bs.dropdown",n))}return!1}},o.prototype.keydown=function(t){if(/(38|40|27|32)/.test(t.which)&&!/input|textarea/i.test(t.target.tagName)){var e=a(this);if(t.preventDefault(),t.stopPropagation(),!e.is(".disabled, :disabled")){var i=l(e),o=i.hasClass("open");if(!o&&27!=t.which||o&&27==t.which)return 27==t.which&&i.find(r).trigger("focus"),e.trigger("click");var n=i.find(".dropdown-menu li:not(.disabled):visible a");if(n.length){var s=n.index(t.target);38==t.which&&0<s&&s--,40==t.which&&s<n.length-1&&s++,~s||(s=0),n.eq(s).trigger("focus")}}}};var t=a.fn.dropdown;a.fn.dropdown=function e(i){return this.each(function(){var t=a(this),e=t.data("bs.dropdown");e||t.data("bs.dropdown",e=new o(this)),"string"==typeof i&&e[i].call(t)})},a.fn.dropdown.Constructor=o,a.fn.dropdown.noConflict=function(){return a.fn.dropdown=t,this},a(document).on("click.bs.dropdown.data-api",s).on("click.bs.dropdown.data-api",".dropdown form",function(t){t.stopPropagation()}).on("click.bs.dropdown.data-api",r,o.prototype.toggle).on("keydown.bs.dropdown.data-api",r,o.prototype.keydown).on("keydown.bs.dropdown.data-api",".dropdown-menu",o.prototype.keydown)}(jQuery),function(a){"use strict";var s=function(t,e){this.options=e,this.$body=a(document.body),this.$element=a(t),this.$dialog=this.$element.find(".modal-dialog"),this.$backdrop=null,this.isShown=null,this.originalBodyPad=null,this.scrollbarWidth=0,this.ignoreBackdropClick=!1,this.fixedContent=".navbar-fixed-top, .navbar-fixed-bottom",this.options.remote&&this.$element.find(".modal-content").load(this.options.remote,a.proxy(function(){this.$element.trigger("loaded.bs.modal")},this))};function r(o,n){return this.each(function(){var t=a(this),e=t.data("bs.modal"),i=a.extend({},s.DEFAULTS,t.data(),"object"==typeof o&&o);e||t.data("bs.modal",e=new s(this,i)),"string"==typeof o?e[o](n):i.show&&e.show(n)})}s.VERSION="3.4.1",s.TRANSITION_DURATION=300,s.BACKDROP_TRANSITION_DURATION=150,s.DEFAULTS={backdrop:!0,keyboard:!0,show:!0},s.prototype.toggle=function(t){return this.isShown?this.hide():this.show(t)},s.prototype.show=function(i){var o=this,t=a.Event("show.bs.modal",{relatedTarget:i});this.$element.trigger(t),this.isShown||t.isDefaultPrevented()||(this.isShown=!0,this.checkScrollbar(),this.setScrollbar(),this.$body.addClass("modal-open"),this.escape(),this.resize(),this.$element.on("click.dismiss.bs.modal",'[data-dismiss="modal"]',a.proxy(this.hide,this)),this.$dialog.on("mousedown.dismiss.bs.modal",function(){o.$element.one("mouseup.dismiss.bs.modal",function(t){a(t.target).is(o.$element)&&(o.ignoreBackdropClick=!0)})}),this.backdrop(function(){var t=a.support.transition&&o.$element.hasClass("fade");o.$element.parent().length||o.$element.appendTo(o.$body),o.$element.show().scrollTop(0),o.adjustDialog(),t&&o.$element[0].offsetWidth,o.$element.addClass("in"),o.enforceFocus();var e=a.Event("shown.bs.modal",{relatedTarget:i});t?o.$dialog.one("bsTransitionEnd",function(){o.$element.trigger("focus").trigger(e)}).emulateTransitionEnd(s.TRANSITION_DURATION):o.$element.trigger("focus").trigger(e)}))},s.prototype.hide=function(t){t&&t.preventDefault(),t=a.Event("hide.bs.modal"),this.$element.trigger(t),this.isShown&&!t.isDefaultPrevented()&&(this.isShown=!1,this.escape(),this.resize(),a(document).off("focusin.bs.modal"),this.$element.removeClass("in").off("click.dismiss.bs.modal").off("mouseup.dismiss.bs.modal"),this.$dialog.off("mousedown.dismiss.bs.modal"),a.support.transition&&this.$element.hasClass("fade")?this.$element.one("bsTransitionEnd",a.proxy(this.hideModal,this)).emulateTransitionEnd(s.TRANSITION_DURATION):this.hideModal())},s.prototype.enforceFocus=function(){a(document).off("focusin.bs.modal").on("focusin.bs.modal",a.proxy(function(t){document===t.target||this.$element[0]===t.target||this.$element.has(t.target).length||this.$element.trigger("focus")},this))},s.prototype.escape=function(){this.isShown&&this.options.keyboard?this.$element.on("keydown.dismiss.bs.modal",a.proxy(function(t){27==t.which&&this.hide()},this)):this.isShown||this.$element.off("keydown.dismiss.bs.modal")},s.prototype.resize=function(){this.isShown?a(window).on("resize.bs.modal",a.proxy(this.handleUpdate,this)):a(window).off("resize.bs.modal")},s.prototype.hideModal=function(){var t=this;this.$element.hide(),this.backdrop(function(){t.$body.removeClass("modal-open"),t.resetAdjustments(),t.resetScrollbar(),t.$element.trigger("hidden.bs.modal")})},s.prototype.removeBackdrop=function(){this.$backdrop&&this.$backdrop.remove(),this.$backdrop=null},s.prototype.backdrop=function(t){var e=this,i=this.$element.hasClass("fade")?"fade":"";if(this.isShown&&this.options.backdrop){var o=a.support.transition&&i;if(this.$backdrop=a(document.createElement("div")).addClass("modal-backdrop "+i).appendTo(this.$body),this.$element.on("click.dismiss.bs.modal",a.proxy(function(t){this.ignoreBackdropClick?this.ignoreBackdropClick=!1:t.target===t.currentTarget&&("static"==this.options.backdrop?this.$element[0].focus():this.hide())},this)),o&&this.$backdrop[0].offsetWidth,this.$backdrop.addClass("in"),!t)return;o?this.$backdrop.one("bsTransitionEnd",t).emulateTransitionEnd(s.BACKDROP_TRANSITION_DURATION):t()}else if(!this.isShown&&this.$backdrop){this.$backdrop.removeClass("in");var n=function(){e.removeBackdrop(),t&&t()};a.support.transition&&this.$element.hasClass("fade")?this.$backdrop.one("bsTransitionEnd",n).emulateTransitionEnd(s.BACKDROP_TRANSITION_DURATION):n()}else t&&t()},s.prototype.handleUpdate=function(){this.adjustDialog()},s.prototype.adjustDialog=function(){var t=this.$element[0].scrollHeight>document.documentElement.clientHeight;this.$element.css({paddingLeft:!this.bodyIsOverflowing&&t?this.scrollbarWidth:"",paddingRight:this.bodyIsOverflowing&&!t?this.scrollbarWidth:""})},s.prototype.resetAdjustments=function(){this.$element.css({paddingLeft:"",paddingRight:""})},s.prototype.checkScrollbar=function(){var t=window.innerWidth;if(!t){var e=document.documentElement.getBoundingClientRect();t=e.right-Math.abs(e.left)}this.bodyIsOverflowing=document.body.clientWidth<t,this.scrollbarWidth=this.measureScrollbar()},s.prototype.setScrollbar=function(){var t=parseInt(this.$body.css("padding-right")||0,10);this.originalBodyPad=document.body.style.paddingRight||"";var n=this.scrollbarWidth;this.bodyIsOverflowing&&(this.$body.css("padding-right",t+n),a(this.fixedContent).each(function(t,e){var i=e.style.paddingRight,o=a(e).css("padding-right");a(e).data("padding-right",i).css("padding-right",parseFloat(o)+n+"px")}))},s.prototype.resetScrollbar=function(){this.$body.css("padding-right",this.originalBodyPad),a(this.fixedContent).each(function(t,e){var i=a(e).data("padding-right");a(e).removeData("padding-right"),e.style.paddingRight=i||""})},s.prototype.measureScrollbar=function(){var t=document.createElement("div");t.className="modal-scrollbar-measure",this.$body.append(t);var e=t.offsetWidth-t.clientWidth;return this.$body[0].removeChild(t),e};var t=a.fn.modal;a.fn.modal=r,a.fn.modal.Constructor=s,a.fn.modal.noConflict=function(){return a.fn.modal=t,this},a(document).on("click.bs.modal.data-api",'[data-toggle="modal"]',function(t){var e=a(this),i=e.attr("href"),o=e.attr("data-target")||i&&i.replace(/.*(?=#[^\s]+$)/,""),n=a(document).find(o),s=n.data("bs.modal")?"toggle":a.extend({remote:!/#/.test(i)&&i},n.data(),e.data());e.is("a")&&t.preventDefault(),n.one("show.bs.modal",function(t){t.isDefaultPrevented()||n.one("hidden.bs.modal",function(){e.is(":visible")&&e.trigger("focus")})}),r.call(n,s,this)})}(jQuery),function(g){"use strict";var o=["sanitize","whiteList","sanitizeFn"],a=["background","cite","href","itemtype","longdesc","poster","src","xlink:href"],t={"*":["class","dir","id","lang","role",/^aria-[\w-]*$/i],a:["target","href","title","rel"],area:[],b:[],br:[],col:[],code:[],div:[],em:[],hr:[],h1:[],h2:[],h3:[],h4:[],h5:[],h6:[],i:[],img:["src","alt","title","width","height"],li:[],ol:[],p:[],pre:[],s:[],small:[],span:[],sub:[],sup:[],strong:[],u:[],ul:[]},r=/^(?:(?:https?|mailto|ftp|tel|file):|[^&:/?#]*(?:[/?#]|$))/gi,l=/^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[a-z0-9+/]+=*$/i;function u(t,e){var i=t.nodeName.toLowerCase();if(-1!==g.inArray(i,e))return-1===g.inArray(i,a)||Boolean(t.nodeValue.match(r)||t.nodeValue.match(l));for(var o=g(e).filter(function(t,e){return e instanceof RegExp}),n=0,s=o.length;n<s;n++)if(i.match(o[n]))return!0;return!1}function n(t,e,i){if(0===t.length)return t;if(i&&"function"==typeof i)return i(t);if(!document.implementation||!document.implementation.createHTMLDocument)return t;var o=document.implementation.createHTMLDocument("sanitization");o.body.innerHTML=t;for(var n=g.map(e,function(t,e){return e}),s=g(o.body).find("*"),a=0,r=s.length;a<r;a++){var l=s[a],h=l.nodeName.toLowerCase();if(-1!==g.inArray(h,n))for(var d=g.map(l.attributes,function(t){return t}),p=[].concat(e["*"]||[],e[h]||[]),c=0,f=d.length;c<f;c++)u(d[c],p)||l.removeAttribute(d[c].nodeName);else l.parentNode.removeChild(l)}return o.body.innerHTML}var m=function(t,e){this.type=null,this.options=null,this.enabled=null,this.timeout=null,this.hoverState=null,this.$element=null,this.inState=null,this.init("tooltip",t,e)};m.VERSION="3.4.1",m.TRANSITION_DURATION=150,m.DEFAULTS={animation:!0,placement:"top",selector:!1,template:'<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,container:!1,viewport:{selector:"body",padding:0},sanitize:!0,sanitizeFn:null,whiteList:t},m.prototype.init=function(t,e,i){if(this.enabled=!0,this.type=t,this.$element=g(e),this.options=this.getOptions(i),this.$viewport=this.options.viewport&&g(document).find(g.isFunction(this.options.viewport)?this.options.viewport.call(this,this.$element):this.options.viewport.selector||this.options.viewport),this.inState={click:!1,hover:!1,focus:!1},this.$element[0]instanceof document.constructor&&!this.options.selector)throw new Error("`selector` option must be specified when initializing "+this.type+" on the window.document object!");for(var o=this.options.trigger.split(" "),n=o.length;n--;){var s=o[n];if("click"==s)this.$element.on("click."+this.type,this.options.selector,g.proxy(this.toggle,this));else if("manual"!=s){var a="hover"==s?"mouseenter":"focusin",r="hover"==s?"mouseleave":"focusout";this.$element.on(a+"."+this.type,this.options.selector,g.proxy(this.enter,this)),this.$element.on(r+"."+this.type,this.options.selector,g.proxy(this.leave,this))}}this.options.selector?this._options=g.extend({},this.options,{trigger:"manual",selector:""}):this.fixTitle()},m.prototype.getDefaults=function(){return m.DEFAULTS},m.prototype.getOptions=function(t){var e=this.$element.data();for(var i in e)e.hasOwnProperty(i)&&-1!==g.inArray(i,o)&&delete e[i];return(t=g.extend({},this.getDefaults(),e,t)).delay&&"number"==typeof t.delay&&(t.delay={show:t.delay,hide:t.delay}),t.sanitize&&(t.template=n(t.template,t.whiteList,t.sanitizeFn)),t},m.prototype.getDelegateOptions=function(){var i={},o=this.getDefaults();return this._options&&g.each(this._options,function(t,e){o[t]!=e&&(i[t]=e)}),i},m.prototype.enter=function(t){var e=t instanceof this.constructor?t:g(t.currentTarget).data("bs."+this.type);if(e||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e)),t instanceof g.Event&&(e.inState["focusin"==t.type?"focus":"hover"]=!0),e.tip().hasClass("in")||"in"==e.hoverState)e.hoverState="in";else{if(clearTimeout(e.timeout),e.hoverState="in",!e.options.delay||!e.options.delay.show)return e.show();e.timeout=setTimeout(function(){"in"==e.hoverState&&e.show()},e.options.delay.show)}},m.prototype.isInStateTrue=function(){for(var t in this.inState)if(this.inState[t])return!0;return!1},m.prototype.leave=function(t){var e=t instanceof this.constructor?t:g(t.currentTarget).data("bs."+this.type);if(e||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e)),t instanceof g.Event&&(e.inState["focusout"==t.type?"focus":"hover"]=!1),!e.isInStateTrue()){if(clearTimeout(e.timeout),e.hoverState="out",!e.options.delay||!e.options.delay.hide)return e.hide();e.timeout=setTimeout(function(){"out"==e.hoverState&&e.hide()},e.options.delay.hide)}},m.prototype.show=function(){var t=g.Event("show.bs."+this.type);if(this.hasContent()&&this.enabled){this.$element.trigger(t);var e=g.contains(this.$element[0].ownerDocument.documentElement,this.$element[0]);if(t.isDefaultPrevented()||!e)return;var i=this,o=this.tip(),n=this.getUID(this.type);this.setContent(),o.attr("id",n),this.$element.attr("aria-describedby",n),this.options.animation&&o.addClass("fade");var s="function"==typeof this.options.placement?this.options.placement.call(this,o[0],this.$element[0]):this.options.placement,a=/\s?auto?\s?/i,r=a.test(s);r&&(s=s.replace(a,"")||"top"),o.detach().css({top:0,left:0,display:"block"}).addClass(s).data("bs."+this.type,this),this.options.container?o.appendTo(g(document).find(this.options.container)):o.insertAfter(this.$element),this.$element.trigger("inserted.bs."+this.type);var l=this.getPosition(),h=o[0].offsetWidth,d=o[0].offsetHeight;if(r){var p=s,c=this.getPosition(this.$viewport);s="bottom"==s&&l.bottom+d>c.bottom?"top":"top"==s&&l.top-d<c.top?"bottom":"right"==s&&l.right+h>c.width?"left":"left"==s&&l.left-h<c.left?"right":s,o.removeClass(p).addClass(s)}var f=this.getCalculatedOffset(s,l,h,d);this.applyPlacement(f,s);var u=function(){var t=i.hoverState;i.$element.trigger("shown.bs."+i.type),i.hoverState=null,"out"==t&&i.leave(i)};g.support.transition&&this.$tip.hasClass("fade")?o.one("bsTransitionEnd",u).emulateTransitionEnd(m.TRANSITION_DURATION):u()}},m.prototype.applyPlacement=function(t,e){var i=this.tip(),o=i[0].offsetWidth,n=i[0].offsetHeight,s=parseInt(i.css("margin-top"),10),a=parseInt(i.css("margin-left"),10);isNaN(s)&&(s=0),isNaN(a)&&(a=0),t.top+=s,t.left+=a,g.offset.setOffset(i[0],g.extend({using:function(t){i.css({top:Math.round(t.top),left:Math.round(t.left)})}},t),0),i.addClass("in");var r=i[0].offsetWidth,l=i[0].offsetHeight;"top"==e&&l!=n&&(t.top=t.top+n-l);var h=this.getViewportAdjustedDelta(e,t,r,l);h.left?t.left+=h.left:t.top+=h.top;var d=/top|bottom/.test(e),p=d?2*h.left-o+r:2*h.top-n+l,c=d?"offsetWidth":"offsetHeight";i.offset(t),this.replaceArrow(p,i[0][c],d)},m.prototype.replaceArrow=function(t,e,i){this.arrow().css(i?"left":"top",50*(1-t/e)+"%").css(i?"top":"left","")},m.prototype.setContent=function(){var t=this.tip(),e=this.getTitle();this.options.html?(this.options.sanitize&&(e=n(e,this.options.whiteList,this.options.sanitizeFn)),t.find(".tooltip-inner").html(e)):t.find(".tooltip-inner").text(e),t.removeClass("fade in top bottom left right")},m.prototype.hide=function(t){var e=this,i=g(this.$tip),o=g.Event("hide.bs."+this.type);function n(){"in"!=e.hoverState&&i.detach(),e.$element&&e.$element.removeAttr("aria-describedby").trigger("hidden.bs."+e.type),t&&t()}if(this.$element.trigger(o),!o.isDefaultPrevented())return i.removeClass("in"),g.support.transition&&i.hasClass("fade")?i.one("bsTransitionEnd",n).emulateTransitionEnd(m.TRANSITION_DURATION):n(),this.hoverState=null,this},m.prototype.fixTitle=function(){var t=this.$element;(t.attr("title")||"string"!=typeof t.attr("data-original-title"))&&t.attr("data-original-title",t.attr("title")||"").attr("title","")},m.prototype.hasContent=function(){return this.getTitle()},m.prototype.getPosition=function(t){var e=(t=t||this.$element)[0],i="BODY"==e.tagName,o=e.getBoundingClientRect();null==o.width&&(o=g.extend({},o,{width:o.right-o.left,height:o.bottom-o.top}));var n=window.SVGElement&&e instanceof window.SVGElement,s=i?{top:0,left:0}:n?null:t.offset(),a={scroll:i?document.documentElement.scrollTop||document.body.scrollTop:t.scrollTop()},r=i?{width:g(window).width(),height:g(window).height()}:null;return g.extend({},o,a,r,s)},m.prototype.getCalculatedOffset=function(t,e,i,o){return"bottom"==t?{top:e.top+e.height,left:e.left+e.width/2-i/2}:"top"==t?{top:e.top-o,left:e.left+e.width/2-i/2}:"left"==t?{top:e.top+e.height/2-o/2,left:e.left-i}:{top:e.top+e.height/2-o/2,left:e.left+e.width}},m.prototype.getViewportAdjustedDelta=function(t,e,i,o){var n={top:0,left:0};if(!this.$viewport)return n;var s=this.options.viewport&&this.options.viewport.padding||0,a=this.getPosition(this.$viewport);if(/right|left/.test(t)){var r=e.top-s-a.scroll,l=e.top+s-a.scroll+o;r<a.top?n.top=a.top-r:l>a.top+a.height&&(n.top=a.top+a.height-l)}else{var h=e.left-s,d=e.left+s+i;h<a.left?n.left=a.left-h:d>a.right&&(n.left=a.left+a.width-d)}return n},m.prototype.getTitle=function(){var t=this.$element,e=this.options;return t.attr("data-original-title")||("function"==typeof e.title?e.title.call(t[0]):e.title)},m.prototype.getUID=function(t){for(;t+=~~(1e6*Math.random()),document.getElementById(t););return t},m.prototype.tip=function(){if(!this.$tip&&(this.$tip=g(this.options.template),1!=this.$tip.length))throw new Error(this.type+" `template` option must consist of exactly 1 top-level element!");return this.$tip},m.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".tooltip-arrow")},m.prototype.enable=function(){this.enabled=!0},m.prototype.disable=function(){this.enabled=!1},m.prototype.toggleEnabled=function(){this.enabled=!this.enabled},m.prototype.toggle=function(t){var e=this;t&&((e=g(t.currentTarget).data("bs."+this.type))||(e=new this.constructor(t.currentTarget,this.getDelegateOptions()),g(t.currentTarget).data("bs."+this.type,e))),t?(e.inState.click=!e.inState.click,e.isInStateTrue()?e.enter(e):e.leave(e)):e.tip().hasClass("in")?e.leave(e):e.enter(e)},m.prototype.destroy=function(){var t=this;clearTimeout(this.timeout),this.hide(function(){t.$element.off("."+t.type).removeData("bs."+t.type),t.$tip&&t.$tip.detach(),t.$tip=null,t.$arrow=null,t.$viewport=null,t.$element=null})},m.prototype.sanitizeHtml=function(t){return n(t,this.options.whiteList,this.options.sanitizeFn)};var e=g.fn.tooltip;g.fn.tooltip=function i(o){return this.each(function(){var t=g(this),e=t.data("bs.tooltip"),i="object"==typeof o&&o;!e&&/destroy|hide/.test(o)||(e||t.data("bs.tooltip",e=new m(this,i)),"string"==typeof o&&e[o]())})},g.fn.tooltip.Constructor=m,g.fn.tooltip.noConflict=function(){return g.fn.tooltip=e,this}}(jQuery),function(n){"use strict";var s=function(t,e){this.init("popover",t,e)};if(!n.fn.tooltip)throw new Error("Popover requires tooltip.js");s.VERSION="3.4.1",s.DEFAULTS=n.extend({},n.fn.tooltip.Constructor.DEFAULTS,{placement:"right",trigger:"click",content:"",template:'<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),((s.prototype=n.extend({},n.fn.tooltip.Constructor.prototype)).constructor=s).prototype.getDefaults=function(){return s.DEFAULTS},s.prototype.setContent=function(){var t=this.tip(),e=this.getTitle(),i=this.getContent();if(this.options.html){var o=typeof i;this.options.sanitize&&(e=this.sanitizeHtml(e),"string"===o&&(i=this.sanitizeHtml(i))),t.find(".popover-title").html(e),t.find(".popover-content").children().detach().end()["string"===o?"html":"append"](i)}else t.find(".popover-title").text(e),t.find(".popover-content").children().detach().end().text(i);t.removeClass("fade top bottom left right in"),t.find(".popover-title").html()||t.find(".popover-title").hide()},s.prototype.hasContent=function(){return this.getTitle()||this.getContent()},s.prototype.getContent=function(){var t=this.$element,e=this.options;return t.attr("data-content")||("function"==typeof e.content?e.content.call(t[0]):e.content)},s.prototype.arrow=function(){return this.$arrow=this.$arrow||this.tip().find(".arrow")};var t=n.fn.popover;n.fn.popover=function e(o){return this.each(function(){var t=n(this),e=t.data("bs.popover"),i="object"==typeof o&&o;!e&&/destroy|hide/.test(o)||(e||t.data("bs.popover",e=new s(this,i)),"string"==typeof o&&e[o]())})},n.fn.popover.Constructor=s,n.fn.popover.noConflict=function(){return n.fn.popover=t,this}}(jQuery),function(s){"use strict";function n(t,e){this.$body=s(document.body),this.$scrollElement=s(t).is(document.body)?s(window):s(t),this.options=s.extend({},n.DEFAULTS,e),this.selector=(this.options.target||"")+" .nav li > a",this.offsets=[],this.targets=[],this.activeTarget=null,this.scrollHeight=0,this.$scrollElement.on("scroll.bs.scrollspy",s.proxy(this.process,this)),this.refresh(),this.process()}function e(o){return this.each(function(){var t=s(this),e=t.data("bs.scrollspy"),i="object"==typeof o&&o;e||t.data("bs.scrollspy",e=new n(this,i)),"string"==typeof o&&e[o]()})}n.VERSION="3.4.1",n.DEFAULTS={offset:10},n.prototype.getScrollHeight=function(){return this.$scrollElement[0].scrollHeight||Math.max(this.$body[0].scrollHeight,document.documentElement.scrollHeight)},n.prototype.refresh=function(){var t=this,o="offset",n=0;this.offsets=[],this.targets=[],this.scrollHeight=this.getScrollHeight(),s.isWindow(this.$scrollElement[0])||(o="position",n=this.$scrollElement.scrollTop()),this.$body.find(this.selector).map(function(){var t=s(this),e=t.data("target")||t.attr("href"),i=/^#./.test(e)&&s(e);return i&&i.length&&i.is(":visible")&&[[i[o]().top+n,e]]||null}).sort(function(t,e){return t[0]-e[0]}).each(function(){t.offsets.push(this[0]),t.targets.push(this[1])})},n.prototype.process=function(){var t,e=this.$scrollElement.scrollTop()+this.options.offset,i=this.getScrollHeight(),o=this.options.offset+i-this.$scrollElement.height(),n=this.offsets,s=this.targets,a=this.activeTarget;if(this.scrollHeight!=i&&this.refresh(),o<=e)return a!=(t=s[s.length-1])&&this.activate(t);if(a&&e<n[0])return this.activeTarget=null,this.clear();for(t=n.length;t--;)a!=s[t]&&e>=n[t]&&(n[t+1]===undefined||e<n[t+1])&&this.activate(s[t])},n.prototype.activate=function(t){this.activeTarget=t,this.clear();var e=this.selector+'[data-target="'+t+'"],'+this.selector+'[href="'+t+'"]',i=s(e).parents("li").addClass("active");i.parent(".dropdown-menu").length&&(i=i.closest("li.dropdown").addClass("active")),i.trigger("activate.bs.scrollspy")},n.prototype.clear=function(){s(this.selector).parentsUntil(this.options.target,".active").removeClass("active")};var t=s.fn.scrollspy;s.fn.scrollspy=e,s.fn.scrollspy.Constructor=n,s.fn.scrollspy.noConflict=function(){return s.fn.scrollspy=t,this},s(window).on("load.bs.scrollspy.data-api",function(){s('[data-spy="scroll"]').each(function(){var t=s(this);e.call(t,t.data())})})}(jQuery),function(r){"use strict";var a=function(t){this.element=r(t)};function e(i){return this.each(function(){var t=r(this),e=t.data("bs.tab");e||t.data("bs.tab",e=new a(this)),"string"==typeof i&&e[i]()})}a.VERSION="3.4.1",a.TRANSITION_DURATION=150,a.prototype.show=function(){var t=this.element,e=t.closest("ul:not(.dropdown-menu)"),i=t.data("target");if(i||(i=(i=t.attr("href"))&&i.replace(/.*(?=#[^\s]*$)/,"")),!t.parent("li").hasClass("active")){var o=e.find(".active:last a"),n=r.Event("hide.bs.tab",{relatedTarget:t[0]}),s=r.Event("show.bs.tab",{relatedTarget:o[0]});if(o.trigger(n),t.trigger(s),!s.isDefaultPrevented()&&!n.isDefaultPrevented()){var a=r(document).find(i);this.activate(t.closest("li"),e),this.activate(a,a.parent(),function(){o.trigger({type:"hidden.bs.tab",relatedTarget:t[0]}),t.trigger({type:"shown.bs.tab",relatedTarget:o[0]})})}}},a.prototype.activate=function(t,e,i){var o=e.find("> .active"),n=i&&r.support.transition&&(o.length&&o.hasClass("fade")||!!e.find("> .fade").length);function s(){o.removeClass("active").find("> .dropdown-menu > .active").removeClass("active").end().find('[data-toggle="tab"]').attr("aria-expanded",!1),t.addClass("active").find('[data-toggle="tab"]').attr("aria-expanded",!0),n?(t[0].offsetWidth,t.addClass("in")):t.removeClass("fade"),t.parent(".dropdown-menu").length&&t.closest("li.dropdown").addClass("active").end().find('[data-toggle="tab"]').attr("aria-expanded",!0),i&&i()}o.length&&n?o.one("bsTransitionEnd",s).emulateTransitionEnd(a.TRANSITION_DURATION):s(),o.removeClass("in")};var t=r.fn.tab;r.fn.tab=e,r.fn.tab.Constructor=a,r.fn.tab.noConflict=function(){return r.fn.tab=t,this};var i=function(t){t.preventDefault(),e.call(r(this),"show")};r(document).on("click.bs.tab.data-api",'[data-toggle="tab"]',i).on("click.bs.tab.data-api",'[data-toggle="pill"]',i)}(jQuery),function(l){"use strict";var h=function(t,e){this.options=l.extend({},h.DEFAULTS,e);var i=this.options.target===h.DEFAULTS.target?l(this.options.target):l(document).find(this.options.target);this.$target=i.on("scroll.bs.affix.data-api",l.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",l.proxy(this.checkPositionWithEventLoop,this)),this.$element=l(t),this.affixed=null,this.unpin=null,this.pinnedOffset=null,this.checkPosition()};function i(o){return this.each(function(){var t=l(this),e=t.data("bs.affix"),i="object"==typeof o&&o;e||t.data("bs.affix",e=new h(this,i)),"string"==typeof o&&e[o]()})}h.VERSION="3.4.1",h.RESET="affix affix-top affix-bottom",h.DEFAULTS={offset:0,target:window},h.prototype.getState=function(t,e,i,o){var n=this.$target.scrollTop(),s=this.$element.offset(),a=this.$target.height();if(null!=i&&"top"==this.affixed)return n<i&&"top";if("bottom"==this.affixed)return null!=i?!(n+this.unpin<=s.top)&&"bottom":!(n+a<=t-o)&&"bottom";var r=null==this.affixed,l=r?n:s.top;return null!=i&&n<=i?"top":null!=o&&t-o<=l+(r?a:e)&&"bottom"},h.prototype.getPinnedOffset=function(){if(this.pinnedOffset)return this.pinnedOffset;this.$element.removeClass(h.RESET).addClass("affix");var t=this.$target.scrollTop(),e=this.$element.offset();return this.pinnedOffset=e.top-t},h.prototype.checkPositionWithEventLoop=function(){setTimeout(l.proxy(this.checkPosition,this),1)},h.prototype.checkPosition=function(){if(this.$element.is(":visible")){var t=this.$element.height(),e=this.options.offset,i=e.top,o=e.bottom,n=Math.max(l(document).height(),l(document.body).height());"object"!=typeof e&&(o=i=e),"function"==typeof i&&(i=e.top(this.$element)),"function"==typeof o&&(o=e.bottom(this.$element));var s=this.getState(n,t,i,o);if(this.affixed!=s){null!=this.unpin&&this.$element.css("top","");var a="affix"+(s?"-"+s:""),r=l.Event(a+".bs.affix");if(this.$element.trigger(r),r.isDefaultPrevented())return;this.affixed=s,this.unpin="bottom"==s?this.getPinnedOffset():null,this.$element.removeClass(h.RESET).addClass(a).trigger(a.replace("affix","affixed")+".bs.affix")}"bottom"==s&&this.$element.offset({top:n-t-o})}};var t=l.fn.affix;l.fn.affix=i,l.fn.affix.Constructor=h,l.fn.affix.noConflict=function(){return l.fn.affix=t,this},l(window).on("load",function(){l('[data-spy="affix"]').each(function(){var t=l(this),e=t.data();e.offset=e.offset||{},null!=e.offsetBottom&&(e.offset.bottom=e.offsetBottom),null!=e.offsetTop&&(e.offset.top=e.offsetTop),i.call(t,e)})})}(jQuery);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/*! Tiny Pub/Sub - v0.7.0 - 2013-01-29
-* https://github.com/cowboy/jquery-tiny-pubsub
-* Copyright (c) 2013 "Cowboy" Ben Alman; Licensed MIT */
-(function(n){var u=n({});n.subscribe=function(){u.on.apply(u,arguments)},n.unsubscribe=function(){u.off.apply(u,arguments)},n.publish=function(){u.trigger.apply(u,arguments)}})(jQuery);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery, $) {(function ($$) {
-  /**
-   * Gets the current top/left position for an event (in particular your mouse pointer)
-   *
-   * @param      {Object}  event   The event
-   * @return     {Object}  { description_of_the_return_value }
-   */
-  $$.mouseFixedPosition = function (event, annotation) {
-    var body = window.document.body;
-    var offset = {
-      top: 0,
-      left: 0
-    };
-
-    if (jQuery(body).css('position') !== "static") {
-      offset = $(body).offset();
-    }
-
-    try {
-      var top = event.pageY - offset.top;
-      var left = event.pageX - offset.left; // in case user is selecting via keyboard, this sets the adder to top-left corner
-
-      if (event.type.indexOf("mouse") === -1 && event.type.indexOf('key') > -1) {
-        var boundingBox = window.getSelection().getRangeAt(0).getBoundingClientRect();
-        top = boundingBox.top - offset.top + boundingBox.height;
-        left = boundingBox.left - offset.left + boundingBox.width;
-      }
-
-      return {
-        top: top,
-        left: left
-      };
-    } catch (e) {
-      return $$.mouseFixedPositionFromRange(event);
-    }
-  };
-
-  $$.mouseFixedPositionFromRange = function (boundingBox) {
-    return {
-      top: boundingBox.top,
-      left: boundingBox.left
-    };
-  };
-
-  $$.getQuoteFromHighlights = function (ranges) {
-    var text = [];
-    var exactText = [];
-
-    for (var i = 0, len = ranges.length; i < len; i++) {
-      text = [];
-      var r = ranges[i];
-
-      try {
-        text.push(Hxighlighter.trim(r.text()));
-      } catch (e) {
-        text.push(Hxighlighter.trim(r.toString()));
-
-        if (r.toString === "[object Object]") {
-          text.pop();
-          text.push(r.exact);
-        }
-      }
-
-      var exact = text.join(' / ').replace(/[\n\r]/g, '<br>');
-      exactText.push(exact);
-    }
-
-    return {
-      'exact': exactText,
-      'exactNoHtml': text
-    };
-  };
-  /**
-   * Gets the unique identifier.
-   * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-   * @return     {string} Unique identifier
-   */
-
-
-  $$.getUniqueId = function () {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-  };
-  /**
-   * Function to determine if value exists or not
-   *
-   * @param      {Object}  obj     The object
-   * @return     {boolean}  returns whether item exists or not
-   */
-
-
-  $$.exists = function (obj) {
-    return typeof obj !== 'undefined';
-  };
-  /**
-   * trims whitespace from strings
-   *
-   * @param      {string}  s       original string
-   * @return     {string}  trimmed string
-   */
-
-
-  $$.trim = function (s) {
-    if (typeof String.prototype.trim === 'function') {
-      return String.prototype.trim.call(s);
-    } else {
-      return s.replace(/^[\s\xA0]+|[\s\xA0]+$/g, '');
-    }
-  };
-  /**
-   * Publishes Event to a specific instance, if no instanceID or '' is sent, the
-   * event will be published to all instances
-   *
-   * @param      {string}  eventName   The event name
-   * @param      {string}  instanceID  The instance id
-   * @param      {array}  list        The list
-   */
-
-
-  $$.publishEvent = function (eventName, instanceID, list) {
-    // console.log(eventName, list);
-    if (!$$.exists(instanceID) || instanceID === "") {
-      jQuery.each($$._instanceIDs, function (_, inst_id) {
-        // some of the events require the core to handle calling the components in a certain order
-        if ($$.requiredEvents.indexOf(eventName) >= 0) {
-          $$._instances[inst_id].core[eventName](list);
-        }
-
-        jQuery.publish(eventName + '.' + inst_id, list);
-      });
-    } else {
-      // some of the events require the core to handle calling the components in a certain order
-      if ($$.requiredEvents.indexOf(eventName) >= 0) {
-        $$._instances[instanceID].core[eventName](list);
-      }
-
-      jQuery.publish(eventName + '.' + instanceID, list);
-    }
-  };
-  /**
-   * Subscribes Event to a specific instance, if no instanceID or '' is sent, all
-   * instances will be subscribed to event
-   *
-   * @param      {string}  eventName   The event name
-   * @param      {string}  instanceID  The instance id
-   * @param      {<type>}  callBack    The call back
-   */
-
-
-  $$.subscribeEvent = function (eventName, instanceID, callBack) {
-    if (!$$.exists(instanceID) || instanceID === "") {
-      jQuery.each($$._instanceIDs, function (_, inst_id) {
-        jQuery.subscribe(eventName + '.' + inst_id, callBack);
-      });
-    } else {
-      jQuery.subscribe(eventName + '.' + instanceID, callBack);
-    }
-  };
-
-  $$.pauseEvent = function (e) {
-    if (e.stopPropagation) e.stopPropagation();
-    if (e.preventDefault) e.preventDefault();
-    e.cancelBubble = true;
-    e.returnValue = false;
-    return false;
-  };
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(0)))
-
-/***/ }),
-/* 22 */
+/* 63 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
 module.exports = __webpack_amd_options__;
 
 /* WEBPACK VAR INJECTION */}.call(this, {}))
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- * 
- */
-//during deployment, this is what decides what gets instantiated, should be moved elsewhere
-__webpack_require__(24);
-
-__webpack_require__(25);
-
-__webpack_require__(26);
-
-__webpack_require__(27);
-
-__webpack_require__(35);
-
-__webpack_require__(39);
-
-__webpack_require__(10);
-
-__webpack_require__(41);
-
-__webpack_require__(43);
-
-__webpack_require__(45);
-
-__webpack_require__(47);
-
-__webpack_require__(49);
-
-__webpack_require__(51);
-
-__webpack_require__(53);
-
-__webpack_require__(55);
-
-__webpack_require__(57);
-
-__webpack_require__(58);
-
-(function ($) {
-  /**
-   * { function_description }
-   *
-   * @class      TextTarget (name)
-   * @param      {<type>}  options  The options
-   * @param      {<type>}  inst_id  The instance identifier
-   */
-  $.TextTarget = function (options, inst_id) {
-    this.options = options;
-    this.instance_id = inst_id;
-    this.guid = undefined;
-    this.annotation_selector = 'hx-annotation-hl';
-    this.init();
-  };
-  /**
-   * { function_description }
-   */
-
-
-  $.TextTarget.prototype.init = function () {
-    var self = this; // this target is only meant to work with text/html objects
-
-    this.media = "text";
-    this.setUpListeners(); // this where the target will be contained
-
-    this.target_selector = this.options.target_selector; // sets up listeners from core and other places
-
-    if (this.options.method == "url") {
-      // if the text exists externally, this will load it into the DOM
-      this.makeQuery(this.options.object_source, this.createTextSlotFromURL.bind(this), this.target_selector);
-    } else if (this.options.method == "inline") {
-      // if the text is already in the DOM, this sets up what is left
-      // console.log('Loading Target via Inline');
-      this.createTextSlotFromSelector(this.options.object_source, this.instance_id);
-    }
-
-    function areScrollbarsVisible() {
-      var scrollableElem = document.createElement('div'),
-          innerElem = document.createElement('div');
-      scrollableElem.style.width = '30px';
-      scrollableElem.style.height = '30px';
-      scrollableElem.style.overflow = 'scroll';
-      scrollableElem.style.borderWidth = '0';
-      innerElem.style.width = '30px';
-      innerElem.style.height = '60px';
-      scrollableElem.appendChild(innerElem);
-      document.body.appendChild(scrollableElem); // Elements only have width if they're in the layout
-
-      var diff = scrollableElem.offsetWidth - scrollableElem.clientWidth;
-      document.body.removeChild(scrollableElem);
-      return diff > 0;
-    }
-
-    window.addEventListener('load', function () {
-      // Show scrollbars if they're hidden.
-      if (!areScrollbarsVisible()) {
-        document.body.classList.add('force-show-scrollbars');
-      }
-    });
-  };
-  /**
-   * Creates a text slot from url.
-   *
-   * @param      {string}  content      The content
-   * @param      {<type>}  selector     The selector
-   * @param      {<type>}  instance_id  The instance identifier
-   */
-
-
-  $.TextTarget.prototype.createTextSlotFromURL = function (content, selector, instance_id) {
-    this.guid = $.getUniqueId(); // each annotation target will be enclosed in a "slot"
-    //var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>";
-    // adds it to the page and turns on the wrapper
-
-    jQuery(selector + ' .annotations-section').append(content);
-    jQuery(selector).prop('id', this.guid);
-    jQuery(selector).addClass('annotation-slot');
-    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets Core know that the target has finished loading on screen
-
-    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
-  };
-  /**
-   * Creates a text slot from selector.
-   *
-   * @param      {<type>}  selector     The selector
-   * @param      {<type>}  instance_id  The instance identifier
-   */
-
-
-  $.TextTarget.prototype.createTextSlotFromSelector = function (selector, instance_id) {
-    // each annotation target will be enclosed in a "slot" with a temporary unique id
-    this.guid = $.getUniqueId();
-    var slot = jQuery(selector);
-    slot.addClass('annotation-slot');
-    slot.attr('id', this.guid);
-    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets core know that the target has finished loading on screen
-    // console.log("Publishing TargetLoaded");
-
-    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
-  };
-  /**
-   * Makes a query.
-   *
-   * @param      {<type>}    url       The url
-   * @param      {Function}  callback  The callback
-   * @param      {<type>}    selector  The selector
-   * @return     {<type>}    { description_of_the_return_value }
-   */
-
-
-  $.TextTarget.prototype.makeQuery = function (url, callback, selector) {
-    var self = this; // retrieves the text to be loaded onto the page and passes it to callback function
-
-    var defer = jQuery.ajax({
-      url: url,
-      type: 'GET',
-      contentType: 'charset=utf-8',
-      success: function success(data) {
-        callback(data, selector, self.instance_id);
-      },
-      async: true
-    });
-    return defer;
-  };
-  /**
-   * { function_description }
-   */
-
-
-  $.TextTarget.prototype.setUpListeners = function () {
-    var self = this;
-    jQuery('.toggle-alerts').click(function () {
-      if (jQuery(this).hasClass('on')) {
-        jQuery(this).html('Turn Alerts On');
-        jQuery(this).removeClass('on');
-        jQuery('.sr-alert').attr('aria-live', 'off');
-      } else {
-        jQuery(this).html('Turn Alerts Off');
-        jQuery(this).addClass('on');
-        jQuery('.sr-alert').attr('aria-live', 'polite');
-      }
-    }); // once the target has been loaded, the selector can be instantiated
-
-    $.subscribeEvent('targetLoaded', self.instance_id, function (_, element) {
-      // console.log("LOADING TARGET");
-      //annotation element gets data that may be needed later
-      self.element = element;
-      self.element.data('source_type', self.options.object_source);
-      self.element.data('source_type', 'text'); // finish setting up selectors
-
-      if (!self.options.viewerOptions.readonly) {
-        self.setUpSelectors(self.element[0]);
-      }
-
-      self.setUpDrawers(self.element[0]); // finish setting up viewers (which contain displays and editors)
-
-      self.setUpViewers(self.element[0]); // finish setting up extra plugins
-
-      self.setUpPlugins(self.element[0]); // finish setting up the storage containers
-
-      self.setUpStorage(self.element[0]);
-    });
-    $.subscribeEvent('editorShown', self.instance_id, function (_, editor, annotation) {
-      jQuery.each(self.plugins, function (_, plugin) {
-        if (typeof plugin.editorShown === "function") {
-          plugin.editorShown(editor, annotation);
-        }
-      });
-    });
-    $.subscribeEvent('displayShown', self.instance_id, function (_, display, annotations) {
-      jQuery.each(self.plugins, function (_, plugin) {
-        if (typeof plugin.displayShown === "function") {
-          plugin.displayShown(display, annotations);
-        }
-      });
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @param      {<type>}  element  The element
-   */
-
-
-  $.TextTarget.prototype.setUpSelectors = function (element) {
-    var self = this;
-    self.selectors = [];
-    jQuery.each($.selectors, function (_, selector) {
-      self.selectors.push(new selector(element, self.instance_id, {
-        'confirm': true
-      }));
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @param      {<type>}  element  The element
-   */
-
-
-  $.TextTarget.prototype.setUpDrawers = function (element) {
-    var self = this;
-    self.drawers = [];
-    jQuery.each($.drawers, function (_, drawer) {
-      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector, self.options));
-    });
-  };
-
-  $.TextTarget.prototype.setUpViewers = function (element) {
-    var self = this;
-    self.viewers = [];
-    jQuery.each($.viewers, function (_, viewer) {
-      self.viewers.push(new viewer({
-        element: element,
-        template_urls: self.options.template_urls,
-        viewer_options: self.options.viewerOptions,
-        username: self.options.username,
-        user_id: self.options.user_id,
-        common_instructor_name: self.options.common_instructor_name,
-        instructors: self.options.instructors,
-        mediaType: self.media
-      }, self.instance_id));
-    });
-  };
-
-  $.TextTarget.prototype.setUpPlugins = function (element) {
-    var self = this;
-    self.plugins = [];
-    jQuery.each($.plugins, function (_, plugin) {
-      var optionsForPlugin;
-
-      try {
-        optionsForPlugin = jQuery.extend({
-          'slot': element
-        }, self.options, self.options[plugin.name]) || {
-          'slot': element
-        };
-      } catch (e) {
-        optionsForPlugin = {
-          'slot': element
-        };
-      }
-
-      self.plugins.push(new plugin(optionsForPlugin, self.instance_id));
-    });
-  };
-
-  $.TextTarget.prototype.setUpStorage = function (element, options) {
-    var self = this;
-    self.storage = [];
-    jQuery.each($.storage, function (idx, storage) {
-      var optionsForStorage;
-
-      try {
-        optionsForStorage = jQuery.extend({}, self.options, self.options[storage.name]) || {};
-      } catch (e) {
-        optionsForStorage = {};
-      }
-
-      self.storage.push(new storage(optionsForStorage, self.instance_id));
-
-      if (self.options.viewerOptions.defaultTab === "mine") {
-        options = {
-          'username': self.options.username
-        };
-      } else if (self.options.viewerOptions.defaultTab === "instructor") {
-        options = {
-          'userid': self.options.instructors
-        };
-      } else {
-        var exclusion = [self.options.user_id].concat(self.options.instructors);
-        options = {
-          'exclude_userid': exclusion
-        };
-      }
-
-      self.storage[idx].onLoad(element, options);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ComponentEnable (name)
-   */
-
-
-  $.TextTarget.prototype.ComponentEnable = function () {
-    // Targets cannot technically be enabled/disabled, but 
-    // there might be cases in which the target needs to be hidden/shown
-    jQuery('#' + this.guid).show();
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ComponentDisable (name)
-   */
-
-
-  $.TextTarget.prototype.ComponentDisable = function () {
-    jQuery('#') + this.guid.hide();
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetSelectionMade (name)
-   */
-
-
-  $.TextTarget.prototype.TargetSelectionMade = function (range, event) {
-    var range = Array.isArray(range) ? range : [range];
-    var self = this;
-    var annotation = {
-      annotationText: [""],
-      ranges: range,
-      id: $.getUniqueId(),
-      exact: range.map(function (r) {
-        return r.text.exact.replace(/[\n\r]/g, '<br>').replace(/    /g, '&nbsp;');
-      }),
-      media: "text",
-      totalReplies: 0,
-      creator: {
-        name: self.options.username,
-        id: self.options.user_id
-      }
-    };
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.TargetSelectionMade(annotation, event);
-    }); //self.TargetAnnotationDraw(annotation);
-    // jQuery('.annotator-wrapper')[0].focus();
-    //$.publishEvent('ViewerEditorOpen', self.instance_id, [annotation]);
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetAnnotationDraw (name)
-   */
-
-
-  $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
-    var self = this;
-    jQuery.each(self.drawers, function (_, drawer) {
-      drawer.draw(annotation);
-    });
-    jQuery.each(self.viewers, function (_, viewer) {
-      if ($.exists(viewer.TargetAnnotationDraw)) {
-        viewer.TargetAnnotationDraw(annotation);
-      }
-    });
-    jQuery.each(self.plugins, function (_, plugin) {
-      if ($.exists(plugin.TargetAnnotationDraw)) {
-        plugin.TargetAnnotationDraw(annotation);
-      }
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetAnnotationUndraw (name)
-   */
-
-
-  $.TextTarget.prototype.TargetAnnotationUndraw = function (annotation) {
-    var self = this;
-    jQuery.each(self.drawers, function (_, drawer) {
-      drawer.undraw(annotation);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerEditorOpen (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerEditorOpen = function (event, annotation) {
-    return annotation;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerEditorClose (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerEditorClose = function (annotation, is_new_annotation, hit_cancel) {
-    var self = this; //console.log(annotation, 'New?:', is_new_annotation, 'Hit Cancel', hit_cancel);
-
-    if (hit_cancel) {
-      if (is_new_annotation) {
-        self.TargetAnnotationUndraw(annotation);
-      } // else, the annotation was already drawn, so don't touch it.
-
-    } else if (is_new_annotation) {
-      annotation = self.plugins.reduce(function (ann, plugin) {
-        return plugin.saving(ann);
-      }, annotation);
-      self.TargetAnnotationDraw(annotation);
-      jQuery('.sr-real-alert').html('Your annotation was saved.');
-      $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, false]);
-    } else {
-      jQuery.each(self.drawers, function (_, drawer) {
-        self.TargetAnnotationUndraw(annotation);
-        annotation = self.plugins.reduce(function (ann, plugin) {
-          return plugin.saving(ann);
-        }, annotation);
-        $.publishEvent('TargetAnnotationDraw', self.instance_id, [annotation]);
-        jQuery('.sr-real-alert').html('Your annotation was updated.');
-        $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, true]);
-      });
-    }
-
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerEditorClose(annotation);
-    });
-    return annotation;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerDisplayOpen (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerDisplayOpen = function (event, annotations) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerDisplayOpen(event, annotations);
-    });
-    return annotations;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerDisplayClose (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerDisplayClose = function (annotations) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerDisplayClose(annotations);
-    });
-    return annotations;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationSave (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationSave = function (annotations, redraw) {
-    var self = this; // console.log(annotations, redraw);
-
-    jQuery.each(self.storage, function (_, store) {
-      store.StorageAnnotationSave(annotations, self.element, redraw);
-    });
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationSave(annotations);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationLoad (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationLoad = function (annotations, converter, undrawOld) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      if (typeof viewer.StorageAnnotationLoad === "function") {
-        viewer.StorageAnnotationLoad(annotations);
-      }
-    });
-
-    if (undrawOld) {
-      $.publishEvent('GetAnnotationsData', self.instance_id, [function (anns) {
-        anns.forEach(function (ann) {
-          self.TargetAnnotationUndraw(ann);
-        });
-      }]);
-    }
-
-    annotations.forEach(function (ann) {
-      var converted_ann = converter(ann, jQuery(self.element).find('.annotator-wrapper'));
-      self.TargetAnnotationDraw(converted_ann);
-      $.publishEvent('annotationLoaded', self.instance_id, [converted_ann]);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationEdit (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationEdit = function () {};
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationDelete (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationDelete();
-    });
-    jQuery.each(self.storage, function (_, store) {
-      store.StorageAnnotationDelete(annotation);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationGetReplies (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationSearch = function (search_options, callback, errfun) {
-    var self = this;
-    jQuery.each(self.storage, function (_, store) {
-      store.search(search_options, callback, errfun);
-    });
-  };
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
-
-(function ($) {
-  $.KeyboardSelector = function (element, inst_id) {
-    this.element = element;
-
-    if (!jQuery(element).hasClass('annotator-wrapper')) {
-      this.element = jQuery(element).find('.annotator-wrapper');
-    }
-
-    this.instance_id = inst_id;
-    this.delimiter_list = ['*', '+', '#', '^'];
-    this.keyMaps = {
-      'BACKSPACE': 8,
-      'TAB': 9,
-      'ENTER': 13,
-      'SHIFT': 16,
-      'CTRL': 17,
-      'ALT': 18,
-      'ESC': 27,
-      'SPACE': 32,
-      'LEFT': 37,
-      'UP': 38,
-      'RIGHT': 39,
-      'DOWN': 40,
-      'DELETE': 46,
-      'MULTIPLY': 106,
-      'ADD': 107,
-      'PIPE': 220,
-      '*': 56,
-      '+': 187,
-      'HOME': 36,
-      'END': 35
-    };
-    this.init();
-  };
-
-  $.KeyboardSelector.prototype.init = function () {
-    var self = this;
-    this.delimiter = this.checkDelimiter(self.element);
-
-    if (!this.delimiter) {//console.log('Error in delimiter...no suitable delimiter found!');
-    }
-
-    this.start = undefined;
-    this.setUpButton();
-  };
-
-  $.KeyboardSelector.prototype.checkDelimiter = function (element) {
-    var textSearch = jQuery(element).text();
-
-    for (var i = 0; i < this.delimiter_list.length; i++) {
-      var testDelimiter = this.delimiter_list[i];
-
-      if (textSearch.indexOf(testDelimiter) == -1) {
-        return testDelimiter;
-      }
-    }
-
-    return undefined;
-  };
-
-  $.KeyboardSelector.prototype.setUpButton = function () {
-    var self = this;
-    jQuery(document).on('keydown', function (event) {
-      if (event.key == '1' && (event.altKey || event.ctrlKey) || event.key == '\'' && (event.altKey || event.ctrlKey)) {
-        event.preventDefault(); //move this to external button
-
-        if (!event.target.isContentEditable && !jQuery(event.target).hasClass('form-control')) {
-          self.turnSelectionModeOn();
-        }
-
-        return false;
-      } else if (event.key == 'Escape') {
-        //console.log("hello");
-        self.turnSelectionModeOff(); // } else if (event.key == ' ') {
-        //     event.preventDefault();
-        //     return false;
-      }
-
-      if (event.key == '2' && (event.altKey || event.ctrlKey)) {
-        event.preventDefault();
-        var currentInst = jQuery('.sr-alert').html();
-
-        if (currentInst.trim() === "") {
-          currentInst = 'Hit "Ctrl + 1" to beginning annotating the text by marking them with apostrophes.';
-        }
-
-        jQuery('.sr-alert').html(currentInst);
-      }
-
-      if (event.key == '3' && (event.altKey || event.ctrlKey)) {
-        var currVal = jQuery('.sr-alert').attr('aria-live');
-        var newVal = currVal == "off" ? 'polite' : 'off';
-        jQuery('.sr-alert').attr('aria-live', newVal);
-        var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
-        jQuery('.sr-real-alert').html(newAlert);
-        event.preventDefault();
-      }
-    });
-    jQuery(document).on('keyup', '*[role="button"]', function (evt) {
-      if (evt.key == 'Enter' || evt.key == ' ') {
-        jQuery(evt.currentTarget).click();
-        return $.pauseEvent(evt);
-        ;
-      }
-    });
-    jQuery(document).on('click', 'button[class*="keyboard-toggle"]', function (evt) {
-      if (jQuery(this).hasClass('selection-mode-on')) {
-        self.turnSelectionModeOff();
-        jQuery(this).removeClass('selection-mode-on');
-      } else {
-        self.turnSelectionModeOn();
-        jQuery(this).addClass('selection-mode-on');
-      }
-    });
-  };
-
-  $.KeyboardSelector.prototype.turnSelectionModeOn = function () {
-    this.saveHTML = this.element.innerHTML;
-    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
-
-    if (!toggleButton.hasClass('should-show')) {
-      toggleButton.click();
-    }
-
-    if (window.navigator.platform.indexOf('Mac') !== -1) {
-      jQuery('.sr-alert').html('Enter the text box until editing text (usually VoiceOver Keys + Down Arrow) then move around using arrow keys without VoiceOver keys held down.');
-    }
-
-    jQuery(this.element).attr('contenteditable', 'true');
-    jQuery(this.element).attr('role', 'textbox');
-    jQuery(this.element).attr('tabindex', "0");
-    jQuery(this.element).attr('aria-multiline', 'true');
-    jQuery(this.element).attr('accesskey', 't');
-    jQuery('.hx-selector-img').remove();
-    jQuery(this.element).on('keydown', jQuery.proxy(this.filterKeys, this));
-    jQuery(this.element).on('keyup', jQuery.proxy(this.setSelection, this));
-    jQuery('aside.sr-only').removeClass('sr-only');
-    this.start = undefined;
-    this.currentSelection = undefined;
-    this.element.innerHTML = this.saveHTML;
-    this.element.focus();
-  };
-
-  $.KeyboardSelector.prototype.turnSelectionModeOff = function () {
-    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
-
-    if (toggleButton.hasClass('should-show')) {
-      toggleButton.click();
-    }
-
-    jQuery(this.element).off('keydown');
-    jQuery(this.element).off('keyup');
-    jQuery(this.element).attr('contenteditable', 'false');
-    jQuery(this.element).attr('role', '');
-    jQuery(this.element).attr('tabindex', '');
-    jQuery(this.element).attr('aria-multiline', 'false');
-    jQuery(this.element).attr('outline', '0px');
-    jQuery('aside').addClass('sr-only');
-    jQuery('.hx-selector-img').remove();
-    this.start = undefined;
-    this.currentSelection = undefined;
-    this.element.focus();
-  };
-  /* Credit to Rich Caloggero
-   * https://github.com/RichCaloggero/annotator/blob/master/annotator.html
-   */
-
-
-  $.KeyboardSelector.prototype.filterKeys = function (keyPressed) {
-    var self = this;
-    var key = keyPressed.key || keypressed.keyCode;
-
-    switch (key) {
-      case self.delimiter:
-        return false;
-
-      case "ArrowUp":
-      case "ArrowDown":
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "Up":
-      case "Down":
-      case "Left":
-      case "Right":
-      case 37:
-      case 38:
-      case 39:
-      case 40:
-      case "Home":
-      case "End":
-      case "Tab":
-        return true;
-
-      case "Backspace":
-        if (self.verifyBackspace()) {
-          self.start = undefined;
-          return true;
-        }
-
-      case "Escape":
-        self.turnSelectionModeOff();
-        keyPressed.preventDefault();
-        return false;
-
-      case "2":
-        if (keyPressed.altKey || keyPressed.ctrlKey) {
-          jQuery('.sr-alert').html(jQuery('.sr-alert').html());
-        }
-
-        keyPressed.preventDefault();
-        return false;
-
-      case "3":
-        if (keyPressed.altKey || keyPressed.ctrlKey) {
-          var currVal = jQuery('.sr-alert').attr('aria-live');
-          var newVal = currVal == "off" ? 'polite' : 'off';
-          jQuery('.sr-alert').attr('aria-live', newVal);
-          var newAlert = currVal == "off" ? 'Alerts are on' : 'Alerts are off';
-          jQuery('.sr-real-alert').html(newAlert);
-        }
-
-        keyPressed.preventDefault();
-        return false;
-
-      default:
-        keyPressed.preventDefault();
-        return false;
-    } // switch
-
-  };
-
-  $.KeyboardSelector.prototype.getBoundingClientRect = function (range) {
-    var newRange = range.cloneRange();
-
-    try {
-      newRange.setStart(range.startContainer, range.startOffset);
-      newRange.setEnd(range.startContainer, range.startOffset + 1);
-      return {
-        top: newRange.getBoundingClientRect().top,
-        left: newRange.getBoundingClientRect().left
-      };
-    } catch (e) {
-      newRange.setStart(range.startContainer, range.startOffset - 1);
-      newRange.setEnd(range.startContainer, range.startOffset);
-      return {
-        top: newRange.getBoundingClientRect().top,
-        left: newRange.getBoundingClientRect().right
-      };
-    }
-  };
-
-  $.KeyboardSelector.prototype.setSelection = function (keyPressed) {
-    var self = this;
-    var key = keyPressed.key || keyPressed.keyCode;
-
-    switch (key) {
-      case self.delimiter:
-        if (!self.start || typeof self.start == "undefined") {
-          self.start = self.copySelection(getSelection());
-          var bcr = self.getBoundingClientRect(self.start); //console.log($.mouseFixedPositionFromRange(self.start), bcr, jQuery(window).scrollTop());
-
-          jQuery('body').append('<div class="hx-selector-img"></div>');
-          jQuery('.hx-selector-img').css({
-            top: bcr.top + jQuery(window).scrollTop() - 5,
-            left: bcr.left - 5
-          });
-          jQuery('.sr-alert').html('Move to end of text to be annotated and press "*" again.');
-        } else {
-          var end = self.copySelection(getSelection());
-          jQuery('.hx-selector-img').remove(); //console.log("Found end", end);
-
-          if (self.currentSelection) {//console.log(hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl'), self.currentSelection.toString());
-          } else {
-            var end = self.copySelection(getSelection());
-            var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
-            var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
-            var boundingBox = undefined;
-            self.currentSelection = document.createRange();
-
-            if (posStart.startOffset < posEnd.startOffset) {
-              self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
-              self.currentSelection.setEnd(end.startContainer, end.startOffset);
-            } else {
-              self.currentSelection.setStart(end.startContainer, end.startOffset);
-              self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
-            }
-          }
-
-          boundingBox = {
-            top: self.currentSelection.getBoundingClientRect().top + jQuery(window).scrollTop() - 5,
-            left: self.currentSelection.getBoundingClientRect().left - 5
-          };
-          var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
-          jQuery('.sr-alert').html('You are now in a text box. Add your annotation. The quote you have selected is: <em>' + ser.text.exact + "</em>");
-          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [ser], boundingBox]); //console.log("Active Element", document.activeElement.className);
-
-          if (document.activeElement.className.indexOf('note-editable') == -1) {
-            //console.log("BLURRING");
-            self.element.blur();
-          } else {
-            setTimeout(function () {
-              jQuery('.note-editable.card-block')[0].focus(); //console.log("should be focusing on", document.activeElement);
-            }, 250);
-          }
-
-          self.turnSelectionModeOff(); // var startComesAfter = self.startComesAfter(self.start, end);
-          // console.log("Found other", startComesAfter);
-          // self.start = startComesAfter[0];
-          // self.processSelection(startComesAfter[0], startComesAfter[1]);
-        }
-
-        break;
-
-      case "ArrowUp":
-      case "ArrowDown":
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "Up":
-      case "Down":
-      case "Left":
-      case "Right":
-      case 37:
-      case 38:
-      case 39:
-      case 40:
-        if (self.start) {
-          var end = self.copySelection(getSelection());
-          var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
-          var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
-          self.currentSelection = document.createRange();
-
-          if (posStart.startOffset < posEnd.startOffset) {
-            self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
-            self.currentSelection.setEnd(end.startContainer, end.startOffset);
-          } else {
-            self.currentSelection.setStart(end.startContainer, end.startOffset);
-            self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
-          } // console.log(self.start, end);
-          // console.log(self.currentSelection, self.currentSelection.toString());
-          // var sel = window.getSelection();
-          // sel.removeAllRanges();
-          // sel.addRange(self.currentSelection);
-
-        }
-
-    }
-  };
-
-  $.KeyboardSelector.prototype.copySelection = function (selection) {
-    // const sel = {
-    //     anchorNode: selection.anchorNode,
-    //     anchorOffset: selection.anchorOffset,
-    //     focusNode: selection.focusNode,
-    //     focusOffset: selection.focusOffset,
-    //     parentElement: selection.anchorNode.parentElement
-    // };
-    return selection.getRangeAt(0);
-  };
-
-  $.KeyboardSelector.prototype.processSelection = function (start, end) {
-    var self = this;
-    var s = getSelection(); //console.log("LOOK HERE", start, end);
-
-    var r = this.removeMarkers(start, end);
-    self.start = undefined; //console.log("R!", r);
-
-    try {
-      var boundingBox = r.end.parentElement.getBoundingClientRect();
-    } catch (e) {
-      var boundingBox = r.endContainer.parentElement.getBoundingClientRect();
-    } //console.log(boundingBox);
-    // publish selection made
-
-
-    Hxighlighter.publishEvent('TargetSelectionMade', this.instance_id, [this.element, [hrange.serializeRange(r, self.element, 'annotator-hl')], boundingBox]); //console.log("Element Focused", document.activeElement);
-
-    if (document.activeElement.className.indexOf('note-editable') == -1) {
-      self.element.blur();
-    }
-
-    self.turnSelectionModeOff(); // this.element.focus();
-  };
-
-  $.KeyboardSelector.prototype.startComesAfter = function (start, end) {
-    if (start.anchorNode == end.anchorNode) {
-      if (start.anchorOffset > end.anchorOffset) {
-        start.anchorOffset += 1;
-        return [end, start];
-      } else {
-        return [start, end];
-      }
-    } // TODO: Handle other use cases (i.e. starting several nodes instead of within the same one)
-
-
-    var commonAncestor = this.getCommonAncestor(start.anchorNode, end.anchorNode);
-    var children = jQuery(commonAncestor).children();
-    var startCounter = 0;
-    jQuery.each(children, function (_, el) {
-      if (el == start.parentElement) {
-        startCounter += start.anchorOffset;
-        return false;
-      } else {
-        startCounter += jQuery(el).text().length;
-      }
-    });
-    var endCounter = 0;
-    jQuery.each(children, function (_, el) {
-      if (el == end.parentElement) {
-        endCounter += end.anchorOffset;
-        return false;
-      } else {
-        endCounter += jQuery(el).text().length;
-      }
-    });
-
-    if (startCounter > endCounter) {
-      return [end, start];
-    } else {
-      return [start, end];
-    }
-  };
-  /**
-   * Gets the common ancestor.
-   * Credit: https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
-   *
-   * @param      {<type>}  a       { parameter_description }
-   * @param      {<type>}  b       { parameter_description }
-   * @return     {Object}  The common ancestor.
-   */
-
-
-  $.KeyboardSelector.prototype.getCommonAncestor = function (a, b) {
-    $parentsa = jQuery(a).parents();
-    $parentsb = jQuery(b).parents();
-    var found = null;
-    $parentsa.each(function () {
-      var thisa = this;
-      $parentsb.each(function () {
-        if (thisa == this) {
-          found = this;
-          return false;
-        }
-      });
-      if (found) return false;
-    });
-    return found;
-  };
-
-  $.KeyboardSelector.prototype.removeMarkers = function (start, end) {
-    var self = this;
-    var _start = start.anchorNode;
-
-    var _startOffset = start.anchorOffset - 1;
-
-    var _end = end.anchorNode;
-
-    var _endOffset = end.anchorOffset - 1; //console.log(_start, _startOffset, _end, _endOffset);
-
-
-    var t2 = this.removeCharacter(_end.textContent, _endOffset);
-    _end.textContent = t2;
-    var t1 = this.removeCharacter(_start.textContent, _startOffset);
-    _start.textContent = t1;
-    var r = document.createRange();
-    r.setStart(_start, _startOffset);
-    var realRange = {
-      startContainer: _start,
-      startOffset: _startOffset,
-      endContainer: _end
-    };
-
-    if (start.anchorNode === end.anchorNode) {
-      realRange['endOffset'] = _endOffset - 1;
-      r.setEnd(_start, _endOffset - 1);
-    } else {
-      realRange['endOffset'] = _endOffset;
-      r.setEnd(_start, _endOffset);
-    } // getting common ancestors
-    // lonesomeday @ https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
-
-
-    realRange['commonAncestorContainer'] = jQuery(_start).parents().has(_end).first()[0];
-    realRange['exact'] = [r.toString()];
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(r); // convert to xpath and then back to a range
-    // var sR = hrange.serializeRange(r, self.element, 'annotator-hl');
-    //var nR = hrange.normalizeRange(sR, self.element, 'annotator-hl');
-    // console.log(sR, nR);
-
-    return r;
-  };
-
-  $.KeyboardSelector.prototype.removeCharacter = function (s, offset) {
-    if (offset === 0) {
-      s = s.slice(1);
-    } else if (offset === s.length - 1) {
-      s = s.slice(0, -1);
-    } else {
-      s = s.slice(0, offset) + s.slice(offset + 1);
-    }
-
-    return s;
-  };
-
-  $.KeyboardSelector.prototype.verifyBackspace = function () {
-    var s = getSelection();
-    var r = document.createRange();
-    var startOffset = s.anchorOffset;
-
-    if (startOffset > 0) {
-      startOffset -= 1;
-    }
-
-    r.setStart(s.anchorNode, startOffset);
-    r.setEnd(s.anchorNode, startOffset + 1);
-    return r.toString() == this.delimiter;
-  };
-
-  $.selectors.push($.KeyboardSelector);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Should be listening for ways to select a text and then return an xpath 
- * object with the range that was selected.
- */
-var jQuery = __webpack_require__(0);
-
-var hrange = __webpack_require__(3);
-
-(function ($) {
-  $.MouseSelector = function (element, inst_id) {
-    var defaultOpts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    this.element = element;
-    this.instance_id = inst_id;
-    this.adder = null;
-    this.wrapperSelector = '.annotator-wrapper';
-    this.mustConfirm = !!defaultOpts.confirm;
-    this.init();
-  };
-
-  $.MouseSelector.prototype.init = function () {
-    var self = this;
-    self.setUpListeners();
-  };
-
-  $.MouseSelector.prototype.setUpListeners = function () {
-    var self = this;
-    this.element.addEventListener('mouseup', function (event) {
-      var selection = window.getSelection();
-      var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
-
-      self.onSelection(selectionRange, event);
-    });
-    document.addEventListener('keyup', function (e) {
-      var allowedKeys = "ArrowUpArrowDownArrowLeftArrowRight";
-
-      if (allowedKeys.indexOf(e.key) > -1 && e.shiftKey) {
-        var selection = window.getSelection();
-        var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
-
-        self.onSelection(selectionRange, event);
-      }
-    });
-  };
-
-  $.MouseSelector.prototype.onSelection = function (range, event) {
-    var self = this; //console.log('onSelection Ran: ', range, event);
-
-    if (range instanceof Range) {
-      //console.log('range is instance of Range', range.toString());
-      var result = self.shouldBeAnnotated(range);
-
-      if (result && (range.toString().length > 0 || range.cloneContents().querySelectorAll('img').length > 0)) {
-        if (self.mustConfirm) {
-          //console.log("Confirming...")
-          self.confirm(range, event);
-        } else {
-          //console.log("Sending TargetSelection to Hxighlighter");
-          //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
-          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [hrange.serializeRange(range, self.element, 'annotator-hl')], event]);
-        }
-      } else {
-        // send message to erase confirm button
-        //console.log('Either result is false or toString() returned 0')
-        self.hideConfirm();
-      }
-    }
-  };
-
-  $.MouseSelector.prototype.shouldBeAnnotated = function (range) {
-    var self = this;
-    var wrapper = self.element.querySelector(self.wrapperSelector);
-    var testingNode = range.commonAncestorContainer;
-
-    while (testingNode !== wrapper && testingNode !== null) {
-      testingNode = testingNode.parentNode;
-    }
-
-    return testingNode === wrapper;
-  };
-
-  $.MouseSelector.prototype.confirm = function (range, event) {
-    var self = this;
-    self.hideConfirm();
-
-    if (self.element.querySelectorAll('.annotation-editor-nav-bar').length == 0) {
-      self.interactionPoint = $.mouseFixedPosition(event); //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
-
-      self.loadButton(hrange.serializeRange(range, self.element, 'annotator-hl'), self.interactionPoint, event); //console.log("Should have loaded button to confirm annotation");
-    }
-  };
-
-  $.MouseSelector.prototype.hideConfirm = function () {
-    jQuery('.hx-confirm-button').remove();
-  };
-
-  $.MouseSelector.prototype.loadButton = function (range, iP, event) {
-    var self = this;
-
-    if (iP.top <= 48) {
-      iP.top = 49;
-    }
-
-    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + (iP.top - 10) + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
-    jQuery('body').append(confirmButtonTemplate);
-    jQuery('.hx-confirm-button button').click(function () {
-      $.publishEvent('drawTemp', self.instance_id, [[range]]);
-      $.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [range], event]);
-      jQuery('.hx-confirm-button').remove();
-    });
-  };
-
-  $.selectors.push($.MouseSelector);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(3);
-
-(function ($) {
-  $.XPathDrawer = function (element, inst_id, hClass, options) {
-    this.element = element;
-    this.instance_id = inst_id;
-    this.h_class = (hClass + ' annotator-hl').trim();
-    this.init();
-    this.drawnAnnotations = [];
-    this.tempHighlights = [];
-    this.options = options || {};
-  };
-
-  $.XPathDrawer.prototype.init = function () {
-    var self = this; // this.highlighter = new annotator.ui.highlighter.Highlighter(this.element, {
-    //     highlightClass: (self.h_class + ' annotator-hl')
-    // });
-
-    jQuery(self.element).on('mouseover', '.' + self.h_class.replace(' ', '.'), function (event) {
-      $.pauseEvent(event);
-      var annotations = self.getAnnotationsFromElement(event); //console.log("MOUSEOVER", annotations);
-
-      Hxighlighter.publishEvent('ViewerDisplayOpen', self.instance_id, [event, annotations]);
-    });
-    jQuery(self.element).on('mouseleave', '.' + self.h_class.replace(' ', '.'), function (event) {
-      Hxighlighter.publishEvent('ViewerDisplayClose', self.instance_id, [event]);
-    });
-    jQuery(self.element).on('click', '.' + self.h_class.replace(' ', '.'), function (event) {
-      var annotations = self.getAnnotationsFromElement(event);
-      Hxighlighter.publishEvent('DrawnSelectionClicked', self.instance_id, [event, annotations]);
-    });
-    Hxighlighter.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation) {
-      self.undraw(annotation);
-    });
-    Hxighlighter.subscribeEvent('GetAnnotationsData', self.instance_id, function (_, callback) {
-      callback(self.getAnnotationsData());
-    });
-    Hxighlighter.subscribeEvent('GetSpecificAnnotationData', self.instance_id, function (_, annotation_id, callback) {
-      callback(self.getSpecificAnnotationData(annotation_id));
-    });
-    Hxighlighter.subscribeEvent('changeDrawnColor', self.instance_id, function (_, annotation, color) {
-      if (annotation._local) {
-        jQuery.each(annotation._local.highlights, function (_, hl) {
-          setTimeout(function () {
-            jQuery(hl).css('background-color', color);
-          }, 250);
-        });
-      }
-    });
-    Hxighlighter.subscribeEvent('undrawAll', self.instance_id, function (_, callBack) {
-      var annotations = self.getAnnotationsData();
-      annotations.forEach(function (ann) {
-        self.undraw(ann);
-      });
-      callBack(annotations);
-    });
-    Hxighlighter.subscribeEvent('drawList', self.instance_id, function (_, annotations, callBack) {
-      annotations.forEach(function (ann) {
-        self.draw(ann);
-      });
-      callBack(annotations);
-    });
-    Hxighlighter.subscribeEvent('drawTemp', self.instance_id, function (_, range, callBack) {
-      var textNodes = hrange.getTextNodesFromAnnotationRanges(range, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
-
-      var spans = [];
-      textNodes.forEach(function (node) {
-        //console.log(node, jQuery(node));
-        jQuery(node).wrap('<span class="temp-ann ' + self.h_class + '"></span>');
-        spans.push(jQuery(node).parent()[0]);
-      });
-      self.tempHighlights = self.tempHighlights.concat(spans);
-    });
-  };
-
-  $.XPathDrawer.prototype.draw = function (annotation) {
-    var self = this; // console.log(self.options, annotation);
-
-    console.log("Annotation Being Drawn", annotation);
-    self.tempHighlights.forEach(function (hl) {
-      jQuery(hl).contents().unwrap();
-    }); // the process for drawing is divided into 4 parts
-    // 1. Retrieve all discrete text nodes associated with annotation
-
-    var textNodes = hrange.getTextNodesFromAnnotationRanges(annotation.ranges, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
-
-    var spans = [];
-    var otherLabel = '';
-
-    if (self.options.user_id === annotation.creator.id) {
-      otherLabel += ' annotation-mine';
-    }
-
-    if (self.options.instructors.indexOf(annotation.creator.id) > -1) {
-      otherLabel += ' annotation-instructor';
-    }
-
-    textNodes.forEach(function (node) {
-      //console.log(node, jQuery(node));
-      jQuery(node).wrap('<span class="' + self.h_class + otherLabel + '"></span>');
-      spans.push(jQuery(node).parent()[0]);
-    }); // 3. In a _local.highlights value, we store the list of span tags generated for the annotation.
-
-    annotation['_local'] = {
-      'highlights': spans
-    }; // 3. Store in each span tag the value of the annotation post-saving _local.highlights
-
-    spans.forEach(function (span) {
-      jQuery(span).data('annotation', annotation);
-    }); //console.log(annotation);
-
-    $.publishEvent('annotationDrawn', self.instance_id, [annotation]); // the annotation is then saved to the current list
-
-    self.drawnAnnotations.push(annotation); // code below allows you to undraw annotations by clicking on them, should this ever be needed in the future
-    // jQuery.each(annotation._local.highlights, function(_, high) {
-    //     jQuery(high).on('mouseover', function() {
-    //          $.publishEvent('toggleViewer')
-    //     });
-    // });
-  };
-
-  $.XPathDrawer.prototype.undraw = function (annotation) {
-    var self = this; //this.highlighter.undraw(annotation);
-
-    if (annotation._local) {
-      //console.log('Undrawing...', annotation._local.highlights)
-      annotation._local.highlights.forEach(function (hl) {
-        jQuery(hl).contents().unwrap();
-      });
-
-      annotation._local.highlights = [];
-    }
-
-    self.tempHighlights.forEach(function (hl) {
-      jQuery(hl).contents().unwrap();
-    });
-    self.drawnAnnotations = self.drawnAnnotations.filter(function (ann) {
-      if (ann.id !== annotation.id) {
-        return ann;
-      }
-    }); //console.log(self.drawnAnnotations);
-
-    $.publishEvent('annotationUndrawn', self.instance_id, [annotation]);
-  };
-
-  $.XPathDrawer.prototype.redraw = function (annotation) {
-    var self = this;
-    self.undraw(annotation);
-    self.draw(annotation); //this.highlighter.redraw(annotation);
-    //$.publishEvent('annotationRedrawn', self.instance_id, [annotation]);
-  };
-
-  $.XPathDrawer.prototype.getAnnotationsFromElement = function (event) {
-    return jQuery(event.target).parents('.annotator-hl').addBack().map(function (_, elem) {
-      return jQuery(elem).data('annotation');
-    }).toArray().sort(function (a, b) {
-      return a.created - b.created;
-    });
-  }; // found @ https://dev.to/saigowthamr/how-to-remove-duplicate-objects-from-an-array-javascript-48ok
-
-
-  $.XPathDrawer.prototype.getUnique = function (arr, comp) {
-    var unique = arr.map(function (e) {
-      return e[comp];
-    }) // store the keys of the unique objects
-    .map(function (e, i, _final) {
-      return _final.indexOf(e) === i && i;
-    }) // eliminate the dead keys & store unique objects
-    .filter(function (e) {
-      return arr[e];
-    }).map(function (e) {
-      return arr[e];
-    });
-    return unique;
-  };
-
-  $.XPathDrawer.prototype.getAnnotationsData = function () {
-    var self = this;
-    var all = self.getUnique(jQuery('.annotator-hl').parents('.annotator-hl').addBack().map(function (_, elem) {
-      return jQuery(elem).data('annotation');
-    }).toArray(), 'id');
-    all.sort(function (a, b) {
-      return b - a;
-    }); //console.log(all);
-
-    return all;
-  };
-
-  $.XPathDrawer.prototype.getSpecificAnnotationData = function (annotation_id) {
-    var self = this;
-    var currentAnnotations = self.getAnnotationsData();
-    var foundAnnotation = currentAnnotations.find(function (ann) {
-      if (ann.id === annotation_id) {
-        return ann;
-      }
-    });
-    return foundAnnotation;
-  };
-
-  $.drawers.push($.XPathDrawer);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 27 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(29);
-/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
-/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(timeago__WEBPACK_IMPORTED_MODULE_3__);
-/**
- * 
- */
-var annotator = annotator ? annotator : __webpack_require__(5);
-
-
-
-
-
-__webpack_require__(8);
-
-__webpack_require__(9);
-
-(function ($) {
-  $.Sidebar = function (options, inst_id) {
-    // sets default options
-    var defaultOptions = {
-      // set up template names that will be pulled
-      TEMPLATENAMES: ["editor", "viewer"],
-      TEMPLATES: {
-        editor: __webpack_require__(31),
-        viewer: __webpack_require__(32),
-        annotationSection: __webpack_require__(33),
-        annotationItem: __webpack_require__(34)
-      },
-      template_suffix: "sidebar",
-      template_urls: ""
-    };
-    this.options = jQuery.extend({}, defaultOptions, options);
-    console.log("Sidebar options", this.options);
-    this.instance_id = inst_id;
-    this.annotation_tool = {
-      interactionPoint: null,
-      editing: false,
-      updating: false,
-      editor: null,
-      viewer: null
-    };
-    this.element = jQuery(this.options.element);
-    this.hideTimer = null;
-    this.load_more_open = false;
-
-    if (options && options.viewer_options && options.viewer_options.defaultTab) {
-      this.latestOpenedTabs = [options.viewer_options.defaultTab];
-    } else {
-      this.latestOpenedTabs = [];
-    }
-
-    this.init();
-  };
-
-  $.Sidebar.prototype.init = function () {
-    var self = this;
-    self.setUpTemplates(self.options.template_suffix);
-    self.setUpSidebar();
-    self.setUpListeners();
-  };
-
-  $.Sidebar.prototype.setUpTemplates = function (suffix) {
-    var self = this;
-    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
-      if (templateName in self.options.TEMPLATES) {
-        return;
-      }
-
-      var options = {
-        url: self.options.template_urls + templateName + '-' + suffix + '.html',
-        type: "GET",
-        contentType: "charset=utf-8",
-        success: function success(data) {
-          var template = _.template(data);
-
-          self.options.TEMPLATES[templateName] = template;
-        },
-        async: true
-      };
-      return jQuery.ajax(options);
-    });
-    jQuery.when.apply(jQuery, deferreds).done(function () {
-      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
-        editorid: self.instance_id.replace(/:/g, '-')
-      });
-    });
-  };
-
-  $.Sidebar.prototype.setUpSidebar = function () {
-    var self = this;
-    var sidebarOptions = jQuery.extend({
-      'tabsAvailable': ['search', 'mine', 'instructor', 'peer']
-    }, self.options.viewer_options, {
-      annotationItems: []
-    });
-    self.element.append(self.options.TEMPLATES.annotationSection(sidebarOptions));
-    self.sidebar = self.element.find('.annotationSection');
-    self.sidebar.parent().css('width', 'calc(100% - var(--sidebar-width))'); // self.element.on('mouseover', '.annotationsHolder', function(event) {
-    //     jQuery('body').css('overflow-y', 'hidden');
-    // });
-    // self.element.on('mouseleave', '.annotationsHolder', function(event) {
-    //     jQuery('body').css('overflow-y', 'scroll');
-    // });
-    // toggle search
-
-    jQuery('#search').click(function () {
-      jQuery('.search-bar.search-toggle').toggle();
-      jQuery('.annotationsHolder').toggleClass('search-opened');
-      $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
-        return a;
-      }, true]);
-    });
-    jQuery('#sidebar-filter-options').click(function () {
-      jQuery('.annotationsHolder').removeClass('search-opened');
-      jQuery('.annotation-filter-buttons').show();
-      jQuery('#sidebar-filter-options').hide();
-      jQuery('.search-bar.search-toggle').hide();
-      jQuery('.tag-token-list').hide();
-      var doit = self.latestOpenedTabs;
-      self.latestOpenedTabs = [];
-      jQuery.each(doit, function (_, tab) {
-        console.log(tab);
-        jQuery('#' + tab).trigger('click');
-      }); // jQuery('.annotationsHolder.side').html('');
-      // var messageVals = [];
-      // var pluralMessage = '';
-      // jQuery.each(jQuery('.btn.user-filter'), function(a, b) {
-      //     if (b.id == 'mynotes') {
-      //         messageVals.push("your annotations")
-      //     } else if (b.id == 'instructor') {
-      //         messageVals.push("instructor annotations");
-      //     } else if (b.id == 'public') {
-      //         messageVals.push("peer annotations");
-      //     }
-      // })
-      // if (messageVals.length > 1) {
-      //     messageVals.splice(messageVals.length - 1, 0, 'and/or,')
-      //     messageVals = messageVals.join(', ').replace(',,', '');
-      //     pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>'
-      // }
-      // jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage)
-
-      return;
-    });
-    jQuery('#search-clear').click(function () {
-      jQuery('#srch-term').val('');
-      $.publishEvent('StorageAnnotationSearch', self.instance_id, [{
-        type: self.options.mediaType
-      }, function (results, converter) {
-        $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows.reverse(), converter, true]);
-      }, function () {}]);
-    });
-    jQuery('#srch-term').on('keydown', function (event) {
-      if (event.key == "Enter") {
-        jQuery('#search-submit').trigger('click');
-      }
-    });
-    jQuery('#search-submit').click(function () {
-      var searchValue = jQuery('#srch-term').val().trim();
-      var searchType = jQuery('.search-bar select').val();
-      var ops = self.filterByType(searchValue, searchType, undefined);
-      self.search(ops);
-    }); // trigger new filter tab
-
-    jQuery('.btn.user-filter').click(function () {
-      if (this.id === "search") {
-        jQuery('.btn.user-filter').removeClass('active');
-        jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
-      } else {
-        if (jQuery(this).hasClass('active')) {
-          self.latestOpenedTabs.splice(self.latestOpenedTabs.indexOf(this.id), 1);
-
-          if (jQuery('.btn.user-filter.active').length == 1) {
-            jQuery(this).removeClass('active');
-            jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');
-            $.publishEvent('StorageAnnotationLoad', self.instance_id, [[], function (a) {
-              return a;
-            }, true]);
-            jQuery('.annotationsHolder.side').html('');
-            var messageVals = [];
-            var pluralMessage = '';
-            jQuery.each(jQuery('.btn.user-filter'), function (a, b) {
-              if (b.id == 'mine') {
-                messageVals.push("your annotations");
-              } else if (b.id == 'instructor') {
-                messageVals.push("instructor annotations");
-              } else if (b.id == 'peer') {
-                messageVals.push("peer annotations");
-              }
-            });
-
-            if (messageVals.length > 1) {
-              messageVals.splice(messageVals.length - 1, 0, 'and/or,');
-              messageVals = messageVals.join(', ').replace(',,', '');
-              pluralMessage = '<br><br>Note: You can select multiple tabs at a time to view those annotations together!</div>';
-            }
-
-            jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
-            return;
-          }
-
-          jQuery(this).removeClass('active');
-          jQuery(this).find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //removeClass('fa-toggle-on').addClass('fa-toggle-off');
-        } else {
-          jQuery(this).addClass('active');
-          self.latestOpenedTabs.push(this.id);
-          jQuery(this).find('.fas.fa-toggle-on').removeClass('fa-flip-horizontal'); //.removeClass('fa-toggle-off').addClass('fa-toggle-on');
-        }
-      }
-
-      jQuery('.annotationsHolder').removeClass('search-opened');
-      jQuery('.search-bar.search-toggle').hide();
-      var search_options = {
-        type: self.media
-      };
-      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
-        return button.id;
-      });
-
-      if (this.id === "search") {
-        jQuery('.annotationsHolder').addClass('search-opened');
-        jQuery('.annotation-filter-buttons').hide();
-        jQuery('#sidebar-filter-options').show();
-        jQuery('.search-bar.search-toggle').show();
-        jQuery('.tag-token-list').show();
-        jQuery('.annotationsHolder.side').html('');
-        jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;">Search annotations with options above.</div>');
-        return;
-      }
-
-      var possible_exclude = [];
-      var possible_include = []; //console.log(filteroptions);
-
-      if (filteroptions.indexOf('mine') > -1) {
-        possible_include.push(self.options.user_id);
-      } else {
-        possible_exclude.push(self.options.user_id);
-      }
-
-      if (filteroptions.indexOf('instructor') > -1) {
-        possible_include = possible_include.concat(self.options.instructors);
-      } else {
-        possible_exclude = possible_exclude.concat(self.options.instructors);
-      }
-
-      if (filteroptions.indexOf('peer') > -1) {
-        if (possible_exclude.length > 0) {
-          search_options['exclude_userid'] = possible_exclude;
-        }
-      } else {
-        search_options['userid'] = possible_include;
-      }
-
-      if (self.options.instructors.indexOf(self.options.user_id) > -1) {
-        if (filteroptions.indexOf('peer') > -1 && (filteroptions.indexOf('mine') > -1 && filteroptions.indexOf('instructor') == -1 || filteroptions.indexOf('mine') == -1 && filteroptions.indexOf('instructor') > -1)) {
-          // jQuery('.btn.user-filter#instructor').addClass('active');
-          // jQuery('.btn.user-filter#instructor').find('.fas').removeClass('fa-toggle-off').addClass('fa-toggle-on');
-          // jQuery('.btn.user-filter#mynotes').addClass('active');
-          // jQuery('.btn.user-filter#mynotes').find('.fas').removeClass('fa-toggle-off').addClass('fa-toggle-on');
-          search_options['exclude_userid'] = []; //search_options['userid'] = [];
-        }
-      }
-
-      self.search(search_options);
-    });
-    jQuery('.sidebar-button#hide_label').click(function () {
-      jQuery(':root').css('--sidebar-width', '0px');
-      jQuery('.annotationSection').hide();
-      self.showSidebarTab(self.options.viewer_options.sidebarversion);
-    });
-    jQuery('.side.annotationsHolder').on('scroll', function () {
-      if (jQuery(this).scrollTop() + jQuery(this).innerHeight() >= jQuery(this)[0].scrollHeight) {
-        var total_left = $.totalAnnotations - jQuery('.side.ann-item').length;
-
-        if (total_left > 0 && jQuery('.load-more').length == 0) {
-          jQuery('.side.annotationsHolder').css('padding-bottom', '40px');
-          jQuery('.side.annotationsHolder').after('<div role="button" tabindex="0" class="load-more side make-jiggle">Load Next ' + self.options.viewer_options.pagination + ' Annotations</div>');
-          self.load_more_open = true;
-          jQuery('.side.load-more').click(function () {
-            var options = {
-              type: self.options.mediaType,
-              limit: self.options.viewer_options.pagination,
-              offset: jQuery('.side.ann-item').length
-            };
-
-            if (jQuery('.search-toggle:visible').length > 0) {
-              var searchValue = jQuery('#srch-term').val().trim();
-              var searchType = jQuery('.search-bar select').val();
-              options = self.filterByType(searchValue, searchType, options);
-            } else {
-              var possible_exclude = [];
-              var possible_include = [];
-              var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
-                return button.id;
-              });
-
-              if (filteroptions.indexOf('mine') > -1) {
-                possible_include.push(self.options.user_id);
-              } else {
-                possible_exclude.push(self.options.user_id);
-              }
-
-              if (filteroptions.indexOf('instructor') > -1) {
-                possible_include = possible_include.concat(self.options.instructors);
-              } else {
-                possible_exclude = possible_exclude.concat(self.options.instructors);
-              }
-
-              if (filteroptions.indexOf('peer') > -1) {
-                if (possible_exclude.length > 0) {
-                  options['exclude_userid'] = possible_exclude;
-                }
-              } else {
-                options['userid'] = possible_include;
-              }
-            }
-
-            jQuery(this).html('<span class="fa fa-spinner make-spin"></span>'); //console.log(options);
-
-            $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
-              jQuery('.side.load-more').remove();
-              jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
-              $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, false]);
-            }, function () {}]);
-          });
-        }
-      } else if (self.load_more_open && jQuery(this).scrollTop() + jQuery(this).innerHeight() <= jQuery(this)[0].scrollHeight - 50) {
-        //console.log('should remove it');
-        self.load_more_open = false;
-        jQuery('.side.load-more').remove();
-        jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
-      }
-    });
-  };
-
-  $.Sidebar.prototype.showSidebarTab = function (type) {
-    // if (type === "smalltab") {
-    jQuery(':root').css('--sidebar-width', '55px');
-    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button"><span class="fas fa-comments"></span></div>'); // }
-
-    jQuery('.open-sidebar').click(function () {
-      jQuery('.open-sidebar').remove();
-      jQuery('.annotationSection').show();
-      jQuery(':root').css('--sidebar-width', '300px');
-    });
-  };
-
-  $.Sidebar.prototype.setUpListeners = function () {
-    var self = this;
-    $.subscribeEvent('StorageAnnotationSave', self.instance_id, function (_, annotation, updating) {
-      console.log("reached here!");
-      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
-        return button.id;
-      });
-
-      if (filteroptions.indexOf('mine') > -1) {
-        self.addAnnotation(annotation, updating, false);
-      } else {
-        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
-      }
-    });
-    $.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation, updating) {
-      jQuery('.item-' + annotation.id).remove();
-
-      if (jQuery('.annotationItem').length == 0) {
-        jQuery('#empty-alert').css('display', 'block');
-      }
-    });
-    $.subscribeEvent('searchTag', self.instance_id, function (_, tag) {
-      var options = {
-        'type': self.options.mediaType,
-        'tag': tag
-      };
-      self.search(options);
-    });
-    $.subscribeEvent('annotationLoaded', self.instance_id, function (_, annotation) {
-      self.addAnnotation(annotation, false, true);
-    });
-    $.subscribeEvent('autosearch', self.instance_id, function (_, term, type) {
-      self.autosearch(term, type);
-    });
-  };
-
-  $.Sidebar.prototype.addAnnotation = function (annotation, updating, shouldAppend) {
-    var self = this;
-
-    if (annotation.media !== "comment" && annotation.text !== "" && $.exists(annotation.tags)) {
-      var ann = annotation;
-      ann.index = 0;
-      ann.instructor_ids = self.options.instructors;
-      ann.common_name = self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ann.creator.name;
-      var annHTML = self.options.TEMPLATES.annotationItem(ann);
-
-      if (self.options.viewer_options.readonly) {
-        annHTML = annHTML.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
-      }
-
-      if (jQuery('.side.item-' + ann.id).length > 0) {
-        jQuery('.item-' + ann.id).html(jQuery(annHTML).html());
-      } else {
-        if (shouldAppend) {
-          jQuery('.annotationsHolder').append(annHTML);
-        } else {
-          jQuery('.annotationsHolder').prepend(annHTML);
-        }
-      }
-
-      jQuery('.item-' + ann.id).find('.delete').confirm({
-        title: 'Delete Annotation?',
-        content: 'Would you like to delete your annotation? This is permanent.',
-        buttons: {
-          confirm: function confirm() {
-            $.publishEvent('StorageAnnotationDelete', self.instance_id, [annotation]);
-          },
-          cancel: function cancel() {}
-        }
-      });
-      jQuery('.side.item-' + ann.id).find('.edit').click(function (event) {
-        self.ViewerEditorOpen(event, ann, true);
-      });
-      jQuery('.side.item-' + ann.id).click(function () {
-        if (ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
-          var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
-          jQuery(self.element).parent().animate({
-            scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 40
-          }); //jQuery(ann._local.highlights).animate({'outline': '2px solid black'}, 1000)
-
-          setTimeout(function () {
-            ann._local.highlights.forEach(function (hl) {
-              if (jQuery(hl).text().trim().length > 0) {
-                jQuery(hl).css({
-                  border: '0 solid black'
-                }).animate({
-                  borderWidth: 2
-                }, 200).animate({
-                  borderWidth: 0
-                }, 200);
-              }
-            });
-          }, 350);
-        }
-      });
-      jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
-        self.autosearch(jQuery(this).text().trim(), 'User');
-        $.pauseEvent(e);
-      });
-      jQuery('.side.item-' + ann.id).find('.annotation-tag.side').click(function (e) {
-        self.autosearch(jQuery(this).text().trim(), 'Tag'); // jQuery('.btn.user-filter').removeClass('active');
-        // jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal');//.removeClass('fa-toggle-on').addClass('fa-toggle-off');
-        // jQuery('.annotationsHolder').addClass('search-opened');
-        // jQuery('.annotation-filter-buttons').hide();
-        // jQuery('#sidebar-filter-options').show();
-        // jQuery('.search-bar.search-toggle').show();
-        // jQuery('.tag-token-list').show();
-        // jQuery('.search-toggle').show(jQuery(this).html().trim());
-        // var options = {
-        //     type: self.options.mediaType,
-        // }
-        // var tagSearched = jQuery(this).html().trim();
-        // options['tag'] = tagSearched;
-        // jQuery('#srch-term').val(tagSearched)
-        // jQuery('.search-bar select').val('Tag');
-        // self.search(options);
-
-        $.pauseEvent(e);
-      });
-      $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
-      jQuery('#empty-alert').css('display', 'none');
-    }
-  };
-
-  $.Sidebar.prototype.filterByType = function (searchValue, type, options) {
-    var self = this;
-    searchValue = searchValue.trim();
-    var options = options ? options : {
-      'type': self.options.mediaType
-    };
-
-    if (searchValue === "") {
-      jQuery('.annotationsHolder .annotationItem').show();
-      return;
-    }
-
-    if (type === "User") {
-      options['username'] = searchValue;
-    } else if (type === "Annotation") {
-      options['text'] = searchValue;
-    } else if (type === "Tag") {
-      options['tag'] = searchValue;
-    }
-
-    return options;
-  };
-
-  $.Sidebar.prototype.search = function (options) {
-    jQuery('.annotationsHolder').prepend('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
-    $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
-      jQuery('.annotationsHolder.side').html('');
-      $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, true]);
-      jQuery('.loading-obj').remove();
-      jQuery('.side.annotationsHolder').scrollTop(0);
-      self.load_more_open = false;
-      jQuery('.side.load-more').remove();
-      jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
-
-      if (results.rows.length == 0) {
-        jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;">No annotations match your search!</div>');
-      }
-    }, function (err) {
-      jQuery('.loading-obj').remove();
-    }]);
-  };
-
-  $.Sidebar.prototype.TargetSelectionMade = function (annotation, event) {
-    var self = this;
-    self.currentSelection = annotation;
-  };
-
-  $.Sidebar.prototype.TargetAnnotationDraw = function (annotation) {};
-
-  $.Sidebar.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
-    var self = this;
-    var editor = jQuery('.side.item-' + annotation.id);
-    editor.find('.body').after('<div class="editor-area side"><textarea id="annotation-text-field")></textarea><div class="plugin-area"></div><button tabindex="0" class="btn btn-primary save action-button">Save</button><button tabindex="0" class="btn btn-default cancel action-button">Cancel</button></div>');
-    editor.find('.body').hide();
-    editor.find('.tagList').hide();
-    jQuery('.edit').prop('disabled', true); // closes the editor tool and does not save annotation
-
-    editor.find('.cancel').click(function () {
-      self.ViewerEditorClose(annotation, true, false, editor);
-    }); // closes the editor and does save annotations
-
-    editor.find('.save').click(function () {
-      var text = editor.find('#annotation-text-field').val();
-
-      if (updating) {
-        annotation.annotationText.pop();
-      }
-
-      annotation.annotationText.push(text);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, false, false]);
-      self.ViewerEditorClose(annotation, true, false, editor);
-    });
-    $.publishEvent('editorShown', self.instance_id, [editor, annotation]);
-  };
-
-  $.Sidebar.prototype.ViewerEditorClose = function (annotation, redraw, should_erase, editor) {
-    jQuery('.editor-area.side').remove();
-    jQuery('.edit').prop('disabled', false);
-    jQuery('.note-link-popover').remove();
-    $.publishEvent('editorHidden', self.instance_id, []);
-
-    if (editor) {
-      editor.find('.side.body').show();
-      editor.find('.tagList.side').show();
-    }
-  };
-
-  $.Sidebar.prototype.ViewerDisplayOpen = function (event, annotations) {};
-
-  $.Sidebar.prototype.ViewerDisplayClose = function (annotations) {};
-
-  $.Sidebar.prototype.StorageAnnotationSave = function (annotations) {};
-
-  $.Sidebar.prototype.StorageAnnotationDelete = function (annotations) {};
-
-  $.Sidebar.prototype.StorageAnnotationLoad = function (annotations) {};
-
-  $.Sidebar.prototype.autosearch = function (term, type) {
-    var self = this;
-
-    if (self.options.viewer_options.readonly) {
-      $.publishEvent('dumpStore', self.instance_id, [function (annotations) {
-        self.tempAnnotationList = annotations;
-        jQuery('.ann-item').show();
-        $.publishEvent('undrawAll', self.instance_id, [function (annList) {
-          self.foundList = [];
-          self.tempAnnotationList.forEach(function (ann) {
-            if (type == "Tag") {
-              if (ann.tags.indexOf(term) > -1) {
-                self.foundList.push(ann);
-              } else {
-                jQuery('.ann-item.item-' + ann.id).hide();
-              }
-            } else if (type == "User") {
-              if (ann.creator.name === term) {
-                self.foundList.push(ann);
-              } else {
-                jQuery('.ann-item.item-' + ann.id).hide();
-              }
-            }
-          });
-          $.publishEvent('drawList', self.instance_id, [self.foundList, function () {
-            jQuery('#empty-alert').html('You are now viewing only annotations with ' + type.toLowerCase() + ' "' + term + '". Click here to view all annotations');
-            jQuery('#empty-alert').show();
-            jQuery('#empty-alert').css('cursor', 'pointer');
-            jQuery('#empty-alert').on('click', function () {
-              jQuery('#empty-alert').off('click');
-              jQuery('#empty-alert').hide();
-              jQuery('#empty-alert').css('cursor', 'default');
-              jQuery('.ann-item').show();
-              $.publishEvent('undrawAll', self.instance_id, [function (annList) {
-                $.publishEvent('drawList', self.instance_id, [self.tempAnnotationList, function () {}]);
-              }]);
-            });
-          }]);
-        }]);
-      }]);
-    } else {
-      jQuery('.btn.user-filter').removeClass('active');
-      jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
-
-      if (term !== self.options.common_instructor_name) {
-        self.search(self.filterByType(term, type, undefined));
-        jQuery('.annotationsHolder').addClass('search-opened');
-        jQuery('.search-toggle').show();
-        jQuery('.annotation-filter-buttons').hide();
-        jQuery('#sidebar-filter-options').show();
-        jQuery('.search-bar.search-toggle').show();
-        jQuery('.tag-token-list').show();
-        $.publishEvent('searchSelected', self.instance_id, []);
-        jQuery('#srch-term').val(term);
-        jQuery('.search-bar select').val(type);
-      } else {
-        jQuery('#sidebar-filter-options').trigger('click');
-        jQuery('.btn.user-filter#instructor').trigger('click');
-      }
-    }
-  };
-
-  $.viewers.push($.Sidebar);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
- * Timeago is a jQuery plugin that makes it easy to support automatically
- * updating fuzzy timestamps (e.g. "4 minutes ago" or "about 1 day ago").
- *
- * @name timeago
- * @version 1.6.7
- * @requires jQuery >=1.5.0 <4.0
- * @author Ryan McGeary
- * @license MIT License - http://www.opensource.org/licenses/mit-license.php
- *
- * For usage and examples, visit:
- * http://timeago.yarp.com/
- *
- * Copyright (c) 2008-2019, Ryan McGeary (ryan -[at]- mcgeary [*dot*] org)
- */
-
-(function (factory) {
-  if (true) {
-    // AMD. Register as an anonymous module.
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else {}
-}(function ($) {
-  $.timeago = function(timestamp) {
-    if (timestamp instanceof Date) {
-      return inWords(timestamp);
-    } else if (typeof timestamp === "string") {
-      return inWords($.timeago.parse(timestamp));
-    } else if (typeof timestamp === "number") {
-      return inWords(new Date(timestamp));
-    } else {
-      return inWords($.timeago.datetime(timestamp));
-    }
-  };
-  var $t = $.timeago;
-
-  $.extend($.timeago, {
-    settings: {
-      refreshMillis: 60000,
-      allowPast: true,
-      allowFuture: false,
-      localeTitle: false,
-      cutoff: 0,
-      autoDispose: true,
-      strings: {
-        prefixAgo: null,
-        prefixFromNow: null,
-        suffixAgo: "ago",
-        suffixFromNow: "from now",
-        inPast: 'any moment now',
-        seconds: "less than a minute",
-        minute: "about a minute",
-        minutes: "%d minutes",
-        hour: "about an hour",
-        hours: "about %d hours",
-        day: "a day",
-        days: "%d days",
-        month: "about a month",
-        months: "%d months",
-        year: "about a year",
-        years: "%d years",
-        wordSeparator: " ",
-        numbers: []
-      }
-    },
-
-    inWords: function(distanceMillis) {
-      if (!this.settings.allowPast && ! this.settings.allowFuture) {
-          throw 'timeago allowPast and allowFuture settings can not both be set to false.';
-      }
-
-      var $l = this.settings.strings;
-      var prefix = $l.prefixAgo;
-      var suffix = $l.suffixAgo;
-      if (this.settings.allowFuture) {
-        if (distanceMillis < 0) {
-          prefix = $l.prefixFromNow;
-          suffix = $l.suffixFromNow;
-        }
-      }
-
-      if (!this.settings.allowPast && distanceMillis >= 0) {
-        return this.settings.strings.inPast;
-      }
-
-      var seconds = Math.abs(distanceMillis) / 1000;
-      var minutes = seconds / 60;
-      var hours = minutes / 60;
-      var days = hours / 24;
-      var years = days / 365;
-
-      function substitute(stringOrFunction, number) {
-        var string = $.isFunction(stringOrFunction) ? stringOrFunction(number, distanceMillis) : stringOrFunction;
-        var value = ($l.numbers && $l.numbers[number]) || number;
-        return string.replace(/%d/i, value);
-      }
-
-      var words = seconds < 45 && substitute($l.seconds, Math.round(seconds)) ||
-        seconds < 90 && substitute($l.minute, 1) ||
-        minutes < 45 && substitute($l.minutes, Math.round(minutes)) ||
-        minutes < 90 && substitute($l.hour, 1) ||
-        hours < 24 && substitute($l.hours, Math.round(hours)) ||
-        hours < 42 && substitute($l.day, 1) ||
-        days < 30 && substitute($l.days, Math.round(days)) ||
-        days < 45 && substitute($l.month, 1) ||
-        days < 365 && substitute($l.months, Math.round(days / 30)) ||
-        years < 1.5 && substitute($l.year, 1) ||
-        substitute($l.years, Math.round(years));
-
-      var separator = $l.wordSeparator || "";
-      if ($l.wordSeparator === undefined) { separator = " "; }
-      return $.trim([prefix, words, suffix].join(separator));
-    },
-
-    parse: function(iso8601) {
-      var s = $.trim(iso8601);
-      s = s.replace(/\.\d+/,""); // remove milliseconds
-      s = s.replace(/-/,"/").replace(/-/,"/");
-      s = s.replace(/T/," ").replace(/Z/," UTC");
-      s = s.replace(/([\+\-]\d\d)\:?(\d\d)/," $1$2"); // -04:00 -> -0400
-      s = s.replace(/([\+\-]\d\d)$/," $100"); // +09 -> +0900
-      return new Date(s);
-    },
-    datetime: function(elem) {
-      var iso8601 = $t.isTime(elem) ? $(elem).attr("datetime") : $(elem).attr("title");
-      return $t.parse(iso8601);
-    },
-    isTime: function(elem) {
-      // jQuery's `is()` doesn't play well with HTML5 in IE
-      return $(elem).get(0).tagName.toLowerCase() === "time"; // $(elem).is("time");
-    }
-  });
-
-  // functions that can be called via $(el).timeago('action')
-  // init is default when no action is given
-  // functions are called with context of a single element
-  var functions = {
-    init: function() {
-      functions.dispose.call(this);
-      var refresh_el = $.proxy(refresh, this);
-      refresh_el();
-      var $s = $t.settings;
-      if ($s.refreshMillis > 0) {
-        this._timeagoInterval = setInterval(refresh_el, $s.refreshMillis);
-      }
-    },
-    update: function(timestamp) {
-      var date = (timestamp instanceof Date) ? timestamp : $t.parse(timestamp);
-      $(this).data('timeago', { datetime: date });
-      if ($t.settings.localeTitle) {
-        $(this).attr("title", date.toLocaleString());
-      }
-      refresh.apply(this);
-    },
-    updateFromDOM: function() {
-      $(this).data('timeago', { datetime: $t.parse( $t.isTime(this) ? $(this).attr("datetime") : $(this).attr("title") ) });
-      refresh.apply(this);
-    },
-    dispose: function () {
-      if (this._timeagoInterval) {
-        window.clearInterval(this._timeagoInterval);
-        this._timeagoInterval = null;
-      }
-    }
-  };
-
-  $.fn.timeago = function(action, options) {
-    var fn = action ? functions[action] : functions.init;
-    if (!fn) {
-      throw new Error("Unknown function name '"+ action +"' for timeago");
-    }
-    // each over objects here and call the requested function
-    this.each(function() {
-      fn.call(this, options);
-    });
-    return this;
-  };
-
-  function refresh() {
-    var $s = $t.settings;
-
-    //check if it's still visible
-    if ($s.autoDispose && !$.contains(document.documentElement,this)) {
-      //stop if it has been removed
-      $(this).timeago("dispose");
-      return this;
-    }
-
-    var data = prepareData(this);
-
-    if (!isNaN(data.datetime)) {
-      if ( $s.cutoff === 0 || Math.abs(distance(data.datetime)) < $s.cutoff) {
-        $(this).text(inWords(data.datetime));
-      } else {
-        if ($(this).attr('title').length > 0) {
-            $(this).text($(this).attr('title'));
-        }
-      }
-    }
-    return this;
-  }
-
-  function prepareData(element) {
-    element = $(element);
-    if (!element.data("timeago")) {
-      element.data("timeago", { datetime: $t.datetime(element) });
-      var text = $.trim(element.text());
-      if ($t.settings.localeTitle) {
-        element.attr("title", element.data('timeago').datetime.toLocaleString());
-      } else if (text.length > 0 && !($t.isTime(element) && element.attr("title"))) {
-        element.attr("title", text);
-      }
-    }
-    return element.data("timeago");
-  }
-
-  function inWords(date) {
-    return $t.inWords(distance(date));
-  }
-
-  function distance(date) {
-    return (new Date().getTime() - date.getTime());
-  }
-
-  // fix for IE6 suckage
-  document.createElement("abbr");
-  document.createElement("time");
-}));
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports) {
-
-module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '';
-with (obj) {
-__p += '<div class="annotation-editor" id="annotation-editor-' +
-((__t = ( editorid )) == null ? '' : __t) +
-'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fa fa-close"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
-
-}
-return __p
-};
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="annotation-viewer-side" id="annotation-viewer-' +
-((__t = ( viewerid )) == null ? '' : __t) +
-'">\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
- _.each(annotations, function(ann){ ;
-__p += '\n            <div class="ann-item" id="annotation-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'">\n                <div class="annotation-username">TEST: ' +
-((__t = ( ann.creator.name )) == null ? '' : __t) +
-'</div>\n                <div class="annotation-date">last updated 2 hours ago</div>\n                <button class="edit" id="edit-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fa fa-pencil"></i></button>\n                <button class="delete" id="delete-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
-((__t = ( ann.exact )) == null ? '' : __t) +
-'</div>\n                <div class="annotation-text">' +
-((__t = ( ann.annotationText )) == null ? '' : __t) +
-'</div>\n                ';
- if (ann.tags && ann.tags.length > 0) { ;
-__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
- _.each(ann.tags, function(tag){ ;
-__p += '\n                            <div class="annotation-tag">' +
-((__t = ( tag )) == null ? '' : __t) +
-'</div>\n                        ';
- }); ;
-__p += '\n                    </div>\n                ';
- } ;
-__p += '\n            </div>\n        ';
- }); ;
-__p += '\n    </div>\n    <div class="plugin-area-bottom">\n    </div>\n</div>\n';
-
-}
-return __p
-};
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <button class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" aria-label="Make annotation using keyboard"><i class="fas fa-keyboard"></i></button>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar"><span class="fas fa-angle-double-left"></span></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
-((__t = ( filterTabCount )) == null ? '' : __t) +
-'">\n            ';
- if (tabsAvailable.indexOf('search') > -1) {;
-__p += '\n            <button type="button" class="btn btn-default inverted user-filter ';
- if (defaultTab.indexOf('search') > -1) {;
-__p += 'active';
- } ;
-__p += '" id="search" id="sidebar-search" aria-label="Toggle Search Region"><span class="fa fa-search"></span><br>Search</button>\n            ';
- } ;
-__p += '\n            ';
- if (tabsAvailable.indexOf('mine') > -1) {;
-__p += '\n        	<button type="button" class="btn btn-default user-filter ';
- if (defaultTab.indexOf('mine') > -1) {;
-__p += 'active';
- } ;
-__p += '" id=\'mine\' aria-label="View my annotations" role="button"><span class="fas fa-toggle-on ';
- if (defaultTab.indexOf('mine') == -1) {;
-__p += 'fa-flip-horizontal';
- } ;
-__p += '"></span><br>Mine</button>\n            ';
- } ;
-__p += '\n            ';
- if (tabsAvailable.indexOf('peer') > -1 || tabsAvailable.indexOf('all') > -1) {;
-__p += '\n        	<button type="button" class="btn btn-default user-filter ';
- if (defaultTab.indexOf('peer') > -1) {;
-__p += 'active';
- } ;
-__p += '" id=\'peer\' aria-label="View peers\' annotations" role="button"><span class="fas fa-toggle-on ';
- if (defaultTab.indexOf('peer')== -1) {;
-__p += 'fa-flip-horizontal';
- } ;
-__p += '"></span><br>Peer</button>\n            ';
- } ;
-__p += '\n            ';
- if (tabsAvailable.indexOf('instructor') > -1) {;
-__p += '\n                <button type="button" class="btn btn-default user-filter ';
- if (defaultTab.indexOf('instructor') > -1) {;
-__p += 'active';
- } ;
-__p += '" id=\'instructor\' aria-label="View instructor annotations" role="button"><span class="fas fa-toggle-on ';
- if (defaultTab.indexOf('instructor') == -1) {;
-__p += 'fa-flip-horizontal';
- } ;
-__p += '"></span><br>Instructor</button>\n            ';
- } ;
-__p += '\n        </div>\n    </div>\n    <div class="separator-solid side"></div>\n    <!-- <div class="filter-options side search-toggle" style=\'display:none;\'>\n        <div class="search-label">Search by:</div>\n        <div class="btn-group">\n            <button type="button" class="btn btn-default query-filter" id="users-filter" aria-label="Search by username">Users</button>\n            <button type="button" class="btn btn-default query-filter" id="annotationtext-filter" aria-label="Search by annotation content">Annotation Text</button>\n            <button type="button" class="btn btn-default query-filter" id="tag-filter" aria-label="Search by annotation tag">Tag</button>\n        </div>\n    </div> -->\n    ';
- if (tabsAvailable.indexOf('search') > -1) {;
-__p += '\n            <button type="button" class="btn btn-default" id="sidebar-filter-options" aria-label="Hide search options"><i class="fas fa-times"></i></button>\n        ';
- } ;
-__p += '\n    <div class="search-bar side search-toggle" style=\'display:none;\'>\n        <div id="search-info" style="display:none">The following allows you to search annotations. The default filter is to search for a username, but make sure to change filter to annotation text or tag for other types of searches.</div>\n    	<div class="input-group">\n            <label for="srch-term" id="searchlabel" class="hidden">Search annotations:</label>\n            <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" aria-describedby="search-info" aria-labeledby="searchlabel" list="tag-list-options">\n            <div class="input-group-btn">\n                <select class="form-control">\n                    <option>Annotation</option>\n                    <option>User</option>\n                    <option>Tag</option>\n                </select>\n            </div>\n        </div>\n        <div class="input-group-btn">\n                <button title="Search" class="btn btn-default" type="submit" id="search-submit" role="button" aria-label="Submit search"><i class="glyphicon glyphicon-search"></i></button>\n                <button title="Clear Search Input" class="btn btn-default" type="clear" id="search-clear" role="button" aria-label="Clear search input"><i class="fas fa-backspace"></i></button>\n            </div>\n        <div id="timeRangeFilter" style="display:none; color:white; margin-top:15px; margin-bottom:-30px">\n            <label for="startTimeFilter">Start:</label> <input type="text" id="startTimeFilter" style="display:inline; width:20%; color: black;" value="0:00"/>\n            <label for="endTimeFilter">End:</label> <input type="text" id="endTimeFilter" style="display:inline;width:20%; color: black;" value="0:00"/>\n        </div>\n    </div>\n    <div class="handleAnnotations" style="display:none">\n        <div id="printAnnotations"> <i class="fa fa-print"></i>   Print My Notes</div>\n        <div id="exportAnnotations"> <i class="fa fa-cloud-download"></i> Export</div>\n        <div id="importAnnotations"> <i class="fa fa-cloud-upload"></i> Import</div>\n    </div>\n    <div class="annotationsHolder side" role="list" aria-label="Annotations" >\n		';
- _.each(annotationItems, function(item) { ;
-__p += '\n			' +
-((__t = ( item )) == null ? '' : __t) +
-'\n		';
- }); ;
-__p += '\n        ';
- if (annotationItems.length == 0) { ;
-__p += '\n            <div id=\'empty-alert\' style="padding:20px;text-align:center;">There are currently no annotations in this document. Be the first!</div>\n        ';
- } else {;
-__p += '\n             <button type="button" class="btn btn-default loadMoreButton" id="loadMoreButton" aria-label="Load more annotations" style="margin-left:-999999px">Load More Annotations</button>\n        ';
- } ;
-__p += '\n	</div>\n    <datalist id="tag-list-options">\n    </datalist>\n</section>';
-
-}
-return __p
-};
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="ann-item annotationItem item-' +
-((__t = ( id )) == null ? '' : __t) +
-' side ';
- if (instructor_ids.indexOf(creator.id) > -1) {;
-__p += 'inst';
-};
-__p += '" role="listitem" aria-label="Annotation #' +
-((__t = (index)) == null ? '' : __t) +
-'">\n    <div style="overflow:auto;">\n    <span class="idAnnotation" style="display:none;">' +
-((__t = ( id )) == null ? '' : __t) +
-'</span>\n    ';
- if (typeof(creator) !== 'undefined') { ;
-__p += '\n    <div class= "annotatedBy field side" aria-label="Annotation created by ';
- if (instructor_ids.indexOf(creator.id) > -1) { print(common_name);} else {print(creator.name);} ;
-__p += '">\n        ';
- if (instructor_ids.indexOf(creator.id) > -1) { print(common_name);;
-__p += '&nbsp;<span class="fas fa-certificate"></span>';
-} else {print(creator.name);} ;
-__p += '     \n        ';
- } else { ;
-__p += '\n        <div class= "annotatedBy field side" aria-label="Annotation created by lduarte1991">\n        lduarte19911\n        ';
- } ;
-__p += '\n    </div>\n    ';
- if( typeof(created) !== 'undefined') { ;
-__p += '\n        ';
- var date = new Date(created); ;
-__p += '\n        <div class="annotatedAt field side" title="';
- print(date) ;
-__p += '" aria-label="last updated ';
- print(date); ;
-__p += '">\n            created ';
- print(jQuery.timeago(date)); ;
-__p += '\n        </div>\n    ';
- } ;
-__p += '\n    </div>\n    <button class="edit" id="edit-' +
-((__t = ( id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
-((__t = ( id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n    ';
- if (media === 'text' || media === "Text") {;
-__p += '\n        <div class="quote field side">\n            <div class="quoteText" aria-label="Excerpt selected for this annotation:">' +
-((__t = ( exact )) == null ? '' : __t) +
-'</div>\n        </div>\n    ';
- } else if (media === 'image' && thumbnail) {;
-__p += '\n        <div class="zoomToImageBounds" style=\'position:relative;\'>\n            <img class="annotation-thumbnail" src="/static/css/images/loading.gif" data-src="' +
-((__t = ( thumbnail )) == null ? '' : __t) +
-'" onError="this.onerror=null;this.src=\'/static/css/images/image-error.png\';" data-svg=".thumbnail-' +
-((__t = ( id )) == null ? '' : __t) +
-'" alt="Thumbnail Preview"/>\n            ';
- if (typeof(svg) !== "undefined") { ;
-__p += '\n                ' +
-((__t = ( svg )) == null ? '' : __t) +
-'\n            ';
- } ;
-__p += '\n            <span class="idAnnotation" style="display:none">' +
-((__t = ( id )) == null ? '' : __t) +
-'</span>\n            <span class="uri" style="display:none">' +
-((__t = ( uri )) == null ? '' : __t) +
-'</span>\n        </div>\n    ';
- } else if (media === "video") {;
-__p += '\n        <div class="playMediaButton" style="text-align:center;">\n            <div class="btn btn-default" style="text-align:center;margin-top:20px;">\n                Segment ' +
-((__t = ( rangeTime.start )) == null ? '' : __t) +
-' - ' +
-((__t = ( rangeTime.end )) == null ? '' : __t) +
-'\n            </div>\n            <span class="idAnnotation" style="display:none">' +
-((__t = ( id )) == null ? '' : __t) +
-'</span>\n            <span class="uri" style="display:none">' +
-((__t = ( uri )) == null ? '' : __t) +
-'</span>\n        </div>\n    ';
- } ;
-__p += '\n    <div style="display:none;" id="annotationTextLabel">Annotation text</div>\n    <div class="body field side" aria-label="Comment: ' +
-__e( annotationText[0].replace(/"/g, '&quot;') ) +
-'">\n        ';
- if (typeof annotationText !== 'undefined') {;
-__p += '\n            ' +
-((__t = ( annotationText[0] )) == null ? '' : __t) +
-'\n        ';
- } ;
-__p += '\n    </div>\n    ';
- if (typeof tags !== "undefined") { ;
-__p += '\n        <div class="tagList field side">\n            ';
- _.each(tags, function(tagItem){ ;
-__p += '\n                <div class="annotation-tag side" aria-label="tag: ' +
-__e( tagItem.replace(/"/g, '&quot;') ) +
-'">\n                    ' +
-((__t = ( tagItem )) == null ? '' : __t) +
-'\n                </div>\n            ';
- }); ;
-__p += '\n        </div>\n    ';
- } ;
-__p += '\n\n    <div class="plugin-area-bottom"></div>\n        <!-- ';
- if (typeof(totalReplies) == "undefined" || totalReplies === 0) { ;
-__p += '\n            <button class=\'create-reply\'>Reply to Annotation</button>\n        ';
- } else { ;
-__p += '\n            <button class=\'view-replies\'>View ' +
-((__t = ( totalReplies )) == null ? '' : __t) +
-' Replies</button>\n        ';
- } ;
-__p += ' -->\n    <!-- <div class="totalreplies field side clicking_allowed" tabindex="0" role="button" aria-label="Make or view replies Annotation #' +
-((__t = (index )) == null ? '' : __t) +
-'">\n        <span class="glyphicon glyphicon-comment"></span>\n        ';
- if (typeof(totalReplies) == "undefined") { ;
-__p += '\n        <span class="replyNum"> 0 </span>\n        ';
- } else { ;
-__p += '\n        <span class="replyNum"> ' +
-((__t = ( totalReplies )) == null ? '' : __t) +
-' </span>\n        ';
- } ;
-__p += '\n    </div> -->\n    <script>\n        // jQuery(\'.annotationItem.item-' +
-((__t = ( id )) == null ? '' : __t) +
-'.side\').data(\'annotation\')\n    </script>\n</div>\n';
-
-}
-return __p
-};
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
-
-/***/ }),
-/* 35 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(36);
-/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/**
- * 
- */
-var annotator = annotator ? annotator : __webpack_require__(5);
-
-
-
-
-(function ($) {
-  $.FloatingViewer = function (options, inst_id) {
-    // sets default options
-    var defaultOptions = {
-      // set up template names that will be pulled
-      TEMPLATENAMES: ["editor", "viewer"],
-      TEMPLATES: {
-        editor: __webpack_require__(37),
-        viewer: __webpack_require__(38)
-      },
-      template_suffix: "floating",
-      template_urls: ""
-    };
-    this.options = jQuery.extend({}, defaultOptions, options);
-    console.log("Floating options", this.options);
-    this.instance_id = inst_id;
-    this.annotation_tool = {
-      interactionPoint: null,
-      editing: false,
-      updating: false,
-      editor: null,
-      viewer: null
-    };
-    this.element = jQuery(this.options.element);
-    this.hideTimer = null;
-    this.init();
-  };
-
-  $.FloatingViewer.prototype.init = function () {
-    var self = this;
-    self.setUpTemplates(self.options.template_suffix); // make sure the viewer doesn't disappear when the person moves their mouse over it
-
-    self.element.on('mouseover', '.annotation-viewer', function (event1) {
-      clearTimeout(self.hideTimer);
-    }); // once they leave the viewer hide it
-
-    self.element.on('mouseleave', '.annotation-viewer', function (event1) {
-      if (self.annotation_tool.isStatic) {
-        return;
-      }
-
-      clearTimeout(self.hideTimer);
-      self.ViewerDisplayClose();
-    });
-    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
-      clearTimeout(self.hideTimer);
-
-      try {
-        self.annotation_tool.viewer.addClass('static');
-        self.annotation_tool.isStatic = true;
-      } catch (e) {
-        self.ViewerDisplayOpen(event1, annotations);
-        self.annotation_tool.viewer.addClass('static');
-        self.annotation_tool.isStatic = true;
-      }
-    });
-    jQuery('body').on('click', '.annotation-username', function (e) {
-      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'User']);
-    });
-    jQuery('body').on('click', '.annotation-tag', function (e) {
-      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'Tag']);
-    });
-    this.setUpPinAndMove();
-  };
-
-  $.FloatingViewer.prototype.setUpTemplates = function (suffix) {
-    var self = this;
-    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
-      if (templateName in self.options.TEMPLATES) {
-        return;
-      }
-
-      var options = {
-        url: self.options.template_urls + templateName + '-' + suffix + '.html',
-        type: "GET",
-        contentType: "charset=utf-8",
-        success: function success(data) {
-          var template = _.template(data);
-
-          self.options.TEMPLATES[templateName] = template;
-        },
-        async: true
-      };
-      return jQuery.ajax(options);
-    });
-    jQuery.when.apply(jQuery, deferreds).done(function () {
-      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
-        editorid: self.instance_id.replace(/:/g, '-')
-      });
-    });
-  };
-
-  $.FloatingViewer.prototype.TargetSelectionMade = function (annotation, event) {
-    // if (event && event instanceof MouseEvent) {
-    this.ViewerEditorOpen(event, annotation, false, $.mouseFixedPosition(event, annotation)); // }
-  };
-
-  $.FloatingViewer.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
-    var self = this;
-
-    if (self.annotation_tool.editing && self.annotation_tool.updating && self.annotation_tool.isStatic && !updating) {
-      // there's already an open editor window for this instance so don't do anything
-      return;
-    }
-
-    if (self.annotation_tool.viewer) {
-      jQuery('.annotation-viewer').remove();
-      delete self.annotation_tool.viewer;
-      self.annotation_tool.isStatic = false;
-      self.annotation_tool.updating = false;
-      self.annotation_tool.editing = false;
-    }
-
-    jQuery('.edit').prop('disabled', true); // set editing mode
-
-    self.annotation_tool.editing = true;
-    self.annotation_tool.updating = updating; // actually set up and draw the Editor
-
-    var wrapperElement = self.element.find('.annotator-wrapper');
-    wrapperElement.after(self.annotation_tool.editorTemplate); // save the element to call upon later
-
-    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/:/g, '-'));
-    var intPt = interactionPoint; // situate it on its proper location
-
-    self.annotation_tool.editor.css({
-      'top': intPt.top - jQuery(window).scrollTop(),
-      'left': intPt.left
-    }); // closes the editor tool and does not save annotation
-
-    self.annotation_tool.editor.find('.cancel').click(function () {
-      console.log("HERE", annotation, !updating, true);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
-    }); // closes the editor and does save annotations
-
-    self.annotation_tool.editor.find('.save').click(function () {
-      var text = self.annotation_tool.editor.find('#annotation-text-field').val();
-
-      if (updating) {
-        annotation.annotationText.pop();
-      }
-
-      annotation.annotationText.push(text);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, false]);
-    });
-    self.annotation_tool.editor.find('#annotation-text-field').val(annotation.annotationText);
-    setTimeout(function () {
-      self.annotation_tool.editor.find('#annotation-text-field')[0].focus();
-    }, 250);
-    self.checkOrientation(self.annotation_tool.editor);
-    $.publishEvent('editorShown', self.instance_id, [self.annotation_tool.editor, annotation]);
-  };
-
-  $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
-    var self = this;
-    jQuery('.edit').prop('disabled', false);
-    jQuery('.note-link-popover').remove();
-    $.publishEvent('editorHidden', self.instance_id, []);
-
-    if (self.annotation_tool.editor) {
-      self.annotation_tool.editor.remove();
-    }
-
-    delete self.annotation_tool.editor;
-    self.annotation_tool.editing = false;
-    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
-  };
-
-  $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
-    var self = this;
-    var annotations = anns.reverse(); // if the timer is set for the tool to be hidden, this intercepts it
-
-    if (self.hideTimer !== undefined) {
-      clearTimeout(self.hideTimer);
-    }
-
-    if (jQuery('.annotation-editor').is(':visible') || jQuery('.hx-confirm-button').is(':visible') || self.annotation_tool.editing || self.annotation_tool.updating || self.annotation_tool.isStatic && Hxighlighter.exists(self.annotation_tool.viewer)) {
-      // there's already an open editor window for this instance so don't do anything
-      return;
-    }
-
-    self.annotation_tool.viewerTemplate = self.options.TEMPLATES['viewer']({
-      'viewerid': self.instance_id.replace(/:/g, '-'),
-      'annotations': annotations,
-      'instructor_ids': self.options.instructors,
-      'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
-    });
-
-    if (self.options.viewer_options.readonly) {
-      self.annotation_tool.viewerTemplate = self.annotation_tool.viewerTemplate.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
-    } // add the viewer to the DOM
-
-
-    self.element.find('.annotator-wrapper').after(self.annotation_tool.viewerTemplate); // collect the object for manipulation and coordinates of where it should appear
-
-    if (self.annotation_tool.viewer) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-
-    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/:/g, '-'));
-    var newTop = annotator.util.mousePosition(event).top - jQuery(window).scrollTop() + 20;
-    var newLeft = annotator.util.mousePosition(event).left + 30;
-    self.annotation_tool.viewer.css({
-      'top': newTop,
-      'left': newLeft
-    });
-    self.annotation_tool.viewer.data('annotations', annotations);
-    self.annotation_tool.viewer.find('.cancel').click(function (event1) {
-      self.annotation_tool.isStatic = false;
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer; // jQuery('body').css('overflow-y', 'scroll');
-    });
-    self.annotation_tool.viewer.find('.edit').click(function (event1) {
-      var annotation_id = jQuery(this).attr('id').replace('edit-', '');
-      var filtered_annotation = annotations.find(function (ann) {
-        if (ann.id === annotation_id) return ann;
-      });
-      self.ViewerEditorOpen(event1, filtered_annotation, true, {
-        top: parseInt(self.annotation_tool.viewer.css('top'), 10),
-        left: parseInt(self.annotation_tool.viewer.css('left'), 10)
-      }); //StorageAnnotationSave
-    });
-    self.annotation_tool.viewer.find('.delete').confirm({
-      title: 'Delete Annotation?',
-      content: 'Would you like to delete your annotation? This is permanent.',
-      buttons: {
-        confirm: function confirm() {
-          var annotation_id = this.$target[0].id.replace('delete-', '');
-          var filtered_annotation = annotations.find(function (ann) {
-            if (ann.id === annotation_id) return ann;
-          });
-          $.publishEvent('StorageAnnotationDelete', self.instance_id, [filtered_annotation]);
-          self.ViewerDisplayClose();
-
-          if (self.annotation_tool.viewer) {
-            jQuery('.annotation-viewer').remove();
-            delete self.annotation_tool.viewer;
-            self.annotation_tool.isStatic = false;
-            self.annotation_tool.updating = false;
-            self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-          }
-        },
-        cancel: function cancel() {}
-      }
-    }); // console.log(annotations);        
-
-    $.publishEvent('displayShown', self.instance_id, [self.annotation_tool.viewer, annotations]);
-    self.checkOrientation(self.annotation_tool.viewer);
-  };
-
-  $.FloatingViewer.prototype.ViewerDisplayClose = function (annotations) {
-    var self = this;
-
-    if (self.annotation_tool.isStatic) {
-      return;
-    }
-
-    console.log('should hide display');
-    clearTimeout(self.hideTimer);
-    self.hideTimer = setTimeout(function () {
-      if (self.hideTimer) {
-        $.publishEvent('displayHidden', self.instance_id, []);
-
-        if (self.annotation_tool.viewer) {
-          self.annotation_tool.viewer.remove();
-          delete self.annotation_tool.viewer;
-        }
-
-        self.annotation_tool.isStatic = false;
-        self.annotation_tool.updating = false;
-        self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-      }
-    }, 500);
-  };
-
-  $.FloatingViewer.prototype.StorageAnnotationSave = function (annotations) {};
-
-  $.FloatingViewer.prototype.StorageAnnotationLoad = function (first_argument) {
-    var self = this;
-
-    if (self.annotation_tool.viewer) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-
-    self.annotation_tool.isStatic = false;
-    self.annotation_tool.updating = false;
-    self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-  };
-
-  $.FloatingViewer.prototype.StorageAnnotationDelete = function (annotation) {
-    var self = this;
-    jQuery('.annotation-viewer').remove();
-    delete self.annotation_tool.viewer;
-    self.annotation_tool.isStatic = false;
-    self.annotation_tool.updating = false;
-    self.annotation_tool.editing = false;
-  };
-
-  $.FloatingViewer.prototype.setUpPinAndMove = function () {
-    var self = this; // keeps track of when mouse button is pressed
-
-    jQuery('body').on('mousedown', function (event) {
-      self.buttonDown = true;
-    }); // keeps track of when mouse button is let go
-
-    jQuery('body').on('mouseup', function (event) {
-      self.buttonDown = false;
-    }); // handles moving the editor by clicking and dragging
-
-    jQuery('body').on('mousedown', '.annotation-editor-nav-bar', function (event) {
-      self.prepareToMove(true, event);
-    }); // handles moving the viewer by clicking and dragging
-
-    jQuery('body').on('mousedown', '.annotation-viewer-nav-bar', function (event) {
-      self.prepareToMove(false, event);
-    });
-    jQuery('body').on('mousemove', function (event) {
-      self.moving(event);
-    });
-    jQuery('body').on('mouseup', function (event) {
-      self.finishedMoving(event);
-    }); // jQuery('body').on('mouseover', '.annotation-editor', function(event) {
-    //     jQuery('body').css('overflow-y', 'hidden');
-    // });
-    // jQuery('body').on('mouseleave', '.annotation-editor', function(event) {
-    //     jQuery('body').css('overflow-y', 'scroll');
-    // });
-    // jQuery('body').on('mouseover', '.annotation-viewer', function(event) {
-    //     jQuery('body').css('overflow-y', 'hidden');
-    // });
-    // jQuery('body').on('mouseleave', '.annotation-viewer', function(event) {
-    //     jQuery('body').css('overflow-y', 'scroll');
-    // });
-
-    jQuery('body').on('mouseleave', function (event) {
-      self.finishedMoving(event);
-    });
-  };
-
-  $.FloatingViewer.prototype.prepareToMove = function (isEditor, event) {
-    var self = this;
-    self.itemMoving = isEditor ? self.annotation_tool.editor : self.annotation_tool.viewer;
-
-    if (self.itemMoving) {
-      $.pauseEvent(event); //turns on moving mode
-
-      self.itemMoving.moving = true; // set initial mouse position offset by where on the editor the user clicked
-
-      var move = annotator.util.mousePosition(event);
-      var editorTop = parseInt(self.itemMoving.css('top'), 10);
-      var editorLeft = parseInt(self.itemMoving.css('left'), 10);
-      self.itemMoving.offsetTopBy = move.top - editorTop;
-      self.itemMoving.offsetLeftBy = move.left - editorLeft;
-    }
-  };
-
-  $.FloatingViewer.prototype.moving = function (event) {
-    var self = this;
-
-    if (self.itemMoving && self.itemMoving.moving) {
-      $.pauseEvent(event); // gets the userlocation (where they've dragged to)
-
-      var move = annotator.util.mousePosition(event);
-      var newTop = move.top - self.itemMoving.offsetTopBy;
-      var newLeft = move.left - self.itemMoving.offsetLeftBy; // var borderBox = self.element[0].getBoundingClientRect();
-
-      if (newTop < 0) {
-        newTop = 0;
-      }
-
-      if (newLeft < 0) {
-        newLeft = 0;
-      }
-
-      if (newTop + self.itemMoving.outerHeight() > window.innerHeight) {
-        newTop = window.innerHeight - self.itemMoving.outerHeight();
-      }
-
-      if (newLeft + self.itemMoving.outerWidth() > window.innerWidth) {
-        newLeft = window.innerWidth - self.itemMoving.outerWidth();
-      }
-      /* TODO: Set boundaries for far right and far down */
-      // sets the editor to that location (fixing offset)
-
-
-      self.itemMoving.css({
-        top: newTop,
-        left: newLeft
-      });
-    } else if (self.buttonDown && self.annotation_tool.viewer && !self.annotation_tool.viewer.hasClass('static')) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-  };
-
-  $.FloatingViewer.prototype.finishedMoving = function (event) {
-    var self = this;
-
-    if (self.itemMoving) {
-      $.pauseEvent(event); //turns on moving mode
-
-      self.itemMoving.moving = false;
-      var move = annotator.util.mousePosition(event);
-      self.annotation_tool.interactionPoint = {
-        top: move.top - self.itemMoving.offsetTopBy,
-        left: move.left - self.itemMoving.offsetLeftBy
-      };
-    }
-  };
-
-  $.FloatingViewer.prototype.checkOrientation = function (viewerElement) {
-    var self = this;
-    var newTop = parseInt(jQuery(viewerElement).css('top'), 10);
-    var newLeft = parseInt(jQuery(viewerElement).css('left'), 10);
-    var elWidth = parseInt(jQuery(viewerElement).outerWidth());
-    var elHeight = parseInt(jQuery(viewerElement).outerHeight());
-
-    if (newTop < 0) {
-      newTop = 0;
-    }
-
-    if (newLeft < 0) {
-      newLeft = 0;
-    }
-
-    if (newTop + elHeight > window.innerHeight) {
-      newTop = window.innerHeight - elHeight - 34 - 75; // 34 is the height of the save/cancel buttons that get cut off 
-    }
-
-    if (newLeft + elWidth > window.innerWidth) {
-      newLeft = window.innerWidth - elWidth - 12; // 12 is the width of the scroll bar
-    }
-
-    jQuery(viewerElement).css('top', newTop);
-    jQuery(viewerElement).css('left', newLeft);
-  };
-
-  $.viewers.push($.FloatingViewer);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports) {
-
-module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '';
-with (obj) {
-__p += '<div class="annotation-editor" id="annotation-editor-' +
-((__t = ( editorid )) == null ? '' : __t) +
-'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
-
-}
-return __p
-};
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="annotation-viewer" id="annotation-viewer-' +
-((__t = ( viewerid )) == null ? '' : __t) +
-'">\n    <nav class=\'annotation-viewer-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close Viewer" tile="Close Viewer"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
- _.each(annotations, function(ann){ ;
-__p += '\n            <div class="ann-item item-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-' floating ';
- if (instructor_ids.indexOf(ann.creator.id) > -1) {;
-__p += 'inst';
-};
-__p += '" id="annotation-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'">\n                <div class="annotation-username">';
- if (instructor_ids.indexOf(ann.creator.id) > -1 && common_name !== "") { print(common_name);;
-__p += '&nbsp;<span class="fas fa-certificate-cap"></span>';
-} else {print(ann.creator.name);} ;
-__p += '</div>\n                <div class="annotation-date" title="' +
-((__t = ( ann.created )) == null ? '' : __t) +
-'">';
- if (ann.created){print(jQuery.timeago(ann.created));} else {print(jQuery.timeago(new Date()))} ;
-__p += '</div>\n                <button class="edit" id="edit-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
-((__t = ( ann.exact )) == null ? '' : __t) +
-'</div>\n                <div class="annotation-text">' +
-((__t = ( ann.annotationText )) == null ? '' : __t) +
-'</div>\n                ';
- if (ann.tags && ann.tags.length > 0) { ;
-__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
- _.each(ann.tags, function(tag){ ;
-__p += '\n                            <div class="annotation-tag">' +
-((__t = ( tag )) == null ? '' : __t) +
-'</div>\n                        ';
- }); ;
-__p += '\n                    </div>\n                ';
- } ;
-__p += '\n                <div class="plugin-area-bottom">\n                </div>\n            </div>\n        ';
- }); ;
-__p += '\n    </div>\n</div>\n';
-
-}
-return __p
-};
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-/**
- *  Summernote RichText Plugin
- *  
- *  Should be generic, but its main purpose is to be used in tandem with annotations.
- *
- */
-__webpack_require__(12);
-
-__webpack_require__(13);
-
-__webpack_require__(40);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.SummernoteRichText = function (options, instanceID) {
-    var maxLength = 1000;
-    this.options = jQuery.extend({
-      height: 150,
-      focus: true,
-      width: 398,
-      placeholder: "Add annotation text...",
-      maximumImageFileSize: 262144,
-      maxHeight: 400,
-      minHeight: 100,
-      maxTextLength: maxLength,
-      dialogsInBody: true,
-      disableResizeEditor: true,
-      callbacks: {
-        onKeydown: function onKeydown(e) {
-          var t = e.currentTarget.innerText;
-
-          if (t.trim().length >= maxLength) {
-            // prevents everything that could add a new character
-            var allowedKeys = 'ArrowLeftArrowRightArrowDownDeleteArrowUpMetaControlAltBackspace';
-            console.log(e.key);
-
-            if (allowedKeys.indexOf(e.key) == -1 || e.key == 'a' && !(e.ctrlKey || e.metaKey) || e.key == 'c' && !(e.ctrlKey || e.metaKey) || e.key == 'v' && !(e.ctrlKey || e.metaKey)) {
-              e.preventDefault();
-              alert('You have reached the character limit for this annotation (max 1000 characters).');
-            }
-          }
-        },
-        onKeyup: function onKeyup(e) {
-          var t = e.currentTarget.innerText;
-          jQuery('#maxContentPost').text(maxLength - t.trim().length);
-        },
-        onPaste: function onPaste(e) {
-          var t = e.currentTarget.innerText;
-          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
-
-          if (t.length + bufferText.length >= maxLength) {
-            e.preventDefault();
-            var bufferTextAllowed = bufferText.trim().substring(0, maxLength - t.length);
-            setTimeout(function () {
-              // wrap in a timer to prevent issues in Firefox
-              document.execCommand('insertText', false, bufferTextAllowed);
-              jQuery('#maxContentPost').text(maxLength - t.length);
-              alert('You have reached the character limit for this annotation (max 1000 characters). Your pasted text was trimmed to meet the 1000 character limit.');
-            }, 10);
-          }
-        }
-      },
-      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]]
-    }, options);
-    this.init();
-    this.instanceID = instanceID;
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.SummernoteRichText.prototype.init = function () {
-    // warns dev that they forgot to include summernote.js
-    if (_typeof(jQuery.summernote) !== "object") {//console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
-    }
-
-    this.annotationListeners();
-  };
-  /**
-   * 
-   * @param element {HTMLElement} - where the annotation will be added
-   * @param selector {String} - selector to find input it is replacing
-   */
-
-
-  $.SummernoteRichText.prototype.addWYSIWYG = function (element, selector) {
-    var self = this; // adds the summernote WYSIWIG to the editor to the selector's location
-
-    self.elementObj = element.find(selector);
-    self.options.width = this.elementObj.parent().width();
-    self.elementObj.summernote(this.options); // removes summernote's ability to tab within the editor so users can tab through items
-
-    delete jQuery.summernote.options.keyMap.pc.TAB;
-    delete jQuery.summernote.options.keyMap.mac.TAB;
-    delete jQuery.summernote.options.keyMap.pc['SHIFT+TAB'];
-    delete jQuery.summernote.options.keyMap.mac['SHIFT+TAB'];
-    element.find('.note-editable').trigger('focus');
-    jQuery('.note-editor button').attr('tabindex', '0');
-    jQuery('.note-statusbar').hide();
-    jQuery(document).on('mouseleave', function () {
-      jQuery('.note-statusbar').trigger('mouseup');
-
-      if (self.elementObj) {
-        var editorObj = self.elementObj.closest('.annotation-editor');
-        var newTop = parseInt(editorObj.css('top'), 10);
-        ;
-        var newLeft = parseInt(editorObj.css('left'), 10);
-        console.log(editorObj, newTop, newLeft);
-
-        if (newTop + editorObj.outerHeight() > window.innerHeight) {
-          newTop = window.innerHeight - editorObj.outerHeight();
-        }
-
-        if (newLeft + editorObj.outerWidth() > window.innerWidth) {
-          newLeft = window.innerWidth - editorObj.outerWidth();
-        }
-
-        if (newTop < 0) {
-          newTop = 0;
-        }
-
-        if (newLeft < 0) {
-          newLeft = 0;
-        }
-
-        editorObj.css({
-          top: newTop,
-          left: newLeft
-        });
-      }
-    });
-  };
-  /**
-   * Returns the HTML value of the WYSIWYG. 
-   *
-   * @return     {String}  HTML value found in the WYSIWYG
-   */
-
-
-  $.SummernoteRichText.prototype.returnValue = function () {
-    var result = this.elementObj.summernote('code');
-
-    if (result.indexOf('<script') >= 0) {
-      alert("I'm sorry Dave, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
-      return result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
-    }
-
-    result = result.replace(/<p><\/p>/g, '').replace(/<p><br><\/p>/g, '');
-    return result;
-  };
-  /**
-   * Deletes the Summernote instance.
-   *
-   * @param      {HTMLElement}  element   The editor element
-   * @param      {String}  selector  The selector containing the area in the editor where to insert the WYSIWYG
-   */
-
-
-  $.SummernoteRichText.prototype.destroy = function (element, selector) {
-    var self = this;
-    self.elementObj.summernote('destroy');
-    jQuery('.tooltip.fade').remove();
-  }; // Annotation specific functions
-
-  /**
-   * Turns on the specific listeners when the plug in is initiated.
-   */
-
-
-  $.SummernoteRichText.prototype.annotationListeners = function () {
-    var self = this;
-    $.subscribeEvent('editorToBeHidden', self.instanceID, function () {
-      self.destroy();
-    }.bind(self));
-    $.subscribeEvent('editorHidden', self.instanceID, function () {
-      self.destroy();
-    }.bind(self));
-    jQuery('body').on('mouseover', '.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function () {
-      var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
-      input.prop('type', 'url');
-      var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
-      var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-      var regex = new RegExp(expression);
-
-      if (chosen.match(regex)) {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
-      } else {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
-      }
-    });
-  };
-  /**
-   * Code to run just before the annotation is saved to storage
-   *
-   * @param      {Annotation}  annotation  The annotation as it currently is saved.
-   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
-   */
-
-
-  $.SummernoteRichText.prototype.saving = function (annotation) {
-    var self = this;
-
-    try {
-      var annotationText = this.returnValue();
-
-      if (typeof this.options.validator === "function") {
-        annotationText = this.options.validator(annotationText);
-      }
-
-      annotation['annotationText'] = [annotationText];
-    } catch (e) {//console.log('plugin was never started');
-    }
-
-    self.destroy();
-    return annotation;
-  };
-  /**
-   * Code that runs once the editor is shown on screen.
-   *
-   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
-   * @param      {HTMLElement}  editor      The editor element
-   */
-
-
-  $.SummernoteRichText.prototype.editorShown = function (editor, annotation) {
-    var self = this;
-    self.addWYSIWYG(editor, '#annotation-text-field');
-
-    if (annotation.annotationText) {
-      self.elementObj.summernote('code', annotation.annotationText);
-    } else if (annotation.schema_version && annotation.schema_version === "catch_v2") {
-      var annotationText = returnWAText(annotation);
-
-      if (typeof annotationText !== "undefined") {
-        self.elementObj.summernote('code', annotationText);
-        self.updating = true;
-        self.updatingText = annotationText;
-      }
-    }
-  };
-
-  $.SummernoteRichText.prototype.setUpEditor = function (type) {
-    var type = type.toLowerCase();
-
-    if (!type || type === "default" || type === "") {
-      return [['font', ['bold', 'italic', 'underline', 'clear']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]];
-    }
-
-    if (type === "simple") {
-      return [['font', ['bold', 'italic', 'underline', 'clear']]];
-    }
-
-    var fullsetup = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['height', ['height']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
-
-    if (type === "instructor") {
-      return fullsetup;
-    }
-
-    if (type.indexOf('no-style')) {}
-  };
-
-  Object.defineProperty($.SummernoteRichText, 'name', {
-    value: "SummernoteRichText"
-  });
-  $.plugins.push($.SummernoteRichText);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Dropdown (Predetermined) Tags Plugin
- *  
- *  Will create an area for inputting tags, just a textfield, no color
- *
- */
-__webpack_require__(10);
-
-__webpack_require__(11);
-
-__webpack_require__(8);
-
-__webpack_require__(9);
-
-__webpack_require__(42);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.DropdownTags = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.init();
-    this.name;
-    this.instanceID = instanceID;
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.DropdownTags.prototype.init = function () {
-    var self = this;
-    self.name = 'DropdownTags';
-    self.annotationListeners();
-    var tags = 'tags' in self.options ? self.options.tags : []; // jQuery.each(tags, function(_, tag) {
-    //   jQuery('#tag-list-options').append('<option value="' + tag + '" />');
-    // });
-
-    jQuery('.search-bar select').on('change', function () {
-      if (jQuery(this).val() == "Tag") {
-        jQuery.each(tags, function (_, tag) {
-          jQuery('#tag-list-options').append('<option value="' + tag + '" />');
-        });
-      } else {
-        jQuery('#tag-list-options').html('');
-      }
-    });
-  };
-  /**
-   * Returns the HTML value of the WYSIWYG. 
-   *
-   * @return     {String}  HTML value found in the WYSIWYG
-   */
-
-
-  $.DropdownTags.prototype.returnValue = function () {
-    var self = this;
-    var tags = jQuery('.token-input-token-facebook p').map(function (_, token) {
-      return jQuery(token).html();
-    }); // Thanks to https://stackoverflow.com/questions/36810940/array-from-on-the-internet-explorer
-
-    if (!Array.from) {
-      Array.from = function () {
-        var toStr = Object.prototype.toString;
-
-        var isCallable = function isCallable(fn) {
-          return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
-        };
-
-        var toInteger = function toInteger(value) {
-          var number = Number(value);
-
-          if (isNaN(number)) {
-            return 0;
-          }
-
-          if (number === 0 || !isFinite(number)) {
-            return number;
-          }
-
-          return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
-        };
-
-        var maxSafeInteger = Math.pow(2, 53) - 1;
-
-        var toLength = function toLength(value) {
-          var len = toInteger(value);
-          return Math.min(Math.max(len, 0), maxSafeInteger);
-        }; // The length property of the from method is 1.
-
-
-        return function from(arrayLike
-        /*, mapFn, thisArg */
-        ) {
-          // 1. Let C be the this value.
-          var C = this; // 2. Let items be ToObject(arrayLike).
-
-          var items = Object(arrayLike); // 3. ReturnIfAbrupt(items).
-
-          if (arrayLike == null) {
-            throw new TypeError("Array.from requires an array-like object - not null or undefined");
-          } // 4. If mapfn is undefined, then let mapping be false.
-
-
-          var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-          var T;
-
-          if (typeof mapFn !== 'undefined') {
-            // 5. else
-            // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-            if (!isCallable(mapFn)) {
-              throw new TypeError('Array.from: when provided, the second argument must be a function');
-            } // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-
-
-            if (arguments.length > 2) {
-              T = arguments[2];
-            }
-          } // 10. Let lenValue be Get(items, "length").
-          // 11. Let len be ToLength(lenValue).
-
-
-          var len = toLength(items.length); // 13. If IsConstructor(C) is true, then
-          // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
-          // 14. a. Else, Let A be ArrayCreate(len).
-
-          var A = isCallable(C) ? Object(new C(len)) : new Array(len); // 16. Let k be 0.
-
-          var k = 0; // 17. Repeat, while k < len… (also steps a - h)
-
-          var kValue;
-
-          while (k < len) {
-            kValue = items[k];
-
-            if (mapFn) {
-              A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-            } else {
-              A[k] = kValue;
-            }
-
-            k += 1;
-          } // 18. Let putStatus be Put(A, "length", len, true).
-
-
-          A.length = len; // 20. Return A.
-
-          return A;
-        };
-      }();
-    }
-
-    return Array.from(tags);
-  }; // Annotation specific functions
-
-  /**
-   * Turns on the specific listeners when the plug in is initiated.
-   */
-
-
-  $.DropdownTags.prototype.annotationListeners = function () {
-    var self = this;
-    $.subscribeEvent('editorHidden', self.instanceID, function () {
-      self.destroy();
-    }.bind(this));
-  };
-  /**
-   * Code to run just before the annotation is saved to storage
-   *
-   * @param      {Annotation}  annotation  The annotation as it currently is saved.
-   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
-   */
-
-
-  $.DropdownTags.prototype.saving = function (annotation) {
-    var self = this;
-    annotation.tags = self.returnValue() || [];
-    return annotation;
-  };
-  /**
-   * Code that runs once the editor is shown on screen.
-   *
-   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
-   * @param      {HTMLElement}  editor      The editor element
-   */
-
-
-  $.DropdownTags.prototype.editorShown = function (editor, annotation) {
-    // console.log('DropdownTags editorShown');
-    var self = this;
-    editor.find('#tag-list').addClass('token-tag-field');
-    self.field = editor.find('.token-tag-field');
-    var tags = 'tags' in self.options ? self.options.tags : [];
-    var preDTags = [];
-    tags.forEach(function (tag) {
-      preDTags.push({
-        name: tag,
-        id: tag
-      });
-    });
-    self.field.tokenInput(preDTags, {
-      theme: 'facebook',
-      preventDuplicates: true,
-      allowTabOut: true,
-      hintText: 'Add a tag...',
-      placeholder: 'Add tags. Separate multiple by using "Enter".',
-      allowFreeTagging: 'folksonomy' in self.options ? self.options.folksonomy : false,
-      noResultsText: "Not Found. Hit ENTER to add a personal tag."
-    });
-    jQuery('#token-input-tag-list').attr('aria-label', 'Add tags. Separate multiple by using "Enter".'); // jQuery('#token-input-tag-list').attr('placeholder', 'Tag:');
-
-    if (annotation.tags && annotation.tags.length > 0) {
-      annotation.tags.forEach(function (tag) {
-        self.field.tokenInput('add', {
-          'name': tag,
-          'id': tag
-        });
-      });
-    }
-  };
-
-  $.DropdownTags.prototype.destroy = function () {
-    var self = this;
-    self.field.tokenInput('destroy');
-    jQuery('.token-input-dropdown-facebook').remove();
-  };
-
-  Object.defineProperty($.DropdownTags, 'name', {
-    value: "DropdownTags"
-  });
-  $.plugins.push($.DropdownTags);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Color (Predetermined) Tags Plugin
- *  
- *  Will create an area for inputting tags, just a textfield, no color
- *
- */
-__webpack_require__(44);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.ColorTags = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.init();
-    this.name;
-    this.instanceID = instanceID;
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.ColorTags.prototype.init = function () {
-    var self = this;
-    self.name = 'ColorTags';
-    self.annotationListeners();
-  };
-  /**
-   * Returns the HTML value of the WYSIWYG. 
-   *
-   * @return     {String}  HTML value found in the WYSIWYG
-   */
-
-
-  $.ColorTags.prototype.returnValue = function () {}; // Annotation specific functions
-
-  /**
-   * Turns on the specific listeners when the plug in is initiated.
-   */
-
-
-  $.ColorTags.prototype.annotationListeners = function () {
-    var self = this;
-    $.subscribeEvent('annotationLoaded', self.instanceID, function (_, ann) {
-      // console.log('hello', ann.tags);
-      if (typeof ann.tags !== 'undefined' && ann.tags.length > 0) {
-        var color = self.getColorFromValue(ann.tags[ann.tags.length - 1]);
-
-        if (typeof color !== "undefined") {
-          setTimeout(function () {
-            $.publishEvent('changeDrawnColor', self.instanceID, [ann, color]);
-          }, 250);
-        }
-      }
-    });
-    $.subscribeEvent('drawList', self.instanceID, function (_, anns) {
-      anns.forEach(function (ann) {
-        // console.log('hello', ann.tags);
-        if (typeof ann.tags !== 'undefined' && ann.tags.length > 0) {
-          var color = self.getColorFromValue(ann.tags[ann.tags.length - 1]);
-
-          if (typeof color !== "undefined") {
-            setTimeout(function () {
-              $.publishEvent('changeDrawnColor', self.instanceID, [ann, color]);
-            }, 250);
-          }
-        }
-      });
-    });
-  };
-
-  $.ColorTags.prototype.getColorFromValue = function (value) {
-    var self = this;
-
-    if ('allTags' in self.options) {
-      var rgbaColor = self.hexToRGBa(self.options.allTags);
-      var rgbaVal = 'rgba(' + rgbaColor.join(',') + ')';
-      return rgbaVal;
-    }
-
-    if (value in self.options) {
-      var rgbaColor = self.hexToRGBa(self.options[value]);
-      var rgbaVal = 'rgba(' + rgbaColor.join(',') + ')';
-      return rgbaVal;
-    }
-
-    return undefined;
-  };
-  /* Following function taken from
-   * https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-   */
-
-
-  $.ColorTags.prototype.hexToRGBa = function (hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-      return r + r + g + g + b + b;
-    });
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16), 0.3] : null;
-  };
-  /**
-   * Code to run just before the annotation is saved to storage
-   *
-   * @param      {Annotation}  annotation  The annotation as it currently is saved.
-   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
-   */
-
-
-  $.ColorTags.prototype.saving = function (annotation) {
-    var self = this;
-
-    if (typeof annotation.tags !== 'undefined' && annotation.tags.length > 0) {
-      var color = self.getColorFromValue(annotation.tags[annotation.tags.length - 1]);
-
-      if (typeof color !== "undefined") {
-        setTimeout(function () {
-          $.publishEvent('changeDrawnColor', self.instanceID, [annotation, color]);
-        }, 250);
-      }
-    }
-
-    return annotation;
-  };
-  /**
-   * Code that runs once the editor is shown on screen.
-   *
-   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
-   * @param      {HTMLElement}  editor      The editor element
-   */
-
-
-  $.ColorTags.prototype.editorShown = function (editor, annotation) {
-    var self = this; // console.log('ColorTags editorShown');
-
-    var listNode = editor.find('.token-input-list-facebook')[0];
-
-    if (listNode.addEventListener) {
-      listNode.addEventListener('DOMNodeInserted', function (event) {
-        if (event.target.className === "token-input-token-facebook") {
-          var color = self.getColorFromValue(jQuery(event.target).find('p').text().trim());
-
-          if (typeof color !== "undefined") {
-            jQuery(event.target).css('background', color);
-          }
-        }
-      }, false);
-    }
-
-    jQuery.each(jQuery(listNode).find('.token-input-token-facebook p'), function (_, el) {
-      var tag = jQuery(el).text();
-      var color = self.getColorFromValue(tag);
-
-      if (typeof color !== "undefined") {
-        jQuery(el).parent().css('background', color);
-      }
-    });
-  };
-
-  $.ColorTags.prototype.displayShown = function (viewer, annotation) {
-    var self = this;
-    jQuery.each(jQuery(viewer).find('.annotation-tag'), function (_, el) {
-      var tag = jQuery(el).text().trim();
-      var color = self.getColorFromValue(tag);
-
-      if (typeof color !== "undefined") {
-        jQuery(el).css('background', color);
-      }
-    });
-  };
-
-  Object.defineProperty($.ColorTags, 'name', {
-    value: "ColorTags"
-  });
-  $.plugins.push($.ColorTags);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  InstructionPanel Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(46);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.InstructionPanel = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
-
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.InstructionPanel.prototype.init = function () {
-    var self = this;
-    self.setUpInstructions();
-  };
-
-  $.InstructionPanel.prototype.setUpInstructions = function () {
-    var self = this;
-
-    if (!self.options.instructions || self.options.instructions.length == 0) {
-      return;
-    } // console.log(self.options.instructions, typeof(self.options.instructions));
-
-
-    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
-    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
-
-    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
-    inst_area.click(function () {
-      if (inst_area.html() == "Collapse Instructions") {
-        inst_area.html('Expand Instructions');
-      } else {
-        inst_area.html('Collapse Instructions');
-      }
-    });
-  };
-
-  $.InstructionPanel.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.InstructionPanel, 'name', {
-    value: "InstructionPanel"
-  });
-  $.plugins.push($.InstructionPanel);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  FontResize Annotations Plugin
- *  
- *
- */
-__webpack_require__(48);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.FontResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.toggleTextSize(0);
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.FontResize.prototype.init = function () {
-    var self = this;
-    self.setUpButtons();
-  };
-
-  $.FontResize.prototype.setUpButtons = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(default)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
-    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
-      self.toggleTextSize(1);
-    });
-    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
-      self.toggleTextSize(-1);
-    });
-  };
-
-  $.FontResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.FontResize.prototype.toggleTextSize = function (step) {
-    var self = this;
-    step = isNaN(Number(step)) ? 0 : Number(step);
-    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
-    var $label = jQuery("#annotations-text-size-label");
-    var nodes = [],
-        curnode,
-        stylesize,
-        styleunit,
-        computed;
-    var minsize = 8;
-    var sizediff = 0;
-
-    if (typeof this.defaultFontSize === "undefined") {
-      this.defaultFontSize = 14;
-    }
-
-    if (typeof this.targetFontSize === "undefined") {
-      this.targetFontSize = this.defaultFontSize;
-    }
-
-    this.targetFontSize += step;
-
-    if (this.targetFontSize < minsize) {
-      this.targetFontSize = minsize;
-    }
-
-    sizediff = this.targetFontSize - this.defaultFontSize;
-
-    if (sizediff === 0) {
-      $label.html("(default)");
-      $content.css('fontSize', '');
-    } else {
-      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
-      $content.css('fontSize', String(this.targetFontSize) + "px");
-      nodes.push($content[0]);
-    } // walk the dom and find custom fontStyle declarations and adust as necessary
-    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
-
-
-    while (nodes.length > 0) {
-      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
-
-      if (curnode.tagName.toLowerCase() == 'font') {
-        computed = window.getComputedStyle(curnode);
-        curnode.style.fontSize = computed['font-size'];
-        curnode.size = "";
-      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
-
-
-      if (curnode != $content[0] && curnode.className != "") {
-        curnode.style.fontSize = "inherit";
-      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
-
-
-      stylesize = parseInt(curnode.style.fontSize, 10);
-
-      if (!isNaN(stylesize)) {
-        styleunit = curnode.style.fontSize.replace(stylesize, '');
-        stylesize += step;
-        stylesize = stylesize < minsize ? minsize : stylesize;
-
-        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
-          curnode.style.fontSize = stylesize + styleunit;
-        }
-      }
-
-      for (var i = curnode.children.length; i > 0; i--) {
-        nodes.push(curnode.children[i - 1]);
-      }
-    }
-  };
-
-  Object.defineProperty($.FontResize, 'name', {
-    value: "FontResize"
-  });
-  $.plugins.push($.FontResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Toggle Annotations Plugin
- *  
- *
- */
-__webpack_require__(50);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.ToggleAnnotations = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.on = true;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.ToggleAnnotations.prototype.init = function () {
-    var self = this;
-    self.setUpButton();
-  };
-
-  $.ToggleAnnotations.prototype.setUpButton = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
-    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
-      var toggleButton = jQuery(this);
-
-      if (!toggleButton.hasClass('should-show')) {
-        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
-          self.tempAnnotationList = annList;
-          self.on = false;
-          toggleButton.addClass('should-show');
-        }]);
-      } else {
-        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-          self.tempAnnotationList = [];
-          self.on = true;
-          toggleButton.removeClass('should-show');
-        }]);
-      }
-    });
-  };
-
-  $.ToggleAnnotations.prototype.editorShown = function () {
-    var self = this;
-
-    if (!self.on) {
-      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-        self.tempAnnotationList = [];
-        self.on = true;
-        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
-      }]);
-    }
-  };
-
-  $.ToggleAnnotations.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.ToggleAnnotations, 'name', {
-    value: "ToggleAnnotations"
-  });
-  $.plugins.push($.ToggleAnnotations);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  DisplayResize Annotations Plugin
- *  
- *
- */
-var annotator = annotator ? annotator : __webpack_require__(5); //uncomment to add css file
-
-__webpack_require__(52);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.DisplayResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    self.itemStretching = false;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.DisplayResize.prototype.init = function () {
-    var self = this;
-    self.setUpListeners();
-  };
-
-  $.DisplayResize.prototype.setUpListeners = function () {
-    var self = this;
-    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
-      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
-      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
-        self.prepareToStretch(event);
-      });
-      jQuery(self.options.slot).on('mousemove', function (event) {
-        self.stretch(event);
-
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
-        }
-      });
-      jQuery(self.options.slot).on('mouseup', function (event) {
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
-        }
-
-        self.finishedStretching(event);
-      });
-      jQuery(self.options.slot).on('mouseleave', function (event) {
-        self.finishedStretching(event);
-      });
-    });
-  };
-
-  $.DisplayResize.prototype.prepareToStretch = function (event) {
-    var self = this;
-    self.itemStretching = true;
-    $.pauseEvent(event);
-    self.initialPoint = annotator.util.mousePosition(event);
-    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
-  };
-
-  $.DisplayResize.prototype.stretch = function (event) {
-    var self = this;
-
-    if (self.itemStretching) {
-      var newPoint = annotator.util.mousePosition(event);
-      var diff = newPoint.top - self.initialPoint.top;
-      var newHeight = self.initialHeight + diff;
-      var innerHeight = self.initialHeight + diff - 30;
-      self.currentViewer.css('height', newHeight);
-      self.currentViewer.find('.annotation-text-field').css({
-        'max-height': innerHeight,
-        'height': innerHeight
-      });
-    }
-  };
-
-  $.DisplayResize.prototype.finishedStretching = function (event) {
-    var self = this;
-    self.itemStretching = false;
-  };
-
-  $.DisplayResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
-    var self = this;
-
-    if (Array.isArray(annotations)) {
-      self.currentViewer = jQuery(viewer);
-    }
-  };
-
-  Object.defineProperty($.DisplayResize, 'name', {
-    value: "DisplayResize"
-  });
-  $.plugins.push($.DisplayResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  SidebarTagTokens Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(54);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.SidebarTagTokens = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.SidebarTagTokens.prototype.init = function () {
-    var self = this; // console.log(this);
-
-    var search_button = jQuery('.btn.user-filter#search');
-    search_button.click(function () {
-      self.removeTokens();
-      setTimeout(function () {
-        self.setUpTokens();
-      }, 250);
-    });
-    jQuery('.search-bar.side #search-submit').click(function () {
-      jQuery('.tag-token-tag').removeClass('active');
-    });
-    jQuery('.search-bar.side #search-clear').click(function () {
-      jQuery('.tag-token-tag').removeClass('active');
-    });
-    jQuery('.annotationSection.side').on('click', '.tag-token-tag', function () {
-      if (jQuery(this).hasClass('active')) {
-        jQuery('.tag-token-tag').removeClass('active');
-        jQuery('.search-bar.side #search-clear').trigger('click');
-      } else {
-        jQuery('.tag-token-tag').removeClass('active');
-        var tagFound = jQuery(this).html().trim();
-        $.publishEvent('searchTag', self.instanceID, [tagFound]);
-        jQuery('.search-bar #srch-term').val(tagFound);
-        jQuery('.search-bar select').val('Tag');
-        jQuery(this).addClass('active');
-      }
-    });
-    self.setUpListeners();
-  };
-
-  $.SidebarTagTokens.prototype.removeTokens = function () {
-    jQuery('.tag-token-list').remove();
-  };
-
-  $.SidebarTagTokens.prototype.setUpTokens = function () {
-    var self = this;
-    var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
-    self.options.tagList.forEach(function (tag) {
-      tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
-    });
-    tokenHTML += "</div>";
-    jQuery('.search-bar.side').after(tokenHTML);
-  };
-
-  $.SidebarTagTokens.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.SidebarTagTokens.prototype.setUpListeners = function () {
-    var self = this;
-    $.subscribeEvent('searchSelected', self.instanceID, function () {
-      setTimeout(function () {
-        self.setUpTokens();
-      }, 250);
-    });
-  };
-
-  Object.defineProperty($.SidebarTagTokens, 'name', {
-    value: "SidebarTagTokens"
-  });
-  $.plugins.push($.SidebarTagTokens);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  AdminButton Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(56);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.AdminButton = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.AdminButton.prototype.init = function () {
-    var self = this;
-    console.log("here");
-
-    if (self.options.AdminButton) {
-      self.url = self.options.AdminButton.homeURL;
-      self.allowed = self.options.AdminButton.has_staff_permissions;
-      console.log(self.url, self.allowed);
-
-      if (self.allowed && self.url && self.url != '') {
-        self.setUpButtons();
-      } else {
-        jQuery(self.options.slot).before('<div class="sidebar-navbar"></div>');
-      }
-    }
-  };
-
-  $.AdminButton.prototype.setUpButtons = function () {
-    var self = this;
-    jQuery(self.options.slot).before('<div class="sidebar-navbar"><a href="' + self.url + '" aria-label="Admin Hub" id="homebutton" role="button"><span class="fas fa-users-cog"></span></button></div>');
-  };
-
-  $.AdminButton.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.AdminButton, 'name', {
-    value: "AdminButton"
-  });
-  $.plugins.push($.AdminButton);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  HxPermissions Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-//require('./filaname.css');
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.HxPermissions = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.HxPermissions.prototype.init = function () {
-    var self = this;
-  };
-
-  $.HxPermissions.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.HxPermissions.prototype.editorShown = function (editor, annotation) {// console.log(annotation.permissions, self.options.user_id, editor);
-  };
-
-  $.HxPermissions.prototype.displayShown = function (display, annotation) {
-    var self = this;
-
-    if (Array.isArray(annotation)) {
-      annotation.forEach(function (ann) {
-        self.removeWithoutPermission(ann, display);
-      });
-    } else {
-      self.removeWithoutPermission(annotation, display);
-    } // console.log(annotation.permissions, self.options.user_id, display);
-
-  };
-
-  $.HxPermissions.prototype.removeWithoutPermission = function (ann, loc) {
-    var self = this;
-
-    if (!ann.permissions) {
-      // either permissions are not turned on or the annotation is fresh and person must have just made it.
-      return;
-    } // hide edit if the person does not have can_update permissions
-
-
-    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
-      loc.find('#edit-' + ann.id).remove();
-    } // hide delete if the person does not have can_delete permissions
-
-
-    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
-      loc.find('#delete-' + ann.id).remove();
-    }
-  };
-
-  Object.defineProperty($.HxPermissions, 'name', {
-    value: "HxPermissions"
-  });
-  $.plugins.push($.HxPermissions);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  HxAlert Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(59);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.HxAlert = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.HxAlert.prototype.init = function () {
-    var self = this; //console.log("Alert options", self.options);
-
-    self.defaultOptions = {
-      buttons: [{
-        title: 'OK',
-        action: function action() {
-          self.current_alert.remove();
-        }
-      }, {
-        title: 'Cancel',
-        action: function action() {
-          self.current_alert.remove();
-        }
-      }],
-      time: 0,
-      // 0 = unlimited, 1 = 1 second, 2 = 2 seconds, ... etc.
-      modal: false
-    };
-    jQuery('body').on('click', '.hx-notify .hx-notify-button.hx-close', function () {
-      self.current_alert.removeClass('opened');
-      setTimeout(function () {
-        self.current_alert.remove();
-      }, 1000);
-    });
-    $.subscribeEvent('HxAlert', self.instanceID, function (_, message, options) {
-      var theseOptions = jQuery.extend({}, self.defaultOptions, options);
-      constructedAlert = self.createNotification(message, theseOptions.modal, theseOptions.buttons);
-      jQuery('body').append(constructedAlert); // if (theseOptions.modal) {
-      //     self.current_alert = jQuery('.hx-modal');
-      // } else {
-
-      self.current_alert = jQuery('.hx-notify');
-      jQuery.each(self.current_alert.find('button'), function (idx, but) {
-        if (jQuery(but).hasClass('hx-close')) {
-          return;
-        }
-
-        var currTitle = jQuery(but).html().trim();
-        var onclick = theseOptions.buttons.find(function (b) {
-          if (b.title == currTitle) {
-            return b;
-          }
-        }).action;
-        jQuery(but).on('click', onclick);
-      });
-      setTimeout(function () {
-        self.current_alert.addClass('opened');
-      }, 500); // }
-
-      if (theseOptions.time !== 0) {
-        setTimeout(function () {
-          self.current_alert.removeClass('opened');
-        }, theseOptions.time * 1000);
-        setTimeout(function () {
-          self.current_alert.remove();
-        }, (theseOptions.time + 1) * 1000);
-      }
-
-      return;
-    });
-  };
-
-  $.HxAlert.prototype.createNotification = function (message, isModal, buttons) {
-    var buttonsHTML = "<button class='hx-notify-button hx-close'><span class='fa fa-close'></span></button>";
-
-    if (buttons.length > 0) {
-      buttonsHTML = "";
-      buttons.forEach(function (b) {
-        buttonsHTML += "<button class='hx-notify-button'>" + b.title + "</button>";
-      });
-    }
-
-    var notificationHTML = "<div class='hx-notify'>" + message + "<div class='hx-notify-button-group'>" + buttonsHTML + "</div></div>";
-    jQuery('.sr-real-alert').html(message); // if (isModal) {
-    //     notificationHTML = "<div class='hx-modal'>" + notificationHTML + "</div>";
-    // }
-
-    return notificationHTML;
-  };
-
-  $.HxAlert.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.HxAlert, 'name', {
-    value: "HxAlert"
-  });
-  $.plugins.push($.HxAlert);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- * 
- */
-(function ($) {
-  /**
-   * Sets up components for Hxighlighte Core isntance
-   *
-   * @class      Core (name)
-   * @param      {Object}  options  The options
-   * @param      {string}  inst_id  The instance identifier
-   */
-  $.Core = function (options, inst_id) {
-    // options and instance ids are saved
-    this.options = options;
-    this.instance_id = inst_id; // keeps track of viewer/plugin modules for UI
-
-    this.viewers = [];
-    this.disabledViewers = [];
-    this.plugins = [];
-    this.disabledPlugins = []; // keeps track of annotations and storage modules for backend
-
-    this.annotations = [];
-    this.storage = [];
-    this.disabledStorage = []; // keeps track of object(s) being annotated
-
-    this.targets = []; // initializes tool
-
-    this.init();
-  };
-  /**
-   * initializer of core and its components
-   */
-
-
-  $.Core.prototype.init = function () {
-    this.setUpTargets();
-    this.setUpViewers(); // this.setUpListeners();
-    //this.setUpStorage();
-    // this.setUpPlugins();
-  };
-  /**
-   * sets up targets to be annotated
-   */
-
-
-  $.Core.prototype.setUpTargets = function () {
-    var targets = this.options.targets;
-
-    for (var i = 0; i < targets.length; i++) {
-      var mediaType = $.Core._capitalizeMedia(targets[i].mediaType) + "Target";
-
-      if (typeof Hxighlighter[mediaType] === "function") {
-        this.targets.push(new Hxighlighter[mediaType](jQuery.extend({}, targets[i], this.options.commonInfo), this.instance_id));
-      }
-    }
-  };
-
-  $.Core.prototype.setUpViewers = function () {};
-
-  $.Core.prototype.TargetSelectionMade = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'TargetSelectionMade', [message[1], message[2]]);
-  };
-
-  $.Core.prototype.TargetAnnotationDraw = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
-  };
-
-  $.Core.prototype.ViewerEditorOpen = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerEditorOpen', message);
-  };
-
-  $.Core.prototype.ViewerDisplayOpen = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerDisplayOpen', message);
-  };
-
-  $.Core.prototype.ViewerEditorClose = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerEditorClose', message);
-  };
-
-  $.Core.prototype.ViewerDisplayClose = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'ViewerDisplayClose', message);
-  };
-
-  $.Core.prototype.StorageAnnotationSave = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationSave', message);
-  };
-
-  $.Core.prototype.StorageAnnotationDelete = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationDelete', message);
-  };
-
-  $.Core.prototype.StorageAnnotationLoad = function (message) {
-    var self = this;
-    self.callFuncInList(this.targets, 'StorageAnnotationLoad', message);
-  }; // $.Core.prototype.StorageAnnotationGetReplies = function(message) {
-  //     var self = this;
-  //     self.callFuncInList(this.targets, 'StorageAnnotationGetReplies', message);
-  // };
-
-
-  $.Core.prototype.StorageAnnotationSearch = function (message) {
-    var self = this; //console.log('Received here');
-
-    self.callFuncInList(this.targets, 'StorageAnnotationSearch', message);
-  }; // Util functions
-
-
-  $.Core.prototype.callFuncInList = function (objectList, funcName, params) {
-    var self = this;
-    jQuery.each(objectList, function (_, component) {
-      if (typeof component[funcName] === "function") {
-        component[funcName].apply(component, params);
-      }
-    });
-  };
-
-  $.Core._capitalizeMedia = function (media) {
-    var editedMedia = Hxighlighter.trim(media);
-    editedMedia = editedMedia.toLowerCase();
-    return editedMedia.charAt(0).toUpperCase() + editedMedia.slice(1);
-  };
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(62);
-
-
-/***/ }),
-/* 62 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
-/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(15);
-/* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
-/* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(17);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
- // vendors
-
-__webpack_require__(18);
-
-__webpack_require__(19); // common Hxighlighter object
-
-
-__webpack_require__(1);
-
-__webpack_require__(21);
-
-__webpack_require__(63);
-
-__webpack_require__(65);
-
-__webpack_require__(67);
-
-__webpack_require__(69);
-
-__webpack_require__(23);
-
-__webpack_require__(60);
-
-__webpack_require__(70);
-
-/***/ }),
-/* 63 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_1__);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-/**
- *  Reply Plugin
- *  
- *
- */
-__webpack_require__(12);
-
-__webpack_require__(13);
-
-__webpack_require__(64);
-
-
-
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.Reply = function (options, instanceID) {
-    this.options = jQuery.extend({
-      height: 70,
-      focus: true,
-      width: 356,
-      dialogsInBody: true,
-      // airMode: true,
-      placeholder: "Reply to annotation...",
-      toolbar: [['font', ['bold', 'italic', 'underline', 'link']]]
-    }, options);
-    this.init();
-    this.instanceID = instanceID;
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.Reply.prototype.init = function () {
-    // warns dev that they forgot to include summernote.js
-    if (_typeof(jQuery.summernote) !== "object") {
-      console.log("You must include summernote.js and summernote.css on this page in order to use this plugin");
-    }
-
-    this.annotationListeners();
-  };
-  /**
-   * 
-   * @param element {HTMLElement} - where the annotation will be added
-   * @param selector {String} - selector to find input it is replacing
-   */
-
-
-  $.Reply.prototype.addWYSIWYG = function (element, selector) {
-    var self = this;
-
-    if (this.elementObj != undefined) {
-      return;
-    } // adds the summernote WYSIWIG to the editor to the selector's location
-
-
-    this.elementObj = element.find(selector);
-    console.log(this.elementObj);
-    var newOptions = jQuery.extend({}, this.options, {
-      'width': element.outerWidth() - 24
-    });
-    this.elementObj.summernote(newOptions); // removes summernote's ability to tab within the editor so users can tab through items
-
-    delete jQuery.summernote.options.keyMap.pc.TAB;
-    delete jQuery.summernote.options.keyMap.mac.TAB;
-  };
-  /**
-   * Returns the HTML value of the WYSIWYG. 
-   *
-   * @return     {String}  HTML value found in the WYSIWYG
-   */
-
-
-  $.Reply.prototype.returnValue = function () {
-    var result = this.elementObj.summernote('code');
-
-    if (result.indexOf('<script') >= 0) {
-      alert("I'm sorry Colin, I'm afraid I can't do that. Only you wil be affected by the JS you entered. It will be escaped for everyone else.");
-      return result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
-    }
-
-    return result;
-  };
-  /**
-   * Deletes the Summernote instance.
-   *
-   * @param      {HTMLElement}  element   The editor element
-   * @param      {String}  selector  The selector containing the area in the editor where to insert the WYSIWYG
-   */
-
-
-  $.Reply.prototype.destroy = function (element, selector) {
-    console.log(jQuery('.summernote').each(function () {
-      jQuery(this).summernote('destroy');
-    }));
-
-    if (this.elementObj) {
-      this.elementObj.val('');
-      this.elementObj.summernote('destroy');
-      this.elementObj = undefined;
-    }
-  }; // Annotation specific functions
-
-  /**
-   * Turns on the specific listeners when the plug in is initiated.
-   */
-
-
-  $.Reply.prototype.annotationListeners = function () {
-    var self = this;
-    $.subscribeEvent('displayHidden', self.instanceID, function () {
-      console.log('reached here, but nothing to destroy');
-      self.destroy();
-    });
-  };
-  /**
-   * Code to run just before the annotation is saved to storage
-   *
-   * @param      {Annotation}  annotation  The annotation as it currently is saved.
-   * @return     {Annotation}  The annotation with the contents of the WYSIWYG inserted.
-   */
-
-
-  $.Reply.prototype.saving = function (annotation) {
-    return annotation;
-  };
-  /**
-   * Code that runs once the display is shown on screen.
-   *
-   * @param      {Annotation}  annotation  The annotation in case the user is editing and we need the text
-   * @param      {HTMLElement}  editor      The editor element
-   */
-
-
-  $.Reply.prototype.displayShown = function (viewer, annotations) {
-    var self = this;
-
-    if (Array.isArray(annotations)) {
-      jQuery.each(annotations, function (_, annotation) {
-        var ann_display = viewer.find('.item-' + annotation.id);
-        self.annotationShown(viewer.find('.item-' + annotation.id), annotation, false);
-      });
-    } else {
-      self.annotationShown(viewer, annotations, true);
-    }
-  };
-
-  $.Reply.prototype.annotationShown = function (viewer, annotation, isSidebar) {
-    var self = this;
-    var prefix = isSidebar ? "sidebar-" : "other-";
-    jQuery(viewer).find('.plugin-area-bottom').append('<div style="display: none;" class="reply-menu reply-menu-' + annotation.id + '"><button class="close-list-reply"><span class="fa fa-times-circle"></span></button><button class="sort-list-reply"><span class="fa fa-sort"></span></button></div><div class="reply-area-' + annotation.id + '"><button class="view-replies" style="display:none;" id="' + prefix + 'replies-' + annotation.id + '">View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies') + '</button><div class="' + prefix + 'reply-list" style="display:none;"></div><div class="create-reply-area" id="' + prefix + 'create-reply-area-' + annotation.id + '" style="display:none;"><textarea id="' + prefix + 'reply-textarea-' + annotation.id + '"></textarea><button id="' + prefix + 'save-reply-' + annotation.id + '">Save</button><button id="' + prefix + 'cancel-reply-' + annotation.id + '">Cancel</button></div><button class="create-reply" id="' + prefix + 'reply-' + annotation.id + '">Reply to Annotation</button></div>');
-
-    if ('totalReplies' in annotation && annotation.totalReplies > 0) {
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").show();
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").hide();
-    }
-
-    jQuery(viewer).find('.plugin-area-bottom #' + prefix + 'reply-' + annotation.id).click(function () {
-      if (jQuery('.note-editor.card').length > 0) {
-        return;
-      }
-
-      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).show();
-      self.addWYSIWYG(viewer, '#' + prefix + 'reply-textarea-' + annotation.id);
-      jQuery(this).hide();
-    });
-    jQuery(viewer).find('.plugin-area-bottom .reply-area-' + annotation.id + ' .view-replies').click(function () {
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").hide();
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").show();
-      jQuery(viewer).find('.' + prefix + 'reply-list').html('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
-      $.publishEvent('GetSpecificAnnotationData', self.instanceID, [annotation.id, function (ann) {
-        self.viewRepliesToAnnotation(ann, viewer, prefix);
-      }]);
-    });
-    jQuery(viewer).find('.plugin-area-bottom .reply-menu-' + annotation.id + ' .close-list-reply').click(function () {
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .view-replies").show();
-      jQuery(viewer).find('.reply-area-' + annotation.id + " .create-reply").hide();
-      jQuery(viewer).find('.' + prefix + 'reply-list').hide();
-      jQuery(viewer).find('.reply-menu').hide();
-    });
-    jQuery(viewer).find('.plugin-area-bottom .reply-menu-' + annotation.id + ' .sort-list-reply').click(function () {
-      jQuery(viewer).find('.plugin-area-bottom .reply-area-' + annotation.id + ' div[class*=reply-list]').toggleClass('reversed');
-    });
-    jQuery('#' + prefix + 'cancel-reply-' + annotation.id).click(function () {
-      self.destroy();
-      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).hide();
-      jQuery('#' + prefix + 'reply-' + annotation.id).show();
-    });
-    jQuery('#' + prefix + 'save-reply-' + annotation.id).click(function () {
-      var result = self.elementObj.summernote('code');
-
-      if (result.indexOf('<script') >= 0) {
-        alert('content contains javascript code that will be removed.');
-        result = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
-      }
-
-      var reply = {
-        annotationText: [result],
-        ranges: {
-          'type': 'Annotation',
-          'format': 'text/html',
-          'source': annotation.id
-        },
-        id: $.getUniqueId(),
-        exact: '',
-        created: new Date(),
-        media: 'comment',
-        creator: {
-          name: self.options.username,
-          id: self.options.user_id
-        }
-      };
-      $.publishEvent('StorageAnnotationSave', self.instanceID, [reply, false]);
-      annotation.totalReplies++;
-      typeof annotation.replies == "undefined" ? annotation.replies = [reply] : annotation.replies.push(reply);
-
-      annotation._local.highlights.forEach(function (high) {
-        jQuery(high).data('annotation', annotation);
-      });
-
-      self.addReplyToViewer(viewer, reply, prefix, annotation);
-      self.destroy();
-
-      if (prefix === "other-") {
-        if (jQuery('.ann-item.item-' + annotation.id + ' .create-reply').length === 2) {
-          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
-          jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').hide();
-          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').show();
-          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
-          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
-        }
-
-        jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
-      } else {
-        if (jQuery('.ann-item.item-' + annotation.id + ' .create-reply').length === 2) {
-          jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
-          jQuery('.floating.ann-item.item-' + annotation.id + ' .create-reply').hide();
-          jQuery('.floating.ann-item.item-' + annotation.id + ' .view-replies').show();
-          jQuery('.floating.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
-          jQuery('.floating.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
-        }
-
-        jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
-      }
-
-      jQuery('#' + prefix + 'create-reply-area-' + annotation.id).hide();
-      jQuery(viewer).find('.create-reply').show();
-      jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').show();
-      jQuery(viewer).find('.plugin-area-bottom .reply-menu').show(); //jQuery('.ann-item.item-'+annotation.id+' div[class*=reply-list]').show();
-    });
-  };
-
-  $.Reply.prototype.viewRepliesToAnnotation = function (annotation, viewer, prefix) {
-    var self = this;
-
-    if (annotation.totalReplies > 0) {
-      if (annotation.replies && annotation.totalReplies == annotation.replies.length) {
-        annotation.replies.forEach(function (rep) {
-          self.addReplyToViewer(viewer, rep, prefix, annotation);
-        });
-        jQuery('.loading-obj').remove();
-      } else {
-        self.retrieveRepliesForAnnotation(annotation, viewer, prefix);
-      }
-    }
-
-    jQuery(viewer).find('.' + prefix + 'reply-list').show();
-    jQuery(viewer).find('.reply-menu').show();
-  };
-
-  $.Reply.prototype.retrieveRepliesForAnnotation = function (annotation, viewer, prefix) {
-    var self = this;
-    $.publishEvent('StorageAnnotationSearch', self.instanceID, [{
-      'source_id': annotation.id,
-      'media': 'Annotation'
-    }, function (results, converter) {
-      jQuery('.loading-obj').remove();
-      results.rows.reverse().forEach(function (reply) {
-        var rep = converter(reply);
-        self.addReplyToViewer(viewer, rep, prefix, annotation);
-        annotation.replies ? annotation.replies.push(rep) : annotation.replies = [rep];
-      });
-
-      if (annotation.totalReplies !== results.rows.length) {
-        annotation.totalReplies = results.rows.length;
-      }
-
-      annotation._local.highlights.forEach(function (high) {
-        jQuery(high).data('annotation', annotation);
-      });
-    }, function () {}]);
-  };
-
-  $.Reply.prototype.addReplyToViewer = function (viewer, reply, prefix, annotation) {
-    var self = this;
-    console.log(annotation, self.options);
-    var delete_option = '';
-
-    if (self.options.HxPermissions && self.options.HxPermissions.has_staff_permissions || annotation.permissions && annotation.permissions.can_delete && annotation.permissions.can_delete.indexOf(self.options.user_id) > -1) {
-      delete_option = "<button class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button>";
-    }
-
-    jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').append("<div class='reply reply-item-" + reply.id + "'>" + delete_option + "<strong>" + reply.creator.name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
-    jQuery('.reply.reply-item-' + reply.id + ' .delete-reply').confirm({
-      'title': 'Delete Reply?',
-      'content': 'Would you like to delete your reply? This is permanent.',
-      'buttons': {
-        confirm: function confirm() {
-          $.publishEvent('StorageAnnotationDelete', self.instanceID, [reply]);
-          annotation.replies = annotation.replies.filter(function (ann) {
-            if (ann.id !== reply.id) {
-              return ann;
-            }
-          });
-          annotation.totalReplies--;
-
-          annotation._local.highlights.forEach(function (high) {
-            jQuery(high).data('annotation', annotation);
-          });
-
-          jQuery('.reply.reply-item-' + reply.id).remove();
-          jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
-
-          if (annotation.totalReplies == 0) {
-            jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').show();
-            jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').hide();
-          } else {
-            jQuery('.side.ann-item.item-' + annotation.id + ' .create-reply').hide();
-            jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').show();
-          }
-
-          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom div[class*=reply-list]').hide();
-          jQuery('.side.ann-item.item-' + annotation.id).find('.plugin-area-bottom .reply-menu').hide();
-        },
-        cancel: function cancel() {}
-      }
-    });
-  };
-
-  $.Reply.prototype.pluralize = function (num, singular, plural) {
-    return num == 1 ? '1 ' + singular : num + ' ' + plural;
-  };
-
-  Object.defineProperty($.Reply, 'name', {
-    value: "Reply"
-  });
-  $.plugins.push($.Reply);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
 /* 64 */
@@ -44756,7 +44877,7 @@ __webpack_require__(68);
     jQuery(self.options.slot).prepend('<button class="hx-style-mine btn btn-default" style="margin-right: 10px; width: 150px;">Underline Mine</button>');
     jQuery('.hx-style-mine').click(function () {
       if (jQuery(this).text().trim() == "Underline Mine") {
-        jQuery('body').append('<style id="style-mine-underline">.annotation-mine { text-decoration: underline dashed; }</style>');
+        jQuery('body').append('<style id="style-mine-underline">.annotation-mine { text-decoration: underline; text-decoration: underline dashed; }</style>');
         jQuery(this).html('Remove Underlines');
       } else {
         jQuery('#style-mine-underline').remove();
@@ -45116,19 +45237,18 @@ var hrange = __webpack_require__(3);
 
   $.CatchPy.prototype.getAnnotationTargetItems = function (webAnn) {
     try {
-      console.log("reached getAnnotationTargetItems", webAnn);
-
+      // console.log("reached getAnnotationTargetItems", webAnn);
       if (webAnn['target']['items'][0]['type'] == "Annotation") {
         // console.log([{'parent':webAnn['target']['items'][0]['source']}]);
         return [{
           'parent': webAnn['target']['items'][0]['source']
         }];
-      } //console.log("nope, something went wrong");
+      } // console.log("nope, something went wrong");
 
 
       return webAnn['target']['items'][0]['selector']['items'];
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       return [];
     }
   };
@@ -45144,7 +45264,6 @@ var hrange = __webpack_require__(3);
       jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
         if (!('parent' in targetItem)) {
           if (targetItem['type'] === "RangeSelector") {
-            console.log("Reached RangeSelector", targetItem);
             xpathRanges.push({
               start: targetItem['startSelector'] ? targetItem['startSelector'].value : targetItem['oa:start'].value,
               startOffset: targetItem['refinedBy'][0].start,
@@ -45158,9 +45277,9 @@ var hrange = __webpack_require__(3);
             });
           } else if (targetItem['type'] === "TextQuoteSelector") {
             textRanges.push({
-              prefix: targetItem['prefix'] || '',
+              prefix: targetItem['prefix'],
               exact: targetItem['exact'],
-              suffix: targetItem['suffix'] || ''
+              suffix: targetItem['suffix']
             });
           }
         } else {
@@ -45187,22 +45306,6 @@ var hrange = __webpack_require__(3);
           var serializedRange = hrange.serializeRange(normalizedRange, element, 'annotator-hl');
           ranges.push(serializedRange);
         }
-      } else {
-        var rangeFound = {};
-
-        if (xpathRanges.length >= 1) {
-          rangeFound['xpath'] = xpathRanges[0];
-        }
-
-        if (positionRanges.length >= 1) {
-          rangeFound['position'] = positionRanges[0];
-        }
-
-        if (textRanges.length >= 1) {
-          rangeFound['text'] = textRanges[0];
-        }
-
-        ranges.push(rangeFound);
       }
 
       if (webAnn['target']['items'][0]['type'] == "Annotation") {

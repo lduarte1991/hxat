@@ -14,32 +14,34 @@ Text Annotation Tool | {{ target_object.target_title }}
 {% block mainapplication %}
     <main class="hxighlighter-container" role="main">
         <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
-            <aside role="complementary" class="sr-only" accesskey="h">
-                    <div class='sr-only'>
-                        <h3>Quick Navigation Links</h3>
-                        <ul>
-                            <li><a href="#to-title">Text to be Annotated</a></li>
-                            <li><a href="#annotationList">Annotation List</a></li>
-                        </ul>
-                    </div>
-                    <h3>Keyboard Shortcuts</h3>
+            <aside aria-labelledby="aside-title" role="complementary" class="sr-only" accesskey="h" id="key-help">
+                    <h3 id="aside-title">Keyboard Help</h3>
+                    <h4>Quick Navigation Links</h4>
                     <ul>
-                        <li><strong>"Ctrl + 1"</strong>: Turn text to be editable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
-                        <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
-                        <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. (You can also use the "Turn Hint Text On/Off" button below)</li>
+                        <li><a href="#to-title">Text to be Annotated</a></li>
+                        <li><a href="#annotationssHolder">Annotation List</a></li>
                     </ul>
-
-                    <h3>Making Annotations via Keyboard Instructions</h3>
+                    <h4>Making Annotations via Keyboard Instructions</h4>
                     <ol>
-                        <li>Hit the "Make Keyboard Annotation" Button (or use the shortcut) to make text editable.</li>
-                        <li>The button should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
+                        <li>Use the shortcut or the <a href="#ma-button">Make Annotation</a> button to make text markable.</li>
+                        <li>This should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
                         <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
                         </li>
                         <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
                     </ol>
-                    <div class='sr-only'>
-                        <div class='sr-real-alert' aria-live='assertive'></div>
-                        <div class="sr-alert" aria-live="polite"></div>
+                    <h4>Keyboard Shortcuts</h4>
+                    <ul>
+                        <li><strong>"Ctrl + 1"</strong>: Turn text to be markable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
+                        <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
+                        <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. <span class="sr-only">(You can also use the "Turn Hint Text On/Off" button below)</span></li>
+                         <li><strong>"Esc"</strong>: Make the text not markable.</li>
+                    </ul>
+                    <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
+
+                    
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="polite">
+                        <div class='sr-real-alert'></div>
+                        <div class="sr-alert"></div>
                         <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
                     </div>
                 </aside>
@@ -50,6 +52,28 @@ Text Annotation Tool | {{ target_object.target_title }}
             </div>
         </section>
     </main>
+    <footer class="hx-footer"></footer>
+    <style>
+        .hx-footer {
+            width: 100%;
+            height: 15px;
+            height: var(--footer-height);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 9999999999999;
+            /* background: black; */
+            background: #ededed;
+            /*-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.39);*/
+            border: 1px solid #c0c0c0;
+        }
+
+        :root {
+            --footer-height: 15px;
+        };
+    </style>
     <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
     <script>
             var tags = "{{ assignment.highlights_options }}".split(',');
