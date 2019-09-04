@@ -59,10 +59,29 @@ class AnnotationStore(object):
 
     @classmethod
     def from_settings(cls, request):
-        backend_type = cls.SETTINGS.get('backend', 'catch')
-        backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend}
-        assert backend_type in backend_types
-        backend_instance = backend_types[backend_type](request)
+        backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
+        backend_types = backend_type_setting.split(',')
+        possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
+        if request.method == "GET" or request.method == "DELETE":
+            version_requested = request.GET.get('version', None)
+        else:
+            body = json.loads(str(request.body, 'utf-8'))
+            version_requested = body.get('version', None)
+            if version_requested is None:
+                version_requested = request.GET.get('version')
+            logger.info('WebAnnotation version found %s' % request.GET.get('version'))
+        if version_requested is not None:
+            try:
+                backend_instance = possible_backend_types[version_requested](request)
+                return cls(request, backend_instance)
+            except Exception as e:
+                logger.info(e)
+                logger.info('version requested (%s) not in list of possible types' % version_requested)
+                raise e
+        else:
+            return cls(request, possible_backend_types['catch'](request))
+        assert backend_type_setting in possible_backend_types
+        backend_instance = possible_backend_types[backend_type](request)
         return cls(request, backend_instance)
 
     @classmethod
@@ -70,15 +89,15 @@ class AnnotationStore(object):
         cls.SETTINGS = settings_dict
         return cls
 
-    def root(self):
-        return self.backend.root()
+    def root(self, annotation_id=None):
+        return self.backend.root(annotation_id)
 
     def index(self):
         raise NotImplementedError
 
     def search(self):
         self.logger.info(u"Search: %s" % self.request.GET)
-        self._verify_course(self.request.GET.get('contextId', None))
+        self._verify_course(self.request.GET.get('contextId', self.request.GET.get('context_id', None)))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
         response = self.backend.search()
@@ -90,14 +109,14 @@ class AnnotationStore(object):
                 self.lti_grade_passback(is_graded=is_graded, status_code=response.status_code, restul_score=1)
         return response
 
-    def create(self):
+    def create(self, annotation_id=None):
         body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Create annotation: %s" % body)
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        self._verify_course(body.get('contextId', body.get('context_id', None)))
+        self._verify_user(body.get('user', body.get('creator', {})).get('id', None))
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
-        response = self.backend.create()
+        response = self.backend.create(annotation_id)
         return response
 
     def read(self, annotation_id):
@@ -109,8 +128,8 @@ class AnnotationStore(object):
     def update(self, annotation_id):
         body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        self._verify_course(body.get('contextId', body.get('platform', {}).get('context_id', None)))
+        self._verify_user(body.get('user', body.get('creator', {})).get('id', None))
         if hasattr(self.backend, 'before_update'):
             self.backend.before_update(annotation_id)
         response = self.backend.update(annotation_id)
@@ -204,13 +223,13 @@ class StoreBackend(object):
         self.request = request
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
-    def root(self):
+    def root(self, annotation_id=None):
         return HttpResponse(json.dumps(dict(name=self.BACKEND_NAME)), content_type='application/json')
 
     def search(self):
         raise NotImplementedError
 
-    def create(self):
+    def create(self, annotation_id):
         raise NotImplementedError
 
     def read(self, annotation_id):
@@ -295,6 +314,21 @@ class CatchStoreBackend(StoreBackend):
         }
         self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
 
+    def root(self, annotation_id):
+        self.logger.info(u"MethodType: %s" % self.request.method)
+        if self.request.method == "GET":
+            self.before_search()
+            response = self.search()
+            self.after_search(response)
+            return response
+        elif self.request.method == "POST":
+            return self.create(annotation_id)
+        elif self.request.method == "PUT":
+            return self.update(annotation_id)
+        elif self.request.method == "DELETE":
+            return self.delete(annotation_id)
+        return self.BACKEND_NAME
+
     def _get_database_url(self, path='/'):
         try:
             if self.request.method == "GET":
@@ -344,7 +378,7 @@ class CatchStoreBackend(StoreBackend):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
         return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
-    def create(self):
+    def create(self, annotation_id):
         body = self._get_request_body()
         database_url = self._get_database_url('/create')
         data = json.dumps(body)
@@ -465,7 +499,7 @@ class AppStoreBackend(StoreBackend):
 
         return HttpResponse(json.dumps(result), status=200, content_type='application/json')
 
-    def create(self):
+    def create(self, annotation_id):
         anno = self._create_or_update(anno=None)
         result = self._serialize_annotation(anno)
         return HttpResponse(json.dumps(result), status=200, content_type='application/json')
@@ -535,3 +569,117 @@ class AppStoreBackend(StoreBackend):
         if anno.parent_id is None:
             data['totalComments'] = anno.total_comments
         return data
+
+
+class WebAnnotationStoreBackend(StoreBackend):
+    BACKEND_NAME = 'catchpy'
+
+    def __init__(self, request):
+        super(WebAnnotationStoreBackend, self).__init__(request)
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
+        self.headers = {
+            'x-annotator-auth-token': request.META.get('HTTP_X_ANNOTATOR_AUTH_TOKEN', '!!MISSING!!'),
+            'content-type': 'application/json',
+        }
+        self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
+
+    def root(self, annotation_id):
+        self.logger.info(u"MethodType: %s" % self.request.method)
+        if self.request.method == "GET":
+            self.before_search()
+            response = self.search()
+            self.after_search(response)
+            return response
+        elif self.request.method == "POST":
+            return self.create(annotation_id)
+        elif self.request.method == "PUT":
+            return self.update(annotation_id)
+        elif self.request.method == "DELETE":
+            return self.delete(annotation_id)
+        return self.BACKEND_NAME
+
+    def _get_database_url(self, path='/'):
+        try:
+            if self.request.method == "GET":
+                assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+            else:
+                body = self._get_request_body()
+                assignment_id = body.get('collectionId', body.get('collection_id', None))
+            if assignment_id:
+                    assignment = self._get_assignment(assignment_id)
+                    base_url = assignment.annotation_database_url
+            else:
+                base_url = str(ANNOTATION_DB_URL).strip()
+        except:
+            self.logger.info("Default annotation_database_url used as assignment could not be found.")
+            base_url = str(ANNOTATION_DB_URL).strip()
+        return '{base_url}{path}'.format(base_url=base_url, path=path)
+
+    def _retrieve_annotator_token(self, user_id):
+        return retrieve_token(user_id, ANNOTATION_DB_API_KEY, ANNOTATION_DB_SECRET_TOKEN)
+
+    def _response_timeout(self):
+        return HttpResponse(json.dumps({"error": "request timeout"}), status=500, content_type='application/json')
+
+    def before_search(self):
+        # Override the auth token when the user is a course administrator, so they can query annotations
+        # that have set their read permissions to private (i.e. read: self-only).
+        # Note: this only works if the "__admin__" group ID was added to the annotation read permissions
+        # prior to saving it, otherwise this will have no effect.
+        if self.ADMIN_GROUP_ENABLED and self.request.LTI['is_staff']:
+            self.logger.info('updating auth token for admin')
+            self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(user_id=self.ADMIN_GROUP_ID)
+
+    def search(self):
+        timeout = 10.0
+        params = self.request.GET.urlencode()
+        database_url = self._get_database_url('/')
+        self.logger.info('search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
+        try:
+            response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('search response status_code=%s content_length=%s' % (response.status_code, response.headers.get('content-length', 0)))
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def after_search(self, response):
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
+        return retrieved_self and int(json.loads(response.content)['total'] > 0)
+
+    def create(self, annotation_id):
+        body = self._get_request_body()
+        database_url = self._get_database_url('/%s' % annotation_id)
+        data = json.dumps(body)
+        self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        try:
+            response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('create response status_code=%s' % response.status_code)
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def update(self, annotation_id):
+        body = self._get_request_body()
+        database_url = self._get_database_url('/%s' % annotation_id)
+        data = json.dumps(body)
+        self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        try:
+            response = requests.put(database_url, data=data, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('update response status_code=%s' % response.status_code)
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def delete(self, annotation_id):
+        database_url = self._get_database_url('/%s' % annotation_id)
+        self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
+        try:
+            response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('delete response status_code=%s' % response.status_code)
+        return HttpResponse(response)

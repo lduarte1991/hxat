@@ -117,11 +117,20 @@ $(document).ready(function() {
 		</ul>
 		<br style="clear:both">
 	</div>
-	
+	<div class="assignment-option-block hx-ui options">
+		<input type='checkbox' {% if form.use_hxighlighter.value == True %} disabled checked{% endif %} {% if form.use_hxighlighter.value is None %}checked{% endif %} id='use_hxighlighter'>
+	<label for='use_hxighlighter'>Use New Hxighlighter UI (Warning you cannot go back to old UI after checking this)</label>
+	</div>
+
+	<div class="assignment-option-block hxighlighter instructor options options" style='display:none;'>
+		<label for='common_inst_name'>Instructor Display Name:</label>
+		<input type='text' value="{{form.common_inst_name.value}}" id='common_inst_name'>
+	</div>
 	<div class="assignment-option-block publishing-options">
 		<input type="checkbox" id="assignment-published" {% if form.is_published.value %} checked {% endif %}>
 		<label for="assignment-published">Publish assignment</label>
 	</div>
+	
 
 	<div class='button-collection'>
 		<div type="submit" class="save" id='save-button' tabindex="0" role="button" onclick='window.assignment_editor.save_form();'>

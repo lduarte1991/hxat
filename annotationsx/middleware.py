@@ -323,7 +323,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         })
 
         lti_launches = request.session.get('LTI_LAUNCH', None)
-        if not lti_launches:
+        if lti_launches is None:
             lti_launches = collections.OrderedDict()
             request.session['LTI_LAUNCH'] = lti_launches
 
@@ -355,6 +355,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
          Sets the current session on the request object based on the given resource_link_id.
          The current session is available via the 'LTI' attribute on the request (e.g. request.LTI).
         '''
+
         setattr(request, 'LTI', LTILaunchSession(request.session, resource_link_id))
         #setattr(request, 'LTI', request.session.get('LTI_LAUNCH', {}).get(resource_link_id))
 

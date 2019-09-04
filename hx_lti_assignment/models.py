@@ -183,6 +183,11 @@ class Assignment(models.Model):
     )
     course = models.ForeignKey(LTICourse, related_name="assignments", null=True, on_delete=models.SET_NULL)
     hidden = models.BooleanField(default=False)
+    use_hxighlighter = models.BooleanField(default=False)
+    common_inst_name = models.CharField(
+        max_length=255,
+        blank=True
+    )
 
     class Meta:
         ordering = ['id']
