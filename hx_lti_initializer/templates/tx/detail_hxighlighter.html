@@ -15,27 +15,33 @@ Text Annotation Tool | {{ target_object.target_title }}
     <main class="hxighlighter-container" role="main">
         <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
             <aside aria-labelledby="aside-title" role="complementary" class="sr-only" accesskey="h" id="key-help">
-                    <h3 id="aside-title">Keyboard Help</h3>
-                    <h4>Quick Navigation Links</h4>
-                    <ul>
-                        <li><a href="#to-title">Text to be Annotated</a></li>
-                        <li><a href="#annotationssHolder">Annotation List</a></li>
-                    </ul>
-                    <h4>Making Annotations via Keyboard Instructions</h4>
-                    <ol>
-                        <li>Use the shortcut or the <a href="#ma-button">Make Annotation</a> button to make text markable.</li>
-                        <li>This should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
-                        <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
-                        </li>
-                        <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
-                    </ol>
-                    <h4>Keyboard Shortcuts</h4>
-                    <ul>
-                        <li><strong>"Ctrl + 1"</strong>: Turn text to be markable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
-                        <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
-                        <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. <span class="sr-only">(You can also use the "Turn Hint Text On/Off" button below)</span></li>
-                         <li><strong>"Esc"</strong>: Make the text not markable.</li>
-                    </ul>
+                    <h3 id='aside-title'>Keyboard Help</h3>
+                    <details>
+                        <summary>Quick Navigation Links</summary>
+                        <ul>
+                            <li><a href="#to-title">Text to be Annotated</a></li>
+                            <li><a href="#annotationsHolder">Annotation List</a></li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>Making Annotations via Keyboard Instructions</summary>
+                        <ol>
+                            <li>Use the shortcut or the <a href="#ma-button">Make Annotation</a> button to make text editable.</li>
+                            <li>This should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
+                            <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
+                            </li>
+                            <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
+                        </ol>
+                    </details>
+                    <details>
+                        <summary>Keyboard Shortcuts</summary>
+                        <ul>
+                            <li><strong>"Ctrl + 1"</strong>: Turn text to be editable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
+                            <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
+                            <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. <span class="sr-only">(You can also use the "Turn Hint Text On/Off" button below)</span></li>
+                            <li><strong>"Esc"</strong>: Make the text not editable.</li>
+                        </ul>
+                    </details>
                     <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
 
                     
