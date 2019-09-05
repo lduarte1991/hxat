@@ -429,6 +429,9 @@ class CatchStoreBackend(StoreBackend):
         self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                cleaned_annotation = json.loads(response.content)
+                self.send_annotation_notification('annotation_created', cleaned_annotation)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -442,6 +445,9 @@ class CatchStoreBackend(StoreBackend):
         self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                cleaned_annotation = json.loads(response.content)
+                self.send_annotation_notification('annotation_updated', cleaned_annotation)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -453,11 +459,27 @@ class CatchStoreBackend(StoreBackend):
         self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
         try:
             response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                cleaned_annotation = json.loads(response.content)
+                self.send_annotation_notification('annotation_deleted', cleaned_annotation)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('delete response status_code=%s' % response.status_code)
         return HttpResponse(response)
+
+    def send_annotation_notification(self, message_type, annotation):
+        collection_id = annotation.get('collectionId', 'unknown_collection')
+        context_id = annotation.get('contextId', 'unknown_context')
+        object_id = annotation.get('uri', 'unknonwn_uri')
+        group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, object_id)
+        self.logger.info("###################### group({}) id({})".format(
+            group, annotation.get('id', 'unknown_id')))
+        async_to_sync(self.channel_layer.group_send)(group, {
+            'type': 'annotation_notification',
+            'message': annotation,
+            'action': message_type
+        })
 
 
 
