@@ -17,6 +17,7 @@ import json
 import requests
 import datetime
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -136,21 +137,8 @@ class AnnotationStore(object):
         #    at this point? leave it to the ws client?
         self.logger.info("###################### about to send notification")
         if response.status_code == 200:
-            context_id = body.get('contextId', 'unknown_context')
-            collection_id = body.get('collectionId', 'unknown_collection')
             cleaned_annotation = json.loads(response.content)
-            group = '{}'.format(collection_id)
-            self.logger.info("###################### group({}) id({})".format(
-                group, cleaned_annotation.get('id', 'unknown_id')))
-            #async_to_sync(self.channel_layer.group_send)(group, {
-            #    'type':'chat_message',
-            #    'message': 'new annotation created ({})'.format(body.get(
-            #        'id', 'unknown_id')),
-            #})
-            async_to_sync(self.channel_layer.group_send)(group, {
-                'type':'annotation_created',
-                'message': cleaned_annotation,
-            })
+            self.send_annotation_notification('annotation_created', cleaned_annotation)
         self.logger.info("###################### done with notification")
         ######### notification ##########################################
         return response
@@ -171,21 +159,8 @@ class AnnotationStore(object):
         response = self.backend.update(annotation_id)
         self.after_update(annotation_id, response)
         if response.status_code == 200:
-            context_id = body.get('contextId', 'unknown_context')
-            collection_id = body.get('collectionId', 'unknown_collection')
             cleaned_annotation = json.loads(response.content)
-            group = '{}'.format(collection_id)
-            self.logger.info("###################### group({}) id({})".format(
-                group, cleaned_annotation.get('id', 'unknown_id')))
-            #async_to_sync(self.channel_layer.group_send)(group, {
-            #    'type':'chat_message',
-            #    'message': 'new annotation created ({})'.format(body.get(
-            #        'id', 'unknown_id')),
-            #})
-            async_to_sync(self.channel_layer.group_send)(group, {
-                'type':'annotation_updated',
-                'message': cleaned_annotation,
-            })
+            self.send_annotation_notification('annotation_updated', cleaned_annotation)
         return response
 
     def after_update(self, annotation_id, response):
@@ -199,23 +174,25 @@ class AnnotationStore(object):
         self.after_delete(annotation_id, response)
         if response.status_code == 200:
             cleaned_annotation = json.loads(response.content)
-            collection_id = cleaned_annotation.get('collectionId', 'unknown_collection')
-            group = '{}'.format(collection_id)
-            self.logger.info("###################### group({}) id({})".format(
-                group, cleaned_annotation.get('id', 'unknown_id')))
-            #async_to_sync(self.channel_layer.group_send)(group, {
-            #    'type':'chat_message',
-            #    'message': 'new annotation created ({})'.format(body.get(
-            #        'id', 'unknown_id')),
-            #})
-            async_to_sync(self.channel_layer.group_send)(group, {
-                'type':'annotation_deleted',
-                'message': cleaned_annotation,
-            })
+            self.send_annotation_notification('annotation_deleted', cleaned_annotation)
         return response
+
 
     def after_delete(self, annotation_id, response):
         pass
+    
+    def send_annotation_notification(self, message_type, annotation):
+        collection_id = annotation.get('collectionId', 'unknown_collection')
+        context_id = annotation.get('contextId', 'unknown_context')
+        object_id = annotation.get('uri', 'unknonwn_uri')
+        group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, object_id)
+        self.logger.info("###################### group({}) id({})".format(
+            group, annotation.get('id', 'unknown_id')))
+        async_to_sync(self.channel_layer.group_send)(group, {
+            'type': 'annotation_notification',
+            'message': annotation,
+            'action': message_type
+        })
 
     def _verify_course(self, context_id, raise_exception=True):
         expected = self.request.LTI['hx_context_id']
