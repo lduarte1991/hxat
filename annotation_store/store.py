@@ -733,9 +733,14 @@ class WebAnnotationStoreBackend(StoreBackend):
         return HttpResponse(response)
 
     def send_annotation_notification(self, message_type, annotation):
-        collection_id = annotation.get('collectionId', 'unknown_collection')
-        context_id = annotation.get('contextId', 'unknown_context')
-        object_id = annotation.get('uri', 'unknonwn_uri')
+        platform = annotation.get('platform', {
+            "collection_id": 'unkonwn_collection',
+            "context_id": 'unknown_context',
+            "target_source_id": 'unknown_target_source_id'
+        })
+        collection_id = platform.collection_id
+        context_id = platform.context_id
+        object_id = platform.target_source_id
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, object_id)
         self.logger.info("###################### group({}) id({})".format(
             group, annotation.get('id', 'unknown_id')))
