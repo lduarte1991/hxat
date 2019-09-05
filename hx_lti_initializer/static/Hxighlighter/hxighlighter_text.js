@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Wednesday, September 4th, 2019, 1:00:01 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 1:10:04 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -33973,7 +33973,7 @@ obj || (obj = {});
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <a href="#key-help" class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" title="Keyboard Help" aria-label="Keyboard Help"><span class="fas fa-keyboard"></span><span class="fas fa-question" style="margin-left: -16px; color: rgba(255, 255, 255, 0.8); -webkit-text-stroke: 1px #595959; "></span></a>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar" title="Toggle sidebar"><span class="fas fa-angle-double-left" aria-pressed="true"></span></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
+__p += '<div class="resize-handle side">\n    <!--<div class="handle-button" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-arrow-right"></i></div>-->\n</div>\n<section class="annotationSection side" role="region" id="annotationList">\n    <nav role="navigation">\n        <!-- <button class="sidebar-button" id=\'create-annotation-side\'><i class="fa fa-edit"></i></button> -->\n        <a href="#key-help" class="sidebar-button keyboard-toggle" role="button" tabindex="0" id="keyboard-toggle" title="Keyboard Help" aria-label="Keyboard Help"><span class="fas fa-keyboard"></span><span class="fas fa-question" style="display: inline;margin-left: -16px; color: rgba(255, 255, 255, 0.8); -webkit-text-stroke: 1px #595959; "></span></a>\n        <button class="sidebar-button" role="button" tabindex="0" id="hide_label" onclick="" aria-label="Toggle sidebar" title="Toggle sidebar"><span class="fas fa-angle-double-left" aria-pressed="true"></span></button>\n    </nav>\n    <div class="group-wrap">\n        <div class="annotation-filter-buttons btn-group buttons-' +
 ((__t = ( filterTabCount )) == null ? '' : __t) +
 '">\n            ';
  if (tabsAvailable.indexOf('search') > -1) {;
@@ -45277,9 +45277,9 @@ var hrange = __webpack_require__(3);
             });
           } else if (targetItem['type'] === "TextQuoteSelector") {
             textRanges.push({
-              prefix: targetItem['prefix'],
+              prefix: targetItem['prefix'] || '',
               exact: targetItem['exact'],
-              suffix: targetItem['suffix']
+              suffix: targetItem['suffix'] || ''
             });
           }
         } else {
@@ -45306,6 +45306,22 @@ var hrange = __webpack_require__(3);
           var serializedRange = hrange.serializeRange(normalizedRange, element, 'annotator-hl');
           ranges.push(serializedRange);
         }
+      } else {
+        var rangeFound = {};
+
+        if (xpathRanges.length >= 1) {
+          rangeFound['xpath'] = xpathRanges[0];
+        }
+
+        if (positionRanges.length >= 1) {
+          rangeFound['position'] = positionRanges[0];
+        }
+
+        if (textRanges.length >= 1) {
+          rangeFound['text'] = textRanges[0];
+        }
+
+        ranges.push(rangeFound);
       }
 
       if (webAnn['target']['items'][0]['type'] == "Annotation") {
