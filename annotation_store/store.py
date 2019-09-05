@@ -360,6 +360,7 @@ class CatchStoreBackend(StoreBackend):
 
     def root(self, annotation_id):
         self.logger.info(u"MethodType: %s" % self.request.method)
+        self.channel_layer = channels.layers.get_channel_layer()
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
