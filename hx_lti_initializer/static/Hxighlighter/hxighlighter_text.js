@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 1:10:04 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 2:51:39 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -33067,7 +33067,7 @@ __webpack_require__(9);
     });
     jQuery.when.apply(jQuery, deferreds).done(function () {
       self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
-        editorid: self.instance_id.replace(/:/g, '-')
+        editorid: self.instance_id.replace(/\W/g, '-')
       });
     });
   };
@@ -34303,7 +34303,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     });
     jQuery.when.apply(jQuery, deferreds).done(function () {
       self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
-        editorid: self.instance_id.replace(/:/g, '-')
+        editorid: self.instance_id.replace(/\W/g, '-')
       });
     });
   };
@@ -34337,7 +34337,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     var wrapperElement = self.element.find('.annotator-wrapper');
     wrapperElement.after(self.annotation_tool.editorTemplate); // save the element to call upon later
 
-    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/:/g, '-'));
+    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/\W/g, '-'));
     var intPt = interactionPoint; // situate it on its proper location
 
     self.annotation_tool.editor.css({
@@ -34397,7 +34397,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
     }
 
     self.annotation_tool.viewerTemplate = self.options.TEMPLATES['viewer']({
-      'viewerid': self.instance_id.replace(/:/g, '-'),
+      'viewerid': self.instance_id.replace(/\W/g, '-'),
       'annotations': annotations,
       'instructor_ids': self.options.instructors,
       'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
@@ -34415,7 +34415,7 @@ var annotator = annotator ? annotator : __webpack_require__(5);
       delete self.annotation_tool.viewer;
     }
 
-    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/:/g, '-'));
+    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/\W/g, '-'));
     var newTop = annotator.util.mousePosition(event).top - jQuery(window).scrollTop() + 20;
     var newLeft = annotator.util.mousePosition(event).left + 30;
     self.annotation_tool.viewer.css({
@@ -35427,7 +35427,7 @@ __webpack_require__(41);
 
     var listNode = editor.find('.token-input-list-facebook')[0];
 
-    if (listNode.addEventListener) {
+    if (listNode && listNode.addEventListener) {
       listNode.addEventListener('DOMNodeInserted', function (event) {
         if (event.target.className === "token-input-token-facebook") {
           var color = self.getColorFromValue(jQuery(event.target).find('p').text().trim());
