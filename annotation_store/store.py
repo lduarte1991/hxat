@@ -360,7 +360,6 @@ class CatchStoreBackend(StoreBackend):
 
     def root(self, annotation_id):
         self.logger.info(u"MethodType: %s" % self.request.method)
-        self.channel_layer = channels.layers.get_channel_layer()
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
@@ -470,6 +469,7 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response)
 
     def send_annotation_notification(self, message_type, annotation):
+        self.channel_layer = channels.layers.get_channel_layer()
         collection_id = annotation.get('collectionId', 'unknown_collection')
         context_id = annotation.get('contextId', 'unknown_context')
         object_id = annotation.get('uri', 'unknonwn_uri')
