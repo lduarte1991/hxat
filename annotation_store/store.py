@@ -738,9 +738,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             "context_id": 'unknown_context',
             "target_source_id": 'unknown_target_source_id'
         })
-        collection_id = platform.collection_id
-        context_id = platform.context_id
-        object_id = platform.target_source_id
+        collection_id = platform["collection_id"]
+        context_id = platform["context_id"]
+        object_id = platform["target_source_id"]
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, object_id)
         self.logger.info("###################### group({}) id({})".format(
             group, annotation.get('id', 'unknown_id')))
