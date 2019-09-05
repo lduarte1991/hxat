@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 1:10:04 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 5:38:45 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 59);
+/******/ 	return __webpack_require__(__webpack_require__.s = 60);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -28332,7 +28332,8 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
     var normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
     normalizedRange.setEnd(endResult.node, endResult.offset); //console.log('HERE', _start, _startOffset, _end, _endOffset, startResult, endResult, getExactText(normalizedRange), serializedRange.text.exact);
-    //console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+
+    console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
   } //console.log(_start, _startOffset, startResult, endResult);
   //console.log(getPrefixAndSuffix(normalizedRange, root, ignoreSelector))
   // Way #2: if that doesn't match what we have stored as the quote, try global positioning from root
@@ -28346,7 +28347,8 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
 
     normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
-    normalizedRange.setEnd(endResult.node, endResult.offset); //console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+    normalizedRange.setEnd(endResult.node, endResult.offset);
+    console.log("Global offset Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
   } // Way #3: looks for an exact match of prefix, suffix, and exact
   // This is for the usecase where someone has added text/html before this
 
@@ -28364,7 +28366,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
       var toCheck = getPrefixAndSuffix(normalizedRange, root, ignoreSelector);
 
       if (serializedRange.text.prefix === toCheck.prefix && serializedRange.text.suffix === toCheck.suffix) {
-        //console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+        console.log("Exact Wording Test: ", getExactText(normalizedRange) === serializedRange.text.exact ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
         break;
       }
     }
@@ -32103,6 +32105,8 @@ __webpack_require__(55);
 
 __webpack_require__(56);
 
+__webpack_require__(58);
+
 (function ($) {
   /**
    * { function_description }
@@ -32444,6 +32448,7 @@ __webpack_require__(56);
 
   $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
     var self = this;
+    console.log('me', annotation);
     jQuery.each(self.drawers, function (_, drawer) {
       drawer.draw(annotation);
     });
@@ -32840,8 +32845,8 @@ var hrange = __webpack_require__(3);
 
   $.XPathDrawer.prototype.draw = function (annotation) {
     var self = this; // console.log(self.options, annotation);
-    // console.log("Annotation Being Drawn", annotation);
 
+    console.log("Annotation Being Drawn", annotation);
     self.tempHighlights.forEach(function (hl) {
       jQuery(hl).contents().unwrap();
     }); // the process for drawing is divided into 4 parts
@@ -32962,6 +32967,7 @@ var hrange = __webpack_require__(3);
   $.XPathDrawer.prototype.getSpecificAnnotationData = function (annotation_id) {
     var self = this;
     var currentAnnotations = self.getAnnotationsData();
+    console.log(currentAnnotations);
     var foundAnnotation = currentAnnotations.find(function (ann) {
       if (ann.id === annotation_id) {
         return ann;
@@ -33362,6 +33368,9 @@ __webpack_require__(9);
         'tag': tag
       };
       self.search(options);
+    });
+    $.subscribeEvent('wsAnnotationLoaded', self.instance_id, function (_, annotation) {
+      self.addAnnotation(annotation, false, false);
     });
     $.subscribeEvent('annotationLoaded', self.instance_id, function (_, annotation) {
       self.addAnnotation(annotation, false, true);
@@ -36837,6 +36846,165 @@ __webpack_require__(57);
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Websockets Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+//require('./filaname.css');
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.Websockets = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    this.timerRetryInterval;
+    this.socket = null;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.Websockets.prototype.init = function () {
+    var self = this;
+    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + self.options.object_id;
+    self.setUpConnection();
+  };
+
+  $.Websockets.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.Websockets.prototype.setUpConnection = function () {
+    var self = this;
+    self.socket = self.openWs(self.slot_id, self.options.Websockets.wsUrl);
+
+    self.socket.onopen = function (e) {
+      self.onWsOpen(e);
+    };
+
+    self.socket.onmessage = function (e) {
+      var data = JSON.parse(e.data);
+      self.receiveWsMessage(data);
+    };
+
+    self.socket.onclose = function (e) {
+      self.onWsClose(e);
+    };
+  };
+
+  $.Websockets.prototype.receiveWsMessage = function (response) {
+    var self = this;
+    var message = response['message'];
+    var annotation = eval("(" + message + ")");
+    self.convertAnnotation(annotation, function (wa) {
+      if (response['type'] === 'annotation_deleted') {
+        $.publishEvent('GetSpecificAnnotationData', self.instanceID, [wa.id, function (annotationFound) {
+          $.publishEvent('TargetAnnotationUndraw', self.instanceID, [annotationFound]);
+          jQuery('.item-' + wa.id).remove();
+        }]);
+      } else {
+        $.publishEvent('wsAnnotationLoaded', self.instanceID, [wa]);
+
+        if (response['type'] === 'annotation_updated') {
+          $.publishEvent('GetSpecificAnnotationData', self.instanceID, [wa.id, function (annotationFound) {
+            $.publishEvent('TargetAnnotationUndraw', self.instanceID, [annotationFound]);
+            $.publishEvent('TargetAnnotationDraw', self.instanceID, [wa]);
+          }]);
+        } else {
+          $.publishEvent('TargetAnnotationDraw', self.instanceID, [wa]);
+        }
+      }
+    });
+  };
+
+  $.Websockets.prototype.openWs = function (slot_id, wsUrl) {
+    var chatSocket = new WebSocket('wss://' + wsUrl + '/ws/chat/' + slot_id + '/');
+    return chatSocket;
+  };
+
+  $.Websockets.prototype.onWsOpen = function () {
+    var self = this;
+
+    if (self.timerRetryInterval) {
+      clearInterval(self.timerRetryInterval);
+      self.timerRetryInterval = undefined;
+    }
+  };
+
+  $.Websockets.prototype.onWsClose = function () {
+    var self = this;
+
+    if (!self.timerRetryInterval) {
+      self.timerRetryInterval = setInterval(function () {
+        console.log('intervalrunning');
+        self.setUpConnection();
+      }, 5000);
+    }
+  };
+
+  Object.defineProperty($.Websockets, 'name', {
+    value: "Websockets"
+  });
+
+  $.Websockets.prototype.convertAnnotation = function (annotation, callBack) {
+    var self = this;
+
+    if (annotation && annotation.schema_version) {
+      return self.convertingFromWebAnnotations(annotation, callBack);
+    } else {
+      return self.convertingFromAnnotatorJS(annotation, callBack);
+    }
+  };
+
+  $.Websockets.prototype.convertingFromWebAnnotations = function (annotation, callBack) {
+    var self = this;
+    $.publishEvent('convertFromWebAnnotation', self.instanceID, [self.options.slot, annotation, callBack]);
+  };
+
+  $.Websockets.prototype.convertingFromAnnotatorJS = function (annotation, callBack) {
+    var self = this;
+    var ranges = annotation.ranges;
+    var rangeList = [];
+    ranges.forEach(function (range) {
+      rangeList.push({
+        'xpath': range,
+        'text': {
+          prefix: '',
+          exact: annotation.quote,
+          suffix: ''
+        }
+      });
+    });
+    var annotation = {
+      annotationText: [annotation.text],
+      created: annotation.created,
+      creator: annotation.user,
+      exact: annotation.quote,
+      id: annotation.id,
+      media: annotation.media,
+      tags: annotation.tags,
+      ranges: rangeList,
+      totalReplies: annotation.totalComments,
+      permissions: annotation.permissions
+    };
+    callBack(annotation);
+  };
+
+  $.plugins.push($.Websockets);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 (function ($) {
@@ -36905,6 +37073,11 @@ __webpack_require__(57);
     self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
   };
 
+  $.Core.prototype.TargetAnnotationUndraw = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetAnnotationUndraw', message);
+  };
+
   $.Core.prototype.ViewerEditorOpen = function (message) {
     var self = this;
     self.callFuncInList(this.targets, 'ViewerEditorOpen', message);
@@ -36969,14 +37142,14 @@ __webpack_require__(57);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(60);
+module.exports = __webpack_require__(61);
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -37003,22 +37176,22 @@ __webpack_require__(1);
 
 __webpack_require__(20);
 
-__webpack_require__(61);
+__webpack_require__(62);
 
-__webpack_require__(65);
+__webpack_require__(66);
 
-__webpack_require__(67);
+__webpack_require__(68);
 
 __webpack_require__(21);
 
-__webpack_require__(69);
-
-__webpack_require__(58);
-
 __webpack_require__(70);
 
+__webpack_require__(59);
+
+__webpack_require__(71);
+
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -37036,9 +37209,9 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
  */
 __webpack_require__(12);
 
-__webpack_require__(62);
+__webpack_require__(63);
 
-__webpack_require__(64);
+__webpack_require__(65);
 
 
 
@@ -37384,7 +37557,7 @@ __webpack_require__(64);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function($) {/**
@@ -38002,7 +38175,7 @@ var lists = {
     unique: unique
 };
 
-var isSupportAmd =  true && __webpack_require__(63); // eslint-disable-line
+var isSupportAmd =  true && __webpack_require__(64); // eslint-disable-line
 /**
  * returns whether font is installed or not.
  *
@@ -44660,7 +44833,7 @@ $$1.summernote = $$1.extend($$1.summernote, {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -44669,13 +44842,13 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44684,7 +44857,7 @@ module.exports = __webpack_amd_options__;
  *
  */
 //uncomment to add css file
-__webpack_require__(66);
+__webpack_require__(67);
 
 (function ($) {
   /**
@@ -44768,13 +44941,13 @@ __webpack_require__(66);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44783,7 +44956,7 @@ __webpack_require__(66);
  *
  */
 //uncomment to add css file
-__webpack_require__(68);
+__webpack_require__(69);
 
 (function ($) {
   /**
@@ -44835,13 +45008,13 @@ __webpack_require__(68);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44898,7 +45071,7 @@ __webpack_require__(68);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
@@ -44910,7 +45083,15 @@ var hrange = __webpack_require__(3);
 
     this.instance_id = inst_id;
     this.store = [];
-    this.url_base = options.storageOptions.external_url.catchpy; //console.log(this.url_base);
+    this.url_base = options.storageOptions.external_url.catchpy;
+    this.setUpListeners(); //console.log(this.url_base);
+  };
+
+  $.CatchPy.prototype.setUpListeners = function () {
+    var self = this;
+    $.subscribeEvent('convertFromWebAnnotation', self.instance_id, function (_, element, webAnnotation, callBack) {
+      callBack(self.convertFromWebAnnotation(webAnnotation, jQuery(element).find('.annotator-wrapper')));
+    });
   };
 
   $.CatchPy.prototype.onLoad = function (element, opts) {
@@ -45237,18 +45418,19 @@ var hrange = __webpack_require__(3);
 
   $.CatchPy.prototype.getAnnotationTargetItems = function (webAnn) {
     try {
-      // console.log("reached getAnnotationTargetItems", webAnn);
+      console.log("reached getAnnotationTargetItems", webAnn);
+
       if (webAnn['target']['items'][0]['type'] == "Annotation") {
         // console.log([{'parent':webAnn['target']['items'][0]['source']}]);
         return [{
           'parent': webAnn['target']['items'][0]['source']
         }];
-      } // console.log("nope, something went wrong");
+      } //console.log("nope, something went wrong");
 
 
       return webAnn['target']['items'][0]['selector']['items'];
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       return [];
     }
   };
@@ -45264,6 +45446,7 @@ var hrange = __webpack_require__(3);
       jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
         if (!('parent' in targetItem)) {
           if (targetItem['type'] === "RangeSelector") {
+            console.log("Reached RangeSelector", targetItem);
             xpathRanges.push({
               start: targetItem['startSelector'] ? targetItem['startSelector'].value : targetItem['oa:start'].value,
               startOffset: targetItem['refinedBy'][0].start,
