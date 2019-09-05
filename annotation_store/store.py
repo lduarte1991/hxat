@@ -715,6 +715,9 @@ class WebAnnotationStoreBackend(StoreBackend):
         self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.put(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                cleaned_annotation = json.loads(response.content)
+                self.send_annotation_notification('annotation_updated', cleaned_annotation)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -726,6 +729,9 @@ class WebAnnotationStoreBackend(StoreBackend):
         self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
         try:
             response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                cleaned_annotation = json.loads(response.content)
+                self.send_annotation_notification('annotation_deleted', cleaned_annotation)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
