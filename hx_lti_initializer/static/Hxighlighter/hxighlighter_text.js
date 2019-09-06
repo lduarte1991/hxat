@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 2:41:08 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 2:55:45 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45125,6 +45125,7 @@ var hrange = __webpack_require__(3);
     var data = jQuery.extend({}, {
       limit: self.options.storageOptions.pagination,
       offset: 0,
+      media: 'text',
       source_id: self.options.object_id,
       context_id: self.options.context_id,
       collection_id: self.options.collection_id,
