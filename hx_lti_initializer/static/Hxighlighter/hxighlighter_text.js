@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 1:52:58 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 1:55:48 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -32850,7 +32850,7 @@ var hrange = __webpack_require__(3);
     var existing_drawn_annotation = self.getSpecificAnnotationData(annotation.id);
 
     if (existing_drawn_annotation) {
-      self.udnraw(existing_drawn_annotation);
+      self.undraw(existing_drawn_annotation);
     }
 
     console.log("Annotation Being Drawn", annotation);
