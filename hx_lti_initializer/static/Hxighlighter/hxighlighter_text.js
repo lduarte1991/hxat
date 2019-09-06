@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 11:57:30 AM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 1:52:58 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -32845,6 +32845,13 @@ var hrange = __webpack_require__(3);
 
   $.XPathDrawer.prototype.draw = function (annotation) {
     var self = this; // console.log(self.options, annotation);
+    // checks to see if annotation has already been drawn, if so it undraws it
+
+    var existing_drawn_annotation = self.getSpecificAnnotationData(annotation.id);
+
+    if (existing_drawn_annotation) {
+      self.udnraw(existing_drawn_annotation);
+    }
 
     console.log("Annotation Being Drawn", annotation);
     self.tempHighlights.forEach(function (hl) {
