@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 2:55:45 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 3:01:06 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -37486,7 +37486,7 @@ __webpack_require__(65);
   $.Reply.prototype.retrieveRepliesForAnnotation = function (annotation, viewer, prefix) {
     var self = this;
     $.publishEvent('StorageAnnotationSearch', self.instanceID, [{
-      'source_id': annotation.id,
+      'target_source': annotation.id,
       'media': 'Annotation'
     }, function (results, converter) {
       jQuery('.loading-obj').remove();
