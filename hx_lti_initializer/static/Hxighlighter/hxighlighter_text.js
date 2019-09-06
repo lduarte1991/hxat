@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 5:38:45 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 11:57:30 AM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -36872,7 +36872,7 @@ __webpack_require__(57);
 
   $.Websockets.prototype.init = function () {
     var self = this;
-    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + self.options.object_id;
+    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id;
     self.setUpConnection();
   };
 
