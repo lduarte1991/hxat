@@ -48,12 +48,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def annotation_notification(self, event):
         message = event['message']
         action = event['action']
-        obj_id = event['target_object_id']
 
         # send message to websocket
         await self.send(text_data=json.dumps({
             'type': action,
             'message': '{}'.format(message),
-            'target_object_id': obj_id
         }))
 

@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 1:55:48 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Friday, September 6th, 2019, 2:41:08 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -36879,7 +36879,7 @@ __webpack_require__(57);
 
   $.Websockets.prototype.init = function () {
     var self = this;
-    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id;
+    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + self.options.object_id;
     self.setUpConnection();
   };
 
@@ -45315,8 +45315,8 @@ var hrange = __webpack_require__(3);
     var purpose = 'commenting';
 
     if (annotation.media === "comment") {
-      targetList.push(annotation.ranges);
-      source_id = annotation.ranges.source; // jQuery.each(annotation.ranges, function(_, range){
+      targetList.push(annotation.ranges); // source_id = annotation.ranges.source;
+      // jQuery.each(annotation.ranges, function(_, range){
       //     targetList.push(range)
       //     source_id = range.parent;
       // });
