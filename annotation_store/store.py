@@ -770,11 +770,12 @@ class WebAnnotationStoreBackend(StoreBackend):
         collection_id = platform["collection_id"]
         context_id = platform["context_id"]
         object_id = platform["target_source_id"]
-        group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, object_id)
+        group = '{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id)
         self.logger.info("###################### group({}) id({})".format(
             group, annotation.get('id', 'unknown_id')))
         async_to_sync(self.channel_layer.group_send)(group, {
             'type': 'annotation_notification',
             'message': annotation,
-            'action': message_type
+            'action': message_type,
+            'target_object_id': object_id
         })
