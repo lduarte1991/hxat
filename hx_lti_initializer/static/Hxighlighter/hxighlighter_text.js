@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:16:18 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:30:44 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -33482,19 +33482,21 @@ __webpack_require__(9);
       $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
       jQuery('#empty-alert').css('display', 'none');
     } else {
-      var parent_id = annotation.ranges[0].parent;
-      var parent = $.publishEvent('GetSpecificAnnotationData', self.instance_id, [parent_id, function (annotation_data) {
-        annotation_data.totalReplies++;
+      try {
+        var parent_id = annotation.ranges[0].parent;
+        $.publishEvent('GetSpecificAnnotationData', self.instance_id, [parent_id, function (annotation_data) {
+          annotation_data.totalReplies++;
 
-        annotation_data._local.highlights.forEach(function (high) {
-          jQuery(high).data('annotation', annotation_data);
-        });
+          annotation_data._local.highlights.forEach(function (high) {
+            jQuery(high).data('annotation', annotation_data);
+          });
 
-        var viewers = jQuery('.item-' + annotation_data.id);
-        jQuery.each(viewers, function (index, viewer) {
-          $.publishEvent('addReplyToViewer', self.instance_id, [viewer, annotation, '', annotation_data]);
-        });
-      }]);
+          var viewers = jQuery('.item-' + annotation_data.id);
+          jQuery.each(viewers, function (index, viewer) {
+            $.publishEvent('addReplyToViewer', self.instance_id, [viewer, annotation, '', annotation_data]);
+          });
+        }]);
+      } catch (e) {}
     }
   };
 
