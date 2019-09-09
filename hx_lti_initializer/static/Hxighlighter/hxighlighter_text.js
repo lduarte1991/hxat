@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:34:26 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:41:39 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -37356,7 +37356,7 @@ __webpack_require__(65);
       self.destroy();
     });
     $.subscribeEvent('addReplyToViewer', self.instanceID, function (_, viewer, reply, prefix, annotation) {
-      self.addReplyToViewer(viewer, reply, prefix, annotation);
+      setTimeout(self.addReplyToViewer(viewer, reply, prefix, annotation), 500);
     });
     $.subscribeEvent('removeReply', self.instanceID, function (_, reply) {
       console.log(reply);
