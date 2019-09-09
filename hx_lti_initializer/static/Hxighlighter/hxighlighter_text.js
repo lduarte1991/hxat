@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:41:39 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 2:43:38 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -37565,8 +37565,8 @@ __webpack_require__(65);
     var reply_list = jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]');
 
     if (reply_list.is(':visible')) {
-      if (reply_list.find('reply-item-' + reply.id).length > 0) {
-        reply_list.find('reply-item-' + reply.id + ' .reply-body').html(reply.annotationText.join('<br>'));
+      if (reply_list.find('.reply-item-' + reply.id).length > 0) {
+        reply_list.find('.reply-item-' + reply.id + ' .reply-body').html(reply.annotationText.join('<br>'));
       } else {
         reply_list.append("<div class='reply reply-item-" + reply.id + "'>" + delete_option + "<strong>" + reply.creator.name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
         jQuery('.reply.reply-item-' + reply.id + ' .delete-reply').confirm({
