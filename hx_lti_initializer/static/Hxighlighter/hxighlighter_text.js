@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 0.0.1 - Thursday, September 5th, 2019, 2:51:39 PM  
+// [AIV_SHORT]  Version: 0.0.1 - Monday, September 9th, 2019, 4:28:15 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -33412,7 +33412,7 @@ __webpack_require__(9);
         if (ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
           var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
           jQuery(self.element).parent().animate({
-            scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 40
+            scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 140
           }); //jQuery(ann._local.highlights).animate({'outline': '2px solid black'}, 1000)
 
           setTimeout(function () {
@@ -36482,6 +36482,7 @@ __webpack_require__(52);
   $.SidebarTagTokens = function (options, instanceID) {
     this.options = jQuery.extend({}, options);
     this.instanceID = instanceID;
+    this.first_time = true;
     this.init();
     return this;
   };
@@ -36528,12 +36529,23 @@ __webpack_require__(52);
 
   $.SidebarTagTokens.prototype.setUpTokens = function () {
     var self = this;
-    var tokenHTML = "<div class='tag-token-list'><span>Top Tags:</span><br>";
+
+    if (self.first_time) {
+      jQuery('#empty-alert').hide();
+      self.first_time = false;
+    }
+
+    var tokenHTML = "<div class='tag-token-list'><span>Available Tags:</span><br>";
     self.options.tagList.forEach(function (tag) {
       tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
     });
     tokenHTML += "</div>";
     jQuery('.search-bar.side').after(tokenHTML);
+    setTimeout(function () {
+      var tag_list_height = jQuery('.annotationSection > .tag-token-list').height();
+      document.documentElement.style.setProperty('--sidebar-search-bar-height-open', tag_list_height + 72 + "px");
+      jQuery('#empty-alert').show();
+    }, 150);
   };
 
   $.SidebarTagTokens.prototype.saving = function (annotation) {
