@@ -47,6 +47,8 @@ if allowed_hosts_other:
 
 # Application definition
 INSTALLED_APPS = (
+    'channels',
+    'notification',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -306,3 +308,16 @@ if ORGANIZATION == "ATG":
     pass
 elif ORGANIZATION == "HARVARDX":
     pass
+
+# channels for notification
+ASGI_APPLICATION = 'annotationsx.routing.application'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(REDIS_HOST, REDIS_PORT)],
+        },
+    }
+}
