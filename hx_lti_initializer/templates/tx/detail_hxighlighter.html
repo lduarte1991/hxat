@@ -160,7 +160,9 @@ Text Annotation Tool | {{ target_object.target_title }}
                     },
                     Badges: {
                     },
-                    
+                    Websockets: {
+                        wsUrl: window.location.hostname
+                    },
                     AdminButton: {
                         {% if is_instructor %}
                         homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",

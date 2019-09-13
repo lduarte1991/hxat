@@ -1,4 +1,6 @@
 Django==2.2.11
+channels
+channels_redis
 django-bootstrap3==11.0.0
 django-braces==1.14.0
 django-crispy-forms==1.7.2
@@ -11,3 +13,4 @@ PyJWT==1.7.1
 python-dateutil==2.8.1
 pytz==2019.3
 requests==2.23.0
+python_dotenv

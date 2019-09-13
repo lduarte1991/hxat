@@ -6,10 +6,14 @@ from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
+import channels.layers
+from asgiref.sync import async_to_sync
+
 import json
 import requests
 import logging
 import urllib
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -479,6 +483,7 @@ class WebAnnotationStoreBackend(StoreBackend):
 
     def root(self, annotation_id):
         self.logger.info(u"MethodType: %s" % self.request.method)
+        self.channel_layer = channels.layers.get_channel_layer()
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
@@ -582,6 +587,11 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('create response status_code=%s' % response.status_code)
+        self.logger.info("###################### about to send create notification")
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_created', cleaned_annotation)
+        self.logger.info("###################### done with notification")
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def update(self, annotation_id):
@@ -595,6 +605,11 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('update response status_code=%s' % response.status_code)
+        self.logger.info("###################### about to send update notification")
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_updated', cleaned_annotation)
+        self.logger.info("###################### done with notification")
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
@@ -606,7 +621,13 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('delete response status_code=%s' % response.status_code)
+        self.logger.info("###################### about to send delete notification")
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_deleted', cleaned_annotation)
+        self.logger.info("###################### done with notification")
         return HttpResponse(response)
+
 
     def _get_tool_provider(self):
         try:
@@ -630,6 +651,7 @@ class WebAnnotationStoreBackend(StoreBackend):
         return DjangoToolProvider.from_django_request(
             lti_secret, request=self.request)
 
+
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
@@ -649,6 +671,25 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+
+
+    def send_annotation_notification(self, message_type, annotation):
+        platform = annotation.get('platform', {
+            "collection_id": 'unkonwn_collection',
+            "context_id": 'unknown_context',
+            "target_source_id": 'unknown_target_source_id'
+        })
+        collection_id = platform["collection_id"]
+        context_id = platform["context_id"]
+        target_source_id = platform["target_source_id"]
+        group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
+        self.logger.info("###################### group({}) id({})".format(
+            group, annotation.get('id', 'unknown_id')))
+        async_to_sync(self.channel_layer.group_send)(group, {
+            'type': 'annotation_notification',
+            'message': annotation,
+            'action': message_type,
+        })
 
 """
 05mar20 naomi: (item1) right now the assumption is that, at least at course
