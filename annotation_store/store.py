@@ -588,7 +588,9 @@ class WebAnnotationStoreBackend(StoreBackend):
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
-            self.after_search(response)
+            is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+            if is_graded and self.after_search(response):
+                self.lti_grade_passback(score=1)
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -644,7 +646,7 @@ class WebAnnotationStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
-        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', [])
         return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
     def create(self, annotation_id):
@@ -654,6 +656,10 @@ class WebAnnotationStoreBackend(StoreBackend):
         self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                if is_graded:
+                    self.lti_grade_passback(score=1)
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
