@@ -649,8 +649,8 @@ class WebAnnotationStoreBackend(StoreBackend):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', [])
         self.logger.info(response)
         self.logger.info(response.content)
-        self.logger.info(json.loads(response.content))
-        return retrieved_self and int(json.loads(str(response.content))['total'] > 0)
+        self.logger.info(json.loads(response.content.decode('utf-8')))
+        return retrieved_self and int(json.loads(str(response.content.decode('utf-8')))['total'] > 0)
 
     def create(self, annotation_id):
         body = self._get_request_body()
