@@ -3,14 +3,13 @@ These functions will be used for the initializer module, but may also be
 helpful elsewhere.
 """
 import django.shortcuts
-from urlparse import urlparse
+from urllib.parse import urlparse
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from abstract_base_classes.target_object_database_api import *
-from models import *
+from .models import *
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from ims_lti_py.tool_provider import DjangoToolProvider
+from django.urls import reverse
 from os.path import splitext, basename
 import base64
 import sys
@@ -49,15 +48,15 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
     except User.DoesNotExist:
         user = User.objects.create_user(username)
         user.is_superuser = False
-        user.is_staff = set(roles) & set(settings.ADMIN_ROLES)
+        user.is_staff = len(set(roles) & set(settings.ADMIN_ROLES)) > 0
         user.set_unusable_password()
         user.save()
     except User.MultipleObjectsReturned:
         user = User.objects.filter(username=username).order_by('id')[0]
-    
+
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
-    
+
     logger.debug('create_new_user: LTIProfile.%s associated with User.%s' % (lti_profile.id, user.id))
     return user, lti_profile
 
@@ -129,8 +128,7 @@ def retrieve_token(userid, apikey, secret):
       'issuedAt': _now(),
       'ttl': 86400
     }, secret)
-
-    return token
+    return str(token, 'utf-8')
 
 def get_admin_ids(context_id):
     """
@@ -175,7 +173,7 @@ def get_annotation_db_credentials_by_course(context_id):
     '''
     fields = ['annotation_database_url', 'annotation_database_apikey', 'annotation_database_secret_token']
     values = Assignment.objects.filter(course__course_id=context_id).values(*fields).distinct(*fields).order_by(*fields)
-    
+
     # The list of database entries might not be unique (despite the *select distinct*) if any of
     # the URLs contain whitespace. The code below accounts for that possibility.
     k, values_by_url = ('annotation_database_url', {})
@@ -189,14 +187,14 @@ def get_annotation_db_credentials_by_course(context_id):
 def fetch_annotations_by_course(context_id, user_id):
     '''
     Fetches annotations for all assignments in a course as given by the LTI context ID.
-    
+
     This function accounts for the fact that annotation database credentials are stored
     on a per-assignment level, so if course assignments have different annotation database
     settings, they will be included in the results. In general, it's expected that a
     course will have one annotation database setting used across assignments (URL, API KEY, SECRET),
     but it's possible that this assumption could change by the simple fact that the settings
     are saved on assignment models, and not on course models.
-    
+
     Returns: [{"rows": [], "totalCount": 0 }]
     '''
     annotation_db_credentials = get_annotation_db_credentials_by_course(context_id)
@@ -227,7 +225,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         "Content-Type":"application/json"
     }
     limit = kwargs.get('limit', 1000) # Note: -1 means get everything there is
-    encoded_context_id = urllib.quote_plus(context_id)
+    encoded_context_id = urllib.parse.quote_plus(context_id)
     request_url = "%s/search?contextId=%s&limit=%s" % (annotation_db_url, encoded_context_id, limit)
 
     logger.debug("fetch_annotations_by_course(): url: %s" % request_url)
@@ -247,7 +245,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         # where each row represents an annotation object.
         # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
-        
+
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
@@ -315,7 +313,7 @@ def get_annotations_keyed_by_annotation_id(annotations):
     Given a set of annotation objects returned by the CATCH database,
     this function returns a dictionary that maps annotation IDs to
     annotation objects.
-    
+
     The intended usage is for when you have an annotation that is a
     reply to another annotation, and you want to lookup the parent
     annotation by its ID.
@@ -328,16 +326,16 @@ class DashboardAnnotations(object):
     '''
     This class is used to transform annotations retrieved from the CATCH DB into
     a data structure that can be rendered on the instructor dashboard.
-    
+
     The intended use case is to take a set of course annotations, group them by user,
     and then augment them with additional information that is useful on the dashboard.
     That includes things like the Assignment and TargetObject names associated with the
     annotations, etc.
-    
+
     Example usage:
-    
+
         user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
-    
+
     Notes:
 
     This class is designed to minimize database hits by loading data up front.
@@ -409,13 +407,13 @@ class DashboardAnnotations(object):
             if object_id in self.target_objects_by_id:
                 target_id = object_id
         return target_id
-    
+
     def get_assignment_name(self, annotation):
         collection_id = annotation['collectionId']
         if collection_id in self.assignment_name_of:
             return self.assignment_name_of[collection_id]
         return ''
-    
+
     def get_target_object_name(self, annotation):
         media_type = annotation.get('media', None)
         object_id = annotation['uri']
@@ -454,7 +452,7 @@ class DashboardAnnotations(object):
             preview_url = url_format.format(url=preview_url, resource_link_id=resource_link_id, focus_id=annotation_id)
 
         return preview_url
-    
+
     def assignment_object_exists(self, annotation):
         media_type = annotation.get('media', None)
         collection_id = annotation['collectionId']

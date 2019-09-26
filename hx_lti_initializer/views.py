@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib import messages
 
@@ -25,10 +25,12 @@ from hx_lti_initializer.utils import (debug_printer, retrieve_token, save_sessio
 from hx_lti_initializer import annotation_database
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-from django.contrib.sites.models import get_current_site
-from ims_lti_py.tool_provider import DjangoToolProvider
+try:
+    from django.contrib.sites.models import get_current_site
+except ImportError:
+    from django.contrib.sites.shortcuts import get_current_site
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 import json
 import time
 import os.path
@@ -396,6 +398,11 @@ def access_annotation_target(
     if not is_instructor and not assignment.is_published:
         raise PermissionDenied('Permission to access unpublished assignment by a non-instructor is denied')
 
+    try:
+        hide_sidebar = request.LTI['launch_params']['custom_hide_sidebar_instance'].split(',')
+    except:
+        hide_sidebar = []
+
     save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
 
     # Dynamically pass in the address that the detail view will use to fetch annotations.
@@ -424,6 +431,8 @@ def access_annotation_target(
         'session': request.session.session_key,
         'org': settings.ORGANIZATION,
         'logger_url': settings.ANNOTATION_LOGGER_URL,
+        'accessibility': settings.ACCESSIBILITY,
+        'hide_sidebar_instance': hide_sidebar
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)
@@ -482,7 +491,10 @@ def access_annotation_target(
         get_paras[k] = request.GET[k]
 
     original.update(get_paras)
-    return render(request, '%s/detail.html' % targ_obj.target_type, original)
+    if targ_obj.target_type == "tx" and assignment.use_hxighlighter:
+        return render(request, '%s/detail_hxighlighter.html' % targ_obj.target_type, original)
+    else:
+        return render(request, '%s/detail.html' % targ_obj.target_type, original)
 
 
 def instructor_dashboard_view(request):

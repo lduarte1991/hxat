@@ -9,7 +9,7 @@ from abc import *
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse, LTIProfile
 
-class TODAPI_LTI:
+class TODAPI_LTI(ABC):
     __metaclass__ = ABCMeta
 
     @abstractmethod

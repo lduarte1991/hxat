@@ -213,7 +213,7 @@ AnnotatorEndpointController.prototype.openEditorForReply = function(location) {
 	this.annotator.onAdderClick();
 
 	var parent = jQuery(this.annotator.editor.element).find('.reply-item span.parent-annotation');
-    parent.html(annotation_id);
+    parent.html(location.annotation_id);
 };
 
 AnnotatorEndpointController.prototype.deleteAnnotation = function(annotation) {
