@@ -3,7 +3,7 @@ from target_object_database.models import TargetObject
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIProfile
 from hx_lti_initializer.test_helper import *
-from target_object_database.views import *
+from .views import *
 from hx_lti_initializer.utils import *
 from django.http import Http404
 

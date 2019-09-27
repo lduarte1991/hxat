@@ -21,15 +21,17 @@ Corner Cases Found:
     4. User tries to view "Share" page while not logged in.
 """
 import sys
-from utils import create_new_user
-from views import *
-from test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
-from django.utils import six
-from cStringIO import StringIO
+from io import StringIO
+from .utils import create_new_user
+from .views import *
+from .models import LTICourse, LTIProfile
+from .forms import CourseForm
+from .test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
 from contextlib import contextmanager
-from models import LTICourse, LTIProfile
+
+from django.utils import six
 from django.contrib.auth.models import User
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.test.client import RequestFactory
 from django.test import TestCase, override_settings
 from django.core.exceptions import PermissionDenied
@@ -37,8 +39,6 @@ from ims_lti_py.tool_provider import DjangoToolProvider
 from django.core.servers.basehttp import get_internal_wsgi_application
 from mock import patch
 
-from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.models import LTICourse
 
 
 @contextmanager

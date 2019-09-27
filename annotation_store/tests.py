@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 import ims_lti_py.tool_provider
 
-from store import StoreBackend, AnnotationStore
+from .store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 
@@ -254,5 +254,3 @@ class StoreBackendTest(TestCase):
                     self.assertTrue(backend.ADMIN_GROUP_ID in result['permissions']['read'])
                 else:
                     self.assertEqual(0, len(result['permissions']['read']))
-
-
