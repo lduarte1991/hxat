@@ -8,7 +8,7 @@ django-extensions==2.1.6
 djangorestframework==3.9.2
 httplib2==0.12.1
 idna==2.8
-git+https://github.com/lduarte1991/ims_lti_py@hx
+git+https://github.com/dodget/ims_lti_py.git@update-unicode
 lti==0.9.3
 lxml==4.3.3
 git+https://github.com/i-kiwamu/python3-oauth2
