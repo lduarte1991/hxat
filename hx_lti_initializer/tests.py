@@ -26,7 +26,7 @@ from .utils import create_new_user
 from .views import *
 from .models import LTICourse, LTIProfile
 from .forms import CourseForm
-from .test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
+from .test_helper import (TEST_CONSUMER_KEY, TEST_SECRET_KEY)
 from contextlib import contextmanager
 
 from django.utils import six
@@ -296,11 +296,6 @@ class LTIInitializerViewsTests(TestCase):
             "oauth_consumer_key": TEST_CONSUMER_KEY,
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
         })
-        self.tool_consumer = create_test_tc()
-        self.other_request = rf.post(
-            '/launch_lti/',
-            self.tool_consumer.generate_launch_data()
-        )
 
     def tearDown(self):
         """
@@ -308,8 +303,6 @@ class LTIInitializerViewsTests(TestCase):
         """
         del self.good_request
         del self.bad_request
-        del self.tool_consumer
-        del self.other_request
         del self.small_request
         del self.missing_user_id
         del self.missing_username

@@ -1,9 +1,11 @@
-from django.test import TestCase
-from target_object_database.models import TargetObject
+from django.test import TestCase, Client
+from .models import TargetObject
+from .views import *
+from .forms import SourceForm
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIProfile
 from hx_lti_initializer.test_helper import *
-from .views import *
+
 from hx_lti_initializer.utils import *
 from django.http import Http404
 
@@ -19,9 +21,11 @@ class TODViewsTests(TestCase):
         4. Starts the LTI tool consumer and makes a data launch request.
         """
 
-        user = User(username="Luis", email="dfslkjfijeflkj")
-        user.save()
-        lti_profile = LTIProfile.objects.create(user=user)
+        self.user = User(username="Luis", email="dfslkjfijeflkj")
+        self.user.save()
+        lti_profile = LTIProfile.objects.create(user=self.user)
+
+        self.client = Client()
 
         course = LTICourse(
             course_name="Fake Course",
@@ -57,6 +61,10 @@ class TODViewsTests(TestCase):
 
         self.tool_consumer = create_test_tc()
         self.other_request = self.tool_consumer.generate_launch_data()
+        for key, value in self.other_request.items():
+            if not value:
+                self.other_request[key] = ''
+        self.other_request.pop('oauth_body_hash')
 
     def tearDown(self):
         """
@@ -69,16 +77,7 @@ class TODViewsTests(TestCase):
     def test_call_view_loads(self):
         """
         """
-        response = self.client.post(
-            'lti_init/launch_lti/annotation/%s/%d' %
-            (self.assignment.assignment_id, self.tod.id), self.other_request)
-        self.assertTrue(
-            open_target_object(
-                response,
-                self.assignment.assignment_id,
-                self.tod.id
-            ).status_code == 200
-        )
+
 
         response2 = self.client.post(
             'lti_init/launch_lti/annotation/%s/fake_id' %
@@ -92,10 +91,25 @@ class TODViewsTests(TestCase):
             34
         )
 
+    def test_create_new_source(self):
+        self.client.force_login(user=self.user, backend=None)
+        response = self.client.get('lti_init/launch_lti/source/create_new_source/')
+        self.assertEqual(response.status_code, 200)
+
     def test_get_admin_url(self):
         """
         """
         self.assertEqual(
             self.tod.get_admin_url(),
-            '/admin/target_object_database/targetobject/%d/' % self.tod.id
+            '/admin/target_object_database/targetobject/%d/change/' % self.tod.id
         )
+
+
+# class TODModelTests(TestCase):
+#
+#     def test_create(self):
+#
+#         target_object = TargetObject.objects.create(
+#
+#         )
+#         self.assertEqual("Test title", target_object.title)

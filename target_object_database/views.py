@@ -52,6 +52,7 @@ def create_new_source(request):
             debug_printer(form.errors)
     else:
         form = SourceForm()
+        print("AAAAAHHHHHHHH")
     return render(
         request,
         'target_object_database/source_form.html',
