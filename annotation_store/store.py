@@ -26,23 +26,23 @@ ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
 class AnnotationStore(object):
     '''
-    AnnotationStore implements a storage interface for annotations and is intended to 
+    AnnotationStore implements a storage interface for annotations and is intended to
     abstract the details of the backend that is actually going to be storing the annotations.
 
     The backend determines where/how annotations are stored. Possible backends include:
-    
+
     1) catch - The Common Annotation, Tagging, and Citation at Harvard (CATCH) project
                which is a separate, cloud-based instance with its own REST API.
-               See also: 
+               See also:
                    http://catcha.readthedocs.io/en/latest/
                    https://github.com/annotationsatharvard/catcha
 
     2) app   - This is an integrated django app that stores annotations in a local database.
-    
-    Client code should not instantiate backend classes directly. The choice of backend class is 
+
+    Client code should not instantiate backend classes directly. The choice of backend class is
     determined at runtime based on the django.settings configuration. This should
     include a setting such as:
-    
+
     ANNOTATION_STORE = {
         "backend": "catch"
     }
@@ -80,7 +80,7 @@ class AnnotationStore(object):
                 raise e
         else:
             return cls(request, possible_backend_types['catch'](request))
-        assert backend_type_setting in possible_backend_types
+        assert backend_type_setting in possible_backend_types.keys()
         backend_instance = possible_backend_types[backend_type](request)
         return cls(request, backend_instance)
 
