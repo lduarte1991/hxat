@@ -242,6 +242,7 @@ CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get('CONTENT_SECURITY_POLICY_DOMAIN'
 SERVER_NAME = os.environ.get('SERVER_NAME', SECURE_SETTINGS.get('SERVER_NAME', ''))
 ORGANIZATION = os.environ.get('ORGANIZATION', SECURE_SETTINGS.get('ORGANIZATION', ''))
 
+
 LTI_SETUP = {
     "TOOL_TITLE": "AnnotationsX",
     "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
@@ -301,3 +302,12 @@ if ORGANIZATION == "ATG":
     pass
 elif ORGANIZATION == "HARVARDX":
     pass
+
+
+PYLTI_CONFIG = {
+    'consumers': {
+        SECURE_SETTINGS['CONSUMER_KEY']: {
+            'secret': SECURE_SETTINGS['LTI_SECRET']
+        }
+    }
+}

@@ -33,11 +33,11 @@ from django.utils import six
 from django.contrib.auth.models import User
 from django.urls import resolve
 from django.test.client import RequestFactory
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, Client
 from django.core.exceptions import PermissionDenied
 from django.core.servers.basehttp import get_internal_wsgi_application
 from mock import patch
-
+from lti import ToolConfig
 
 
 @contextmanager
@@ -239,8 +239,11 @@ class LTIInitializerViewsTests(TestCase):
         self.assertEqual(newprofile.user.username, username)
         self.assertEqual(newprofile.anon_id, user_id)
 
-    def test_launch_lti(self):
-        pass
+    def test_lti_config(self):
+        client = Client()
+        response = client.get('/lti/config')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response._headers['content-type'], ('Content-Type', 'text/xml'))
 
 
 class LTIInitializerUrlsTests(TestCase):

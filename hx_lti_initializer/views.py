@@ -16,6 +16,8 @@ from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib import messages
 
+from lti import ToolConfig
+
 from annotationsx.exceptions import AnnotationTargetDoesNotExist
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
@@ -612,3 +614,16 @@ def change_starting_resource(request, assignment_id, object_id):
             LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id).delete()
         data['response'] = 'Success: Deleted'
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+def tool_config(request):
+    url = request.build_absolute_uri('/')[:-1] + reverse(settings.LTI_SETUP['LAUNCH_URL'])
+    lti_tool_config = ToolConfig(
+        title=settings.LTI_SETUP['TOOL_TITLE'],
+        launch_url=url,
+        secure_launch_url=url,
+        extensions=settings.LTI_SETUP.get('EXTENSION_PARAMETERS', ''),
+        description = settings.LTI_SETUP['TOOL_DESCRIPTION']
+    )
+    lti_tool_config.initialize_models = settings.LTI_SETUP['INITIALIZE_MODELS']
+
+    return HttpResponse(lti_tool_config.to_xml(), content_type='text/xml')
