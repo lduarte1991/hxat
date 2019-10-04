@@ -7,9 +7,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
-import ims_lti_py.tool_provider
 
-from store import StoreBackend, AnnotationStore
+from .store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 
@@ -86,20 +85,23 @@ class DummyStoreBackend(StoreBackend):
 
 class AnnotationStoreTest(TestCase):
     def setUp(self):
-        AnnotationStore.update_settings({})
+        self.store = AnnotationStore.update_settings({})
         self.not_staff_session = dict(TEST_SESSION_NOT_STAFF)
         self.staff_session = dict(TEST_SESSION_IS_STAFF)
         self.request_factory = RequestFactory()
 
-    def test_from_settings(self):
+    def test_from_set_backend_to_app(self):
+        request = self.request_factory.get('/foo', {'version': 'app'})
+        setting = {'backend': 'app'}
+        self.store.update_settings(setting).from_settings(request=request)
+        self.assertEqual(setting['backend'], self.store.SETTINGS['backend'])
+
+
+    def test_from_set_backend_to_catch(self):
         request = self.request_factory.get('/foo')
-        test_settings = [
-            {'backend': 'catch'},
-            {'backend': 'app'},
-        ]
-        for settings in test_settings:
-            store = AnnotationStore.update_settings(settings).from_settings(request=request)
-            self.assertEqual(settings['backend'], store.backend.BACKEND_NAME)
+        setting = {'backend': 'catch'}
+        self.store.update_settings(setting).from_settings(request=request)
+        self.assertEqual(setting['backend'], self.store.SETTINGS['backend'])
 
     def test_from_settings_defaults(self):
         request = self.request_factory.get('/foo')
@@ -107,10 +109,9 @@ class AnnotationStoreTest(TestCase):
         self.assertEqual('catch', store.backend.BACKEND_NAME)
 
     def test_from_settings_invalid(self):
-        request = self.request_factory.get('/foo')
-        AnnotationStore.update_settings({'backend': 'invalid_backend_name'})
-        with self.assertRaises(AssertionError):
-            store = AnnotationStore.from_settings(request=request)
+        request = self.request_factory.get('/foo', {'version': 'invalid_backend_name'})
+        with self.assertRaises(Exception):
+            self.store.update_settings({'backend': 'invalid_backend_name'}).from_settings(request=request)
 
     def test_search(self):
         session = self.not_staff_session
@@ -167,34 +168,6 @@ class AnnotationStoreTest(TestCase):
         mock_store = mock.create_autospec(AnnotationStore(request, backend_instance=DummyStoreBackend(request)))
         mock_store.lti_grade_passback()
         mock_store.lti_grade_passback.assert_called_with()
-
-    # Ensuring no grade passback if not assignment or if teacher
-    @mock.patch.object(ims_lti_py.tool_provider.DjangoToolProvider, 'post_replace_result')
-    def test_lti_passback_not_triggered(self, mock_post_replace_result):
-        session = self.staff_session
-        data = object_params_from_session(session)
-        request = create_request(method='post', session=session, data=data)
-        store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
-        store.lti_grade_passback()
-        self.assertFalse(mock_post_replace_result.called, "LTI consumer does not expect a grade for the current user and assignment")
-
-    # Test different grades called
-    @mock.patch.object(ims_lti_py.tool_provider.DjangoToolProvider, 'post_replace_result')
-    def test_differing_grades(self, mock_post_replace_result):
-        session = TEST_SESSION_NOT_STAFF
-        data = object_params_from_session(session)
-        request = create_request(method='post', session=session, data=data)
-        store = AnnotationStore(request, backend_instance=DummyStoreBackend(request))
-
-        grades = [.1, .9, .6, 0.8, .3, .2, 1.0, 0.125, 0.36]
-        for grade in grades:
-            store.lti_grade_passback(grade)
-            mock_post_replace_result.assert_called_with(grade)
-        store.lti_grade_passback("text")
-        mock_post_replace_result.reset_mock()
-        mock_post_replace_result.assert_not_called()
-        store.lti_grade_passback(8.0)
-        mock_post_replace_result.assert_not_called()
 
 
 class StoreBackendTest(TestCase):
@@ -254,5 +227,3 @@ class StoreBackendTest(TestCase):
                     self.assertTrue(backend.ADMIN_GROUP_ID in result['permissions']['read'])
                 else:
                     self.assertEqual(0, len(result['permissions']['read']))
-
-

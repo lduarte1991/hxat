@@ -52,6 +52,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
   <div id="hxat-status" role="alert" class="offscreen"></div>
   <div id="hxat-alert" role="alert" class="offscreen"></div>
 	<div  id="viewer" class="test" style="padding:50px 75px;" class="fit-to-canvas">
+    {% if accessibility %}
         <section id="make_annotations_panel" class="hidden" role="region" aria-label="Make annotations using keyboard input">
         <h3>Instructions to Make Annotations using Keyboard Input</h3>
           <ol>
@@ -71,6 +72,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
           </div>
           <button role="button" class="btn btn-default" data-toggled="false">Save Highlights</button>
       </section>
+      {% endif %}
         <div class="btn-toolbar target-object-controls" role="toolbar" aria-label="Annotation toolbar controls">
             <div class="btn-group" role="group" aria-label="Hide or Show Annotations">
                 <button id="annotations-status" type="button" class="btn btn-default on" aria-label="Hide Annotations">
@@ -133,7 +135,7 @@ Annotation Tool | Text | {{ target_object.target_title }}
         //'Accessibility',
         //'Touch',
       ],
-      'database_url': "{% url 'annotation_store:api_root' %}",
+      'database_url': "{% url 'annotation_store:api_root_prefix' %}",
       'database_params': {
         "resource_link_id": "{{ resource_link_id }}",
         "utm_source": "{{ utm_source }}"

@@ -21,24 +21,23 @@ Corner Cases Found:
     4. User tries to view "Share" page while not logged in.
 """
 import sys
-from utils import create_new_user
-from views import *
-from test_helper import (create_test_tc, TEST_CONSUMER_KEY, TEST_SECRET_KEY)
-from django.utils import six
-from cStringIO import StringIO
+from io import StringIO
+from .utils import create_new_user
+from .views import *
+from .models import LTICourse, LTIProfile
+from .forms import CourseForm
+from .test_helper import (TEST_CONSUMER_KEY, TEST_SECRET_KEY)
 from contextlib import contextmanager
-from models import LTICourse, LTIProfile
+
+from django.utils import six
 from django.contrib.auth.models import User
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.test.client import RequestFactory
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, Client
 from django.core.exceptions import PermissionDenied
-from ims_lti_py.tool_provider import DjangoToolProvider
 from django.core.servers.basehttp import get_internal_wsgi_application
 from mock import patch
-
-from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.models import LTICourse
+from lti import ToolConfig
 
 
 @contextmanager
@@ -65,91 +64,6 @@ def create_user_for_test(self, **kwargs):
     )
 
     return user, lti_profile
-
-
-class LTIInitializerUtilsTests(TestCase):
-    """
-    Focuses on those functions found within hx_lti_initializer/utils.py
-    """
-
-    def setUp(self):
-        """
-        This is very simple, imitate the paramaters passed in via a request
-        and create a tool provider from ims_lti_py.
-        """
-        tool_provider_parameters = {
-          "lti_message_type": "basic-lti-launch-request",
-          "lti_version": "LTI-1p0",
-          "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
-          "lis_result_sourcedid": "261-154-728-17-784",
-          "lis_outcome_service_url": "http://localhost/lis_grade_passback",
-          "launch_presentation_return_url": "http://example.com/lti_return",
-          "custom_param1": "custom1",
-          "custom_param2": "custom2",
-          "ext_lti_message_type": "extension-lti-launch",
-          "roles": "Learner,Instructor,Observer"
-        }
-        self.tp = DjangoToolProvider('hi', 'oi', tool_provider_parameters)
-
-    def tearDown(self):
-        """
-        Make sure to delete the provider created in the set up.
-        """
-        del self.tp
-
-'''
-    def test_get_lti_value(self):
-        """
-        Should return the attribute within the LTI tool provider.
-        """
-        value_found = get_lti_value('launch_presentation_return_url', self.tp)
-        value_found2 = get_lti_value('custom_param1', self.tp)
-        self.assertEqual(value_found, 'http://example.com/lti_return')
-        self.assertEqual(value_found2, 'custom1')
-        self.assertEqual(get_lti_value('fake_param', self.tp), None)
-
-    def test_get_lti_value_negation(self):
-        """
-        Should NOT return the wrong value for an attribute within the LTI tool
-        provider, i.e. checking contraposition.
-        """
-        value_found = get_lti_value('launch_presentation_return_url', self.tp)
-        self.assertNotEqual(value_found, 'http://fake.com/lti_return')
-    @patch('hx_lti_initializer.utils.logger')
-    def test_debug_printer_when_lti_debug_enabled(self, mock_logger):
-        """
-        Should check to see if the value is being printed out to stderr only if
-        the LTI_DEBUG in settings is set to True.
-        """
-        settings.LTI_DEBUG = True
-        value_found = get_lti_value('roles', self.tp)
-        mock_logger.debug.assert_called_with("['Learner', 'Instructor', 'Observer']")
-
-    @patch('hx_lti_initializer.utils.logger')
-    def test_debug_printer_when_lti_debug_disabled(self, mock_logger):
-        settings.LTI_DEBUG = False
-        value_found = get_lti_value('lis_outcome_service_url', self.tp)
-        mock_logger.debug.assert_not_called()
-'''
-
-'''
-    def test_retrieve_token(self):
-        """
-        Should pass the test if payload matches the userid and apikey passed in
-        Cannot test the rest due to its usage of time/encrypted oath values.
-        """
-        expected = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMD\
-        E0LTAyLTI3VDE3OjAwOjQyLjQwNjQ0MSswOjAwIiwgImNvbnN1bWVyS2V5IjogImZha2Vfc\
-        2VjcmV0IiwgInVzZXJJZCI6ICJ1c2VybmFtZSIsICJ0dGwiOiA4NjQwMH0.Dx1PoF-7mqBO\
-        OSGDMZ9R_s3oaaLRPnn6CJgGGF2A5CQ"
-        response = retrieve_token("username", "fake_apikey", "fake_apikey")
-
-        # because the middle hashes are dependent on time, conly the header
-        # and footer are checked for secret key
-        self.assertEqual(expected.split('.')[0], response.split('.')[0])
-        self.assertNotEqual(expected.split('.')[2], response.split('.')[2])
-
-'''
 
 
 class LTIInitializerModelsTests(TestCase):
@@ -296,11 +210,6 @@ class LTIInitializerViewsTests(TestCase):
             "oauth_consumer_key": TEST_CONSUMER_KEY,
             "user_id": "234jfhrwekljrsfw8abcd35cseddda",
         })
-        self.tool_consumer = create_test_tc()
-        self.other_request = rf.post(
-            '/launch_lti/',
-            self.tool_consumer.generate_launch_data()
-        )
 
     def tearDown(self):
         """
@@ -308,8 +217,6 @@ class LTIInitializerViewsTests(TestCase):
         """
         del self.good_request
         del self.bad_request
-        del self.tool_consumer
-        del self.other_request
         del self.small_request
         del self.missing_user_id
         del self.missing_username
@@ -332,8 +239,11 @@ class LTIInitializerViewsTests(TestCase):
         self.assertEqual(newprofile.user.username, username)
         self.assertEqual(newprofile.anon_id, user_id)
 
-    def test_launch_lti(self):
-        pass
+    def test_lti_config(self):
+        client = Client()
+        response = client.get('/lti/config')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response._headers['content-type'], ('Content-Type', 'text/xml'))
 
 
 class LTIInitializerUrlsTests(TestCase):

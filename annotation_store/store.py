@@ -4,11 +4,11 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import F, Q
-from ims_lti_py.tool_provider import DjangoToolProvider
+from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
-from models import Annotation, AnnotationTags
+from .models import Annotation, AnnotationTags
 
 import json
 import requests
@@ -26,23 +26,23 @@ ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
 class AnnotationStore(object):
     '''
-    AnnotationStore implements a storage interface for annotations and is intended to 
+    AnnotationStore implements a storage interface for annotations and is intended to
     abstract the details of the backend that is actually going to be storing the annotations.
 
     The backend determines where/how annotations are stored. Possible backends include:
-    
+
     1) catch - The Common Annotation, Tagging, and Citation at Harvard (CATCH) project
                which is a separate, cloud-based instance with its own REST API.
-               See also: 
+               See also:
                    http://catcha.readthedocs.io/en/latest/
                    https://github.com/annotationsatharvard/catcha
 
     2) app   - This is an integrated django app that stores annotations in a local database.
-    
-    Client code should not instantiate backend classes directly. The choice of backend class is 
+
+    Client code should not instantiate backend classes directly. The choice of backend class is
     determined at runtime based on the django.settings configuration. This should
     include a setting such as:
-    
+
     ANNOTATION_STORE = {
         "backend": "catch"
     }
@@ -59,10 +59,29 @@ class AnnotationStore(object):
 
     @classmethod
     def from_settings(cls, request):
-        backend_type = cls.SETTINGS.get('backend', 'catch')
-        backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend}
-        assert backend_type in backend_types
-        backend_instance = backend_types[backend_type](request)
+        backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
+        backend_types = backend_type_setting.split(',')
+        possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
+        if request.method == "GET" or request.method == "DELETE":
+            version_requested = request.GET.get('version', None)
+        else:
+            body = json.loads(str(request.body, 'utf-8'))
+            version_requested = body.get('version', None)
+            if version_requested is None:
+                version_requested = request.GET.get('version')
+            logger.info('WebAnnotation version found %s' % request.GET.get('version'))
+        if version_requested is not None:
+            try:
+                backend_instance = possible_backend_types[version_requested](request)
+                return cls(request, backend_instance)
+            except Exception as e:
+                logger.info(e)
+                logger.info('version requested (%s) not in list of possible types' % version_requested)
+                raise e
+        else:
+            return cls(request, possible_backend_types['catch'](request))
+        assert backend_type_setting in possible_backend_types.keys()
+        backend_instance = possible_backend_types[backend_type](request)
         return cls(request, backend_instance)
 
     @classmethod
@@ -70,15 +89,15 @@ class AnnotationStore(object):
         cls.SETTINGS = settings_dict
         return cls
 
-    def root(self):
-        return self.backend.root()
+    def root(self, annotation_id=None):
+        return self.backend.root(annotation_id)
 
     def index(self):
         raise NotImplementedError
 
     def search(self):
         self.logger.info(u"Search: %s" % self.request.GET)
-        self._verify_course(self.request.GET.get('contextId', None))
+        self._verify_course(self.request.GET.get('contextId', self.request.GET.get('context_id', None)))
         if hasattr(self.backend, 'before_search'):
             self.backend.before_search()
         response = self.backend.search()
@@ -87,17 +106,17 @@ class AnnotationStore(object):
             # forgets to turn it on initially
             is_graded = self.request.LTI.get('is_graded', False)
             if is_graded and self.backend.after_search(response):
-                self.lti_grade_passback(is_graded=is_graded, status_code=response.status_code, restul_score=1)
+                self.lti_grade_passback(score=1)
         return response
 
-    def create(self):
-        body = json.loads(self.request.body)
+    def create(self, annotation_id=None):
+        body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Create annotation: %s" % body)
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        self._verify_course(body.get('contextId', body.get('context_id', None)))
+        self._verify_user(body.get('user', body.get('creator', {})).get('id', None))
         if hasattr(self.backend, 'before_create'):
             self.backend.before_create()
-        response = self.backend.create()
+        response = self.backend.create(annotation_id)
         return response
 
     def read(self, annotation_id):
@@ -107,10 +126,10 @@ class AnnotationStore(object):
         pass
 
     def update(self, annotation_id):
-        body = json.loads(self.request.body)
+        body = json.loads(str(self.request.body, 'utf-8'))
         self.logger.info(u"Update annotation %s: %s" % (annotation_id, body))
-        self._verify_course(body.get('contextId', None))
-        self._verify_user(body.get('user', {}).get('id', None))
+        self._verify_course(body.get('contextId', body.get('platform', {}).get('context_id', None)))
+        self._verify_user(body.get('user', body.get('creator', {})).get('id', None))
         if hasattr(self.backend, 'before_update'):
             self.backend.before_update(annotation_id)
         response = self.backend.update(annotation_id)
@@ -157,11 +176,21 @@ class AnnotationStore(object):
 
         if 'launch_params' in self.request.LTI:
             params = self.request.LTI['launch_params']
-            return DjangoToolProvider(CONSUMER_KEY, lti_secret, params)
-        return DjangoToolProvider(CONSUMER_KEY, lti_secret)
+
+            # the middleware includes an LTI dict with all lti params for
+            # lti_grade_passback() -- an lti request that is not a lti-launch.
+            # py-lti only understands lti params that come directly in the POST
+            mutable_post = self.request.POST.copy()
+            mutable_post.update(params)
+            self.request.POST = mutable_post
+
+            return DjangoToolProvider.from_django_request(
+                lti_secret, request=self.request)
+        return DjangoToolProvider.from_django_request(
+            lti_secret, request=self.request)
 
     def lti_grade_passback(self, score=1.0):
-        if score < 0 or score > 1.0 or isinstance(score, basestring):
+        if score < 0 or score > 1.0 or isinstance(score, str):
             return
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
@@ -194,13 +223,13 @@ class StoreBackend(object):
         self.request = request
         self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
 
-    def root(self):
+    def root(self, annotation_id=None):
         return HttpResponse(json.dumps(dict(name=self.BACKEND_NAME)), content_type='application/json')
 
     def search(self):
         raise NotImplementedError
 
-    def create(self):
+    def create(self, annotation_id):
         raise NotImplementedError
 
     def read(self, annotation_id):
@@ -220,7 +249,7 @@ class StoreBackend(object):
             raise e
 
     def _get_request_body(self):
-        body = json.loads(self.request.body)
+        body = json.loads(str(self.request.body, 'utf-8'))
         if self.ADMIN_GROUP_ENABLED:
             return self._modify_permissions(body)
         return body
@@ -285,8 +314,36 @@ class CatchStoreBackend(StoreBackend):
         }
         self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
 
+    def root(self, annotation_id):
+        self.logger.info(u"MethodType: %s" % self.request.method)
+        if self.request.method == "GET":
+            self.before_search()
+            response = self.search()
+            self.after_search(response)
+            return response
+        elif self.request.method == "POST":
+            return self.create(annotation_id)
+        elif self.request.method == "PUT":
+            return self.update(annotation_id)
+        elif self.request.method == "DELETE":
+            return self.delete(annotation_id)
+        return self.BACKEND_NAME
+
     def _get_database_url(self, path='/'):
-        base_url = str(ANNOTATION_DB_URL).strip()
+        try:
+            if self.request.method == "GET":
+                assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+            else:
+                body = self._get_request_body()
+                assignment_id = body.get('collectionId', body.get('collection_id', None))
+            if assignment_id:
+                    assignment = self._get_assignment(assignment_id)
+                    base_url = assignment.annotation_database_url
+            else:
+                base_url = str(ANNOTATION_DB_URL).strip()
+        except:
+            self.logger.info("Default annotation_database_url used as assignment could not be found.")
+            base_url = str(ANNOTATION_DB_URL).strip()
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
     def _retrieve_annotator_token(self, user_id):
@@ -319,9 +376,9 @@ class CatchStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
-        return retrieved_self and int(json.loads(response.content)['total'] > 0)
+        return retrieved_self and int(json.loads(str(response.content).decode('utf-8'))['total'] > 0)
 
-    def create(self):
+    def create(self, annotation_id):
         body = self._get_request_body()
         database_url = self._get_database_url('/create')
         data = json.dumps(body)
@@ -442,7 +499,7 @@ class AppStoreBackend(StoreBackend):
 
         return HttpResponse(json.dumps(result), status=200, content_type='application/json')
 
-    def create(self):
+    def create(self, annotation_id):
         anno = self._create_or_update(anno=None)
         result = self._serialize_annotation(anno)
         return HttpResponse(json.dumps(result), status=200, content_type='application/json')
@@ -512,3 +569,163 @@ class AppStoreBackend(StoreBackend):
         if anno.parent_id is None:
             data['totalComments'] = anno.total_comments
         return data
+
+
+class WebAnnotationStoreBackend(StoreBackend):
+    BACKEND_NAME = 'catchpy'
+
+    def __init__(self, request):
+        super(WebAnnotationStoreBackend, self).__init__(request)
+        self.logger = logging.getLogger('{module}.{cls}'.format(module=__name__, cls=self.__class__.__name__))
+        self.headers = {
+            'x-annotator-auth-token': request.META.get('HTTP_X_ANNOTATOR_AUTH_TOKEN', '!!MISSING!!'),
+            'content-type': 'application/json',
+        }
+        self.timeout = 5.0 # most actions should complete within this amount of time, other than search perhaps
+
+    def root(self, annotation_id):
+        self.logger.info(u"MethodType: %s" % self.request.method)
+        if self.request.method == "GET":
+            self.before_search()
+            response = self.search()
+            is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+            if is_graded and self.after_search(response):
+                self.lti_grade_passback(score=1)
+            return response
+        elif self.request.method == "POST":
+            return self.create(annotation_id)
+        elif self.request.method == "PUT":
+            return self.update(annotation_id)
+        elif self.request.method == "DELETE":
+            return self.delete(annotation_id)
+        return self.BACKEND_NAME
+
+    def _get_database_url(self, path='/'):
+        try:
+            if self.request.method == "GET":
+                assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+            else:
+                body = self._get_request_body()
+                assignment_id = body.get('collectionId', body.get('collection_id', None))
+            if assignment_id:
+                    assignment = self._get_assignment(assignment_id)
+                    base_url = assignment.annotation_database_url
+            else:
+                base_url = str(ANNOTATION_DB_URL).strip()
+        except:
+            self.logger.info("Default annotation_database_url used as assignment could not be found.")
+            base_url = str(ANNOTATION_DB_URL).strip()
+        return '{base_url}{path}'.format(base_url=base_url, path=path)
+
+    def _retrieve_annotator_token(self, user_id):
+        return retrieve_token(user_id, ANNOTATION_DB_API_KEY, ANNOTATION_DB_SECRET_TOKEN)
+
+    def _response_timeout(self):
+        return HttpResponse(json.dumps({"error": "request timeout"}), status=500, content_type='application/json')
+
+    def before_search(self):
+        # Override the auth token when the user is a course administrator, so they can query annotations
+        # that have set their read permissions to private (i.e. read: self-only).
+        # Note: this only works if the "__admin__" group ID was added to the annotation read permissions
+        # prior to saving it, otherwise this will have no effect.
+        if self.ADMIN_GROUP_ENABLED and self.request.LTI['is_staff']:
+            self.logger.info('updating auth token for admin')
+            self.headers['x-annotator-auth-token'] = self._retrieve_annotator_token(user_id=self.ADMIN_GROUP_ID)
+
+    def search(self):
+        timeout = 10.0
+        params = self.request.GET.urlencode()
+        database_url = self._get_database_url('/')
+        self.logger.info('search request: url=%s headers=%s params=%s timeout=%s' % (database_url, self.headers, params, timeout))
+        try:
+            response = requests.get(database_url, headers=self.headers, params=params, timeout=timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('search response status_code=%s content_length=%s' % (response.status_code, response.headers.get('content-length', 0)))
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def after_search(self, response):
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', [])
+        return retrieved_self and int(json.loads(str(response.content.decode('utf-8')))['total'] > 0)
+
+    def create(self, annotation_id):
+        body = self._get_request_body()
+        database_url = self._get_database_url('/%s' % annotation_id)
+        data = json.dumps(body)
+        self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        try:
+            response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                if is_graded:
+                    self.lti_grade_passback(score=1)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('create response status_code=%s' % response.status_code)
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def update(self, annotation_id):
+        body = self._get_request_body()
+        database_url = self._get_database_url('/%s' % annotation_id)
+        data = json.dumps(body)
+        self.logger.info('update request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
+        try:
+            response = requests.put(database_url, data=data, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('update response status_code=%s' % response.status_code)
+        return HttpResponse(response.content, status=response.status_code, content_type='application/json')
+
+    def delete(self, annotation_id):
+        database_url = self._get_database_url('/%s' % annotation_id)
+        self.logger.info('delete request: url=%s headers=%s' % (database_url, self.headers))
+        try:
+            response = requests.delete(database_url, headers=self.headers, timeout=self.timeout)
+        except requests.exceptions.Timeout as e:
+            self.logger.error("requested timed out!")
+            return self._response_timeout()
+        self.logger.info('delete response status_code=%s' % response.status_code)
+        return HttpResponse(response)
+
+    def _get_tool_provider(self):
+        try:
+            lti_secret = settings.LTI_SECRET_DICT[self.request.LTI.get('hx_context_id')]
+        except KeyError:
+            lti_secret = settings.LTI_SECRET
+
+        if 'launch_params' in self.request.LTI:
+            params = self.request.LTI['launch_params']
+
+            # the middleware includes an LTI dict with all lti params for
+            # lti_grade_passback() -- an lti request that is not a lti-launch.
+            # py-lti only understands lti params that come directly in the POST
+            mutable_post = self.request.POST.copy()
+            mutable_post.update(params)
+            self.request.POST = mutable_post
+
+            return DjangoToolProvider.from_django_request(
+                lti_secret, request=self.request)
+        return DjangoToolProvider.from_django_request(
+            lti_secret, request=self.request)
+
+    def lti_grade_passback(self, score=1.0):
+        if score < 0 or score > 1.0 or isinstance(score, str):
+            return
+        tool_provider = self._get_tool_provider()
+        if not tool_provider.is_outcome_service():
+            self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
+            return
+        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+        try:
+            outcome = tool_provider.post_replace_result(score)
+            self.logger.info(vars(outcome))
+            if outcome.is_success():
+                self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
+            else:
+                self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
+            self.outcome = outcome
+        except Exception as e:
+            self.logger.error("LTI post_replace_result request failed: %s" % str(e))

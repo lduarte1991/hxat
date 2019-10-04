@@ -72,7 +72,9 @@
             <div class="annotation-fullscreen clicking_allowed" tabindex="0" role="button" aria-label="Toggle Fullscreen Mode">
                 <i class="fa fa-expand"></i>
             </div>
+            {% if accessibility %}
             {% block keyboardinput %}{% endblock %}
+            {% endif %}
             {% if org == "HARVARDX" %}
                 <div class="logo" aria-label="HarvardX Logo">
                     <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" alt="HarvardX Logo" />
@@ -123,10 +125,10 @@
                     flags: false,
                     instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
                     default_tab: "{{ assignment.default_tab }}",
-                    show_instructor_tab: "{{assignment.include_instructor_tab}}",
-                    show_mynotes_tab: "{{assignment.include_mynotes_tab}}",
-                    show_public_tab: "{{assignment.include_public_tab}}",
-                    instructions: "{{instructions | escapejs }}",
+                    show_instructor_tab: "{% if 'Instructor' not in hide_sidebar_instance and assignment.include_instructor_tab %}True{% else %}False{% endif %}",
+                    show_mynotes_tab: "{% if 'My Notes' not in hide_sidebar_instance and assignment.include_mynotes_tab %}True{% else %}False{% endif %}",
+                    show_public_tab: "{% if 'Public' not in hide_sidebar_instance and assignment.include_public_tab %}True{% else %}False{% endif %}",
+                    hide_sidebar_instance: "{% if 'Instructor' in hide_sidebar_instance %} false {% endif %}",
                     dashboard_hidden: {{dashboard_hidden}},
                     {% if transcript_hidden %}
                     transcript_hidden: {{transcript_hidden}},

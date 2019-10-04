@@ -17,7 +17,7 @@ class Annotation(models.Model):
     quote = models.TextField(blank=True, default='')
     json = models.TextField(blank=True, default='{}')
     tags =  models.ManyToManyField('AnnotationTags', related_name='annotations')
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
     total_comments = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

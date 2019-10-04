@@ -1,6 +1,6 @@
 from django.db import models
 from hx_lti_initializer.models import LTIProfile, LTICourse
-from urlparse import urlparse
+from urllib.parse import urlparse
 from os.path import splitext, basename
 
 
@@ -31,7 +31,7 @@ class TargetObject(LTI_TodApi):
     target_citation = models.TextField(blank=True)
     target_created = models.DateTimeField(auto_now_add=True, auto_now=False)
     target_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
-    target_creator = models.ForeignKey(LTIProfile, null=True)
+    target_creator = models.ForeignKey(LTIProfile, null=True, on_delete=models.SET_NULL)
     target_courses = models.ManyToManyField(LTICourse)
     ANNOTATION_TYPES = (
         ('tx', 'Text Annotation'),

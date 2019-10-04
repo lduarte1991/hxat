@@ -1,6 +1,7 @@
 .Python
 /pyenv
 env
+env3
 bin
 lib
 node_modules

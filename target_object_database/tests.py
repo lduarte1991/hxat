@@ -1,9 +1,11 @@
-from django.test import TestCase
-from target_object_database.models import TargetObject
+from django.test import TestCase, Client
+from django.test.client import RequestFactory
+from .models import TargetObject
+from .views import *
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIProfile
 from hx_lti_initializer.test_helper import *
-from target_object_database.views import *
+
 from hx_lti_initializer.utils import *
 from django.http import Http404
 
@@ -19,9 +21,13 @@ class TODViewsTests(TestCase):
         4. Starts the LTI tool consumer and makes a data launch request.
         """
 
-        user = User(username="Luis", email="dfslkjfijeflkj")
-        user.save()
-        lti_profile = LTIProfile.objects.create(user=user)
+        self.rf = RequestFactory()
+
+        self.user = User(username="Luis", email="dfslkjfijeflkj")
+        self.user.save()
+        lti_profile = LTIProfile.objects.create(user=self.user)
+
+        self.client = Client()
 
         course = LTICourse(
             course_name="Fake Course",
@@ -55,23 +61,34 @@ class TODViewsTests(TestCase):
             target_external_options=""
         )
 
-        self.tool_consumer = create_test_tc()
-        self.other_request = self.tool_consumer.generate_launch_data()
 
     def tearDown(self):
         """
         """
         del self.assignment
         del self.tod
-        del self.tool_consumer
-        del self.other_request
 
     def test_call_view_loads(self):
         """
         """
-        response = self.client.post(
-            'lti_init/launch_lti/annotation/%s/%d' %
-            (self.assignment.assignment_id, self.tod.id), self.other_request)
+        response = self.rf.post('lti_init/launch_lti/annotation/%s/%d' %
+            (self.assignment.assignment_id, self.tod.id), {
+            "lti_message_type": "basic-lti-launch-request",
+            "oauth_consumer_key": TEST_CONSUMER_KEY,
+            "lti_version": "LTI-1p0",
+            "resource_link_id": "c28ddcf1b2b13c52757aed1fe9b2eb0a4e2710a3",
+            "lis_result_sourcedid": "261-154-728-17-784",
+            "lis_outcome_service_url": "http://localhost/lis_grade_passback",
+            "launch_presentation_return_url": "http://example.com/lti_return",
+            "custom_param1": "custom1",
+            "custom_param2": "custom2",
+            "oauth_signature": "aVQIRM6OkBku6yk3Guqyz+VUdgU=",
+            "user_id": "234jfhrwekljrsfw8abcd35cseddda",
+            "ext_lti_message_type": "extension-lti-launch",
+            "roles": "Learner,Instructor,Observer",
+            "lis_person_sourcedid": "fakeusername",
+        })
+
         self.assertTrue(
             open_target_object(
                 response,
@@ -97,5 +114,5 @@ class TODViewsTests(TestCase):
         """
         self.assertEqual(
             self.tod.get_admin_url(),
-            '/admin/target_object_database/targetobject/%d/' % self.tod.id
+            '/admin/target_object_database/targetobject/%d/change/' % self.tod.id
         )

@@ -9,7 +9,7 @@ from hx_lti_initializer.models import LTICourse
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 from hx_lti_initializer import annotation_database
-from store import AnnotationStore
+from .store import AnnotationStore
 
 import json
 import requests
@@ -18,9 +18,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@require_http_methods(["GET"])
-def api_root(request):
-    return AnnotationStore.from_settings(request).root()
+@csrf_exempt
+@require_http_methods(["GET", "POST", "PUT", "DELETE"])
+def api_root(request, annotation_id=None):
+    return AnnotationStore.from_settings(request).root(annotation_id)
 
 @require_http_methods(["GET"])
 def search(request):

@@ -733,6 +733,7 @@
                 repliesList: jQuery('.repliesList'),
                 templateReply: self.initOptions.TEMPLATES.editReplyItem({"isNewAnnotation": false}),
                 onSuccess: boundCallback,
+                annotation_id: annotation.id,
             };
             
             self.initOptions.endpoint.openEditorForReply(options);
@@ -793,11 +794,14 @@
         });
         jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
             title: "Would you like to delete your annotation?",
+            container: 'body',
             placement: 'left',
             onConfirm: function (){
                 if(annotationItem.authToDeleteButton) {
-                    self.initOptions.endpoint.deleteAnnotation(annotation);
-                    jQuery('#hxat-alert').html('Annotation has been deleted');
+                    setTimeout(function() {
+                        self.initOptions.endpoint.deleteAnnotation(annotation);
+                        jQuery('#hxat-alert').html('Annotation has been deleted');
+                    }, 1);
                 }
             },
         });

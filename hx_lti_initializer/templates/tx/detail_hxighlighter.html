@@ -1,0 +1,190 @@
+{% extends 'hx_lti_initializer/hxighlighter_base.html' %}
+
+{% load staticfiles %}
+{% load list_of_ids %}
+
+{% block title %}
+Text Annotation Tool | {{ target_object.target_title }}
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'Hxighlighter/hxighlighter_text.css' %}">
+{% endblock %}
+
+{% block mainapplication %}
+    <main class="hxighlighter-container" role="main">
+        <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
+            <aside aria-labelledby="aside-title" role="complementary" class="sr-only" accesskey="h" id="key-help">
+                    <h3 id='aside-title'>Keyboard Help</h3>
+                    <details>
+                        <summary>Quick Navigation Links</summary>
+                        <ul>
+                            <li><a href="#to-title">Text to be Annotated</a></li>
+                            <li><a href="#annotationsHolder">Annotation List</a></li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>Making Annotations via Keyboard Instructions</summary>
+                        <ol>
+                            <li>Use the shortcut or the <a href="#ma-button">Make Annotation</a> button to make text editable.</li>
+                            <li>This should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
+                            <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
+                            </li>
+                            <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
+                        </ol>
+                    </details>
+                    <details>
+                        <summary>Keyboard Shortcuts</summary>
+                        <ul>
+                            <li><strong>"Ctrl + 1"</strong>: Turn text to be editable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
+                            <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
+                            <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. <span class="sr-only">(You can also use the "Turn Hint Text On/Off" button below)</span></li>
+                            <li><strong>"Esc"</strong>: Make the text not editable.</li>
+                        </ul>
+                    </details>
+                    <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
+
+                    
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="polite">
+                        <div class='sr-real-alert'></div>
+                        <div class="sr-alert"></div>
+                        <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
+                    </div>
+                </aside>
+            <div class='annotations-section'>
+                <h3 id='to-title'>{{ target_object.target_title | safe }}</h3>
+                <h4>{{ target_object.target_author | safe }}</h4>
+                {{ target_object.target_content | safe}}
+            </div>
+        </section>
+    </main>
+    <footer class="hx-footer"></footer>
+    <style>
+        .hx-footer {
+            width: 100%;
+            height: 15px;
+            height: var(--footer-height);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 9999999999999;
+            /* background: black; */
+            background: #ededed;
+            /*-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.39);*/
+            border: 1px solid #c0c0c0;
+        }
+
+        :root {
+            --footer-height: 15px;
+        };
+    </style>
+    <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
+    <script>
+            var tags = "{{ assignment.highlights_options }}".split(',');
+            var hide_sidebar = {{ hide_sidebar_instance | safe }};
+            var tagDict = {};
+            tags.forEach(function(tagval) {
+                var pair = tagval.split(':');
+                tagDict[pair[0]] = pair[1]
+            });
+            var tabsCounter = 1;
+            var tabsList = ['search'];
+            {% if assignment.include_mynotes_tab %}
+                if (hide_sidebar.indexOf('mine') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('mine');
+                }
+            {% endif %}
+
+            {% if assignment.include_instructor_tab %}
+                if (hide_sidebar.indexOf('instructor') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('instructor');
+                }
+            {% endif %}
+
+            {% if assignment.include_public_tab %}
+                if (hide_sidebar.indexOf('peer') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('peer');
+            }
+            {% endif %}
+            var defTab = "{{ assignment.default_tab }}";
+            if (defTab == "Instructor") {
+                defTab = "instructor"
+            } else if (defTab == "MyNotes") {
+                defTab = "mine";
+            } else if (defTab == "Public") {
+                defTab = "peer"
+            }
+            var hxighlighter_object1 = {
+                "commonInfo": {
+                    "mediaType": "text",
+                    "context_id": "{{ course }}",
+                    "collection_id": "{{ collection }}",
+                    "object_id": "{{ object }}",
+                    "username": "{{ username }}",
+                    "user_id": "{{ user_id }}",
+                    "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
+                    "common_instructor_name": "{{assignment.common_inst_name}}"
+                },
+                "targets": [{
+                    'mediaType': "text",
+                    'method': 'inline',
+                    'object_source': '.container1',
+                    "template_urls":  "{% static 'templates/dashboard/' %}",
+                    "DropdownTags": {
+                        'tags': Object.keys(tagDict),
+                        'folksonomy': true,
+                    },
+                    {% if instructions != "" %}
+                    "InstructionPanel": {
+                        'instructions': "{{ instructions | escapejs }}"
+                    },
+                    {% endif %}
+                    "ColorTags": tagDict,
+                    "SidebarTagTokens": {
+                        'tagList': Object.keys(tagDict),
+                    },
+                    "HxPermissions": {
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                    },
+                    viewerOptions: {
+                        filterTabCount: tabsCounter,
+                        defaultTab: defTab,
+                        tabsAvailable: tabsList,
+                        sidebarversion: 'sidemenu',
+                        pagination: {{ assignment.pagination_limit }}
+                    },
+                    Badges: {
+                    },
+                    
+                    AdminButton: {
+                        {% if is_instructor %}
+                        homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                        {% endif %}
+                    },  
+                    PrevNextButton: {
+                        prevUrl: {% if prev_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
+                        nextUrl: {% if next_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
+                    },
+                    storageOptions: {
+                        external_url: {
+                            catchpy: "{% url 'annotation_store:api_root' %}"
+                        },
+                        token: "{{ token }}",
+                        pagination: {{ assignment.pagination_limit }},
+                        database_params: {
+                            resource_link_id: "{{ resource_link_id }}",
+                            utm_source: "{{ utm_source }}",
+                            version: 'catchpy'
+                        }
+                    }
+                }],
+            };
+            Hxighlighter(hxighlighter_object1);
+        </script>
+{% endblock %}

@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect, re
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core import serializers
 import uuid
 import json
@@ -53,9 +53,12 @@ def create_new_assignment(request):
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
+                template_used = 'hx_lti_assignment/create_new_assignment2.html'
+                if assignment.use_hxighlighter:
+                    template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
                 return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment2.html',
+                    template_used,
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -95,13 +98,14 @@ def create_new_assignment(request):
 	            'annotation_database_apikey': getattr(settings, 'ANNOTATION_DB_API_KEY', ""),
 	            'annotation_database_secret_token': getattr(settings, 'ANNOTATION_DB_SECRET_TOKEN', ""),
 	            'pagination_limit': getattr(settings, 'ANNOTATION_PAGINATION_LIMIT_DEFAULT', 20),
+                'use_hxighlighter': None,
             })
         targets_form = AssignmentTargetsFormSet()
         target_num = 0
         
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment2.html',
+        'hx_lti_assignment/create_new_assignment_hxighlighter.html',
         {
             'form': form,
             'targets_form': targets_form,
@@ -132,7 +136,6 @@ def edit_assignment(request, id):
         )
         targets = 'id=' + id + '&assignment_id=' + assignment.assignment_id
         if targets_form.is_valid():
-            print targets_form
             assignment_targets = targets_form.save(commit=False)
             changed = False
             if len(targets_form.deleted_objects) > 0:
@@ -161,9 +164,12 @@ def edit_assignment(request, id):
             url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
         else:
+            template_used = 'hx_lti_assignment/create_new_assignment2.html'
+            if assignment.use_hxighlighter:
+                    template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
             return render(
                     request,
-                    'hx_lti_assignment/create_new_assignment2.html',
+                    template_used,
                     {
                         'form': form,
                         'targets_form': targets_form,
@@ -187,9 +193,12 @@ def edit_assignment(request, id):
     except:
         course_name = None
 
+    template_used = 'hx_lti_assignment/create_new_assignment2.html'
+    if assignment.use_hxighlighter:
+        template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
     return render(
         request,
-        'hx_lti_assignment/create_new_assignment2.html',
+        template_used,
         {
             'form': form,
             'targets_form': targets_form,
@@ -265,7 +274,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         assignment.assignment_id = uuid.uuid4()
         assignment.save()
         result.update({'new_assignment_id': str(assignment.assignment_id)})
-        result.update({'assignment_name': unicode(assignment.assignment_name)})
+        result.update({'assignment_name': str(assignment.assignment_name)})
         
         pks = []
         for at in aTargets:

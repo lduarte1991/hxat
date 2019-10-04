@@ -37,7 +37,7 @@ def format_tags(tagslist):
 	'''
 	return ', '.join(tagslist)
 
-@register.assignment_tag
+@register.simple_tag
 def get_annotation_manual(**kwargs):
 	'''
 	Returns the URL to the annotation manual. When the URL is present in the django settings,
