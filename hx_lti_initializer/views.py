@@ -260,7 +260,8 @@ def launch_lti(request):
     except:
         logger.debug("DEBUG - Not waiting to be added as admin")
 
-    return course_admin_hub(request)
+    url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % resource_link_id
+    return redirect(url)
 
 
 @login_required
