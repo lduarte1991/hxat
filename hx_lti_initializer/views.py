@@ -242,7 +242,8 @@ def launch_lti(request):
                     userfound.delete()
                 except:
                     logger.info("Not waiting to be added as admin")
-                return course_admin_hub(request)
+                url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % resource_link_id
+                return redirect(url)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
                 return access_annotation_target(request, course_id, assignment_id, object_id)
@@ -260,7 +261,8 @@ def launch_lti(request):
     except:
         logger.debug("DEBUG - Not waiting to be added as admin")
 
-    return course_admin_hub(request)
+    url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % resource_link_id
+    return redirect(url)
 
 
 @login_required
