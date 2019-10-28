@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Thursday, September 12th, 2019, 4:57:18 PM  
+// [AIV_SHORT]  Version: 1.0.0 - Monday, October 28th, 2019, 12:58:01 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -28253,6 +28253,11 @@ function getNodeFromXpath(root, xpath, offset, ignoreSelector) {
     return it.length > 0;
   });
   var traversingDown = root;
+
+  if (!(traversingDown instanceof HTMLElement) && typeof traversingDown[0] !== "undefined") {
+    traversingDown = traversingDown[0];
+  }
+
   tree.forEach(function (it) {
     var selector = it.replace(/\[.*\]/g, '');
     var counter = parseInt(it.replace(/.*?\[(.*)\]/g, '$1'), 10) - 1;
@@ -28309,6 +28314,21 @@ function getIndicesOf(searchStr, str, caseSensitive) {
   }
 
   return indices;
+} // https://stackoverflow.com/questions/29573700/finding-the-difference-between-two-string-in-javascript-with-regex
+
+
+function isDifferenceAlphaNumeric(a, b) {
+  var i = 0;
+  var j = 0;
+  var result = "";
+
+  while (j < b.length) {
+    if (a[i] != b[j] || i == a.length) result += b[j];else i++;
+    j++;
+  }
+
+  var regex = /^[A-Za-z0-9]+$/i;
+  return regex.test(result);
 }
 
 function normalizeRange(serializedRange, root, ignoreSelector) {
@@ -28332,14 +28352,15 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
     var normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
     normalizedRange.setEnd(endResult.node, endResult.offset); //console.log('HERE', _start, _startOffset, _end, _endOffset, startResult, endResult, getExactText(normalizedRange), serializedRange.text.exact);
-    //console.log("Xpath Test: ", compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
+
+    console.log("Xpath Test: ", getExactText(normalizedRange), serializedRange.text.exact, compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
   } //console.log(_start, _startOffset, startResult, endResult);
   //console.log(getPrefixAndSuffix(normalizedRange, root, ignoreSelector))
   // Way #2: if that doesn't match what we have stored as the quote, try global positioning from root
   // This is for the usecase where someone has changed tagnames so xpath cannot be found
 
 
-  if (!(startResult && endResult) || serializedRange.text.exact && !compareExactText(getExactText(normalizedRange), serializedRange.text.exact)) {
+  if (!(startResult && endResult) || serializedRange.text.exact && typeof serializedRange.position !== "undefined" && !compareExactText(getExactText(normalizedRange), serializedRange.text.exact)) {
     startResult = recurseGetNodeFromOffset(root, serializedRange.position.globalStartOffset); //getNodeFromXpath(root, '/', serializedRange.position.globalStartOffset, ignoreSelector);
 
     endResult = recurseGetNodeFromOffset(root, serializedRange.position.globalEndOffset); //getNodeFromXpath(root, '/', serializedRange.position.globalEndOffset, ignoreSelector);
@@ -28368,7 +28389,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
         break;
       }
     }
-  } // Possible Way #4: fuzzy search? TBD, no idea how to do this. fuzzy substrings are not as common as searching list of records
+  } // Possible Way #5: fuzzy search? TBD, no idea how to do this. fuzzy substrings are not as common as searching list of records
 
 
   return normalizedRange;
@@ -45246,6 +45267,7 @@ var hrange = __webpack_require__(3);
           });
         }
       } else if (xpathRanges.length === 1 && positionRanges.length === 0 && textRanges.length === 0) {
+        console.log(element, xpathRanges);
         var startNode = hrange.getNodeFromXpath(element, xpathRanges[0].start, xpathRanges[0].startOffset, 'annotator-hl');
         var endNode = hrange.getNodeFromXpath(element, xpathRanges[0].end, xpathRanges[0].endOffset, 'annotator-hl');
 
@@ -45583,8 +45605,6 @@ __webpack_require__(70);
     if (self.options.PrevNextButton) {
       self.prevUrl = self.options.PrevNextButton.prevUrl;
       self.nextUrl = self.options.PrevNextButton.nextUrl;
-      self.current = self.options.PrevNextButton.current;
-      self.total = self.options.PrevNextButton.total;
       self.setUpButtons();
     }
   };
@@ -45595,17 +45615,13 @@ __webpack_require__(70);
     var toPrepend = "";
 
     if (self.prevUrl && self.prevUrl != "") {
-      toPrepend += '<a href="' + self.prevUrl + '" title="Back" id="prevButtonTop" role="button">Back</a>';
-      toAppend += '<a href="' + self.prevUrl + '" title="Back" id="prevButtonBottom" role="button">Back</a>'; //jQuery(self.options.slot).append('<a href="'+self.prevUrl+'" title="Previous Page" id="prevButton" role="button">Previous</button>');
-    }
-
-    if (self.current && self.total && self.total !== 1) {
-      toPrepend += "<span class='counter'>" + self.current + " out of " + self.total + "</span>";
+      toPrepend += '<a href="' + self.prevUrl + '" title="Previous Page" id="prevButtonTop" role="button">Previous</button>';
+      toAppend += '<a href="' + self.prevUrl + '" title="Previous Page" id="prevButtonBottom" role="button">Previous</button>'; //jQuery(self.options.slot).append('<a href="'+self.prevUrl+'" title="Previous Page" id="prevButton" role="button">Previous</button>');
     }
 
     if (self.nextUrl && self.nextUrl != "") {
-      toPrepend += '<a href="' + self.nextUrl + '" title="Continue" id="nextButtonTop" role="button">Continue</a>';
-      toAppend += '<a href="' + self.nextUrl + '" title="Continue" id="nextButtonBottom" role="button">Continue</as>'; //jQuery(self.options.slot).append('<a href="'+self.nextUrl+'" title="Next Page" id="nextButton" role="button">Next</button>');
+      toPrepend += '<a href="' + self.nextUrl + '" title="Next Page" id="nextButtonTop" role="button">Next</button>';
+      toAppend += '<a href="' + self.nextUrl + '" title="Next Page" id="nextButtonBottom" role="button">Next</button>'; //jQuery(self.options.slot).append('<a href="'+self.nextUrl+'" title="Next Page" id="nextButton" role="button">Next</button>');
     }
 
     jQuery(self.options.slot).before(toPrepend);
