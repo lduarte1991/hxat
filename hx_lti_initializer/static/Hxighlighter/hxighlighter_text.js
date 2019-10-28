@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Monday, October 28th, 2019, 12:58:01 PM  
+// [AIV_SHORT]  Version: 1.0.0 - Monday, October 28th, 2019, 4:50:36 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -28135,7 +28135,8 @@ function compareExactText(text1, text2) {
 
   var res1 = getDiff(text1, text2);
   var res2 = getDiff(text2, text1);
-  return text1 === text2 || res1.trim().length === 0 || res2.trim().length === 0;
+  var regexp = /[^A-Za-z0-9]+/g;
+  return text1 === text2 || res1.trim().length === 0 || res2.trim().length === 0 || regexp.test(res1) || regexp.test(res2);
 }
 
 ;
@@ -28314,21 +28315,6 @@ function getIndicesOf(searchStr, str, caseSensitive) {
   }
 
   return indices;
-} // https://stackoverflow.com/questions/29573700/finding-the-difference-between-two-string-in-javascript-with-regex
-
-
-function isDifferenceAlphaNumeric(a, b) {
-  var i = 0;
-  var j = 0;
-  var result = "";
-
-  while (j < b.length) {
-    if (a[i] != b[j] || i == a.length) result += b[j];else i++;
-    j++;
-  }
-
-  var regex = /^[A-Za-z0-9]+$/i;
-  return regex.test(result);
 }
 
 function normalizeRange(serializedRange, root, ignoreSelector) {
@@ -28342,18 +28328,17 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
   var _start = sR.start;
   var _end = sR.end;
   var _startOffset = sR.startOffset;
-  var _endOffset = sR.endOffset; // three ways of getting text:
+  var _endOffset = sR.endOffset;
+  var normalizedRange = document.createRange(); // three ways of getting text:
   // Way #1: Given an xpath, find the way to the node
 
   var startResult = getNodeFromXpath(root, _start, _startOffset, ignoreSelector);
   var endResult = getNodeFromXpath(root, _end, _endOffset, ignoreSelector);
 
   if (startResult && endResult) {
-    var normalizedRange = document.createRange();
     normalizedRange.setStart(startResult.node, startResult.offset);
     normalizedRange.setEnd(endResult.node, endResult.offset); //console.log('HERE', _start, _startOffset, _end, _endOffset, startResult, endResult, getExactText(normalizedRange), serializedRange.text.exact);
-
-    console.log("Xpath Test: ", getExactText(normalizedRange), serializedRange.text.exact, compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH");
+    //console.log("Xpath Test: ", getExactText(normalizedRange), serializedRange.text.exact, compareExactText(getExactText(normalizedRange), serializedRange.text.exact) ? "YES THEY MATCH" : "NO THEY DO NOT MATCH")
   } //console.log(_start, _startOffset, startResult, endResult);
   //console.log(getPrefixAndSuffix(normalizedRange, root, ignoreSelector))
   // Way #2: if that doesn't match what we have stored as the quote, try global positioning from root
@@ -28389,7 +28374,7 @@ function normalizeRange(serializedRange, root, ignoreSelector) {
         break;
       }
     }
-  } // Possible Way #5: fuzzy search? TBD, no idea how to do this. fuzzy substrings are not as common as searching list of records
+  } // Possible Way #4: fuzzy search? TBD, no idea how to do this. fuzzy substrings are not as common as searching list of records
 
 
   return normalizedRange;
@@ -28517,13 +28502,19 @@ function recurseFromNodeToNode(currentNode, range) {
 
 function getTextNodesFromAnnotationRanges(ranges, root) {
   var textNodesList = [];
-  ranges.forEach(function (range) {
-    var normRanged = normalizeRange(range, root, 'annotator-hl'); //recurseFromNodeToNode(range.startContainer, range);
 
-    var nodes = recurseFromNodeToNode(normRanged.startContainer, normRanged); //console.log(normRanged, ranges, nodes, normRanged.cloneContents());
+  try {
+    ranges.forEach(function (range) {
+      var normRanged = normalizeRange(range, root, 'annotator-hl'); //recurseFromNodeToNode(range.startContainer, range);
 
-    textNodesList = textNodesList.concat(nodes.nodes);
-  });
+      var nodes = recurseFromNodeToNode(normRanged.startContainer, normRanged); //console.log(normRanged, ranges, nodes, normRanged.cloneContents());
+
+      textNodesList = textNodesList.concat(nodes.nodes);
+    });
+  } catch (e) {
+    console.log("There was an error in getting the ranges.");
+  }
+
   return textNodesList;
 }
 
@@ -45267,7 +45258,6 @@ var hrange = __webpack_require__(3);
           });
         }
       } else if (xpathRanges.length === 1 && positionRanges.length === 0 && textRanges.length === 0) {
-        console.log(element, xpathRanges);
         var startNode = hrange.getNodeFromXpath(element, xpathRanges[0].start, xpathRanges[0].startOffset, 'annotator-hl');
         var endNode = hrange.getNodeFromXpath(element, xpathRanges[0].end, xpathRanges[0].endOffset, 'annotator-hl');
 
