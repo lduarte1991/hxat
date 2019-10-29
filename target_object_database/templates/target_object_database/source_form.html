@@ -37,9 +37,9 @@
 		var links = "{{form.target_content.value | escapejs}}".split(';');
 		console.log('find me', links);
 		if (links.length === 3) {
-			window.youtubeLink = links[0];
-			window.html5Link = links[1];
-			window.html5Link = links[2];
+			window.youtubeLink = links[0] || "";
+			window.html5Link = links[1] || "";
+			window.transcript_link = links[2] || "";
 		}
 
 		// window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link:form.target_type | escapejs}}";
