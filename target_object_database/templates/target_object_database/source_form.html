@@ -121,6 +121,11 @@
 					jQuery('.tx').show();
 					jQuery('#id_target_content').summernote(options);
 					jQuery('label[for="id_target_content"]').text('Source Content');
+					if ("{{ form.target_content.value | escapejs }}".length > 0) {
+						console.log("Should disable", "{{ form.target_content.value | escapejs }}");
+						jQuery('#id_target_content').summernote('disable');
+					}
+
 				} else if (value === "ig") {
 					jQuery('.vd').hide();
 					jQuery('.tx').hide();
@@ -209,13 +214,6 @@
 
 			<div class="help_text">Do not deselect any courses, just make sure yours is selected</div>
 		</div>
-		{% if form.target_type == "tx" and form.target_content.value != "" %}
-			<script>
-				jQuery(document).ready(function() {
-					jQuery('#id_target_content').summernote("disable");
-				});
-			</script>
-		{% endif %}
 
 		{% buttons %}
 			<div type="submit" class="save" id='source-save-button'>
