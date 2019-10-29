@@ -36,6 +36,9 @@
 
 		{% if form.target_type == 'vd' %}
 		var links = "{{form.target_content.value | escapejs}}".split(';');
+		window.youtubeLink =  "";
+		window.html5Link = "";
+		window.transcript_link = "";
 		if (links.length === 3) {
 			window.youtubeLink = links[0] || "";
 			window.html5Link = links[1] || "";
