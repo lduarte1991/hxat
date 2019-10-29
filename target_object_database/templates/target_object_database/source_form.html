@@ -121,6 +121,7 @@
 					jQuery('.tx').show();
 					jQuery('#id_target_content').summernote(options);
 					jQuery('label[for="id_target_content"]').text('Source Content');
+					jQuery('#id_target_content').before('<p class="tx" style="font-size: 0.75em">Warning: Make sure to do all copy edits before making any annotations. Making changes to the text after any annotations have been made may cause you to have to remake the annotations as well.</p>')
 					if ("{{ form.target_content.value | escapejs }}".length > 0) {
 						jQuery('#id_target_content').next().find(".note-editable").attr("contenteditable", false);
 						var warn_user = function() {
