@@ -34,14 +34,14 @@
 		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 
+		{% if form.target_type == 'vd' %}
 		var links = "{{form.target_content.value | escapejs}}".split(';');
-		console.log('find me', links);
 		if (links.length === 3) {
 			window.youtubeLink = links[0] || "";
 			window.html5Link = links[1] || "";
 			window.transcript_link = links[2] || "";
 		}
-
+		{% endif %}
 		// window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link:form.target_type | escapejs}}";
 		// window.html5Link = "{{form.target_content.value | just_the_html5_vid_link:form.target_type | escapejs}}";
 		// window.transcript_link = "{{form.target_content.value | just_the_transcript_link:form.target_type | escapejs}}";
@@ -209,6 +209,13 @@
 
 			<div class="help_text">Do not deselect any courses, just make sure yours is selected</div>
 		</div>
+		{% if form.target_type == "tx" and form.target_content.value !== "" %}
+			<script>
+				jQuery(document).ready(function() {
+					jQuery('#id_target_content').summernote("disable");
+				});
+			</script>
+		{% endif %}
 
 		{% buttons %}
 			<div type="submit" class="save" id='source-save-button'>
