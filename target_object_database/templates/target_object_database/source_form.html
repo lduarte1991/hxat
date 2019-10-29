@@ -123,6 +123,7 @@
 					jQuery('label[for="id_target_content"]').text('Source Content');
 					if ("{{ form.target_content.value | escapejs }}".length > 0) {
 						console.log("Should disable", "{{ form.target_content.value | escapejs }}");
+						console.log(jQuery('#id_target_content').summernote('isEmpty'));
 						jQuery('#id_target_content').summernote('disable');
 					}
 
