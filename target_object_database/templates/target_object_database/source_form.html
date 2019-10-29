@@ -127,7 +127,7 @@
 							var result = confirm('Editing Text (even a small typo or formatting) may cause you to lose annotations anyone has created. Talk to Tech Team to get full details on the effects of your changes.\n Do you want to still edit text?');
 							if (result) {
 								jQuery('#id_target_content').next().find(".note-editable").attr("contenteditable", true);
-								Query('#id_target_content').next().find('.note-editable').off('click', warn_user);
+								jQuery('#id_target_content').next().find('.note-editable').off('click', warn_user);
 							}
 
 						}
