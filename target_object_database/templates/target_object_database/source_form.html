@@ -209,7 +209,7 @@
 
 			<div class="help_text">Do not deselect any courses, just make sure yours is selected</div>
 		</div>
-		{% if form.target_type == "tx" and form.target_content.value !== "" %}
+		{% if form.target_type == "tx" and form.target_content.value != "" %}
 			<script>
 				jQuery(document).ready(function() {
 					jQuery('#id_target_content').summernote("disable");
