@@ -122,9 +122,14 @@
 					jQuery('#id_target_content').summernote(options);
 					jQuery('label[for="id_target_content"]').text('Source Content');
 					if ("{{ form.target_content.value | escapejs }}".length > 0) {
-						console.log("Should disable", "{{ form.target_content.value | escapejs }}");
-						console.log(jQuery('#id_target_content').summernote('isEmpty'));
-						jQuery('#id_target_content').summernote('disable');
+						jQuery('#id_target_content').next().find(".note-editable").attr("contenteditable", false);
+						var warn_user = function() {
+							var result = confirm('Editing Text (even a small typo or formatting) may cause you to lose annotations anyone has created. Talk to Tech Team to get full details on the effects of your changes.\n Do you want to still edit text?');
+							if (result) {
+								jQuery('#id_target_content').next().find(".note-editable").attr("contenteditable", true);
+							}
+						}
+						jQuery('#id_target_content').next().find
 					}
 
 				} else if (value === "ig") {
