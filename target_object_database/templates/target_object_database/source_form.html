@@ -124,8 +124,8 @@
 					jQuery('.tx').show();
 					jQuery('#id_target_content').summernote(options);
 					jQuery('label[for="id_target_content"]').text('Source Content');
-					jQuery('#id_target_content').before('<p class="tx" style="font-size: 0.75em">Warning: Make sure to do all copy edits before making any annotations. Making changes to the text after any annotations have been made may cause you to have to remake the annotations as well.</p>')
-					if ("{{ form.target_content.value | escapejs }}".length > 0) {
+					jQuery('#id_target_content').before('<p class="tx" style="font-size: 0.75em">Warning: Make sure to do all copy edits before making any annotations. Making changes to the text after any annotations have been made may cause you to have to remake the annotations as well.</p>');
+					if ("{{ form.target_content.value | escapejs }}".length > 0 || "{{ form.target_content.value | escapejs }}" === "None") {
 						jQuery('#id_target_content').next().find(".note-editable").attr("contenteditable", false);
 						var warn_user = function() {
 							var result = confirm('Editing text (even a small typo or formatting) may cause you to lose annotations anyone has created.\nTalk to Tech Team to get full details on the effects of your changes.\n\nDo you want to still edit text?');
