@@ -143,7 +143,7 @@ class Assignment(models.Model):
         default=True
     )
     include_public_tab = models.BooleanField(
-        help_text="Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations.",
+        help_text="Include a tab for peer annotations. Used for private annotations. If you want users to view each other's annotations.",
         default=True
     )
     allow_highlights = models.BooleanField(
