@@ -150,8 +150,8 @@ class Assignment(models.Model):
         help_text="Allow predetermined tags with colors.",
         default=False
     )
-    highlights_options = models.CharField(
-        max_length=255,
+    highlights_options = models.TextField(
+        max_length=1024,
         blank=True
     )
     allow_touch = models.BooleanField(
