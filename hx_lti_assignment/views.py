@@ -54,7 +54,7 @@ def create_new_assignment(request):
                     str(request.POST) + "What?"
                 debug_printer(form.errors)
                 template_used = 'hx_lti_assignment/create_new_assignment2.html'
-                if assignment.use_hxighlighter:
+                if assignment and assignment.use_hxighlighter:
                     template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
                 return render(
                     request,
