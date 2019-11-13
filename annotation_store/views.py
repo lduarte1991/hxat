@@ -154,7 +154,7 @@ def grade_me(request):
         'content-type': 'application/json',
     }
 
-    response = requests.get(search_database_url, headers=headers, data=urllib.parse.urlencode(params, True))
+    response = requests.get(search_database_url, headers=headers, params=urllib.parse.urlencode(params, True))
     if response.status_code == 200:
         logger.info('Grade me search was made successfully')
         annotations = json.loads(response.text)
