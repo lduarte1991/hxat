@@ -137,9 +137,9 @@ def grade_me(request):
     object_id = request.LTI['hx_object_id']
 
     params = {
-        'uri': object_id,
-        'collectionId': collection_id,
-        'contextId': context_id,
+        'source_id': object_id,
+        'collection_id': collection_id,
+        'context_id': context_id,
         'userid': user_id
     }
 
