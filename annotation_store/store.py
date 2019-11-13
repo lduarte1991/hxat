@@ -90,12 +90,14 @@ class AnnotationStore(object):
         return cls
 
     def root(self, annotation_id=None):
+        self.logger.info('Reached root method in store')
         return self.backend.root(annotation_id)
 
     def index(self):
         raise NotImplementedError
 
     def search(self):
+        self.logger.info("reached search method in store" % is_graded)
         self.logger.info(u"Search: %s" % self.request.GET)
         self._verify_course(self.request.GET.get('contextId', self.request.GET.get('context_id', None)))
         if hasattr(self.backend, 'before_search'):
@@ -376,6 +378,7 @@ class CatchStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
+        self.logger.info('Reached after_search of old %s' % retrieved_self)
         return retrieved_self and int(json.loads(str(response.content).decode('utf-8'))['total'] > 0)
 
     def create(self, annotation_id):
@@ -647,6 +650,7 @@ class WebAnnotationStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', [])
+        self.logger('Reached after_search of new %s' % retrieved_self)
         return retrieved_self and int(json.loads(str(response.content.decode('utf-8')))['total'] > 0)
 
     def create(self, annotation_id):

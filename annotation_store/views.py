@@ -21,15 +21,18 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def api_root(request, annotation_id=None):
+    logger.info('reached api_root')
     return AnnotationStore.from_settings(request).root(annotation_id)
 
 @require_http_methods(["GET"])
 def search(request):
+    logger.info('reached search method in views')
     return AnnotationStore.from_settings(request).search()
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def create(request):
+    logger.info('reached create method in views')
     store = AnnotationStore.from_settings(request)
     response = store.create()
     if response.status_code == 200:
