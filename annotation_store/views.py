@@ -156,6 +156,7 @@ def grade_me(request):
     }
 
     response = requests.get(search_database_url, headers=headers, params=urllib.parse.urlencode(params, True))
+    request_sent = False
     if response.status_code == 200:
         logger.info('Grade me search was made successfully')
         annotations = json.loads(response.text)
@@ -163,4 +164,5 @@ def grade_me(request):
             logger.info('Should get a grade back')
             store = AnnotationStore.from_settings(request)
             store.lti_grade_passback()
-    return response
+            request_sent = True
+    return HttpResponse(json.dumps({'grade_request_sent': request_sent}), content_type="application/json")
