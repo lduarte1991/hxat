@@ -139,7 +139,7 @@ def grade_me(request):
         'uri': object_id,
         'collectionId': collection_id,
         'contextId': context_id,
-        'userid' = user_id
+        'userid': user_id
     }
 
     assignment = Assignment.objects.get(assignment_id=collection_id)
