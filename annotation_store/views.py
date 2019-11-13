@@ -158,7 +158,7 @@ def grade_me(request):
     response = requests.get(search_database_url, headers=headers, params=urllib.parse.urlencode(params, True))
     request_sent = False
     if response.status_code == 200:
-        logger.info('Grade me search was made successfully')
+        logger.info('Grade me search was made successfully %s' % str(dir(response)))
         annotations = json.loads(response.text)
         logger.info('Response %s' % str(annotations['total']))
         if annotations['total'] > 0:
