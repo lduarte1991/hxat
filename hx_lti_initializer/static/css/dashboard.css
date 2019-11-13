@@ -121,6 +121,20 @@
     cursor: pointer;
 }
 
+.grade-me {
+    position: absolute;
+    float: right;
+    top: 5px;
+    right: 135px;
+    font-size: 2em;
+    color: white;
+    cursor: pointer;
+}
+
+.grade-me i {
+    color: white;
+}
+
 .resize-handle.side > .handle-button > img {
     width: 25px;
 }
