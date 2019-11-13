@@ -160,6 +160,7 @@ def grade_me(request):
     if response.status_code == 200:
         logger.info('Grade me search was made successfully')
         annotations = json.loads(response.text)
+        logger.info('Response %s' % response.text)
         if annotations['total'] > 0:
             logger.info('Should get a grade back')
             store = AnnotationStore.from_settings(request)
