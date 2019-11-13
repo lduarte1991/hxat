@@ -14,6 +14,7 @@ from .store import AnnotationStore
 import json
 import requests
 import urllib
+import urllib.parse
 import logging
 
 logger = logging.getLogger(__name__)
