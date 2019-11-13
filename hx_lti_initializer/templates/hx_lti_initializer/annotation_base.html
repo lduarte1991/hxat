@@ -80,6 +80,7 @@
                     <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" alt="HarvardX Logo" />
                 </div>
             {% endif %}
+            <div class="grade-me clicking_allowed" tabindex="0" title="Send grade to edx" aria-label="Send grade to edx"><a href="{% url 'annotation_store:api_grade_me'%}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}"><i class="fa fa-check"></i></a></div>
             <div class="handle-button clicking_allowed" tabindex="0" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-navicon"></i></div>
         </nav>
 

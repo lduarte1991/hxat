@@ -127,3 +127,39 @@ def transfer(request, instructor_only="1"):
     #logger.debug("%s" % str(request.POST.getlist('assignment_inst[]')))
     data = dict()
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+@login_required
+def grade_me(request):
+    user_id = request.LTI['hx_user_id']
+    context_id = request.LTI['hx_context_id']
+    collection_id = request.LTI['hx_collection_id']
+    object_id = request.LTI['hx_object_id']
+
+    params = {
+        'uri': object_id,
+        'collectionId': collection_id,
+        'contextId': context_id,
+        'userid' = user_id
+    }
+
+    assignment = Assignment.objects.get(assignment_id=collection_id)
+    search_database_url = str(assignment.annotation_database_url).strip()
+    token = retrieve_token(
+            user_id,
+            assignment.annotation_database_apikey,
+            assignment.annotation_database_secret_token
+    )
+    headers = {
+        'x-annotator-auth-token': token,
+        'content-type': 'application/json',
+    }
+
+    response = requests.get(search_database_url, headers=headers, data=urllib.urlencode(params, True))
+    if response.status_code == 200:
+        logger.info('Grade me search was made successfully')
+        annotations = json.loads(response.text)
+        if annotations['total'] > 0:
+            logger.info('Should get a grade back')
+            store = AnnotationStore.from_settings(request)
+            store.lti_grade_passback()
+    return response
