@@ -321,7 +321,7 @@ class CatchStoreBackend(StoreBackend):
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
-            is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+            is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)         
             return response
