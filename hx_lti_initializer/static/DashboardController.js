@@ -266,6 +266,7 @@
 
     $.DashboardController.prototype.grademeClicked = function(e) {
     	var self = this;
+    	jQuery('.grade-me').tooltip('dispose');
     	var options = {
             url: self.initOptions.grademe_url,
             success: function (data) {
