@@ -266,6 +266,8 @@
 
     $.DashboardController.prototype.grademeClicked = function(e) {
     	var self = this;
+    	console.log("grademeClicked");
+    	console.log(self.initOptions.grademe_url);
     	var options = {
             url: self.initOptions.grademe_url,
             success: function (data) {
