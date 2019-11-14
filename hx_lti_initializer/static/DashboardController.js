@@ -154,6 +154,7 @@
 		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
 		el.on("click", ".grade-me", grademeClicked);
+		console.log(el, jQuery('.grade-me'));
 	};
 
 	$.DashboardController.prototype.loadMoreAnnotations = function() {
