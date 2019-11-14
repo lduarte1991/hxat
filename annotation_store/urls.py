@@ -10,4 +10,5 @@ urlpatterns = [
     url( r'^api/destroy/(?P<annotation_id>[0-9]+|)$', views.delete, name="api_delete"),
     url( r'^api/update/(?P<annotation_id>[0-9]+)$', views.update, name="api_update"),
     url( r'^api/transfer_annotations/(?P<instructor_only>[0-1])?$', views.transfer, name="api_transfer_annotations"),
+    url( r'^api/grade/me', views.grade_me, name="api_grade_me"),
 ]

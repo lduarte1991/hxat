@@ -80,6 +80,9 @@
                     <img src="{% static "css/images/hx_inv.png" %}" style="height:40px;" alt="HarvardX Logo" />
                 </div>
             {% endif %}
+            {% if is_graded %}
+            <div class="grade-me clicking_allowed" tabindex="0" aria-label="Send grade to edx"><i class="fa fa-check"></i></div>
+            {% endif %}
             <div class="handle-button clicking_allowed" tabindex="0" title="Hide/Show dashboard" aria-labeledby="sidebar-hide-sidebar-instructions" role="button"><i class="fa fa-navicon"></i></div>
         </nav>
 
@@ -124,6 +127,7 @@
                     showMediaSelector: false,
                     flags: false,
                     instructors: {{ assignment.course.course_admins| list_of_ids | safe}},
+                    grademe_url: "{% url 'annotation_store:api_grade_me'%}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}",
                     default_tab: "{{ assignment.default_tab }}",
                     show_instructor_tab: "{% if 'Instructor' not in hide_sidebar_instance and assignment.include_instructor_tab %}True{% else %}False{% endif %}",
                     show_mynotes_tab: "{% if 'My Notes' not in hide_sidebar_instance and assignment.include_mynotes_tab %}True{% else %}False{% endif %}",
