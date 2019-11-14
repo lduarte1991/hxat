@@ -154,7 +154,6 @@
 		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
 		jQuery('nav#navigationBar').on("click", ".grade-me", grademeClicked);
-		console.log(el, jQuery('.grade-me'));
 	};
 
 	$.DashboardController.prototype.loadMoreAnnotations = function() {
@@ -267,15 +266,23 @@
 
     $.DashboardController.prototype.grademeClicked = function(e) {
     	var self = this;
-    	console.log("grademeClicked");
-    	console.log(self.initOptions.grademe_url);
     	var options = {
             url: self.initOptions.grademe_url,
             success: function (data) {
-            	console.log("Worked: ", data);
-            },
-            error: function(data) {
-            	console.log(data)
+            	var itgraded = data['grade_request_sent'];
+            	if (itgraded) {
+            		jQuery('.grade-me').tooltip({'title': 'Grade was successfully recorded.', 'placement': 'bottom', 'container': 'body'});
+            		jQuery('.grade-me').tooltip('show');
+            		setTimeout(function() {
+            			jQuery('.grade-me').tooltip('hide');
+            		}, 3000);
+            	} else {
+            		jQuery('.grade-me').tooltip({'title': 'Error in recording grade. Make sure you have made at least one annotation before submitting', 'placement': 'bottom', 'container': 'body'});
+            		jQuery('.grade-me').tooltip('show');
+            		setTimeout(function() {
+            			jQuery('.grade-me').tooltip('hide');
+            		}, 3000);
+            	}
             },
             async: true,
         };
