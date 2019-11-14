@@ -153,7 +153,7 @@
 		el.on("click", ".annotation-instructions", instructionsClicked);
 		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
-		el.on("click", ".grade-me", grademeClicked);
+		jQuery('nav#navigationBar').on("click", ".grade-me", grademeClicked);
 		console.log(el, jQuery('.grade-me'));
 	};
 
