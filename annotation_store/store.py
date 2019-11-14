@@ -90,14 +90,12 @@ class AnnotationStore(object):
         return cls
 
     def root(self, annotation_id=None):
-        self.logger.info('Reached root method in store')
         return self.backend.root(annotation_id)
 
     def index(self):
         raise NotImplementedError
 
     def search(self):
-        self.logger.info("reached search method in store" % is_graded)
         self.logger.info(u"Search: %s" % self.request.GET)
         self._verify_course(self.request.GET.get('contextId', self.request.GET.get('context_id', None)))
         if hasattr(self.backend, 'before_search'):
@@ -323,7 +321,8 @@ class CatchStoreBackend(StoreBackend):
             response = self.search()
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
             if is_graded and self.after_search(response):
-                self.lti_grade_passback(score=1)         
+                self.lti_grade_passback(score=1)
+                self.logger.info("Grade sent back for user %s" % self.requesst.LTI['hx_user_id'])  
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -380,7 +379,6 @@ class CatchStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('userid', '')
-        self.logger.info('Reached after_search of old %s' % json.loads(response.content))
         return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
     def create(self, annotation_id):
@@ -394,6 +392,7 @@ class CatchStoreBackend(StoreBackend):
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
                 if is_graded:
                     self.lti_grade_passback(score=1)
+                    self.logger.info("Grade sent back for user %s" % self.requesst.LTI['hx_user_id']) 
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -695,7 +694,6 @@ class WebAnnotationStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', self.request.GET.getlist('userid', []))
-        self.logger.info('Reached after_search of new %s' % retrieved_self)
         return retrieved_self and int(json.loads(response.content)['total']) > 0
 
     def create(self, annotation_id):
