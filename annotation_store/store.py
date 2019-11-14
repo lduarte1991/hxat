@@ -379,8 +379,8 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
-        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
-        self.logger.info('Reached after_search of old "%s:%s" :: %s' % (type(self.request.LTI['launch_params'].get('user_id', '*')), type(self.request.GET.get('userid', '')), retrieved_self))
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('userid', '')
+        self.logger.info('Reached after_search of old %s' % retrieved_self)
         return retrieved_self and int(json.loads(str(response.content).decode('utf-8'))['total'] > 0)
 
     def create(self, annotation_id):
