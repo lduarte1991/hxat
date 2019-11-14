@@ -270,6 +270,7 @@
             url: self.initOptions.grademe_url,
             success: function (data) {
             	var itgraded = data['grade_request_sent'];
+            	console.log("Grade recorded?", itgraded);
             	if (itgraded) {
             		jQuery('.grade-me').tooltip({'title': 'Grade was successfully recorded.', 'placement': 'bottom', 'container': 'body'});
             		jQuery('.grade-me').tooltip('show');
