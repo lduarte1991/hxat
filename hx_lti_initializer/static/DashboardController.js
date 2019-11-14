@@ -147,11 +147,13 @@
 		var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
 		var instructionsClicked = self.__bind(self.instructionsClicked, self);
 		var fullscreenClicked = self.__bind(self.fullscreenClicked, self);
+		var grademeClicked = self.__bind(self.grademeClicked, self);
 		var el = self.element;
 		el.on("click", ".annotationItem", annotationClicked);
 		el.on("click", ".annotation-instructions", instructionsClicked);
 		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
+		el.on("click", ".grade-me", grademeClicked);
 	};
 
 	$.DashboardController.prototype.loadMoreAnnotations = function() {
@@ -260,6 +262,21 @@
 
     $.DashboardController.prototype.fullscreenClicked = function(e) {
     	this.viewer.toggleFullscreen();
+    };
+
+    $.DashboardController.prototype.grademeClicked = function(e) {
+    	var self = this;
+    	var options = {
+            url: self.initOptions.grademe_url,
+            success: function (data) {
+            	console.log("Worked: ", data);
+            },
+            error: function(data) {
+            	console.log(data)
+            },
+            async: true,
+        };
+        jQuery.ajax(options);
     };
 
     $.DashboardController.prototype.replyDeleteClicked = function(e) {
