@@ -266,9 +266,7 @@
 
     $.DashboardController.prototype.grademeClicked = function(e) {
     	var self = this;
-    	if (self.should_dispose_of_tooltip) {
-    		jQuery('.grade-me').tooltip('dispose');
-    	}
+        jQuery('.grade-me').tooltip('destroy');
     	
     	var options = {
             url: self.initOptions.grademe_url,
@@ -280,14 +278,12 @@
             		jQuery('.grade-me').tooltip('show');
             		setTimeout(function() {
             			jQuery('.grade-me').tooltip('hide');
-            			self.should_dispose_of_tooltip = true;
             		}, 3000);
             	} else {
             		jQuery('.grade-me').tooltip({'title': 'Error in recording grade. Make sure you have made at least one annotation before submitting', 'placement': 'bottom', 'container': 'body'});
             		jQuery('.grade-me').tooltip('show');
             		setTimeout(function() {
             			jQuery('.grade-me').tooltip('hide');
-            			self.should_dispose_of_tooltip = true;
             		}, 3000);
             	}
             },
