@@ -323,8 +323,7 @@ class CatchStoreBackend(StoreBackend):
             response = self.search()
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
             if is_graded and self.after_search(response):
-                self.lti_grade_passback(score=1)
-            
+                self.lti_grade_passback(score=1)         
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -381,7 +380,7 @@ class CatchStoreBackend(StoreBackend):
 
     def after_search(self, response):
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
-        self.logger.info('Reached after_search of old %s' % retrieved_self)
+        self.logger.info('Reached after_search of old %s %s %s' % (self.request.LTI['launch_params'].get('user_id', '*'), self.request.GET.get('user_id', ''), retrieved_self))
         return retrieved_self and int(json.loads(str(response.content).decode('utf-8'))['total'] > 0)
 
     def create(self, annotation_id):
