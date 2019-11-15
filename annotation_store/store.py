@@ -322,7 +322,7 @@ class CatchStoreBackend(StoreBackend):
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)
-                self.logger.info("Grade sent back for user %s" % self.requesst.LTI['hx_user_id'])  
+                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])  
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -392,7 +392,7 @@ class CatchStoreBackend(StoreBackend):
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
                 if is_graded:
                     self.lti_grade_passback(score=1)
-                    self.logger.info("Grade sent back for user %s" % self.requesst.LTI['hx_user_id']) 
+                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id']) 
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
