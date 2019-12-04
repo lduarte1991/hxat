@@ -1,6 +1,6 @@
 certifi==2019.3.9
 chardet==3.0.4
-Django==2.2.4
+Django==2.2.8
 django-bootstrap3==11.0.0
 django-braces==1.13.0
 django-crispy-forms==1.7.2
