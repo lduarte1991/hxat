@@ -209,7 +209,8 @@ def launch_lti(request):
             except:
                 logger.info("Not waiting to be added as admin")
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using TYLOR")
-        
+        ur = reverse('hx_lti_initializer:access_annotation_target')
+        logger.debug('%s' % ur)
         url = reverse(
             'hx_lti_initializer:access_annotation_target',
             course_id=course_id,
@@ -252,16 +253,8 @@ def launch_lti(request):
                 except:
                     logger.info("Not waiting to be added as admin")
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object TYLOR")
-                url = reverse(
-                    'hx_lti_initializer:access_annotation_target',
-                    course_id=course_id,
-                    assignment_id=assignment_id,
-                    object_id=object_id,
-                    ) + '?resource_link_id=%s' % resource_link_id
-                logger.info("TYLOR: %s" % url)
+                url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % resource_link_id
                 return redirect(url)
-                # url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % resource_link_id
-                # return redirect(url)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object TYLOR")
                 url = reverse(
