@@ -209,7 +209,9 @@ def launch_lti(request):
             except:
                 logger.info("Not waiting to be added as admin")
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
-        return access_annotation_target(request, course_id, assignment_id, object_id)
+        url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,assignment_id,object_id])
+        url += '?resource_link_id=%s' % resource_link_id
+        return redirect(url)
     except AnnotationTargetDoesNotExist as e:
         logger.warning('Could not access annotation target using resource config.')
         logger.info('Deleting resource config because it is invalid.')
@@ -246,7 +248,9 @@ def launch_lti(request):
                 return redirect(url)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
-                return access_annotation_target(request, course_id, assignment_id, object_id)
+                url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,assignment_id,object_id])
+                url += '?resource_link_id=%s' % resource_link_id
+                return redirect(url)
         except:
             logger.debug("DEBUG - User wants the index")
 
