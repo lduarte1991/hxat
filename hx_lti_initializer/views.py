@@ -215,6 +215,7 @@ def launch_lti(request):
             assignment_id=assignment_id,
             object_id=object_id,
             ) + '?resource_link_id=%s' % resource_link_id
+        raise Exception(url)
         return redirect(url)
         # return access_annotation_target(request, course_id, assignment_id, object_id)
     except AnnotationTargetDoesNotExist as e:
@@ -259,6 +260,7 @@ def launch_lti(request):
                     assignment_id=assignment_id,
                     object_id=object_id,
                     ) + '?resource_link_id=%s' % resource_link_id
+                raise Exception(url)
                 return redirect(url)
                 # return access_annotation_target(request, course_id, assignment_id, object_id)
         except:
