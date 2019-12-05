@@ -208,7 +208,8 @@ def launch_lti(request):
                 userfound.delete()
             except:
                 logger.info("Not waiting to be added as admin")
-        logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
+        logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using TYLOR")
+        
         url = reverse(
             'hx_lti_initializer:access_annotation_target',
             course_id=course_id,
