@@ -1,4 +1,4 @@
-| [lduarte1991](https://github.com/lduarte1991/hxat) | ![Open PRs](https://img.shields.io/github/issues-pr/lduarte1991/hxat.svg) [![Build Status](https://travis-ci.org/lduarte1991/hxat.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) | [harvard-atg](https://github.com/Harvard-ATG/annotationsx) | ![Open PRs](https://img.shields.io/github/issues-pr/harvard-atg/annotationsx.svg) [![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) |
+| [lduarte1991](https://github.com/lduarte1991/hxat) | ![Open PRs](https://img.shields.io/github/issues-pr/lduarte1991/hxat.svg) [![Build Status](https://travis-ci.org/lduarte1991/hxat.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) | [harvard-atg](https://github.com/Harvard-ATG/annotationsx) | ![Open PRs](https://img.shields.io/github/issues-pr/harvard-atg/annotationsx.svg) [![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)](https://travis-ci.org/Harvard-ATG/annotationsx) ![Coverage Status](./coverage.svg)|
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 # The HarvardX Annotation Tool (The HxAT)
 
@@ -82,3 +82,12 @@ See the example to get started: `annotationsx/settings/secure.py.example`.
 
 TODO
 
+### Other Notes
+
+**Update the Coverage Badge**
+
+```
+$ coverage run --source='.' manage.py test
+$ coverage-badge -f -o coverage.svg
+```
+- Then commit and push the changes!
