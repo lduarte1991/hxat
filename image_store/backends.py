@@ -136,7 +136,7 @@ class IMMImageStoreBackend(ImageStoreBackend):
                 course = courses[0]
             else:
                 raise ImageStoreBackendException("Multiple courses found {num}".format(num=len(courses)))
-        elif r.status_code == 404:``
+        elif r.status_code == 404:
             course = self._create_course()
         else:
             raise ImageStoreBackendException("Find course error: {status_code}".format(status_code=r.status_code))
