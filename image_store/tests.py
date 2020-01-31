@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 from . import backends 
 
 ImageStoreBackend = backends.ImageStoreBackend
+ImageStoreBackendException = backends.ImageStoreBackendException
 IMMImageStoreBackend = backends.IMMImageStoreBackend
 
 class TestImageStoreBackend(unittest.TestCase):
@@ -60,8 +61,21 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         }
         self.assertEqual(expected_headers, backend.headers)
 
+    
+    def test_constructor_missing_required_config(self):
+        with self.assertRaises(ImageStoreBackendException):
+            config = {}
+            lti_params = self.lti_params
+            backend = IMMImageStoreBackend(config, lti_params)
+
+    def test_constructor_missing_required_lti_params(self):
+        with self.assertRaises(ImageStoreBackendException):
+            config = self.config
+            lti_params = {"context_id": "foocontext123"}
+            backend = IMMImageStoreBackend(config, lti_params)
+
     @patch('image_store.backends.requests.post')
-    def test_authenticate(self, mock_post):
+    def test_obtain_token(self, mock_post):
         request_url = "%s/auth/obtain-token" % self.config['base_url']
         request_headers = {
             "Accept": "application/json",
@@ -83,7 +97,7 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         mock_post.return_value.json.return_value = response_data
         
         backend = IMMImageStoreBackend(self.config, self.lti_params)
-        actual_access_token = backend._authenticate()
+        actual_access_token = backend._obtain_token(course_id=None)
 
         mock_post.assert_called_with(request_url, headers=request_headers, data=json.dumps(request_data))
         self.assertEqual(response_data["access_token"], actual_access_token)

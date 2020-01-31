@@ -90,12 +90,12 @@ def handle_file_upload(data, files, lti_params):
     Raises:
         ValidationError
     '''
-    image_backend_class = getattr(image_store.backends, settings.IMAGE_STORE_BACKEND)
-    image_backend = image_backend_class(settings.IMAGE_STORE_BACKEND_CONFIG, lti_params)
-    
-    title = data.get('target_title', 'Untitled Target Object')
+    title = "Annotation: %s" % data.get('target_title', 'Untitled Target Object')
     uploaded_file = files['target_file']
+
     try:
+        image_backend_class = getattr(image_store.backends, settings.IMAGE_STORE_BACKEND)
+        image_backend = image_backend_class(settings.IMAGE_STORE_BACKEND_CONFIG, lti_params)
         manifest_url = image_backend.store([uploaded_file], title)
     except image_store.backends.ImageStoreBackendException as e:
         raise ValidationError("Error uploading image. Details: %s" % e)

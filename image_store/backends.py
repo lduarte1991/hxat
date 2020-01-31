@@ -40,37 +40,46 @@ class IMMImageStoreBackend(ImageStoreBackend):
         super().__init__(config, lti_params)
 
         # configuration for API
-        self.client_id = config['client_id']
-        self.client_secret = config['client_secret']
-        self.base_url = config['base_url']
+        try:
+            self.client_id = config['client_id']
+            self.client_secret = config['client_secret']
+            self.base_url = config['base_url']
+        except KeyError as e: 
+            raise ImageStoreBackendException("Misconfigured: %s" % str(e))
+
         self.headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
 
         # course-specific parameters
-        self.user_id = lti_params['lis_person_sourcedid']
-        self.course_attrs = {
-            "lti_context_id": lti_params['context_id'],
-            "lti_tool_consumer_instance_guid": lti_params['tool_consumer_instance_guid'],
-            "lti_tool_consumer_instance_name": lti_params['tool_consumer_instance_name'],
-            "lti_context_title": lti_params['context_title'],
-            "lti_context_label": lti_params['context_label'],
-            "title": html.unescape(lti_params['context_title']),
-            "sis_course_id": lti_params['lis_course_offering_sourcedid'],
-            "canvas_course_id": lti_params['custom_canvas_course_id'],
-        }
+        try:
+            # required
+            self.user_id = lti_params['lis_person_sourcedid']
+            self.course_attrs = {
+                "lti_context_id": lti_params['context_id'],
+                "lti_tool_consumer_instance_guid": lti_params['tool_consumer_instance_guid'],
+                "lti_tool_consumer_instance_name": lti_params['tool_consumer_instance_name'],
+                "lti_context_title": lti_params['context_title'],
+                "lti_context_label": lti_params['context_label'],
+                "title": html.unescape(lti_params['context_title']),
+            }
+            # optional (if provided)
+            if lti_params.get('lis_course_offering_sourcedid'):
+                self.course_attrs["sis_course_id"] = lti_params['lis_course_offering_sourcedid']
+            if lti_params.get('custom_canvas_course_id'):
+                self.course_attrs['canvas_course_id'] = lti_params['custom_canvas_course_id']
+        except KeyError as e:
+            raise ImageStoreBackendException("Missing required LTI course params: %s" % str(e))
 
     def store(self, uploaded_files, title):
         ''' Returns URL to a IIIF manifest containing the images. '''
         manifest_url = None
         try:
-            # authenticate 
-            access_token = self._authenticate()
-            self.headers['Authorization'] = 'Token {access_token}'.format(access_token=access_token)
-
-            # create course space if not exists for storing images
+            # authenticate and ensure course space exists
+            self._obtain_token_find_or_create_course()
             course = self._find_or_create_course()
+            self._obtain_token_update_course(course['id'])
 
             # upload image to the course space
             course_images = self._upload_images(course['id'], uploaded_files)
@@ -93,10 +102,18 @@ class IMMImageStoreBackend(ImageStoreBackend):
 
         return manifest_url
 
-    def _authenticate(self):
+    def _obtain_token_find_or_create_course(self):
+        access_token = self._obtain_token(course_id=None)
+        self.headers['Authorization'] = 'Token {access_token}'.format(access_token=access_token)
+
+    def _obtain_token_update_course(self, course_id):
+        access_token = self._obtain_token(course_id=course_id)
+        self.headers['Authorization'] = 'Token {access_token}'.format(access_token=access_token)
+
+    def _obtain_token(self, course_id=None):
         ''' 
-        Authenticates with API using client credentials (key/secret).
-        Obtains temporary access token for subsequent API requests.
+        Authenticates with API using client credentials (key/secret) and 
+        obtains temporary access token for requests.
         '''
         url = "%s/auth/obtain-token" % self.base_url
         post_data = {
@@ -104,6 +121,11 @@ class IMMImageStoreBackend(ImageStoreBackend):
             "client_secret": self.client_secret,
             "user_id": self.user_id,
         }
+        if course_id:
+            post_data.update({
+                "course_permission": "write",
+                "course_id": course_id
+            })
         r = requests.post(url, headers=self.headers, data=json.dumps(post_data))
         logger.debug("API POST {url} data:{post_data} status:{status_code} text:{text}".format(url=url, post_data=post_data, status_code=r.status_code, text=r.text))
         
