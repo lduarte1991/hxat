@@ -115,6 +115,7 @@ def launch_lti(request):
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             logger.debug('DEBUG - LTI Profile NOT found. New User to be created.')
             user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
+            logger.debug("DEBUG - new user{} profile{}".format(user, lti_profile))
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
@@ -174,12 +175,19 @@ def launch_lti(request):
             message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
             messages.warning(request, message_error)
 
+            # 04feb20 naomi: counting on canvas/edx to ALWAYS send the context_title
+            # otherwise, create_new_user will fail within exception handling...
             # create and save a new course for the instructor, with a default name of their canvas course's name
             context_title = None
             if 'context_title' in request.LTI['launch_params']:
                 context_title = request.LTI['launch_params']['context_title']
             course_object = LTICourse.create_course(course, lti_profile, name=context_title)
-            create_new_user(anon_id=str(course), username='preview:%s' % course_object.id, display_name="Preview %s" % str(course_object), roles=['student'], scope=user_scope)
+            create_new_user(
+                    anon_id=str(course),
+                    username='preview:{}'.format(course_object.id),
+                    display_name='Preview {}'.format(course_object),
+                    roles=['student'],
+                    scope=user_scope)
 
             # save the course name to the session so it auto-populate later.
             save_session(
@@ -190,6 +198,7 @@ def launch_lti(request):
         else:
             logger.info('Course not created because user does not have an admin role')
     try:
+        logger.debug("DEBUG *-* resource_link_id={}".format(resource_link_id))
         config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
         assignment_id = config.collection_id
         object_id = config.object_id
