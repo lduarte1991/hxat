@@ -53,7 +53,6 @@ def create_new_source(request):
             debug_printer(form.errors)
     else:
         form = SourceForm()
-        print("AAAAAHHHHHHHH")
     return render(
         request,
         'target_object_database/source_form.html',
@@ -104,7 +103,7 @@ def handlePopAdd(request, addForm, field):
         if form.is_valid():
             try:
                 newObject = form.save()
-            except ValidationError:
+            except ValidationError as e:
                 newObject = None
             if newObject:
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s", "%s", "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject.target_title), escape(newObject.target_author), escape(newObject.target_created), escape(newObject.target_type)))  # noqa

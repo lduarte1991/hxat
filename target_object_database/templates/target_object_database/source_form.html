@@ -67,10 +67,28 @@
 		  });
 		  {% endif %}
 		  jQuery('form').on('click', '#source-save-button', function(event) {
-		  	jQuery(this).closest('form').submit();
+				var allow_submit = true;
+				var required_for_all_types = ['id_target_type', 'id_target_title'];
+				required_for_all_types.forEach(function(id) {
+					var el = document.getElementById(id);
+					if(!el.value) {
+						allow_submit = false;
+					}
+					markRequiredIfEmpty(el);
+				});
+				if(allow_submit) {
+					jQuery(this).closest('form').submit();
+				}
 		  });
 	});
-		
+
+	var markRequiredIfEmpty = function(el) {
+		if(el.value) {
+			$(el).css({'outline': 'none', 'outline-offset': 'none'})
+		} else {
+			$(el).css({'outline': 'red 2px solid', 'outline-offset': '5px'});
+		}
+	}
 
 	var createVideoFields = function() {
 		jQuery('.vdchange').before("<div class='form-group vd'>\
@@ -133,28 +151,18 @@
 					jQuery('.ig').show();
 					jQuery('#id_target_content').destroy();
 					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
-                    jQuery('#id_target_content').blur( function() {
-                        var content = jQuery('#id_target_content').val();
-                        var expression = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-                        var regex = new RegExp(expression);
-                        jQuery('#content-error').remove();
-                        if (content.match(regex) && content.match(regex).length === 1) {
-                            jQuery('#id_target_content').css('outline', 'none');
-                            jQuery('#id_target_content').css('outline-offset', 'none');
-                        } else {
-                            jQuery('#id_target_content').css('outline', 'red 2px solid');
-                            jQuery('#id_target_content').css('outline-offset', '5px');
-                            jQuery('#id_target_content').before('<p id="content-error" style="color:red; font-size:10pt;">Not a valid manifest URL. Make sure it\'s only one URL and that it begins with "https".</p>');
-                        }
-                    });
 					jQuery('label[for="id_target_content"]').text('Source Manifest');
 					jQuery('#id_image_store').show();
 				}
 			});
+
+			jQuery('#id_target_title').on('blur', function(e) {
+				this.value = this.value.trim();
+				markRequiredIfEmpty(this);
+			});
+
 			jQuery('#id_target_type').trigger('change');
-            jQuery('#id_target_content').focus(function(){console.log("targetabouttochange");}).blur( function(){
-                console.log("Targetchanged");
-            });
+			
 			setTimeout(function(){
 				if (window.navigator.platform === "Win32") {
 					jQuery('.bootstrap-select.form-control').addClass('win');
@@ -237,7 +245,7 @@
 		{{ form.non_field_errors }}
 	{% endif %}
 
-	<form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
+	<form method="POST" id="id_target_form" class="post-form" enctype="multipart/form-data">{% csrf_token %}
 		<div class="form-group">
 			<label for="id_target_type">Annotation Type</label> 
 			<select class="form-control selectpicker" data-live-search="false" id="id_target_type" name="target_type">
@@ -248,11 +256,13 @@
 		</div>
 
 		<div class="form-group">
-			<label for="id_target_title">Source Title:</label> 
-			<input id="id_target_title" maxlength="255" name="target_title" class="form-control hx-textfield" type="text" value="{{ form.target_title.value }}">
+			<label for="id_target_title">Source Title:</label>
+			{{form.target_title.errors}}  
+			<input id="id_target_title" maxlength="255" name="target_title" class="form-control hx-textfield" type="text" value="{{ form.target_title.value | default_if_none:"" }}" required>
 		</div>
 		<div class="form-group tx">
 			<label for="id_target_author">Source Author:</label> 
+			{{form.target_author.errors}} 
 			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value }}">
 		</div>
 
@@ -271,12 +281,13 @@
 		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 
             {{form.target_content.errors}}
-			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | escape  }}</textarea>
+			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | default_if_none:"" | escape  }}</textarea>
 		</div>
 
 		<div class="form-group">
-			<label for="id_target_citation">Source Citation:</label> 
-			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | escape }}</textarea>
+			<label for="id_target_citation">Source Citation:</label>
+			{{form.target_citation.errors}} 
+			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | default_if_none:"" | escape }}</textarea>
 		</div>
 
 		<div class="form-group" style='display:none;'>

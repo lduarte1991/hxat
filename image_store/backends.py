@@ -87,6 +87,9 @@ class IMMImageStoreBackend(ImageStoreBackend):
         except ImageStoreBackendException as e:
             logger.exception("Image store backend error: %s" % str(e))
             raise e
+        except requests.exceptions.RequestException as e:
+            logger.exception("Image store request exception: %s" % str(e))
+            raise ImageStoreBackendException('Image store HTTP connection error: %s' % str(e))
 
         return manifest_url
 
