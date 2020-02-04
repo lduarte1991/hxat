@@ -100,7 +100,7 @@ def launch_lti(request):
             display_name = lti_profile.user.username
             messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
             messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
-        except:
+        except Exception:
             logger.debug('DEBUG - username not found in post.')
             raise PermissionDenied('username not found in LTI launch')
     logger.debug("DEBUG - user name: " + display_name)
@@ -162,7 +162,7 @@ def launch_lti(request):
         )
 
     except LTICourse.DoesNotExist:
-        logger.debug('DEBUG - Course %s was NOT found. Will be created.' %course)
+        logger.debug( 'DEBUG - Course {} was NOT found. Will be created.'.format(course))
 
         # Put a message on the screen to indicate to the user that the course doesn't exist
         message_error = "Sorry, the course you are trying to reach does not exist."
@@ -213,7 +213,7 @@ def launch_lti(request):
                 course_object.add_admin(lti_profile)
                 logger.info("CourseAdmin Pending found: %s" % userfound)
                 userfound.delete()
-            except:
+            except Exception:
                 logger.info("Not waiting to be added as admin")
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
         return access_annotation_target(request, course_id, assignment_id, object_id)
@@ -223,8 +223,8 @@ def launch_lti(request):
         LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
         logger.info('Proceed to the admin hub.')
     except PermissionDenied as e:
-        raise e # make sure to re-raise this exception since we shouldn't proceed
-    except:
+        raise e  # make sure to re-raise this exception since we shouldn't proceed
+    except Exception as e:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
         # to be routed directly to an assignment given the correct POST parameters,
@@ -247,13 +247,13 @@ def launch_lti(request):
                     course_object.add_admin(lti_profile)
                     logger.info("CourseAdmin Pending found: %s" % userfound)
                     userfound.delete()
-                except:
+                except Exception:
                     logger.info("Not waiting to be added as admin")
                 return course_admin_hub(request)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
                 return access_annotation_target(request, course_id, assignment_id, object_id)
-        except:
+        except Exception:
             logger.debug("DEBUG - User wants the index")
 
     try:
@@ -264,7 +264,7 @@ def launch_lti(request):
         course_object.add_admin(lti_profile)
         logger.info("CourseAdmin Pending found: %s" % userfound)
         userfound.delete()
-    except:
+    except Exception:
         logger.debug("DEBUG - Not waiting to be added as admin")
 
     return course_admin_hub(request)
@@ -301,7 +301,7 @@ def edit_course(request, id):
                                 new_admin_course_id=course.course_id
                             )
                             new_course_admin.save()
-                        except:
+                        except Exception:
                             # admin already pending
                             logger.info("Admin already pending.")
 
@@ -318,7 +318,7 @@ def edit_course(request, id):
 
     try:
         pending_admins = LTICourseAdmin.objects.filter(new_admin_course_id=course.course_id)
-    except:
+    except Exception:
         pending_admins = None
 
     return render(
@@ -351,7 +351,7 @@ def course_admin_hub(request):
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
 
-    except:
+    except Exception:
         object_id = None
         collection_id = None
         to = None
@@ -401,7 +401,7 @@ def access_annotation_target(
         raise AnnotationTargetDoesNotExist('Assignment or target object does not exist')
     try:
         is_instructor = request.LTI['is_staff']
-    except:
+    except Exception:
         is_instructor = False
 
     if not is_instructor and not assignment.is_published:
@@ -409,7 +409,7 @@ def access_annotation_target(
 
     try:
         hide_sidebar = request.LTI['launch_params']['custom_hide_sidebar_instance'].split(',')
-    except:
+    except Exception:
         hide_sidebar = []
 
     save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
@@ -530,6 +530,7 @@ def instructor_dashboard_view(request):
     }
     return render(request, 'hx_lti_initializer/dashboard_view.html', context)
 
+
 def instructor_dashboard_student_list_view(request):
     '''
     Renders the student annotations for the instructor dashboard.
@@ -558,6 +559,7 @@ def instructor_dashboard_student_list_view(request):
     }
     return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 
+
 def error_view(request, message):
     '''
     Implements graceful and user-friendly (also debugger-friendly) error displays
@@ -582,7 +584,7 @@ def delete_assignment(request):
         assignment = Assignment.objects.get(assignment_id=collection_id)
         assignment.delete()
         logger.debug("DEBUG - Assignment Deleted: " + unicode(assignment))
-    except:
+    except Exception:
         return error_view(request, "The assignment deletion may have failed")
 
     url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
@@ -611,7 +613,7 @@ def change_starting_resource(request, assignment_id, object_id):
             config.object_id = object_id
             config.save()
             data['response'] = 'Success: Updated'
-        except:
+        except Exception:
             newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
             newConfig.save()
             data['response'] = 'Success: Created'

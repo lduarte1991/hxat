@@ -8,7 +8,6 @@ from .conftest import random_instructor
 from .conftest import random_learner
 
 
-
 @pytest.mark.django_db
 def test_LTIProfile_create(random_instructor):
     """

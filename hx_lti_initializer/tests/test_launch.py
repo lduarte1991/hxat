@@ -6,8 +6,6 @@ import pytest
 
 from lti import ToolConsumer
 from random import randint
-from urllib.parse import quote_plus
-from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -20,6 +18,7 @@ from .conftest import random_instructor
 
 
 old_timestamp = '1580487110'
+
 
 @pytest.mark.django_db
 def test_launchLti_session_ok(random_course_instructor):
@@ -64,7 +63,7 @@ def test_launchLti_session_ok(random_course_instructor):
 
     # this will not print if test successful
     for key in launch_params.keys():
-        print('************ launch_params: {} = {}'.format( key, launch_params.get(key)))
+        print('************ launch_params: {} = {}'.format(key, launch_params.get(key)))
 
     for key in client.session.keys():
         print('************ SESSION: {} = {}'.format(key, client.session.get(key)))
@@ -86,7 +85,7 @@ def test_launchLti_session_ok(random_course_instructor):
 @pytest.mark.django_db
 def test_launchLti_user_course_ok():
     instructor_name = 'audre_lorde'
-    instructor_edxid = '{}{}'.format(randint(1000,65534), randint(1000, 65534))
+    instructor_edxid = '{}{}'.format(randint(1000, 65534), randint(1000, 65534))
     course_id = 'hx+FancyCourse+TermCode+Year'
     target_path = reverse('hx_lti_initializer:launch_lti')
     launch_url = 'http://testserver{}'.format(target_path)
@@ -135,11 +134,11 @@ def test_launchLti_user_course_ok():
 
 
 @pytest.mark.django_db
-def test_launchLti_expired_timestamp(random_course_instructor):
-    instructor = random_course_instructor['profile']
-    course = random_course_instructor['course']
+def test_launchLti_expired_timestamp(random_instructor):
+    instructor = random_instructor['profile']
+    course_id = 'hx+FancyCourse+TermCode+Year'
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,
@@ -152,7 +151,8 @@ def test_launchLti_expired_timestamp(random_course_instructor):
                 'lis_outcome_service_url': 'fake_url',
                 'user_id': instructor.anon_id,
                 'roles': ['Instructor'],
-                'context_id': course.course_id,
+                'context_id': course_id,
+                'context_title': '{}-title'.format(course_id),
                 },
             )
     params = consumer.generate_launch_data()
@@ -172,7 +172,7 @@ def test_launchLti_unknown_consumer(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key='stark',
             consumer_secret='winter is coming',
@@ -197,12 +197,13 @@ def test_launchLti_unknown_consumer(random_course_instructor):
             )
     assert(response.status_code == 403)
 
+
 @pytest.mark.django_db
 def test_launchLti_missing_consumer(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,
@@ -228,12 +229,13 @@ def test_launchLti_missing_consumer(random_course_instructor):
             )
     assert(response.status_code == 403)
 
+
 @pytest.mark.django_db
 def test_launchLti_missing_required_param(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,
@@ -258,12 +260,13 @@ def test_launchLti_missing_required_param(random_course_instructor):
 
     assert(response.status_code == 400)
 
+
 @pytest.mark.django_db
 def test_launchLti_switch_consumer(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,
@@ -301,7 +304,7 @@ def test_launchLti_with_query_string(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}?extra_param=blah&more_args=bloft'.format(target_path)
+    launch_url = 'http://testserver{}?extra_param=blah&more_args=bloft'.format(target_path)
     print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm launch_url: {}'.format(launch_url))
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
@@ -320,7 +323,6 @@ def test_launchLti_with_query_string(random_course_instructor):
             )
     params = consumer.generate_launch_data()
     print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm lti params: {}'.format(params))
-    req = consumer.generate_launch_request()
 
     client = Client(enforce_csrf_checks=False)
     response = client.post(
@@ -333,15 +335,13 @@ def test_launchLti_with_query_string(random_course_instructor):
     assert(response.content == 'hey')
 
 
-
-
 @pytest.mark.skip
 @pytest.mark.django_db
 def test_launchLti(random_course_instructor):
     instructor = random_course_instructor['profile']
     course = random_course_instructor['course']
     target_path = '/lti_init/launch_lti/'
-    launch_url='http://testserver{}'.format(target_path)
+    launch_url = 'http://testserver{}'.format(target_path)
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,
@@ -358,8 +358,7 @@ def test_launchLti(random_course_instructor):
                 },
             )
     params = consumer.generate_launch_data()
-    #replace for old timestamp
-    params['oauth_timestamp'] = old_timestamp
+    #req = consumer.generate_launch_request()
 
     client = Client(enforce_csrf_checks=False)
     response = client.post(

@@ -15,15 +15,13 @@ load the iframe.
 import collections
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from lti.contrib.django import DjangoToolProvider
 import logging
-import time
 import json
 import importlib
-import oauth2
 
 from .lti_validators import LTIRequestValidator
 
@@ -145,7 +143,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
 class CookielessSessionMiddleware(MiddlewareMixin):
     '''
-    This middleware implements cookieless sessions by retrieving the session identifier 
+    This middleware implements cookieless sessions by retrieving the session identifier
     from  cookies (preferred, if available) or the request URL.
 
     This must be added to INSTALLED_APPS prior to other middleware that uses the session.
@@ -216,7 +214,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         # when moving to django2 and replacing MIDDLEWARE_CLASSES to MIDDLEWARE in
         # settings, the behavior of exceptions in middleware changed:
         # https://docs.djangoproject.com/en/2.2/topics/http/middleware/#upgrading-pre-django-1-10-style-middleware
-        # "Under MIDDLEWARE_CLASSES, process_exception is applied to exceptions raised from a middleware 
+        # "Under MIDDLEWARE_CLASSES, process_exception is applied to exceptions raised from a middleware
         # process_request method. Under MIDDLEWARE, process_exception applies only
         # to exceptions raised from the view."
         #
@@ -253,7 +251,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         consumer_key = getattr(settings, 'CONSUMER_KEY', None)
         try:
             secret = settings.LTI_SECRET_DICT[request.POST.get('context_id')]
-        except:
+        except Exception:
             secret = settings.LTI_SECRET
 
         if consumer_key is None or secret is None:
@@ -321,7 +319,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
 
     def _update_session(self, request):
         '''
-        Updates the session with the current LTI launch request. There may be multiple LTI launches associated with a 
+        Updates the session with the current LTI launch request. There may be multiple LTI launches associated with a
         single session. Each LTI launch is mapped to its POST parameters using the resource_link_id as the key.
 
         Example:
