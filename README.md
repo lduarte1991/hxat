@@ -3,30 +3,39 @@
 
 # The HarvardX Annotation Tool (HxAT)
 
-Tool for annotating text, images, and videos. Integrates with LMS platforms such as [edX](https://www.edx.org/) and [Canvas](https://www.instructure.com/canvas/) via [LTI](https://www.imsglobal.org/activity/learning-tools-interoperability).
+A tool for annotating text, images, and videos.
 
-### Requirements
+Integrates with LMS platforms such as [edX](https://www.edx.org/) and [Canvas](https://www.instructure.com/canvas/) via [LTI](https://www.imsglobal.org/activity/learning-tools-interoperability).
 
-- **Application:** python3 and [django](https://www.djangoproject.com/)
-- **Database:** postgres 
-- **Annotation Store:** [catchpy](https://github.com/nmaekawa/catchpy) 
+Depends on [CatchPy](https://github.com/nmaekawa/catchpy), a REST API for annotation storage.
 
-A minimal install requires a postgres database for the application, but it will not be able to persist annotations. To persist annotations, a service such as [catchpy](https://github.com/nmaekawa/catchpy) must be running as well.
+## Getting Started
+Requirements:
+
+- Python 3.6+ 
+- Postgresql 9.6+
 
 ### Quickstart
 
 ```
+$ pip install -r requirements.txt
 $ cp annotationsx/settings/secure.py.example annotationsx/settings/secure.py 
 $ ./manage.py migrate
 $ ./manage.py createsuperuser
 $ ./manage.py runserver
 ```
 
-Note: that you will need to edit `secure.py` to configure the database and modify other values as appropriate.
+Notes:
+- You will need to create a postgres database first (e.g. `createdb hxat`).
+- You will need to edit `secure.py` to configure the database connection details.
 
-## LTI Installation
+## LMS Integration
 
-For **Canvas**:
+### Platform Compatibility
+
+This tool is compatible with [Edx](https://www.edx.org/) and [Canvas](https://www.canvaslms.com/), integrating through the LTI protocol for LMS platforms. The primary difference is that edX displays an annotation author's name using the username, and Canvas uses an author's full name.
+
+### Installing in Canvas
 
 1. In your Canvas course, click `Settings -> Apps -> View App Configurations -> Add App` and then:
 2. Select "By URL" for Configuration Type.
@@ -37,11 +46,9 @@ For **Canvas**:
     - Config URL: https://localhost:8000/lti/config
 4. If the installation worked, the tool should appear in your left navigation.
 
-## LTI Details
+### Installing in edX
 
-### Platform Compatibility
-
-This tool is compatible with [Edx](https://www.edx.org/) and [Canvas](https://www.canvaslms.com/), integrating through the LTI protocol for LMS platforms. The primary difference is that edX displays an annotation author's name using the username, and Canvas uses an author's full name.
+Refer to [10.21.4. Adding an LTI Component to a Course Unit](https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/lti_component.html#adding-an-lti-component-to-a-course-unit).
 
 ### Launch configuration
 
@@ -52,25 +59,31 @@ When the tool launches (i.e. authenticates a user for a particular course contex
 2. **Display a specific annotation assignment**
 	- The tool is passed custom parameters so it knows exactly which target object and annotation assignment should be rendered immediatley. This is most often used to embed an annotation assignment in edX or in a Canvas module.
 
-### Privacy 
+## Development
 
-As much as possible, the tool avoids storing student information, and in cases where it must identify students (i.e. annotations), it uses the anonymous `user_id` that is provided by the LTI consumer along with the provided name. Instructor information is, however, stored in the tool database.
+**To run tests:**
 
-## Developer documentation
+```
+$ ./manage.py test
+```
 
-
-**To update the coverage badge**
+**To update the test coverage badge:**
 
 ```
 $ coverage run --source='.' manage.py test
 $ coverage-badge -f -o coverage.svg
 ```
 
-Then commit and push the changes!
+Be sure to commit and push the changes!
 
-**Uniqueness of user_id in edX compared to Canvas:**
+**A note about storing user information:**
 
-In edX, the opaque `user_id` is  unique within the scope of a course. In Canvas, the opaque `user_id` is unique within the scope of the university-wide hosted instance. 
+As much as possible, the policy of the tool is to avoid storing user information. User information may be stored with annotations in an external store such as CatchPy. If user information does need to be stored, only the anonymous `user_id` should be used. Instructor information including the `name` may be stored, however, for administrative purposes.
+
+
+**A note about the user_id in edX compared to Canvas:**
+
+In edX, the opaque `user_id` is unique within the scope of a course. In Canvas, the opaque `user_id` is unique within the scope of the platform. In other words, you can't assume that the same user will have the same `user_id` in two different courses when the tool is being used in edX.
 
 **The meaning of the ORG variable:**
 
