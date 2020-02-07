@@ -235,6 +235,11 @@ LOGGING = {
             'handlers': ['default', 'console'],
             'propagate': False,
         },
+        'notification': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
     },
 }
 

@@ -63,6 +63,12 @@ ANNOTATION_DB_URL = 'http://default.annotation.db.url.org'
 ANNOTATION_DB_API_KEY = 'default_annotation_db_api_key'
 ANNOTATION_DB_SECRET_TOKEN = 'default_annotation_db_secret_token'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
+
 # redefine logging configs to NOT log in files, just console thank you
 LOGGING = {
     'version': 1,
