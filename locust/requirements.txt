@@ -1,0 +1,4 @@
+-r ../annotationsx/requirements/test.txt
+
+locustio
+websocket-client

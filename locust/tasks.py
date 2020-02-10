@@ -3,23 +3,21 @@ import json
 import os
 
 from lti import ToolConsumer
-from uuid import uuid4
 
-from .locust import COLLECTION_ID
-from .locust import CONTEXT_ID
-from .locust import RESOURCE_LINK_ID
-from .locust import TARGET_SOURCE_ID
-from .locust import USER_ID
-from .utils import fresh_wa
+from locust import between
+from locust import TaskSet
+from locust import task
+
+from .utils import fresh_ann
 
 
 def hxat_create(locust):
-    catcha = fresh_wa()
+    catcha = fresh_ann()
 
-    anno_id = str(uuid4())
+    anno_id = catcha['id']
     params = {
-            'resource_link_id': locust.hxat['resource_link_id'],
-            'utm_source': locust.hxat['utm_source'],
+            'resource_link_id': locust.hxat_client.resource_link_id,
+            'utm_source': locust.hxat_client.utm_source,
             'version': 'catchpy',
             }
     target_path = '/annotation_store/api/{}?'.format(anno_id)
@@ -28,7 +26,7 @@ def hxat_create(locust):
         name='/annotation_store/api/create',
         headers={
             'Content-Type': 'Application/json',
-            'x-annotator-auth-token': locust.store_token,
+            'x-annotator-auth-token': locust.hxat_client.store_token,
             'Referer': 'https://naomi.hxat.hxtech.org/lti_init/launch_lti/',
         },
         params=params,
@@ -55,15 +53,15 @@ def hxat_create(locust):
 
 def hxat_search(locust, limit=50, offset=0):
     params = {
-        'resource_link_id': locust.hxat['resource_link_id'],
-        'utm_source': locust.hxat['utm_source'],
+        'resource_link_id': locust.hxat_client.resource_link_id,
+        'utm_source': locust.hxat_client.utm_source,
         'version': 'catchpy',
         'limit': limit,
         'offset': offset,
         'media': 'text',
-        'source_id': locust.hxat['target_source_id'],
-        'context_id': locust.hxat['context_id'],
-        'collection_id': locust.hxat['collection_id'],
+        'source_id': locust.hxat_client.target_source_id,
+        'context_id': locust.hxat_client.context_id,
+        'collection_id': locust.hxat_client.collection_id,
     }
     target_path = '/annotation_store/api/'
     response = locust.client.get(
@@ -71,7 +69,7 @@ def hxat_search(locust, limit=50, offset=0):
             name='/annotation_store/api/search',
             headers={
                 'Content-Type': 'Application/json',
-                'x-annotator-auth-token': locust.store_token,
+                'x-annotator-auth-token': locust.hxat_client.store_token,
                 'Referer': 'https://naomi.hxat.hxtech.org/lti_init/launch_lti/',
             },
             params=params,
@@ -100,11 +98,11 @@ def hxat_get_static(locust, url_path):
     target_path = os.path.join('/static/', url_path)
     response = locust.client.get(
             target_path, catch_response=True,
-            cookies={'sessionid': locust.hxat['utm_source']},
+            cookies={'sessionid': locust.hxat_client.utm_source},
             name='/static',
             headers={
                 'Accept': 'text/css,*/*;q=0.1',
-                'Referer': 'https://naomi.hxat.hxtech.org/lti_init/launch_lti/',
+                'Referer': '{}/lti_init/launch_lti/'.locust.host,
             },
             verify=locust.ssl_verify,
     )
@@ -117,20 +115,20 @@ def hxat_get_static(locust, url_path):
 def hxat_lti_launch(locust):
     target_path = '/lti_init/launch_lti/'
     consumer = ToolConsumer(
-            consumer_key=locust.hxat['consumer_key']
-            consumer_secret=locust.hxat['secret_key']
+            consumer_key=locust.hxat_client.consumer_key,
+            consumer_secret=locust.hxat_client.secret_key,
             launch_url='{}{}'.format(locust.host, target_path),
             params={
                 "lti_message_type": "basic-lti-launch-request",
                 "lti_version": "LTI-1p0",
-                "resource_link_id": locust.hxat['resource_link_id'],
+                "resource_link_id": locust.hxat_client.resource_link_id,
                 # TODO check if lis_* actually needed for hxat
-                #"lis_person_sourcedid": locust.hxat['user_name'],
+                #"lis_person_sourcedid": locust.hxat_client.user_name,
                 #"lis_outcome_service_url": os.environ.get('LIS_OUTCOME_SERVICE_URL', 'fake_url'),
-                "user_id": locust.hxat['user_id'],
-                "roles": locust.hxat{'user_roles'],
-                "context_id": locust.hxat['context_id'],
-                "context_title": locust.hxat['context_title'],
+                "user_id": locust.hxat_client.user_id,
+                "roles": locust.hxat_client.user_roles,
+                "context_id": locust.hxat_client.context_id,
+                "context_title": locust.hxat_client.context_title,
                 },
             )
     headers = {
@@ -150,13 +148,14 @@ def hxat_lti_launch(locust):
             response.failure('missing session-id cookies')
             return False
         else:
-            locust.hxat['utm_source'] = cookie_sid
+            locust.hxat_client.utm_source = cookie_sid
             response.success()
             return True
 
 
 def create_ws_and_connect(locust):
     pass
+
 
 def try_reconnect(locust):
     if locust.ws_client.ws and locust.ws_client.ws.connected:
@@ -169,6 +168,7 @@ def try_reconnect(locust):
             locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws reconnect FAILED')
 
 
+# behavior
 class WSJustConnect(TaskSet):
     wait_time = between(15, 90)
 

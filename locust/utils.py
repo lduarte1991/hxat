@@ -1,19 +1,8 @@
 
-import code
-import jwt
-import sys
-
-from datetime import datetime
-from dateutil import tz
 from random import randint
 from subprocess import Popen
 from subprocess import PIPE
 from uuid import uuid4
-
-from locust import COLLECTION_ID
-from locust import CONTEXT_ID
-from locust import TARGET_SOURCE_ID
-from locust import USER_ID
 
 
 # this is particular to the target_source document
@@ -21,52 +10,16 @@ from locust import USER_ID
 target_doc = [0, 589, 313, 434, 593, 493]
 
 
-# locust writest to stdout
-class Console(code.InteractiveConsole):
-    def write(self, data):
-        #sys.stdout.write("\033[2K\033[E")
-        #sys.stdout.write("\033[34m< " + data + "\033[39m")
-        sys.stdout.write(data)
-        sys.stdout.write("\n> ")
-        sys.stdout.flush()
-
-''' need to define these; want to be able to randomize at some point
-from .utils import get_collection_id
-from .utils import get_context_id
-from .utils import get_context_title
-from .utils import get_resource_link_id
-from .utils import get_target_source_id
-from .utils import get_user_id
-from .utils import get_user_roles
-from .utils import get_consumer_key
-from .utils import get_secret_key
-'''
-
 #
 # catchpy webannotation funcs
 #
-def make_jwt(
-        apikey, secret, user,
-        iat=None, ttl=36000, override=[],
-        backcompat=False):
-    payload = {
-        'consumerKey': apikey if apikey else str(uuid4()),
-        'userId': user if user else str(uuid4()),
-        'issuedAt': iat if iat else datetime.now(tz.tzutc()).isoformat(),
-        'ttl': ttl,
-    }
-    if not backcompat:
-        payload['override'] = override
-
-    return jwt.encode(payload, secret)
-
-
 def fetch_fortune():
     process = Popen('fortune', shell=True, stdout=PIPE, stderr=None)
     output, _ = process.communicate()
     return output.decode('utf-8')
 
-def fresh_wa():
+
+def fresh_ann(hxat_client):
     ptag = randint(1, len(target_doc))
     sel_start = randint(0, target_doc[ptag])
     sel_end = randint(sel_start, target_doc[ptag])
@@ -83,21 +36,21 @@ def fresh_wa():
             }],
         },
         "creator": {
-            "id": "d99019cf42efda58f412e711d97beebe",
-            "name": "nmaekawa2017"
+            "id": hxat_client.user_id,
+            "name": hxat_client.user_name,
         },
-        "id": "013ec74f-1234-5678-3c61-b5cf9d6f7484",
+        "id": str(uuid4()),
         "permissions": {
-            "can_admin": [USER_ID],
-            "can_delete": [USER_ID],
+            "can_admin": [hxat_client.user_id],
+            "can_delete": [hxat_client.user_id],
             "can_read": [],
-            "can_update": [USER_ID]
+            "can_update": [hxat_client.user_id]
         },
         "platform": {
-            "collection_id": COLLECTION_ID,
-            "context_id": CONTEXT_ID,
+            "collection_id": hxat_client.collection_id,
+            "context_id": hxat_client.context_id,
             "platform_name": "edX",
-            "target_source_id": TARGET_SOURCE_ID,
+            "target_source_id": hxat_client.target_source_id,
         },
         "schema_version": "1.1.0",
         "target": {
@@ -118,7 +71,5 @@ def fresh_wa():
         "type": "Annotation"
     }
     return x
-
-
 
 
