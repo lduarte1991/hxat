@@ -16,6 +16,8 @@ from dateutil import tz
 from urllib.parse import urlparse
 from uuid import uuid4
 
+from locust import events
+
 
 # valid codes for ws read
 OPCODE_DATA = (websocket.ABNF.OPCODE_TEXT, websocket.ABNF.OPCODE_BINARY)
