@@ -2,6 +2,7 @@
 import json
 import logging
 
+from channels.exceptions import DenyConnection
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
@@ -25,16 +26,14 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
         logging.getLogger(__name__).debug('--------------- added group to channel layer')
 
-        await self.accept()
+        auth = self.scope.get('hxat_auth', 'forbidden')
+        if auth != 'authenticated':
+            logging.getLogger(__name__).debug('--------------- ws auth FAILED, dropping connection')
+            raise DenyConnection()  # return status_code=403
+        else:
+            await self.accept()
+            logging.getLogger(__name__).debug('--------------- connection accepted')
 
-        logging.getLogger(__name__).debug('--------------- connection accepted')
-
-        '''
-        await self.send(text_data=json.dumps({
-            'type': 'websockets.accept',
-            }))
-        logging.getLogger(__name__).debug('--------------- accept message SENT')
-        '''
 
     async def disconnect(self, close_code):
         # leave room group
@@ -67,3 +66,4 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'type': action,
             'message': '{}'.format(message),
         }))
+

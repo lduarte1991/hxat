@@ -188,8 +188,6 @@ def create_ws_and_connect(locust):
 
     # should have a ws_client
     locust.ws_client.connect(as_qs=True)
-    #return locust.ws_client.ws.connected
-
 
 
 def try_reconnect(locust):

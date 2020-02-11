@@ -32,6 +32,11 @@ class SessionAuthMiddleware(object):
         parsed_query = parse_qs(query_string)
         self.log.debug('******************** parsed({})'.format(parsed_query)),
 
+        if not parsed_query:
+            scope['hxat_auth'] = 'forbiden'
+            self.log.debug('******************** finished with middleware EARLY: no query string')
+            return self.inner(scope)
+
         session_id = parsed_query.get(b'utm_source', None)[0].decode()
         resource_link_id = parsed_query.get(b'resource_link_id', None)[0].decode()
 
