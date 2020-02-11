@@ -1,4 +1,7 @@
 
+import code
+import sys
+
 from random import randint
 from subprocess import Popen
 from subprocess import PIPE
@@ -8,6 +11,16 @@ from uuid import uuid4
 # this is particular to the target_source document
 # how many text chars in a <p> element
 target_doc = [0, 589, 313, 434, 593, 493]
+
+
+# locust writest to stdout
+class Console(code.InteractiveConsole):
+    def write(self, data):
+        #sys.stdout.write("\033[2K\033[E")
+        #sys.stdout.write("\033[34m< " + data + "\033[39m")
+        sys.stdout.write(data)
+        sys.stdout.write("\n> ")
+        sys.stdout.flush()
 
 
 #

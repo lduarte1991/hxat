@@ -1,14 +1,17 @@
 
 import json
 import os
+import re
 
 from lti import ToolConsumer
 
 from locust import between
+from locust import events
 from locust import TaskSet
 from locust import task
 
-from .utils import fresh_ann
+from utils import fresh_ann
+from wsclient import SocketClient
 
 
 def hxat_create(locust):
@@ -154,7 +157,39 @@ def hxat_lti_launch(locust):
 
 
 def create_ws_and_connect(locust):
-    pass
+
+    # check if ws client already exists for this locust client
+    if locust.ws_client is None:
+        # to create ws client, it has to have a successful lti-launch
+        if locust.hxat_client.utm_source is not None:
+            url_path = '/ws/notification/{}--{}--{}'.format(
+                    re.sub('[\W_]', '-', locust.hxat_client.context_id),
+                    re.sub('[\W_]', '-', locust.hxat_client.collection_id),
+                    locust.hxat_client.target_source_id,
+            )
+            locust.log('-------------- URL_PATH={}'.format(url_path))
+            locust.ws_client = SocketClient(
+                   host=locust.host,
+                   hxat_utm_source=locust.hxat_client.utm_source,
+                   hxat_resource_link_id=locust.hxat_client.resource_link_id,
+                   app_url_path=url_path,
+                   verbose=locust.verbose,
+                   use_ssl=locust.use_ssl,
+            )
+        else:
+            # unable to create ws before lti-launch
+            events.request_failure.fire(
+                request_type='ws', name='connection',
+                response_time=None,
+                response_length=0,
+                exception=Exception('unable to create ws before lti-launch'),
+            )
+            return False
+
+    # should have a ws_client
+    locust.ws_client.connect(as_qs=True)
+    #return locust.ws_client.ws.connected
+
 
 
 def try_reconnect(locust):
@@ -179,7 +214,7 @@ class WSJustConnect(TaskSet):
             #hxat_get_static(self.locust, '/Hxighlighter/hxighlighter_text.css')
             #hxat_get_static(self.locust, '/Hxighlighter/hxighlighter_text.js')
             #hxat_search(self.locust)
-            self.locust.ws_client.connect()
+            create_ws_and_connect(self.locust)
         else:
             raise Exception('failed to lti login')
 
