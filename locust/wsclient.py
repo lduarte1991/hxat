@@ -91,11 +91,13 @@ class SocketClient(object):
             'x_utm_source': self.hxat_utm_source,
             'x_lid_source': self.hxat_resource_link_id,
         } if as_header else {}
+        self.log('-------------- CONNECT HEADER={}'.format(header))
 
         cookie = {
             'sessionid': self.hxat_utm_source,
             'resourcelinkid': self.hxat_resource_link_id,
         } if as_cookie else {}
+        self.log('-------------- CONNECT COOKIE={}'.format(cookie))
 
         try:
             self.ws = websocket.create_connection(
@@ -104,17 +106,23 @@ class SocketClient(object):
                         'cert_reqs': ssl.CERT_NONE,  # do not check certs
                         'check_hostname': False,     # do not check hostname
                         },
-                    #header=header,
-                    #cookie=cookie,
+                    header=header,
+                    cookie=cookie,
                     )
         except Exception as e:
+            self.log('-------------- CONNECT exception [{}]: {}'.format(
+                e.status_code, e))  # response status_code == 403
+
             events.request_failure.fire(
                 request_type='ws', name='connection',
                 response_time=None,
                 response_length=0,
                 exception=e,
-                )
+            )
+            # client should be smarter and know that if 403, it probably will
+            # not be able to connect, ever, due to wrong creds
         else:
+            self.log('-------------- CONNECT SUCCESS')
             events.request_success.fire(
                 request_type='ws', name='connection',
                 response_time=None,
@@ -163,6 +171,7 @@ class SocketClient(object):
     def recv(self):
         while True:
             opcode, data = self._recv()
+            self.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
 
             if opcode == websocket.ABNF.OPCODE_TEXT and isinstance(
                     data, bytes):
