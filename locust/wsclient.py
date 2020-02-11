@@ -18,6 +18,8 @@ from uuid import uuid4
 
 from locust import events
 
+from utils import Console
+
 
 # valid codes for ws read
 OPCODE_DATA = (websocket.ABNF.OPCODE_TEXT, websocket.ABNF.OPCODE_BINARY)
@@ -30,59 +32,53 @@ class SocketClient(object):
     connects and reads from ws; does not send anything; ever.
     '''
     def __init__(
-            self, locust,
-            hxat_session_id,
+            self,
+            host,
+            hxat_utm_source,
             hxat_resource_link_id,
             app_url_path='',
             timeout=2,
             verbose=False,
-            use_ssl=False,
+            use_ssl=True,
             ):
-        self.locust = locust
-        self.hxat_session_id = hxat_session_id
+        self.console = Console()
+        self.host = host
+        self.hxat_utm_source = hxat_utm_source
         self.hxat_resource_link_id = hxat_resource_link_id
         self.ws_timeout = timeout
         self.verbose = verbose
         self.session_id = uuid4().hex
         self.protocol = 'wss' if use_ssl else 'ws'
 
-        # get hostname from locust.host
-        h = urlparse(locust.host)
+        h = urlparse(self.host)
         self.hostname = h.netloc
 
-        room_name = '{}--{}--{}'.format(
-                re.sub(r'[\W_]', '-', self.locust.hxat['context_id']),
-                re.sub(r'[\W_]', '-', self.locust.hxat['collection_id']),
-                self.locust.hxat['target_source_id'],
-        )
-
-        url_path = os.path.join('/', app_url_path, room_name)
-        self.log('-------------- URL_PATH={}'.format(url_path))
-
         self.url = '{}://{}{}/'.format(
-                self.protocol, self.hostname, url_path)
+                self.protocol, self.hostname, app_url_path)
 
         self.ws = None
         self.thread = None
-        self.session_id = None
 
         events.quitting += self.on_close
 
 
     def log(self, msg):
         if self.verbose:
-            self.locust.log('[{}] {}'.format(self.session_id, msg))
+            self.console.write('[{}] {}'.format(self.session_id, msg))
 
 
     def connect(self, as_qs=False, as_header=False, as_cookie=False):
-        if self.ws is None:
+        if self.ws is not None:
             self.log('nothing to do: already connected')
             # TODO: have to manage recv thread?
             return
 
+        self.log('-------------- CONNECT as_qs={} as_header={} as_cookie={}'.format(
+            as_qs, as_header, as_cookie))
+
         if as_qs:
             conn_url = '{}?utm_source={}&resource_link_id={}'.format(
-                    self.url, self.hxat_session_id,
+                    self.url, self.hxat_utm_source,
                     self.hxat_resource_link_id)
         else:
             conn_url = self.url
@@ -92,12 +88,12 @@ class SocketClient(object):
         self.log('-------------- CONNECT TO HOST={}'.format(self.hostname))
 
         header = {
-            'x_utm_source': self.hxat_session_id,
+            'x_utm_source': self.hxat_utm_source,
             'x_lid_source': self.hxat_resource_link_id,
         } if as_header else {}
 
         cookie = {
-            'sessionid': self.hxat_session_id,
+            'sessionid': self.hxat_utm_source,
             'resourcelinkid': self.hxat_resource_link_id,
         } if as_cookie else {}
 
@@ -108,8 +104,8 @@ class SocketClient(object):
                         'cert_reqs': ssl.CERT_NONE,  # do not check certs
                         'check_hostname': False,     # do not check hostname
                         },
-                    header=header,
-                    cookie=cookie,
+                    #header=header,
+                    #cookie=cookie,
                     )
         except Exception as e:
             events.request_failure.fire(

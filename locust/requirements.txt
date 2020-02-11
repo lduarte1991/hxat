@@ -1,4 +1,5 @@
 -r ../annotationsx/requirements/test.txt
 
+iso8601
 locustio
 websocket-client
