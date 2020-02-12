@@ -62,6 +62,7 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
 
 
 def save_session(request, **kwargs):
+    logger.debug('..*..*..*..*..*..*..*.. saving session')
     session_map = {
         "user_id": ["hx_user_id", None],
         "user_name": ["hx_user_name", None],

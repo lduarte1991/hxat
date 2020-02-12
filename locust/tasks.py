@@ -146,6 +146,10 @@ def hxat_lti_launch(locust):
     if response.content == '':
         response.failure('no data')
     else:
+
+        locust.log('*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*')
+        locust.log(response.content)
+
         cookie_sid = response.cookies.get('sessionid', None)
         if not cookie_sid:
             response.failure('missing session-id cookies')
@@ -194,7 +198,7 @@ def try_reconnect(locust):
     if locust.ws_client.ws and locust.ws_client.ws.connected:
         pass
     else:
-        locust.ws_client.connect()
+        locust.ws_client.connect(as_qs=True)
         if locust.ws_client.ws and locust.ws_client.ws.connected:
             locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws RECONNECTED')
         else:
