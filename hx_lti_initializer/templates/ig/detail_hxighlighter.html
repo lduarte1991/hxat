@@ -8,7 +8,7 @@ Text Annotation Tool | {{ target_object.target_title }}
 {% endblock %}
 
 {% block cssfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'Hxighlighter/hxighlighter_image_m2.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'hxighlighter/hxighlighter_image_m2.css' %}">
 {% endblock %}
 
 {% block mainapplication %}
@@ -59,7 +59,7 @@ Text Annotation Tool | {{ target_object.target_title }}
 
         #viewer { position: fixed; width: 100%; height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
     </style>
-    <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_image_m2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'hxighlighter/hxighlighter_image_m2.js' %}"></script>
     <script>
             var tags = "{{ assignment.highlights_options }}".split(',');
             var hide_sidebar = {{ hide_sidebar_instance | safe }};
