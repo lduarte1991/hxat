@@ -112,7 +112,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                 "targets": [{
                     'mediaType': "image",
                     'method': 'inline',
-                    'manifest_url': "{{ target_object }}",
+                    'manifest_url': "{{ target_object.target_content }}",
                     'mirador_build_path': '{% static "hxighlighter/vendor/Mirador/" %}',
                     'object_source': '.container1',
                     "template_urls":  "{% static 'templates/dashboard/' %}",
