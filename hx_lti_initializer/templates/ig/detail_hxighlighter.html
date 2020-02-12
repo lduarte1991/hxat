@@ -103,7 +103,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     "mediaType": "image",
                     "context_id": "{{ course }}",
                     "collection_id": "{{ collection }}",
-                    "object_id": "{{ target_object }}",
+                    "object_id": "{{ target_object.pk }}",
                     "username": "{{ username }}",
                     "user_id": "{{ user_id }}",
                     "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
@@ -111,7 +111,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                 },
                 "targets": [{
                     'mediaType': "image",
-                    'method': 'inline',
+                    'method': 'manifest',
                     'manifest_url': "{{ target_object.target_content }}",
                     'mirador_build_path': '{% static "hxighlighter/vendor/Mirador/" %}',
                     'object_source': '.container1',
