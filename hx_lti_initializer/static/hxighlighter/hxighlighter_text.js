@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Wednesday, January 22nd, 2020, 4:33:34 PM  
+// [AIV_SHORT]  Version: 1.0.0 - Tuesday, January 28th, 2020, 2:37:16 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 64);
+/******/ 	return __webpack_require__(__webpack_require__.s = 85);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -41961,13 +41961,9 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 45 */
+/* 44 */,
+/* 45 */,
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -41987,7 +41983,7 @@ __webpack_require__(12);
 
 __webpack_require__(13);
 
-__webpack_require__(46);
+__webpack_require__(47);
 
 
 
@@ -42347,2456 +42343,13 @@ __webpack_require__(46);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
 /* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- * 
- */
-//during deployment, this is what decides what gets instantiated, should be moved elsewhere
-__webpack_require__(48);
-
-__webpack_require__(49);
-
-__webpack_require__(22);
-
-__webpack_require__(50);
-
-__webpack_require__(30);
-
-__webpack_require__(10);
-
-__webpack_require__(32);
-
-__webpack_require__(34);
-
-__webpack_require__(54);
-
-__webpack_require__(56);
-
-__webpack_require__(58);
-
-__webpack_require__(59);
-
-__webpack_require__(61);
-
-__webpack_require__(36);
-
-__webpack_require__(38);
-
-__webpack_require__(40);
-
-__webpack_require__(41);
-
-(function ($) {
-  /**
-   * { function_description }
-   *
-   * @class      TextTarget (name)
-   * @param      {<type>}  options  The options
-   * @param      {<type>}  inst_id  The instance identifier
-   */
-  $.TextTarget = function (options, inst_id) {
-    this.options = options;
-    this.instance_id = inst_id;
-    this.guid = undefined;
-    this.annotation_selector = 'hx-annotation-hl';
-    this.init();
-  };
-  /**
-   * { function_description }
-   */
-
-
-  $.TextTarget.prototype.init = function () {
-    var self = this; // this target is only meant to work with text/html objects
-
-    this.media = "text";
-    this.setUpListeners(); // this where the target will be contained
-
-    this.target_selector = this.options.target_selector; // sets up listeners from core and other places
-
-    if (this.options.method == "url") {
-      // if the text exists externally, this will load it into the DOM
-      this.makeQuery(this.options.object_source, this.createTextSlotFromURL.bind(this), this.target_selector);
-    } else if (this.options.method == "inline") {
-      // if the text is already in the DOM, this sets up what is left
-      // console.log('Loading Target via Inline');
-      this.createTextSlotFromSelector(this.options.object_source, this.instance_id);
-    }
-
-    function areScrollbarsVisible() {
-      var scrollableElem = document.createElement('div'),
-          innerElem = document.createElement('div');
-      scrollableElem.style.width = '30px';
-      scrollableElem.style.height = '30px';
-      scrollableElem.style.overflow = 'scroll';
-      scrollableElem.style.borderWidth = '0';
-      innerElem.style.width = '30px';
-      innerElem.style.height = '60px';
-      scrollableElem.appendChild(innerElem);
-      document.body.appendChild(scrollableElem); // Elements only have width if they're in the layout
-
-      var diff = scrollableElem.offsetWidth - scrollableElem.clientWidth;
-      document.body.removeChild(scrollableElem);
-      return diff > 0;
-    }
-
-    window.addEventListener('load', function () {
-      // Show scrollbars if they're hidden.
-      if (!areScrollbarsVisible()) {
-        document.body.classList.add('force-show-scrollbars');
-      }
-    });
-  };
-  /**
-   * Creates a text slot from url.
-   *
-   * @param      {string}  content      The content
-   * @param      {<type>}  selector     The selector
-   * @param      {<type>}  instance_id  The instance identifier
-   */
-
-
-  $.TextTarget.prototype.createTextSlotFromURL = function (content, selector, instance_id) {
-    this.guid = $.getUniqueId(); // each annotation target will be enclosed in a "slot"
-    //var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>";
-    // adds it to the page and turns on the wrapper
-
-    jQuery(selector + ' .annotations-section').append(content);
-    jQuery(selector).prop('id', this.guid);
-    jQuery(selector).addClass('annotation-slot');
-    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets Core know that the target has finished loading on screen
-
-    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
-  };
-  /**
-   * Creates a text slot from selector.
-   *
-   * @param      {<type>}  selector     The selector
-   * @param      {<type>}  instance_id  The instance identifier
-   */
-
-
-  $.TextTarget.prototype.createTextSlotFromSelector = function (selector, instance_id) {
-    // each annotation target will be enclosed in a "slot" with a temporary unique id
-    this.guid = $.getUniqueId();
-    var slot = jQuery(selector);
-    slot.addClass('annotation-slot');
-    slot.attr('id', this.guid);
-    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets core know that the target has finished loading on screen
-    // console.log("Publishing TargetLoaded");
-
-    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
-  };
-  /**
-   * Makes a query.
-   *
-   * @param      {<type>}    url       The url
-   * @param      {Function}  callback  The callback
-   * @param      {<type>}    selector  The selector
-   * @return     {<type>}    { description_of_the_return_value }
-   */
-
-
-  $.TextTarget.prototype.makeQuery = function (url, callback, selector) {
-    var self = this; // retrieves the text to be loaded onto the page and passes it to callback function
-
-    var defer = jQuery.ajax({
-      url: url,
-      type: 'GET',
-      contentType: 'charset=utf-8',
-      success: function success(data) {
-        callback(data, selector, self.instance_id);
-      },
-      async: true
-    });
-    return defer;
-  };
-  /**
-   * { function_description }
-   */
-
-
-  $.TextTarget.prototype.setUpListeners = function () {
-    var self = this;
-    jQuery('.toggle-alerts').click(function () {
-      if (jQuery(this).hasClass('on')) {
-        jQuery(this).html('Turn Alerts On');
-        jQuery(this).removeClass('on');
-        jQuery('.sr-alert').attr('aria-live', 'off');
-      } else {
-        jQuery(this).html('Turn Alerts Off');
-        jQuery(this).addClass('on');
-        jQuery('.sr-alert').attr('aria-live', 'polite');
-      }
-    }); // once the target has been loaded, the selector can be instantiated
-
-    $.subscribeEvent('targetLoaded', self.instance_id, function (_, element) {
-      // console.log("LOADING TARGET");
-      //annotation element gets data that may be needed later
-      self.element = element;
-      self.element.data('source_type', self.options.object_source);
-      self.element.data('source_type', 'text'); // finish setting up selectors
-
-      self.setUpDrawers(self.element[0]); // finish setting up viewers (which contain displays and editors)
-
-      self.setUpViewers(self.element[0]); // finish setting up extra plugins
-
-      self.setUpPlugins(self.element[0]); // finish setting up the storage containers
-
-      self.setUpStorage(self.element[0]);
-
-      if (!self.options.viewerOptions.readonly) {
-        self.setUpSelectors(self.element[0]);
-      }
-    });
-    $.subscribeEvent('editorShown', self.instance_id, function (_, editor, annotation) {
-      jQuery.each(self.plugins, function (_, plugin) {
-        if (typeof plugin.editorShown === "function") {
-          plugin.editorShown(editor, annotation);
-        }
-      });
-    });
-    $.subscribeEvent('displayShown', self.instance_id, function (_, display, annotations) {
-      jQuery.each(self.plugins, function (_, plugin) {
-        if (typeof plugin.displayShown === "function") {
-          plugin.displayShown(display, annotations);
-        }
-      });
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @param      {<type>}  element  The element
-   */
-
-
-  $.TextTarget.prototype.setUpSelectors = function (element) {
-    var self = this;
-    self.selectors = [];
-    jQuery.each($.selectors, function (_, selector) {
-      self.selectors.push(new selector(element, self.instance_id, {
-        'confirm': true
-      }));
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @param      {<type>}  element  The element
-   */
-
-
-  $.TextTarget.prototype.setUpDrawers = function (element) {
-    var self = this;
-    self.drawers = [];
-    jQuery.each($.drawers, function (_, drawer) {
-      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector, self.options));
-    });
-  };
-
-  $.TextTarget.prototype.setUpViewers = function (element) {
-    var self = this;
-    self.viewers = [];
-    jQuery.each($.viewers, function (_, viewer) {
-      self.viewers.push(new viewer({
-        element: element,
-        template_urls: self.options.template_urls,
-        viewer_options: self.options.viewerOptions,
-        username: self.options.username,
-        user_id: self.options.user_id,
-        common_instructor_name: self.options.common_instructor_name,
-        instructors: self.options.instructors,
-        mediaType: self.media
-      }, self.instance_id));
-    });
-  };
-
-  $.TextTarget.prototype.setUpPlugins = function (element) {
-    var self = this;
-    self.plugins = [];
-    jQuery.each($.plugins, function (_, plugin) {
-      var optionsForPlugin;
-
-      try {
-        optionsForPlugin = jQuery.extend({
-          'slot': element
-        }, self.options, self.options[plugin.name]) || {
-          'slot': element
-        };
-      } catch (e) {
-        optionsForPlugin = {
-          'slot': element
-        };
-      }
-
-      self.plugins.push(new plugin(optionsForPlugin, self.instance_id));
-    });
-  };
-
-  $.TextTarget.prototype.setUpStorage = function (element, options) {
-    var self = this;
-    self.storage = [];
-    jQuery.each($.storage, function (idx, storage) {
-      var optionsForStorage;
-
-      try {
-        optionsForStorage = jQuery.extend({}, self.options, self.options[storage.name]) || {};
-      } catch (e) {
-        optionsForStorage = {};
-      }
-
-      self.storage.push(new storage(optionsForStorage, self.instance_id));
-
-      if (self.options.viewerOptions.defaultTab === "mine") {
-        options = {
-          'username': self.options.username
-        };
-      } else if (self.options.viewerOptions.defaultTab === "instructor") {
-        options = {
-          'userid': self.options.instructors
-        };
-      } else {
-        var exclusion = [self.options.user_id].concat(self.options.instructors);
-        options = {
-          'exclude_userid': exclusion
-        };
-      }
-
-      self.storage[idx].onLoad(element, options);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ComponentEnable (name)
-   */
-
-
-  $.TextTarget.prototype.ComponentEnable = function () {
-    // Targets cannot technically be enabled/disabled, but 
-    // there might be cases in which the target needs to be hidden/shown
-    jQuery('#' + this.guid).show();
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ComponentDisable (name)
-   */
-
-
-  $.TextTarget.prototype.ComponentDisable = function () {
-    jQuery('#') + this.guid.hide();
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetSelectionMade (name)
-   */
-
-
-  $.TextTarget.prototype.TargetSelectionMade = function (range, event) {
-    var range = Array.isArray(range) ? range : [range];
-    var self = this;
-    var annotation = {
-      annotationText: [""],
-      ranges: range,
-      id: $.getUniqueId(),
-      exact: range.map(function (r) {
-        return r.text.exact.replace(/[\n\r]/g, '<br>').replace(/    /g, '&nbsp;');
-      }),
-      media: "text",
-      totalReplies: 0,
-      creator: {
-        name: self.options.username,
-        id: self.options.user_id
-      }
-    };
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.TargetSelectionMade(annotation, event);
-    }); //self.TargetAnnotationDraw(annotation);
-    // jQuery('.annotator-wrapper')[0].focus();
-    //$.publishEvent('ViewerEditorOpen', self.instance_id, [annotation]);
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetAnnotationDraw (name)
-   */
-
-
-  $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
-    var self = this;
-    jQuery.each(self.drawers, function (_, drawer) {
-      drawer.draw(annotation);
-    });
-    jQuery.each(self.viewers, function (_, viewer) {
-      if ($.exists(viewer.TargetAnnotationDraw)) {
-        viewer.TargetAnnotationDraw(annotation);
-      }
-    });
-    jQuery.each(self.plugins, function (_, plugin) {
-      if ($.exists(plugin.TargetAnnotationDraw)) {
-        plugin.TargetAnnotationDraw(annotation);
-      }
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      TargetAnnotationUndraw (name)
-   */
-
-
-  $.TextTarget.prototype.TargetAnnotationUndraw = function (annotation) {
-    var self = this;
-    jQuery.each(self.drawers, function (_, drawer) {
-      drawer.undraw(annotation);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerEditorOpen (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerEditorOpen = function (event, annotation) {
-    return annotation;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerEditorClose (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerEditorClose = function (annotation, is_new_annotation, hit_cancel) {
-    var self = this; //console.log(annotation, 'New?:', is_new_annotation, 'Hit Cancel', hit_cancel);
-
-    if (hit_cancel) {
-      if (is_new_annotation) {
-        self.TargetAnnotationUndraw(annotation);
-      } // else, the annotation was already drawn, so don't touch it.
-
-    } else if (is_new_annotation) {
-      annotation = self.plugins.reduce(function (ann, plugin) {
-        return plugin.saving(ann);
-      }, annotation);
-      self.TargetAnnotationDraw(annotation);
-      jQuery('.sr-alert').html('');
-      jQuery('.sr-real-alert').html('Your annotation was saved. Your annotation has been added to the top of the annotation list.');
-      $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, false]);
-    } else {
-      jQuery.each(self.drawers, function (_, drawer) {
-        self.TargetAnnotationUndraw(annotation);
-        annotation = self.plugins.reduce(function (ann, plugin) {
-          return plugin.saving(ann);
-        }, annotation);
-        $.publishEvent('TargetAnnotationDraw', self.instance_id, [annotation]);
-        jQuery('.sr-alert').html('');
-        jQuery('.sr-real-alert').html('Your annotation was updated. You can find your annotation in the annotation list.');
-        $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, true]);
-      });
-    }
-
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerEditorClose(annotation);
-    });
-    return annotation;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerDisplayOpen (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerDisplayOpen = function (event, annotations) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerDisplayOpen(event, annotations);
-    });
-    return annotations;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      ViewerDisplayClose (name)
-   */
-
-
-  $.TextTarget.prototype.ViewerDisplayClose = function (annotations) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerDisplayClose(annotations);
-    });
-    return annotations;
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationSave (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationSave = function (annotations, redraw) {
-    var self = this; // console.log(annotations, redraw);
-
-    jQuery.each(self.storage, function (_, store) {
-      store.StorageAnnotationSave(annotations, self.element, redraw);
-    });
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationSave(annotations);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationLoad (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationLoad = function (annotations, converter, undrawOld) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      if (typeof viewer.StorageAnnotationLoad === "function") {
-        viewer.StorageAnnotationLoad(annotations);
-      }
-    });
-
-    if (undrawOld) {
-      $.publishEvent('GetAnnotationsData', self.instance_id, [function (anns) {
-        anns.forEach(function (ann) {
-          self.TargetAnnotationUndraw(ann);
-        });
-      }]);
-    }
-
-    annotations.forEach(function (ann) {
-      var converted_ann = converter(ann, jQuery(self.element).find('.annotator-wrapper'));
-      self.TargetAnnotationDraw(converted_ann);
-      $.publishEvent('annotationLoaded', self.instance_id, [converted_ann]);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationEdit (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationEdit = function () {};
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationDelete (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
-    var self = this;
-    jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationDelete();
-    });
-    jQuery.each(self.storage, function (_, store) {
-      store.StorageAnnotationDelete(annotation);
-    });
-  };
-  /**
-   * { function_description }
-   *
-   * @class      StorageAnnotationGetReplies (name)
-   */
-
-
-  $.TextTarget.prototype.StorageAnnotationSearch = function (search_options, callback, errfun) {
-    var self = this;
-    jQuery.each(self.storage, function (_, store) {
-      store.search(search_options, callback, errfun);
-    });
-  };
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+// extracted by mini-css-extract-plugin
 
 /***/ }),
 /* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Should be listening for ways to select a text and then return an xpath 
- * object with the range that was selected.
- */
-var jQuery = __webpack_require__(0);
-
-var hrange = __webpack_require__(4);
-
-(function ($) {
-  $.MouseSelector = function (element, inst_id) {
-    var defaultOpts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    this.element = element;
-    this.instance_id = inst_id;
-    this.adder = null;
-    this.wrapperSelector = '.annotator-wrapper';
-    this.mustConfirm = !!defaultOpts.confirm;
-    this.init();
-  };
-
-  $.MouseSelector.prototype.init = function () {
-    var self = this;
-    self.setUpListeners();
-  };
-
-  $.MouseSelector.prototype.setUpListeners = function () {
-    var self = this;
-    this.element.addEventListener('mouseup', function (event) {
-      var selection = window.getSelection();
-      var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
-
-      self.onSelection(selectionRange, event);
-    });
-    document.addEventListener('keyup', function (e) {
-      var allowedKeys = "ArrowUpArrowDownArrowLeftArrowRight";
-
-      if (allowedKeys.indexOf(e.key) > -1 && e.shiftKey) {
-        var selection = window.getSelection();
-        var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
-
-        self.onSelection(selectionRange, event);
-      }
-    });
-  };
-
-  $.MouseSelector.prototype.onSelection = function (range, event) {
-    var self = this; //console.log('onSelection Ran: ', range, event);
-
-    if (range instanceof Range) {
-      //console.log('range is instance of Range', range.toString());
-      var result = self.shouldBeAnnotated(range);
-
-      if (result && (range.toString().length > 0 || range.cloneContents().querySelectorAll('img').length > 0)) {
-        if (self.mustConfirm) {
-          //console.log("Confirming...")
-          self.confirm(range, event);
-        } else {
-          //console.log("Sending TargetSelection to Hxighlighter");
-          //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
-          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [hrange.serializeRange(range, self.element, 'annotator-hl')], event]);
-        }
-      } else {
-        // send message to erase confirm button
-        //console.log('Either result is false or toString() returned 0')
-        self.hideConfirm();
-      }
-    }
-  };
-
-  $.MouseSelector.prototype.shouldBeAnnotated = function (range) {
-    var self = this;
-    var wrapper = self.element.querySelector(self.wrapperSelector);
-    var testingNode = range.commonAncestorContainer;
-
-    while (testingNode !== wrapper && testingNode !== null) {
-      testingNode = testingNode.parentNode;
-    }
-
-    return testingNode === wrapper;
-  };
-
-  $.MouseSelector.prototype.confirm = function (range, event) {
-    var self = this;
-    self.hideConfirm();
-
-    if (self.element.querySelectorAll('.annotation-editor-nav-bar').length == 0 && self.element.querySelectorAll('.annotation-viewer-nav-bar').length == 0) {
-      self.interactionPoint = $.mouseFixedPosition(event); //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
-
-      self.loadButton(hrange.serializeRange(range, self.element, 'annotator-hl'), self.interactionPoint, event); //console.log("Should have loaded button to confirm annotation");
-    } else {
-      $.publishEvent('HxAlert', self.instance_id, ["You have a pinned annotation window. Close it to make a new annotation.", {
-        buttons: [],
-        time: 5
-      }]);
-    }
-  };
-
-  $.MouseSelector.prototype.hideConfirm = function () {
-    jQuery('.hx-confirm-button').remove();
-  };
-
-  $.MouseSelector.prototype.loadButton = function (range, iP, event) {
-    var self = this;
-
-    if (iP.top <= 48) {
-      iP.top = 49;
-    }
-
-    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + (iP.top - 10) + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
-    jQuery('body').append(confirmButtonTemplate);
-    jQuery('.hx-confirm-button button').click(function () {
-      $.publishEvent('drawTemp', self.instance_id, [[range]]);
-      $.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [range], event]);
-      jQuery('.hx-confirm-button').remove();
-    });
-  };
-
-  $.selectors.push($.MouseSelector);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
-
-(function ($) {
-  $.XPathDrawer = function (element, inst_id, hClass, options) {
-    this.element = element;
-    this.instance_id = inst_id;
-    this.h_class = (hClass + ' annotator-hl').trim();
-    this.init();
-    this.drawnAnnotations = [];
-    this.tempHighlights = [];
-    this.options = options || {};
-  };
-
-  $.XPathDrawer.prototype.init = function () {
-    var self = this; // this.highlighter = new annotator.ui.highlighter.Highlighter(this.element, {
-    //     highlightClass: (self.h_class + ' annotator-hl')
-    // });
-
-    jQuery(self.element).on('mouseover', '.' + self.h_class.replace(' ', '.'), function (event) {
-      $.pauseEvent(event);
-      var annotations = self.getAnnotationsFromElement(event); //console.log("MOUSEOVER", annotations);
-
-      Hxighlighter.publishEvent('ViewerDisplayOpen', self.instance_id, [event, annotations]);
-    });
-    jQuery(self.element).on('mouseleave', '.' + self.h_class.replace(' ', '.'), function (event) {
-      Hxighlighter.publishEvent('ViewerDisplayClose', self.instance_id, [event]);
-    });
-    jQuery(self.element).on('click', '.' + self.h_class.replace(' ', '.'), function (event) {
-      var annotations = self.getAnnotationsFromElement(event);
-      Hxighlighter.publishEvent('DrawnSelectionClicked', self.instance_id, [event, annotations]);
-    });
-    Hxighlighter.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation) {
-      self.undraw(annotation);
-    });
-    Hxighlighter.subscribeEvent('GetAnnotationsData', self.instance_id, function (_, callback) {
-      callback(self.getAnnotationsData());
-    });
-    Hxighlighter.subscribeEvent('GetSpecificAnnotationData', self.instance_id, function (_, annotation_id, callback) {
-      callback(self.getSpecificAnnotationData(annotation_id));
-    });
-    Hxighlighter.subscribeEvent('changeDrawnColor', self.instance_id, function (_, annotation, color) {
-      if (annotation._local) {
-        jQuery.each(annotation._local.highlights, function (_, hl) {
-          setTimeout(function () {
-            jQuery(hl).css('background-color', color);
-          }, 250);
-        });
-      }
-    });
-    Hxighlighter.subscribeEvent('undrawAll', self.instance_id, function (_, callBack) {
-      var annotations = self.getAnnotationsData();
-      annotations.forEach(function (ann) {
-        self.undraw(ann);
-      });
-      callBack(annotations);
-    });
-    Hxighlighter.subscribeEvent('drawList', self.instance_id, function (_, annotations, callBack) {
-      annotations.forEach(function (ann) {
-        self.draw(ann);
-      });
-      callBack(annotations);
-    });
-    Hxighlighter.subscribeEvent('drawTemp', self.instance_id, function (_, range, callBack) {
-      var textNodes = hrange.getTextNodesFromAnnotationRanges(range, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
-
-      var spans = [];
-      textNodes.forEach(function (node) {
-        //console.log(node, jQuery(node));
-        jQuery(node).wrap('<span class="temp-ann ' + self.h_class + '"></span>');
-        spans.push(jQuery(node).parent()[0]);
-      });
-      self.tempHighlights = self.tempHighlights.concat(spans);
-    });
-  };
-
-  $.XPathDrawer.prototype.draw = function (annotation) {
-    var self = this; // console.log(self.options, annotation);
-    // console.log("Annotation Being Drawn", annotation);
-
-    self.tempHighlights.forEach(function (hl) {
-      jQuery(hl).contents().unwrap();
-    }); // the process for drawing is divided into 4 parts
-    // 1. Retrieve all discrete text nodes associated with annotation
-
-    var textNodes = hrange.getTextNodesFromAnnotationRanges(annotation.ranges, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
-
-    var spans = [];
-    var otherLabel = '';
-
-    if (self.options.user_id === annotation.creator.id) {
-      otherLabel += ' annotation-mine';
-    }
-
-    if (self.options.instructors.indexOf(annotation.creator.id) > -1) {
-      otherLabel += ' annotation-instructor';
-    }
-
-    var labelIt = true;
-    textNodes.forEach(function (node) {
-      //console.log(node, jQuery(node));
-      var node_id = "";
-
-      if (labelIt) {
-        labelIt = false;
-        node_id = ' id="first-node-' + annotation.id + '" ';
-      }
-
-      jQuery(node).wrap('<span' + node_id + ' class="' + self.h_class + otherLabel + '"></span>');
-      spans.push(jQuery(node).parent()[0]);
-    }); // 3. In a _local.highlights value, we store the list of span tags generated for the annotation.
-
-    annotation['_local'] = {
-      'highlights': spans
-    }; // 3. Store in each span tag the value of the annotation post-saving _local.highlights
-
-    spans.forEach(function (span) {
-      jQuery(span).data('annotation', annotation);
-    }); //console.log(annotation);
-
-    $.publishEvent('annotationDrawn', self.instance_id, [annotation]); // the annotation is then saved to the current list
-
-    self.drawnAnnotations.push(annotation); // code below allows you to undraw annotations by clicking on them, should this ever be needed in the future
-    // jQuery.each(annotation._local.highlights, function(_, high) {
-    //     jQuery(high).on('mouseover', function() {
-    //          $.publishEvent('toggleViewer')
-    //     });
-    // });
-  };
-
-  $.XPathDrawer.prototype.undraw = function (annotation) {
-    var self = this; //this.highlighter.undraw(annotation);
-
-    if (annotation._local) {
-      //console.log('Undrawing...', annotation._local.highlights)
-      annotation._local.highlights.forEach(function (hl) {
-        jQuery(hl).contents().unwrap();
-      });
-
-      annotation._local.highlights = [];
-    }
-
-    self.tempHighlights.forEach(function (hl) {
-      jQuery(hl).contents().unwrap();
-    });
-    self.drawnAnnotations = self.drawnAnnotations.filter(function (ann) {
-      if (ann.id !== annotation.id) {
-        return ann;
-      }
-    }); //console.log(self.drawnAnnotations);
-
-    $.publishEvent('annotationUndrawn', self.instance_id, [annotation]);
-  };
-
-  $.XPathDrawer.prototype.redraw = function (annotation) {
-    var self = this;
-    self.undraw(annotation);
-    self.draw(annotation); //this.highlighter.redraw(annotation);
-    //$.publishEvent('annotationRedrawn', self.instance_id, [annotation]);
-  };
-
-  $.XPathDrawer.prototype.getAnnotationsFromElement = function (event) {
-    return jQuery(event.target).parents('.annotator-hl').addBack().map(function (_, elem) {
-      return jQuery(elem).data('annotation');
-    }).toArray().sort(function (a, b) {
-      return a.created - b.created;
-    });
-  }; // found @ https://dev.to/saigowthamr/how-to-remove-duplicate-objects-from-an-array-javascript-48ok
-
-
-  $.XPathDrawer.prototype.getUnique = function (arr, comp) {
-    var unique = arr.map(function (e) {
-      return e[comp];
-    }) // store the keys of the unique objects
-    .map(function (e, i, _final) {
-      return _final.indexOf(e) === i && i;
-    }) // eliminate the dead keys & store unique objects
-    .filter(function (e) {
-      return arr[e];
-    }).map(function (e) {
-      return arr[e];
-    });
-    return unique;
-  };
-
-  $.XPathDrawer.prototype.getAnnotationsData = function () {
-    var self = this;
-    var all = self.getUnique(jQuery('.annotator-hl').parents('.annotator-hl').addBack().map(function (_, elem) {
-      return jQuery(elem).data('annotation');
-    }).toArray(), 'id');
-    all.sort(function (a, b) {
-      return b - a;
-    }); //console.log(all);
-
-    return all;
-  };
-
-  $.XPathDrawer.prototype.getSpecificAnnotationData = function (annotation_id) {
-    var self = this;
-    var currentAnnotations = self.getAnnotationsData();
-    var foundAnnotation = currentAnnotations.find(function (ann) {
-      if (ann.id === annotation_id) {
-        return ann;
-      }
-    });
-    return foundAnnotation;
-  };
-
-  $.drawers.push($.XPathDrawer);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 50 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(51);
-/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
-/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
-/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/**
- * 
- */
-var annotator = annotator ? annotator : __webpack_require__(7);
-
-
-
-
-(function ($) {
-  $.FloatingViewer = function (options, inst_id) {
-    // sets default options
-    var defaultOptions = {
-      // set up template names that will be pulled
-      TEMPLATENAMES: ["editor", "viewer"],
-      TEMPLATES: {
-        editor: __webpack_require__(52),
-        viewer: __webpack_require__(53)
-      },
-      template_suffix: "floating",
-      template_urls: ""
-    };
-    this.options = jQuery.extend({}, defaultOptions, options);
-    console.log("Floating options", this.options);
-    this.instance_id = inst_id;
-    this.annotation_tool = {
-      interactionPoint: null,
-      editing: false,
-      updating: false,
-      editor: null,
-      viewer: null
-    };
-    this.element = jQuery(this.options.element);
-    this.hideTimer = null;
-    this.init();
-  };
-
-  $.FloatingViewer.prototype.init = function () {
-    var self = this;
-    self.setUpTemplates(self.options.template_suffix); // make sure the viewer doesn't disappear when the person moves their mouse over it
-
-    self.element.on('mouseover', '.annotation-viewer', function (event1) {
-      clearTimeout(self.hideTimer);
-    }); // once they leave the viewer hide it
-
-    self.element.on('mouseleave', '.annotation-viewer', function (event1) {
-      if (self.annotation_tool.isStatic) {
-        return;
-      }
-
-      clearTimeout(self.hideTimer);
-      self.ViewerDisplayClose();
-    });
-    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
-      clearTimeout(self.hideTimer);
-
-      try {
-        self.annotation_tool.viewer.addClass('static');
-        self.annotation_tool.isStatic = true;
-      } catch (e) {
-        self.ViewerDisplayOpen(event1, annotations);
-        self.annotation_tool.viewer.addClass('static');
-        self.annotation_tool.isStatic = true;
-      }
-    });
-    jQuery('body').on('click', '.annotation-username', function (e) {
-      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'User']);
-    });
-    jQuery('body').on('click', '.annotation-tag', function (e) {
-      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'Tag']);
-    });
-    this.setUpPinAndMove();
-  };
-
-  $.FloatingViewer.prototype.setUpTemplates = function (suffix) {
-    var self = this;
-    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
-      if (templateName in self.options.TEMPLATES) {
-        return;
-      }
-
-      var options = {
-        url: self.options.template_urls + templateName + '-' + suffix + '.html',
-        type: "GET",
-        contentType: "charset=utf-8",
-        success: function success(data) {
-          var template = _.template(data);
-
-          self.options.TEMPLATES[templateName] = template;
-        },
-        async: true
-      };
-      return jQuery.ajax(options);
-    });
-    jQuery.when.apply(jQuery, deferreds).done(function () {
-      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
-        editorid: self.instance_id.replace(/\W/g, '-')
-      });
-    });
-  };
-
-  $.FloatingViewer.prototype.TargetSelectionMade = function (annotation, event) {
-    // if (event && event instanceof MouseEvent) {
-    this.ViewerEditorOpen(event, annotation, false, $.mouseFixedPosition(event, annotation)); // }
-  };
-
-  $.FloatingViewer.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
-    var self = this;
-
-    if (self.annotation_tool.editing && self.annotation_tool.updating && self.annotation_tool.isStatic && !updating) {
-      // there's already an open editor window for this instance so don't do anything
-      return;
-    }
-
-    if (self.annotation_tool.viewer) {
-      jQuery('.annotation-viewer').remove();
-      delete self.annotation_tool.viewer;
-      self.annotation_tool.isStatic = false;
-      self.annotation_tool.updating = false;
-      self.annotation_tool.editing = false;
-    }
-
-    jQuery('.edit').prop('disabled', true); // set editing mode
-
-    self.annotation_tool.editing = true;
-    self.annotation_tool.updating = updating; // actually set up and draw the Editor
-
-    var wrapperElement = self.element.find('.annotator-wrapper');
-    wrapperElement.after(self.annotation_tool.editorTemplate); // save the element to call upon later
-
-    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/\W/g, '-'));
-    var intPt = interactionPoint; // situate it on its proper location
-
-    self.annotation_tool.editor.css({
-      'top': intPt.top - jQuery(window).scrollTop(),
-      'left': intPt.left
-    }); // closes the editor tool and does not save annotation
-
-    self.annotation_tool.editor.find('.cancel').click(function () {
-      console.log("HERE", annotation, !updating, true);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
-    }); // closes the editor and does save annotations
-
-    self.annotation_tool.editor.find('.save').click(function () {
-      var text = self.annotation_tool.editor.find('#annotation-text-field').val();
-
-      if (updating) {
-        annotation.annotationText.pop();
-      }
-
-      annotation.annotationText.push(text);
-      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, false]);
-    });
-    self.annotation_tool.editor.find('#annotation-text-field').val(annotation.annotationText);
-    setTimeout(function () {
-      self.annotation_tool.editor.find('#annotation-text-field')[0].focus();
-    }, 250);
-    self.checkOrientation(self.annotation_tool.editor);
-    $.publishEvent('editorShown', self.instance_id, [self.annotation_tool.editor, annotation]);
-  };
-
-  $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
-    var self = this;
-    jQuery('.edit').prop('disabled', false);
-    jQuery('.note-link-popover').remove();
-    $.publishEvent('editorHidden', self.instance_id, []);
-
-    if (self.annotation_tool.editor) {
-      self.annotation_tool.editor.remove();
-    }
-
-    delete self.annotation_tool.editor;
-    self.annotation_tool.editing = false;
-    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
-  };
-
-  $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
-    var self = this;
-    var annotations = anns.reverse(); // if the timer is set for the tool to be hidden, this intercepts it
-
-    if (self.hideTimer !== undefined) {
-      clearTimeout(self.hideTimer);
-    }
-
-    if (jQuery('.annotation-editor').is(':visible') || jQuery('.hx-confirm-button').is(':visible') || self.annotation_tool.editing || self.annotation_tool.updating || self.annotation_tool.isStatic && Hxighlighter.exists(self.annotation_tool.viewer)) {
-      // there's already an open editor window for this instance so don't do anything
-      return;
-    }
-
-    self.annotation_tool.viewerTemplate = self.options.TEMPLATES['viewer']({
-      'viewerid': self.instance_id.replace(/\W/g, '-'),
-      'annotations': annotations,
-      'instructor_ids': self.options.instructors,
-      'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
-    });
-
-    if (self.options.viewer_options.readonly) {
-      self.annotation_tool.viewerTemplate = self.annotation_tool.viewerTemplate.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
-    } // add the viewer to the DOM
-
-
-    self.element.find('.annotator-wrapper').after(self.annotation_tool.viewerTemplate); // collect the object for manipulation and coordinates of where it should appear
-
-    if (self.annotation_tool.viewer) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-
-    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/\W/g, '-'));
-    var newTop = annotator.util.mousePosition(event).top - jQuery(window).scrollTop() + 20;
-    var newLeft = annotator.util.mousePosition(event).left + 30;
-    self.annotation_tool.viewer.css({
-      'top': newTop,
-      'left': newLeft
-    });
-    self.annotation_tool.viewer.data('annotations', annotations);
-    self.annotation_tool.viewer.find('.cancel').click(function (event1) {
-      self.annotation_tool.isStatic = false;
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer; // jQuery('body').css('overflow-y', 'scroll');
-    });
-    self.annotation_tool.viewer.find('.edit').click(function (event1) {
-      var annotation_id = jQuery(this).attr('id').replace('edit-', '');
-      var filtered_annotation = annotations.find(function (ann) {
-        if (ann.id === annotation_id) return ann;
-      });
-      self.ViewerEditorOpen(event1, filtered_annotation, true, {
-        top: parseInt(self.annotation_tool.viewer.css('top'), 10),
-        left: parseInt(self.annotation_tool.viewer.css('left'), 10)
-      }); //StorageAnnotationSave
-    });
-    self.annotation_tool.viewer.find('.delete').confirm({
-      title: 'Delete Annotation?',
-      content: 'Would you like to delete your annotation? This is permanent.',
-      buttons: {
-        confirm: function confirm() {
-          var annotation_id = this.$target[0].id.replace('delete-', '');
-          var filtered_annotation = annotations.find(function (ann) {
-            if (ann.id === annotation_id) return ann;
-          });
-          $.publishEvent('StorageAnnotationDelete', self.instance_id, [filtered_annotation]);
-          self.ViewerDisplayClose();
-
-          if (self.annotation_tool.viewer) {
-            jQuery('.annotation-viewer').remove();
-            delete self.annotation_tool.viewer;
-            self.annotation_tool.isStatic = false;
-            self.annotation_tool.updating = false;
-            self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-          }
-        },
-        cancel: function cancel() {}
-      }
-    }); // console.log(annotations);        
-
-    $.publishEvent('displayShown', self.instance_id, [self.annotation_tool.viewer, annotations]);
-    self.checkOrientation(self.annotation_tool.viewer);
-  };
-
-  $.FloatingViewer.prototype.ViewerDisplayClose = function (annotations) {
-    var self = this;
-
-    if (self.annotation_tool.isStatic) {
-      return;
-    }
-
-    console.log('should hide display');
-    clearTimeout(self.hideTimer);
-    self.hideTimer = setTimeout(function () {
-      if (self.hideTimer) {
-        $.publishEvent('displayHidden', self.instance_id, []);
-
-        if (self.annotation_tool.viewer) {
-          self.annotation_tool.viewer.remove();
-          delete self.annotation_tool.viewer;
-        }
-
-        self.annotation_tool.isStatic = false;
-        self.annotation_tool.updating = false;
-        self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-      }
-    }, 500);
-  };
-
-  $.FloatingViewer.prototype.StorageAnnotationSave = function (annotations) {};
-
-  $.FloatingViewer.prototype.StorageAnnotationLoad = function (first_argument) {
-    var self = this;
-
-    if (self.annotation_tool.viewer) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-
-    self.annotation_tool.isStatic = false;
-    self.annotation_tool.updating = false;
-    self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
-  };
-
-  $.FloatingViewer.prototype.StorageAnnotationDelete = function (annotation) {
-    var self = this;
-    jQuery('.annotation-viewer').remove();
-    delete self.annotation_tool.viewer;
-    self.annotation_tool.isStatic = false;
-    self.annotation_tool.updating = false;
-    self.annotation_tool.editing = false;
-  };
-
-  $.FloatingViewer.prototype.setUpPinAndMove = function () {
-    var self = this; // keeps track of when mouse button is pressed
-
-    jQuery('body').on('mousedown', function (event) {
-      self.buttonDown = true;
-    }); // keeps track of when mouse button is let go
-
-    jQuery('body').on('mouseup', function (event) {
-      self.buttonDown = false;
-    }); // handles moving the editor by clicking and dragging
-
-    jQuery('body').on('mousedown', '.annotation-editor-nav-bar', function (event) {
-      self.prepareToMove(true, event);
-    }); // handles moving the viewer by clicking and dragging
-
-    jQuery('body').on('mousedown', '.annotation-viewer-nav-bar', function (event) {
-      self.prepareToMove(false, event);
-    });
-    jQuery('body').on('mousemove', function (event) {
-      self.moving(event);
-    });
-    jQuery('body').on('mouseup', function (event) {
-      self.finishedMoving(event);
-    }); // jQuery('body').on('mouseover', '.annotation-editor', function(event) {
-    //     jQuery('body').css('overflow-y', 'hidden');
-    // });
-    // jQuery('body').on('mouseleave', '.annotation-editor', function(event) {
-    //     jQuery('body').css('overflow-y', 'scroll');
-    // });
-    // jQuery('body').on('mouseover', '.annotation-viewer', function(event) {
-    //     jQuery('body').css('overflow-y', 'hidden');
-    // });
-    // jQuery('body').on('mouseleave', '.annotation-viewer', function(event) {
-    //     jQuery('body').css('overflow-y', 'scroll');
-    // });
-
-    jQuery('body').on('mouseleave', function (event) {
-      self.finishedMoving(event);
-    });
-  };
-
-  $.FloatingViewer.prototype.prepareToMove = function (isEditor, event) {
-    var self = this;
-    self.itemMoving = isEditor ? self.annotation_tool.editor : self.annotation_tool.viewer;
-
-    if (self.itemMoving) {
-      $.pauseEvent(event); //turns on moving mode
-
-      self.itemMoving.moving = true; // set initial mouse position offset by where on the editor the user clicked
-
-      var move = annotator.util.mousePosition(event);
-      var editorTop = parseInt(self.itemMoving.css('top'), 10);
-      var editorLeft = parseInt(self.itemMoving.css('left'), 10);
-      self.itemMoving.offsetTopBy = move.top - editorTop;
-      self.itemMoving.offsetLeftBy = move.left - editorLeft;
-    }
-  };
-
-  $.FloatingViewer.prototype.moving = function (event) {
-    var self = this;
-
-    if (self.itemMoving && self.itemMoving.moving) {
-      $.pauseEvent(event); // gets the userlocation (where they've dragged to)
-
-      var move = annotator.util.mousePosition(event);
-      var newTop = move.top - self.itemMoving.offsetTopBy;
-      var newLeft = move.left - self.itemMoving.offsetLeftBy; // var borderBox = self.element[0].getBoundingClientRect();
-
-      if (newTop < 0) {
-        newTop = 0;
-      }
-
-      if (newLeft < 0) {
-        newLeft = 0;
-      }
-
-      if (newTop + self.itemMoving.outerHeight() > window.innerHeight) {
-        newTop = window.innerHeight - self.itemMoving.outerHeight();
-      }
-
-      if (newLeft + self.itemMoving.outerWidth() > window.innerWidth) {
-        newLeft = window.innerWidth - self.itemMoving.outerWidth();
-      }
-      /* TODO: Set boundaries for far right and far down */
-      // sets the editor to that location (fixing offset)
-
-
-      self.itemMoving.css({
-        top: newTop,
-        left: newLeft
-      });
-    } else if (self.buttonDown && self.annotation_tool.viewer && !self.annotation_tool.viewer.hasClass('static')) {
-      self.annotation_tool.viewer.remove();
-      delete self.annotation_tool.viewer;
-    }
-  };
-
-  $.FloatingViewer.prototype.finishedMoving = function (event) {
-    var self = this;
-
-    if (self.itemMoving) {
-      $.pauseEvent(event); //turns on moving mode
-
-      self.itemMoving.moving = false;
-      var move = annotator.util.mousePosition(event);
-      self.annotation_tool.interactionPoint = {
-        top: move.top - self.itemMoving.offsetTopBy,
-        left: move.left - self.itemMoving.offsetLeftBy
-      };
-    }
-  };
-
-  $.FloatingViewer.prototype.checkOrientation = function (viewerElement) {
-    var self = this;
-    var newTop = parseInt(jQuery(viewerElement).css('top'), 10);
-    var newLeft = parseInt(jQuery(viewerElement).css('left'), 10);
-    var elWidth = parseInt(jQuery(viewerElement).outerWidth());
-    var elHeight = parseInt(jQuery(viewerElement).outerHeight());
-
-    if (newTop < 0) {
-      newTop = 0;
-    }
-
-    if (newLeft < 0) {
-      newLeft = 0;
-    }
-
-    if (newTop + elHeight > window.innerHeight) {
-      newTop = window.innerHeight - elHeight - 34 - 75; // 34 is the height of the save/cancel buttons that get cut off 
-    }
-
-    if (newLeft + elWidth > window.innerWidth) {
-      newLeft = window.innerWidth - elWidth - 12; // 12 is the width of the scroll bar
-    }
-
-    jQuery(viewerElement).css('top', newTop);
-    jQuery(viewerElement).css('left', newLeft);
-  };
-
-  $.viewers.push($.FloatingViewer);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports) {
-
-module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '';
-with (obj) {
-__p += '<div class="annotation-editor" id="annotation-editor-' +
-((__t = ( editorid )) == null ? '' : __t) +
-'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
-
-}
-return __p
-};
-
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="annotation-viewer" id="annotation-viewer-' +
-((__t = ( viewerid )) == null ? '' : __t) +
-'">\n    <nav class=\'annotation-viewer-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close Viewer" tile="Close Viewer"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
- _.each(annotations, function(ann){ ;
-__p += '\n            <div class="ann-item item-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-' floating ';
- if (instructor_ids.indexOf(ann.creator.id) > -1) {;
-__p += 'inst';
-};
-__p += '" id="annotation-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'">\n                <div class="annotation-username">';
- if (instructor_ids.indexOf(ann.creator.id) > -1 && common_name !== "") { print(common_name);;
-__p += '&nbsp;<span class="fas fa-certificate-cap"></span>';
-} else {print(ann.creator.name);} ;
-__p += '</div>\n                <div class="annotation-date" title="' +
-((__t = ( ann.created )) == null ? '' : __t) +
-'">';
- if (ann.created){print(jQuery.timeago(ann.created));} else {print(jQuery.timeago(new Date()))} ;
-__p += '</div>\n                <button class="edit" id="edit-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
-((__t = ( ann.id )) == null ? '' : __t) +
-'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
-((__t = ( ann.exact )) == null ? '' : __t) +
-'</div>\n                <div class="annotation-text">' +
-((__t = ( ann.annotationText )) == null ? '' : __t) +
-'</div>\n                ';
- if (ann.tags && ann.tags.length > 0) { ;
-__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
- _.each(ann.tags, function(tag){ ;
-__p += '\n                            <div class="annotation-tag">' +
-((__t = ( tag )) == null ? '' : __t) +
-'</div>\n                        ';
- }); ;
-__p += '\n                    </div>\n                ';
- } ;
-__p += '\n                <div class="plugin-area-bottom">\n                </div>\n            </div>\n        ';
- }); ;
-__p += '\n    </div>\n</div>\n';
-
-}
-return __p
-};
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  InstructionPanel Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(55);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.InstructionPanel = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
-
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.InstructionPanel.prototype.init = function () {
-    var self = this;
-    self.setUpInstructions();
-  };
-
-  $.InstructionPanel.prototype.setUpInstructions = function () {
-    var self = this;
-
-    if (!self.options.instructions || self.options.instructions.length == 0) {
-      return;
-    } // console.log(self.options.instructions, typeof(self.options.instructions));
-
-
-    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
-    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
-
-    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
-    inst_area.click(function () {
-      if (inst_area.html() == "Collapse Instructions") {
-        inst_area.html('Expand Instructions');
-      } else {
-        inst_area.html('Collapse Instructions');
-      }
-    });
-  };
-
-  $.InstructionPanel.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.InstructionPanel, 'name', {
-    value: "InstructionPanel"
-  });
-  $.plugins.push($.InstructionPanel);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  FontResize Annotations Plugin
- *  
- *
- */
-__webpack_require__(57);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.FontResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.toggleTextSize(0);
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.FontResize.prototype.init = function () {
-    var self = this;
-    self.setUpButtons();
-  };
-
-  $.FontResize.prototype.setUpButtons = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(+0)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
-    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
-      self.toggleTextSize(1);
-    });
-    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
-      self.toggleTextSize(-1);
-    });
-  };
-
-  $.FontResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.FontResize.prototype.toggleTextSize = function (step) {
-    var self = this;
-    step = isNaN(Number(step)) ? 0 : Number(step);
-    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
-    var $label = jQuery("#annotations-text-size-label");
-    var nodes = [],
-        curnode,
-        stylesize,
-        styleunit,
-        computed;
-    var minsize = 8;
-    var sizediff = 0;
-
-    if (typeof this.defaultFontSize === "undefined") {
-      this.defaultFontSize = 14;
-    }
-
-    if (typeof this.targetFontSize === "undefined") {
-      this.targetFontSize = this.defaultFontSize;
-    }
-
-    this.targetFontSize += step;
-
-    if (this.targetFontSize < minsize) {
-      this.targetFontSize = minsize;
-    }
-
-    sizediff = this.targetFontSize - this.defaultFontSize;
-
-    if (sizediff === 0) {
-      $label.html("(+0)");
-      $content.css('fontSize', '');
-    } else {
-      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
-      $content.css('fontSize', String(this.targetFontSize) + "px");
-      nodes.push($content[0]);
-    } // walk the dom and find custom fontStyle declarations and adust as necessary
-    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
-
-
-    while (nodes.length > 0) {
-      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
-
-      if (curnode.tagName.toLowerCase() == 'font') {
-        computed = window.getComputedStyle(curnode);
-        curnode.style.fontSize = computed['font-size'];
-        curnode.size = "";
-      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
-
-
-      if (curnode != $content[0] && curnode.className != "") {
-        curnode.style.fontSize = "inherit";
-      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
-
-
-      stylesize = parseInt(curnode.style.fontSize, 10);
-
-      if (!isNaN(stylesize)) {
-        styleunit = curnode.style.fontSize.replace(stylesize, '');
-        stylesize += step;
-        stylesize = stylesize < minsize ? minsize : stylesize;
-
-        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
-          curnode.style.fontSize = stylesize + styleunit;
-        }
-      }
-
-      for (var i = curnode.children.length; i > 0; i--) {
-        nodes.push(curnode.children[i - 1]);
-      }
-    }
-  };
-
-  Object.defineProperty($.FontResize, 'name', {
-    value: "FontResize"
-  });
-  $.plugins.push($.FontResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
-
-(function ($) {
-  $.KeyboardSelector = function (element, inst_id) {
-    this.element = element;
-
-    if (!jQuery(element).hasClass('annotator-wrapper')) {
-      this.element = jQuery(element).find('.annotator-wrapper');
-    }
-
-    this.instance_id = inst_id;
-    this.delimiter_list = ['*', '+', '#', '^'];
-    this.keyMaps = {
-      'BACKSPACE': 8,
-      'TAB': 9,
-      'ENTER': 13,
-      'SHIFT': 16,
-      'CTRL': 17,
-      'ALT': 18,
-      'ESC': 27,
-      'SPACE': 32,
-      'LEFT': 37,
-      'UP': 38,
-      'RIGHT': 39,
-      'DOWN': 40,
-      'DELETE': 46,
-      'MULTIPLY': 106,
-      'ADD': 107,
-      'PIPE': 220,
-      '*': 56,
-      '+': 187,
-      'HOME': 36,
-      'END': 35
-    };
-    this.init();
-  };
-
-  $.KeyboardSelector.prototype.init = function () {
-    var self = this;
-    this.delimiter = this.checkDelimiter(self.element);
-
-    if (!this.delimiter) {//console.log('Error in delimiter...no suitable delimiter found!');
-    }
-
-    this.start = undefined;
-    this.setUpButton();
-  };
-
-  $.KeyboardSelector.prototype.checkDelimiter = function (element) {
-    var textSearch = jQuery(element).text();
-
-    for (var i = 0; i < this.delimiter_list.length; i++) {
-      var testDelimiter = this.delimiter_list[i];
-
-      if (textSearch.indexOf(testDelimiter) == -1) {
-        return testDelimiter;
-      }
-    }
-
-    return undefined;
-  };
-
-  $.KeyboardSelector.prototype.setUpButton = function () {
-    var self = this;
-    jQuery(document).on('keydown', function (event) {
-      if (event.key == '1' && (event.altKey || event.ctrlKey) || event.key == '\'' && (event.altKey || event.ctrlKey)) {
-        event.preventDefault(); //move this to external button
-
-        if (!event.target.isContentEditable && !jQuery(event.target).hasClass('form-control')) {
-          self.turnSelectionModeOn();
-        }
-
-        return false;
-      } else if (event.key == 'Escape') {
-        //console.log("hello");
-        self.turnSelectionModeOff(); // } else if (event.key == ' ') {
-        //     event.preventDefault();
-        //     return false;
-      }
-
-      if (event.key == '2' && (event.altKey || event.ctrlKey)) {
-        event.preventDefault();
-        var currentInst = jQuery('.sr-alert').html();
-
-        if (currentInst.trim() === "") {
-          currentInst = 'Hit "Ctrl + 1" to beginning annotating the text by marking them with apostrophes.';
-        }
-
-        jQuery('.sr-alert').html('');
-        setTimeout(function () {
-          jQuery('.sr-alert').html(currentInst);
-        }, 250);
-      }
-
-      if (event.key == '3' && (event.altKey || event.ctrlKey)) {
-        var currVal = jQuery('#hx-sr-notifications').attr('aria-live');
-        var newVal = currVal == "off" ? 'assertive' : 'off';
-        var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
-
-        if (newVal == "off") {
-          jQuery('.sr-real-alert').html(newAlert);
-          setTimeout(function () {
-            jQuery('#hx-sr-notifications').attr('aria-live', newVal);
-            jQuery('.sr-real-alert').html('');
-          }, 500);
-          var currVal = jQuery('.sr-alert').html();
-          jQuery('.sr-alert').html('');
-          jQuery('.sr-alert').data('old', currVal);
-        } else {
-          jQuery('.sr-alert').html(jQuery('.sr-alert').data('old'));
-          jQuery('#hx-sr-notifications').attr('aria-live', newVal);
-          jQuery('.sr-real-alert').html(newAlert);
-        }
-
-        event.preventDefault();
-      }
-    });
-    jQuery(document).on('keyup', '*[role="button"]', function (evt) {
-      if (evt.key == 'Enter' || evt.key == ' ') {
-        jQuery(evt.currentTarget).click();
-        return $.pauseEvent(evt);
-        ;
-      }
-    }); // var slot = self.element;
-    // if (!self.element.hasClass('annotation-slot')) {
-    //     slot = self.element.find('.annotation-slot');
-    // }
-    // if (slot.length === 0) {
-    //     slot = self.element.closest('.annotation-slot');
-    // }
-    // jQuery(slot).prepend('<button class="hx-keyboard-toggle btn btn-default" style="margin-right: 10px;">Toggle Keyboard Input</button>');
-
-    jQuery(document).on('click', 'a[class*="keyboard-toggle"]', function (evt) {
-      jQuery('#key-help').toggleClass('sr-only');
-      jQuery(this).toggleClass('selected');
-      jQuery(self.element).closest('main').animate({
-        scrollTop: jQuery(self.element).closest('main').scrollTop() + jQuery('#key-help').offset().top - 50
-      }); // if (jQuery(this).hasClass('selection-mode-on')) {
-      // self.turnSelectionModeOff();
-      //jQuery(this).removeClass('selection-mode-on');
-      // } else {
-      // self.turnSelectionModeOn();
-      //jQuery(this).addClass('selection-mode-on');
-      // }
-    });
-    jQuery(document).on('click', 'button[class*="make-annotation-button"]', function (evt) {
-      if (jQuery(this).hasClass('selection-mode-on')) {
-        self.turnSelectionModeOff();
-        jQuery(this).removeClass('selection-mode-on');
-      } else {
-        self.turnSelectionModeOn();
-        jQuery(this).addClass('selection-mode-on');
-      }
-    });
-    $.subscribeEvent('wysiwygOpened', self.instance_id, function (e) {
-      if (self.currentSelection) {
-        var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
-        jQuery('.note-editable.card-block').attr('aria-label', 'The quote you have selected is: <em>' + ser.text.exact + '</em>. You are now in a text box. Add your annotation.');
-      }
-    });
-    $.subscribeEvent('focusOnContext', self.instance_id, function (_, ann) {
-      self.addMarkers(ann.ranges);
-    });
-  };
-
-  $.KeyboardSelector.prototype.turnSelectionModeOn = function () {
-    this.saveHTML = this.element.innerHTML;
-    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
-
-    if (!toggleButton.hasClass('should-show')) {
-      toggleButton.click();
-    }
-
-    if (window.navigator.platform.indexOf('Mac') !== -1) {
-      jQuery('.sr-alert').html('Enter the text box until editing text (usually VoiceOver Keys + Down Arrow) then move around using arrow keys without VoiceOver keys held down.');
-    }
-
-    jQuery(this.element).attr('contenteditable', 'true');
-    jQuery(this.element).attr('role', 'textbox');
-    jQuery(this.element).attr('tabindex', "0");
-    jQuery(this.element).attr('aria-label', 'You are now in the text to be annotated. Mark selection with asterisks.');
-    jQuery(this.element).attr('aria-multiline', 'true');
-    jQuery(this.element).attr('accesskey', 't');
-    jQuery('.hx-selector-img').remove();
-    jQuery(this.element).on('keydown', jQuery.proxy(this.filterKeys, this));
-    jQuery(this.element).on('keyup', jQuery.proxy(this.setSelection, this));
-    this.start = undefined;
-    this.currentSelection = undefined;
-    this.element.innerHTML = this.saveHTML;
-    this.element.focus();
-  };
-
-  $.KeyboardSelector.prototype.turnSelectionModeOff = function () {
-    var self = this;
-    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
-
-    if (toggleButton.hasClass('should-show')) {
-      toggleButton.click();
-    }
-
-    jQuery(this.element).off('keydown');
-    jQuery(this.element).off('keyup');
-    jQuery(this.element).attr('contenteditable', 'false');
-    jQuery(this.element).attr('role', '');
-    jQuery(this.element).attr('tabindex', '');
-    jQuery(this.element).attr('aria-multiline', 'false');
-    jQuery(this.element).attr('outline', '0px');
-    jQuery('.hx-selector-img').remove();
-    this.start = undefined;
-    this.currentSelection = undefined;
-    setTimeout(function () {
-      self.element.blur();
-    }, 250);
-  };
-  /* Credit to Rich Caloggero
-   * https://github.com/RichCaloggero/annotator/blob/master/annotator.html
-   */
-
-
-  $.KeyboardSelector.prototype.filterKeys = function (keyPressed) {
-    var self = this;
-    var key = keyPressed.key || keypressed.keyCode;
-
-    switch (key) {
-      case self.delimiter:
-        return false;
-
-      case "ArrowUp":
-      case "ArrowDown":
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "Up":
-      case "Down":
-      case "Left":
-      case "Right":
-      case 37:
-      case 38:
-      case 39:
-      case 40:
-      case "Home":
-      case "End":
-      case "Tab":
-        return true;
-
-      case "Backspace":
-        if (self.verifyBackspace()) {
-          self.start = undefined;
-          return true;
-        }
-
-      case "Escape":
-        self.turnSelectionModeOff();
-        keyPressed.preventDefault();
-        jQuery('.sr-real-alert').html("Keyboard Selection Mode is off.");
-        return false;
-
-      case "2":
-        if (keyPressed.altKey || keyPressed.ctrlKey) {
-          jQuery('.sr-alert').html(jQuery('.sr-alert').html());
-        }
-
-        keyPressed.preventDefault();
-        return false;
-
-      case "3":
-        if (keyPressed.altKey || keyPressed.ctrlKey) {
-          var currVal = jQuery('.sr-alert').attr('aria-live');
-          var newVal = currVal == "off" ? 'polite' : 'off';
-          jQuery('.sr-alert').attr('aria-live', newVal);
-          var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
-          jQuery('.sr-real-alert').html(newAlert);
-        }
-
-        keyPressed.preventDefault();
-        return false;
-
-      default:
-        keyPressed.preventDefault();
-        return false;
-    } // switch
-
-  };
-
-  $.KeyboardSelector.prototype.getBoundingClientRect = function (range) {
-    var newRange = range.cloneRange();
-
-    try {
-      newRange.setStart(range.startContainer, range.startOffset);
-      newRange.setEnd(range.startContainer, range.startOffset + 1);
-      return {
-        top: newRange.getBoundingClientRect().top,
-        left: newRange.getBoundingClientRect().left
-      };
-    } catch (e) {
-      newRange.setStart(range.startContainer, range.startOffset - 1);
-      newRange.setEnd(range.startContainer, range.startOffset);
-      return {
-        top: newRange.getBoundingClientRect().top,
-        left: newRange.getBoundingClientRect().right
-      };
-    }
-  };
-
-  $.KeyboardSelector.prototype.setSelection = function (keyPressed) {
-    var self = this;
-    var key = keyPressed.key || keyPressed.keyCode;
-
-    switch (key) {
-      case self.delimiter:
-        if (!self.start || typeof self.start == "undefined") {
-          self.start = self.copySelection(getSelection());
-          var bcr = self.getBoundingClientRect(self.start); //console.log($.mouseFixedPositionFromRange(self.start), bcr, jQuery(window).scrollTop());
-
-          jQuery('body').append('<div class="hx-selector-img"></div>');
-          jQuery('.hx-selector-img').css({
-            top: bcr.top + jQuery(window).scrollTop() - 5,
-            left: bcr.left - 5
-          });
-          jQuery('.sr-alert').html();
-          jQuery('.sr-alert').html('Move to end of text to be annotated and press "*" again.');
-        } else {
-          var end = self.copySelection(getSelection());
-          jQuery('.hx-selector-img').remove(); //console.log("Found end", end);
-
-          if (self.currentSelection) {//console.log(hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl'), self.currentSelection.toString());
-          } else {
-            var end = self.copySelection(getSelection());
-            var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
-            var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
-            var boundingBox = undefined;
-            self.currentSelection = document.createRange();
-
-            if (posStart.startOffset < posEnd.startOffset) {
-              self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
-              self.currentSelection.setEnd(end.startContainer, end.startOffset);
-            } else {
-              self.currentSelection.setStart(end.startContainer, end.startOffset);
-              self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
-            }
-          }
-
-          boundingBox = {
-            top: self.currentSelection.getBoundingClientRect().top + jQuery(window).scrollTop() - 5,
-            left: self.currentSelection.getBoundingClientRect().left - 5
-          };
-          var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
-          jQuery('.sr-alert').html(''); //jQuery('.sr-alert').html('You are now in a text box. Add your annotation. The quote you have selected is: <em>' + ser.text.exact + "</em>");
-
-          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [ser], boundingBox]); //console.log("Active Element", document.activeElement.className);
-
-          if (document.activeElement.className.indexOf('note-editable') == -1) {
-            //console.log("BLURRING");
-            self.element.blur();
-          } else {
-            setTimeout(function () {
-              jQuery('.note-editable.card-block')[0].focus(); //console.log("should be focusing on", document.activeElement);
-            }, 250);
-          }
-
-          self.turnSelectionModeOff(); // var startComesAfter = self.startComesAfter(self.start, end);
-          // console.log("Found other", startComesAfter);
-          // self.start = startComesAfter[0];
-          // self.processSelection(startComesAfter[0], startComesAfter[1]);
-        }
-
-        break;
-
-      case "ArrowUp":
-      case "ArrowDown":
-      case "ArrowLeft":
-      case "ArrowRight":
-      case "Up":
-      case "Down":
-      case "Left":
-      case "Right":
-      case 37:
-      case 38:
-      case 39:
-      case 40:
-        if (self.start) {
-          var end = self.copySelection(getSelection());
-          var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
-          var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
-          self.currentSelection = document.createRange();
-
-          if (posStart.startOffset < posEnd.startOffset) {
-            self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
-            self.currentSelection.setEnd(end.startContainer, end.startOffset);
-          } else {
-            self.currentSelection.setStart(end.startContainer, end.startOffset);
-            self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
-          } // console.log(self.start, end);
-          // console.log(self.currentSelection, self.currentSelection.toString());
-          // var sel = window.getSelection();
-          // sel.removeAllRanges();
-          // sel.addRange(self.currentSelection);
-
-        }
-
-    }
-  };
-
-  $.KeyboardSelector.prototype.copySelection = function (selection) {
-    // const sel = {
-    //     anchorNode: selection.anchorNode,
-    //     anchorOffset: selection.anchorOffset,
-    //     focusNode: selection.focusNode,
-    //     focusOffset: selection.focusOffset,
-    //     parentElement: selection.anchorNode.parentElement
-    // };
-    return selection.getRangeAt(0);
-  };
-
-  $.KeyboardSelector.prototype.processSelection = function (start, end) {
-    var self = this;
-    var s = getSelection(); //console.log("LOOK HERE", start, end);
-
-    var r = this.removeMarkers(start, end);
-    self.start = undefined; //console.log("R!", r);
-
-    try {
-      var boundingBox = r.end.parentElement.getBoundingClientRect();
-    } catch (e) {
-      var boundingBox = r.endContainer.parentElement.getBoundingClientRect();
-    } //console.log(boundingBox);
-    // publish selection made
-
-
-    Hxighlighter.publishEvent('TargetSelectionMade', this.instance_id, [this.element, [hrange.serializeRange(r, self.element, 'annotator-hl')], boundingBox]); //console.log("Element Focused", document.activeElement);
-
-    if (document.activeElement.className.indexOf('note-editable') == -1) {
-      self.element.blur();
-    }
-
-    self.turnSelectionModeOff(); // this.element.focus();
-  };
-
-  $.KeyboardSelector.prototype.startComesAfter = function (start, end) {
-    if (start.anchorNode == end.anchorNode) {
-      if (start.anchorOffset > end.anchorOffset) {
-        start.anchorOffset += 1;
-        return [end, start];
-      } else {
-        return [start, end];
-      }
-    } // TODO: Handle other use cases (i.e. starting several nodes instead of within the same one)
-
-
-    var commonAncestor = this.getCommonAncestor(start.anchorNode, end.anchorNode);
-    var children = jQuery(commonAncestor).children();
-    var startCounter = 0;
-    jQuery.each(children, function (_, el) {
-      if (el == start.parentElement) {
-        startCounter += start.anchorOffset;
-        return false;
-      } else {
-        startCounter += jQuery(el).text().length;
-      }
-    });
-    var endCounter = 0;
-    jQuery.each(children, function (_, el) {
-      if (el == end.parentElement) {
-        endCounter += end.anchorOffset;
-        return false;
-      } else {
-        endCounter += jQuery(el).text().length;
-      }
-    });
-
-    if (startCounter > endCounter) {
-      return [end, start];
-    } else {
-      return [start, end];
-    }
-  };
-  /**
-   * Gets the common ancestor.
-   * Credit: https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
-   *
-   * @param      {<type>}  a       { parameter_description }
-   * @param      {<type>}  b       { parameter_description }
-   * @return     {Object}  The common ancestor.
-   */
-
-
-  $.KeyboardSelector.prototype.getCommonAncestor = function (a, b) {
-    $parentsa = jQuery(a).parents();
-    $parentsb = jQuery(b).parents();
-    var found = null;
-    $parentsa.each(function () {
-      var thisa = this;
-      $parentsb.each(function () {
-        if (thisa == this) {
-          found = this;
-          return false;
-        }
-      });
-      if (found) return false;
-    });
-    return found;
-  };
-
-  $.KeyboardSelector.prototype.removeMarkers = function (start, end) {
-    var self = this;
-    var _start = start.anchorNode;
-
-    var _startOffset = start.anchorOffset - 1;
-
-    var _end = end.anchorNode;
-
-    var _endOffset = end.anchorOffset - 1; //console.log(_start, _startOffset, _end, _endOffset);
-
-
-    var t2 = this.removeCharacter(_end.textContent, _endOffset);
-    _end.textContent = t2;
-    var t1 = this.removeCharacter(_start.textContent, _startOffset);
-    _start.textContent = t1;
-    var r = document.createRange();
-    r.setStart(_start, _startOffset);
-    var realRange = {
-      startContainer: _start,
-      startOffset: _startOffset,
-      endContainer: _end
-    };
-
-    if (start.anchorNode === end.anchorNode) {
-      realRange['endOffset'] = _endOffset - 1;
-      r.setEnd(_start, _endOffset - 1);
-    } else {
-      realRange['endOffset'] = _endOffset;
-      r.setEnd(_start, _endOffset);
-    } // getting common ancestors
-    // lonesomeday @ https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
-
-
-    realRange['commonAncestorContainer'] = jQuery(_start).parents().has(_end).first()[0];
-    realRange['exact'] = [r.toString()];
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(r); // convert to xpath and then back to a range
-    // var sR = hrange.serializeRange(r, self.element, 'annotator-hl');
-    //var nR = hrange.normalizeRange(sR, self.element, 'annotator-hl');
-    // console.log(sR, nR);
-
-    return r;
-  };
-
-  $.KeyboardSelector.prototype.addMarkers = function (ranges) {
-    console.log(ranges);
-  };
-
-  $.KeyboardSelector.prototype.removeCharacter = function (s, offset) {
-    if (offset === 0) {
-      s = s.slice(1);
-    } else if (offset === s.length - 1) {
-      s = s.slice(0, -1);
-    } else {
-      s = s.slice(0, offset) + s.slice(offset + 1);
-    }
-
-    return s;
-  };
-
-  $.KeyboardSelector.prototype.verifyBackspace = function () {
-    var s = getSelection();
-    var r = document.createRange();
-    var startOffset = s.anchorOffset;
-
-    if (startOffset > 0) {
-      startOffset -= 1;
-    }
-
-    r.setStart(s.anchorNode, startOffset);
-    r.setEnd(s.anchorNode, startOffset + 1);
-    return r.toString() == this.delimiter;
-  };
-
-  $.selectors.push($.KeyboardSelector);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Toggle Annotations Plugin
- *  
- *
- */
-__webpack_require__(60);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.ToggleAnnotations = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.on = true;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.ToggleAnnotations.prototype.init = function () {
-    var self = this;
-    self.setUpButton();
-  };
-
-  $.ToggleAnnotations.prototype.setUpButton = function () {
-    var self = this;
-    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
-    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
-      var toggleButton = jQuery(this);
-
-      if (!toggleButton.hasClass('should-show')) {
-        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
-          self.tempAnnotationList = annList;
-          self.on = false;
-          toggleButton.addClass('should-show');
-        }]);
-      } else {
-        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-          self.tempAnnotationList = [];
-          self.on = true;
-          toggleButton.removeClass('should-show');
-        }]);
-      }
-    });
-  };
-
-  $.ToggleAnnotations.prototype.editorShown = function () {
-    var self = this;
-
-    if (!self.on) {
-      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
-        self.tempAnnotationList = [];
-        self.on = true;
-        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
-      }]);
-    }
-  };
-
-  $.ToggleAnnotations.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.ToggleAnnotations, 'name', {
-    value: "ToggleAnnotations"
-  });
-  $.plugins.push($.ToggleAnnotations);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  DisplayResize Annotations Plugin
- *  
- *
- */
-var annotator = annotator ? annotator : __webpack_require__(7); //uncomment to add css file
-
-__webpack_require__(62);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.DisplayResize = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    self.itemStretching = false;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.DisplayResize.prototype.init = function () {
-    var self = this;
-    self.setUpListeners();
-  };
-
-  $.DisplayResize.prototype.setUpListeners = function () {
-    var self = this;
-    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
-      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
-      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
-        self.prepareToStretch(event);
-      });
-      jQuery(self.options.slot).on('mousemove', function (event) {
-        self.stretch(event);
-
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
-        }
-      });
-      jQuery(self.options.slot).on('mouseup', function (event) {
-        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
-        }
-
-        self.finishedStretching(event);
-      });
-      jQuery(self.options.slot).on('mouseleave', function (event) {
-        self.finishedStretching(event);
-      });
-    });
-  };
-
-  $.DisplayResize.prototype.prepareToStretch = function (event) {
-    var self = this;
-    self.itemStretching = true;
-    $.pauseEvent(event);
-    self.initialPoint = annotator.util.mousePosition(event);
-    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
-  };
-
-  $.DisplayResize.prototype.stretch = function (event) {
-    var self = this;
-
-    if (self.itemStretching) {
-      var newPoint = annotator.util.mousePosition(event);
-      var diff = newPoint.top - self.initialPoint.top;
-      var newHeight = self.initialHeight + diff;
-      var innerHeight = self.initialHeight + diff - 30;
-      self.currentViewer.css('height', newHeight);
-      self.currentViewer.find('.annotation-text-field').css({
-        'max-height': innerHeight,
-        'height': innerHeight
-      });
-    }
-  };
-
-  $.DisplayResize.prototype.finishedStretching = function (event) {
-    var self = this;
-    self.itemStretching = false;
-  };
-
-  $.DisplayResize.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
-    var self = this;
-
-    if (Array.isArray(annotations)) {
-      self.currentViewer = jQuery(viewer);
-    }
-  };
-
-  Object.defineProperty($.DisplayResize, 'name', {
-    value: "DisplayResize"
-  });
-  $.plugins.push($.DisplayResize);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 62 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
@@ -45598,14 +43151,2482 @@ var hrange = __webpack_require__(4);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 64 */
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(65);
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ * 
+ */
+//during deployment, this is what decides what gets instantiated, should be moved elsewhere
+__webpack_require__(56);
+
+__webpack_require__(57);
+
+__webpack_require__(22);
+
+__webpack_require__(58);
+
+__webpack_require__(30);
+
+__webpack_require__(10);
+
+__webpack_require__(32);
+
+__webpack_require__(34);
+
+__webpack_require__(62);
+
+__webpack_require__(64);
+
+__webpack_require__(66);
+
+__webpack_require__(67);
+
+__webpack_require__(69);
+
+__webpack_require__(36);
+
+__webpack_require__(38);
+
+__webpack_require__(40);
+
+__webpack_require__(41);
+
+(function ($) {
+  /**
+   * { function_description }
+   *
+   * @class      TextTarget (name)
+   * @param      {<type>}  options  The options
+   * @param      {<type>}  inst_id  The instance identifier
+   */
+  $.TextTarget = function (options, inst_id) {
+    this.options = options;
+    this.instance_id = inst_id;
+    this.guid = undefined;
+    this.annotation_selector = 'hx-annotation-hl';
+    this.init();
+  };
+  /**
+   * { function_description }
+   */
+
+
+  $.TextTarget.prototype.init = function () {
+    var self = this; // this target is only meant to work with text/html objects
+
+    this.media = "text";
+    this.setUpListeners(); // this where the target will be contained
+
+    this.target_selector = this.options.target_selector; // sets up listeners from core and other places
+
+    if (this.options.method == "url") {
+      // if the text exists externally, this will load it into the DOM
+      this.makeQuery(this.options.object_source, this.createTextSlotFromURL.bind(this), this.target_selector);
+    } else if (this.options.method == "inline") {
+      // if the text is already in the DOM, this sets up what is left
+      // console.log('Loading Target via Inline');
+      this.createTextSlotFromSelector(this.options.object_source, this.instance_id);
+    }
+
+    function areScrollbarsVisible() {
+      var scrollableElem = document.createElement('div'),
+          innerElem = document.createElement('div');
+      scrollableElem.style.width = '30px';
+      scrollableElem.style.height = '30px';
+      scrollableElem.style.overflow = 'scroll';
+      scrollableElem.style.borderWidth = '0';
+      innerElem.style.width = '30px';
+      innerElem.style.height = '60px';
+      scrollableElem.appendChild(innerElem);
+      document.body.appendChild(scrollableElem); // Elements only have width if they're in the layout
+
+      var diff = scrollableElem.offsetWidth - scrollableElem.clientWidth;
+      document.body.removeChild(scrollableElem);
+      return diff > 0;
+    }
+
+    window.addEventListener('load', function () {
+      // Show scrollbars if they're hidden.
+      if (!areScrollbarsVisible()) {
+        document.body.classList.add('force-show-scrollbars');
+      }
+    });
+  };
+  /**
+   * Creates a text slot from url.
+   *
+   * @param      {string}  content      The content
+   * @param      {<type>}  selector     The selector
+   * @param      {<type>}  instance_id  The instance identifier
+   */
+
+
+  $.TextTarget.prototype.createTextSlotFromURL = function (content, selector, instance_id) {
+    this.guid = $.getUniqueId(); // each annotation target will be enclosed in a "slot"
+    //var slot = "<div class='annotation-slot' id='" + this.guid + "'>" + content + "</div>";
+    // adds it to the page and turns on the wrapper
+
+    jQuery(selector + ' .annotations-section').append(content);
+    jQuery(selector).prop('id', this.guid);
+    jQuery(selector).addClass('annotation-slot');
+    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets Core know that the target has finished loading on screen
+
+    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
+  };
+  /**
+   * Creates a text slot from selector.
+   *
+   * @param      {<type>}  selector     The selector
+   * @param      {<type>}  instance_id  The instance identifier
+   */
+
+
+  $.TextTarget.prototype.createTextSlotFromSelector = function (selector, instance_id) {
+    // each annotation target will be enclosed in a "slot" with a temporary unique id
+    this.guid = $.getUniqueId();
+    var slot = jQuery(selector);
+    slot.addClass('annotation-slot');
+    slot.attr('id', this.guid);
+    jQuery('.annotations-section').addClass('annotator-wrapper').removeClass('annotations-section'); // lets core know that the target has finished loading on screen
+    // console.log("Publishing TargetLoaded");
+
+    $.publishEvent('targetLoaded', instance_id, [jQuery('#' + this.guid)]);
+  };
+  /**
+   * Makes a query.
+   *
+   * @param      {<type>}    url       The url
+   * @param      {Function}  callback  The callback
+   * @param      {<type>}    selector  The selector
+   * @return     {<type>}    { description_of_the_return_value }
+   */
+
+
+  $.TextTarget.prototype.makeQuery = function (url, callback, selector) {
+    var self = this; // retrieves the text to be loaded onto the page and passes it to callback function
+
+    var defer = jQuery.ajax({
+      url: url,
+      type: 'GET',
+      contentType: 'charset=utf-8',
+      success: function success(data) {
+        callback(data, selector, self.instance_id);
+      },
+      async: true
+    });
+    return defer;
+  };
+  /**
+   * { function_description }
+   */
+
+
+  $.TextTarget.prototype.setUpListeners = function () {
+    var self = this;
+    jQuery('.toggle-alerts').click(function () {
+      if (jQuery(this).hasClass('on')) {
+        jQuery(this).html('Turn Alerts On');
+        jQuery(this).removeClass('on');
+        jQuery('.sr-alert').attr('aria-live', 'off');
+      } else {
+        jQuery(this).html('Turn Alerts Off');
+        jQuery(this).addClass('on');
+        jQuery('.sr-alert').attr('aria-live', 'polite');
+      }
+    }); // once the target has been loaded, the selector can be instantiated
+
+    $.subscribeEvent('targetLoaded', self.instance_id, function (_, element) {
+      // console.log("LOADING TARGET");
+      //annotation element gets data that may be needed later
+      self.element = element;
+      self.element.data('source_type', self.options.object_source);
+      self.element.data('source_type', 'text'); // finish setting up selectors
+
+      self.setUpDrawers(self.element[0]); // finish setting up viewers (which contain displays and editors)
+
+      self.setUpViewers(self.element[0]); // finish setting up extra plugins
+
+      self.setUpPlugins(self.element[0]); // finish setting up the storage containers
+
+      self.setUpStorage(self.element[0]);
+
+      if (!self.options.viewerOptions.readonly) {
+        self.setUpSelectors(self.element[0]);
+      }
+    });
+    $.subscribeEvent('editorShown', self.instance_id, function (_, editor, annotation) {
+      jQuery.each(self.plugins, function (_, plugin) {
+        if (typeof plugin.editorShown === "function") {
+          plugin.editorShown(editor, annotation);
+        }
+      });
+    });
+    $.subscribeEvent('displayShown', self.instance_id, function (_, display, annotations) {
+      jQuery.each(self.plugins, function (_, plugin) {
+        if (typeof plugin.displayShown === "function") {
+          plugin.displayShown(display, annotations);
+        }
+      });
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @param      {<type>}  element  The element
+   */
+
+
+  $.TextTarget.prototype.setUpSelectors = function (element) {
+    var self = this;
+    self.selectors = [];
+    jQuery.each($.selectors, function (_, selector) {
+      self.selectors.push(new selector(element, self.instance_id, {
+        'confirm': true
+      }));
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @param      {<type>}  element  The element
+   */
+
+
+  $.TextTarget.prototype.setUpDrawers = function (element) {
+    var self = this;
+    self.drawers = [];
+    jQuery.each($.drawers, function (_, drawer) {
+      self.drawers.push(new drawer(element, self.instance_id, self.annotation_selector, self.options));
+    });
+  };
+
+  $.TextTarget.prototype.setUpViewers = function (element) {
+    var self = this;
+    self.viewers = [];
+    jQuery.each($.viewers, function (_, viewer) {
+      self.viewers.push(new viewer({
+        element: element,
+        template_urls: self.options.template_urls,
+        viewer_options: self.options.viewerOptions,
+        username: self.options.username,
+        user_id: self.options.user_id,
+        common_instructor_name: self.options.common_instructor_name,
+        instructors: self.options.instructors,
+        mediaType: self.media
+      }, self.instance_id));
+    });
+  };
+
+  $.TextTarget.prototype.setUpPlugins = function (element) {
+    var self = this;
+    self.plugins = [];
+    jQuery.each($.plugins, function (_, plugin) {
+      var optionsForPlugin;
+
+      try {
+        optionsForPlugin = jQuery.extend({
+          'slot': element
+        }, self.options, self.options[plugin.name]) || {
+          'slot': element
+        };
+      } catch (e) {
+        optionsForPlugin = {
+          'slot': element
+        };
+      }
+
+      self.plugins.push(new plugin(optionsForPlugin, self.instance_id));
+    });
+  };
+
+  $.TextTarget.prototype.setUpStorage = function (element, options) {
+    var self = this;
+    self.storage = [];
+    jQuery.each($.storage, function (idx, storage) {
+      var optionsForStorage;
+
+      try {
+        optionsForStorage = jQuery.extend({}, self.options, self.options[storage.name]) || {};
+      } catch (e) {
+        optionsForStorage = {};
+      }
+
+      self.storage.push(new storage(optionsForStorage, self.instance_id));
+
+      if (self.options.viewerOptions.defaultTab === "mine") {
+        options = {
+          'username': self.options.username
+        };
+      } else if (self.options.viewerOptions.defaultTab === "instructor") {
+        options = {
+          'userid': self.options.instructors
+        };
+      } else {
+        var exclusion = [self.options.user_id].concat(self.options.instructors);
+        options = {
+          'exclude_userid': exclusion
+        };
+      }
+
+      self.storage[idx].onLoad(element, options);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ComponentEnable (name)
+   */
+
+
+  $.TextTarget.prototype.ComponentEnable = function () {
+    // Targets cannot technically be enabled/disabled, but 
+    // there might be cases in which the target needs to be hidden/shown
+    jQuery('#' + this.guid).show();
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ComponentDisable (name)
+   */
+
+
+  $.TextTarget.prototype.ComponentDisable = function () {
+    jQuery('#') + this.guid.hide();
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetSelectionMade (name)
+   */
+
+
+  $.TextTarget.prototype.TargetSelectionMade = function (range, event) {
+    var range = Array.isArray(range) ? range : [range];
+    var self = this;
+    var annotation = {
+      annotationText: [""],
+      ranges: range,
+      id: $.getUniqueId(),
+      exact: range.map(function (r) {
+        return r.text.exact.replace(/[\n\r]/g, '<br>').replace(/    /g, '&nbsp;');
+      }),
+      media: "text",
+      totalReplies: 0,
+      creator: {
+        name: self.options.username,
+        id: self.options.user_id
+      }
+    };
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.TargetSelectionMade(annotation, event);
+    }); //self.TargetAnnotationDraw(annotation);
+    // jQuery('.annotator-wrapper')[0].focus();
+    //$.publishEvent('ViewerEditorOpen', self.instance_id, [annotation]);
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetAnnotationDraw (name)
+   */
+
+
+  $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
+    var self = this;
+    jQuery.each(self.drawers, function (_, drawer) {
+      drawer.draw(annotation);
+    });
+    jQuery.each(self.viewers, function (_, viewer) {
+      if ($.exists(viewer.TargetAnnotationDraw)) {
+        viewer.TargetAnnotationDraw(annotation);
+      }
+    });
+    jQuery.each(self.plugins, function (_, plugin) {
+      if ($.exists(plugin.TargetAnnotationDraw)) {
+        plugin.TargetAnnotationDraw(annotation);
+      }
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      TargetAnnotationUndraw (name)
+   */
+
+
+  $.TextTarget.prototype.TargetAnnotationUndraw = function (annotation) {
+    var self = this;
+    jQuery.each(self.drawers, function (_, drawer) {
+      drawer.undraw(annotation);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerEditorOpen (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerEditorOpen = function (event, annotation) {
+    return annotation;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerEditorClose (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerEditorClose = function (annotation, is_new_annotation, hit_cancel) {
+    var self = this; //console.log(annotation, 'New?:', is_new_annotation, 'Hit Cancel', hit_cancel);
+
+    if (hit_cancel) {
+      if (is_new_annotation) {
+        self.TargetAnnotationUndraw(annotation);
+      } // else, the annotation was already drawn, so don't touch it.
+
+    } else if (is_new_annotation) {
+      annotation = self.plugins.reduce(function (ann, plugin) {
+        return plugin.saving(ann);
+      }, annotation);
+      self.TargetAnnotationDraw(annotation);
+      jQuery('.sr-alert').html('');
+      jQuery('.sr-real-alert').html('Your annotation was saved. Your annotation has been added to the top of the annotation list.');
+      $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, false]);
+    } else {
+      jQuery.each(self.drawers, function (_, drawer) {
+        self.TargetAnnotationUndraw(annotation);
+        annotation = self.plugins.reduce(function (ann, plugin) {
+          return plugin.saving(ann);
+        }, annotation);
+        $.publishEvent('TargetAnnotationDraw', self.instance_id, [annotation]);
+        jQuery('.sr-alert').html('');
+        jQuery('.sr-real-alert').html('Your annotation was updated. You can find your annotation in the annotation list.');
+        $.publishEvent('StorageAnnotationSave', self.instance_id, [annotation, true]);
+      });
+    }
+
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerEditorClose(annotation);
+    });
+    return annotation;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerDisplayOpen (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerDisplayOpen = function (event, annotations) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerDisplayOpen(event, annotations);
+    });
+    return annotations;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      ViewerDisplayClose (name)
+   */
+
+
+  $.TextTarget.prototype.ViewerDisplayClose = function (annotations) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.ViewerDisplayClose(annotations);
+    });
+    return annotations;
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationSave (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationSave = function (annotations, redraw) {
+    var self = this; // console.log(annotations, redraw);
+
+    jQuery.each(self.storage, function (_, store) {
+      store.StorageAnnotationSave(annotations, self.element, redraw);
+    });
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.StorageAnnotationSave(annotations);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationLoad (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationLoad = function (annotations, converter, undrawOld) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      if (typeof viewer.StorageAnnotationLoad === "function") {
+        viewer.StorageAnnotationLoad(annotations);
+      }
+    });
+
+    if (undrawOld) {
+      $.publishEvent('GetAnnotationsData', self.instance_id, [function (anns) {
+        anns.forEach(function (ann) {
+          self.TargetAnnotationUndraw(ann);
+        });
+      }]);
+    }
+
+    annotations.forEach(function (ann) {
+      var converted_ann = converter(ann, jQuery(self.element).find('.annotator-wrapper'));
+      self.TargetAnnotationDraw(converted_ann);
+      $.publishEvent('annotationLoaded', self.instance_id, [converted_ann]);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationEdit (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationEdit = function () {};
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationDelete (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
+    var self = this;
+    jQuery.each(self.viewers, function (_, viewer) {
+      viewer.StorageAnnotationDelete();
+    });
+    jQuery.each(self.storage, function (_, store) {
+      store.StorageAnnotationDelete(annotation);
+    });
+  };
+  /**
+   * { function_description }
+   *
+   * @class      StorageAnnotationGetReplies (name)
+   */
+
+
+  $.TextTarget.prototype.StorageAnnotationSearch = function (search_options, callback, errfun) {
+    var self = this;
+    jQuery.each(self.storage, function (_, store) {
+      store.search(search_options, callback, errfun);
+    });
+  };
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Should be listening for ways to select a text and then return an xpath 
+ * object with the range that was selected.
+ */
+var jQuery = __webpack_require__(0);
+
+var hrange = __webpack_require__(4);
+
+(function ($) {
+  $.MouseSelector = function (element, inst_id) {
+    var defaultOpts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    this.element = element;
+    this.instance_id = inst_id;
+    this.adder = null;
+    this.wrapperSelector = '.annotator-wrapper';
+    this.mustConfirm = !!defaultOpts.confirm;
+    this.init();
+  };
+
+  $.MouseSelector.prototype.init = function () {
+    var self = this;
+    self.setUpListeners();
+  };
+
+  $.MouseSelector.prototype.setUpListeners = function () {
+    var self = this;
+    this.element.addEventListener('mouseup', function (event) {
+      var selection = window.getSelection();
+      var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
+
+      self.onSelection(selectionRange, event);
+    });
+    document.addEventListener('keyup', function (e) {
+      var allowedKeys = "ArrowUpArrowDownArrowLeftArrowRight";
+
+      if (allowedKeys.indexOf(e.key) > -1 && e.shiftKey) {
+        var selection = window.getSelection();
+        var selectionRange = selection.getRangeAt(0); //console.log(selectionRange.cloneContents());
+
+        self.onSelection(selectionRange, event);
+      }
+    });
+  };
+
+  $.MouseSelector.prototype.onSelection = function (range, event) {
+    var self = this; //console.log('onSelection Ran: ', range, event);
+
+    if (range instanceof Range) {
+      //console.log('range is instance of Range', range.toString());
+      var result = self.shouldBeAnnotated(range);
+
+      if (result && (range.toString().length > 0 || range.cloneContents().querySelectorAll('img').length > 0)) {
+        if (self.mustConfirm) {
+          //console.log("Confirming...")
+          self.confirm(range, event);
+        } else {
+          //console.log("Sending TargetSelection to Hxighlighter");
+          //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
+          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [hrange.serializeRange(range, self.element, 'annotator-hl')], event]);
+        }
+      } else {
+        // send message to erase confirm button
+        //console.log('Either result is false or toString() returned 0')
+        self.hideConfirm();
+      }
+    }
+  };
+
+  $.MouseSelector.prototype.shouldBeAnnotated = function (range) {
+    var self = this;
+    var wrapper = self.element.querySelector(self.wrapperSelector);
+    var testingNode = range.commonAncestorContainer;
+
+    while (testingNode !== wrapper && testingNode !== null) {
+      testingNode = testingNode.parentNode;
+    }
+
+    return testingNode === wrapper;
+  };
+
+  $.MouseSelector.prototype.confirm = function (range, event) {
+    var self = this;
+    self.hideConfirm();
+
+    if (self.element.querySelectorAll('.annotation-editor-nav-bar').length == 0 && self.element.querySelectorAll('.annotation-viewer-nav-bar').length == 0) {
+      self.interactionPoint = $.mouseFixedPosition(event); //console.log(hrange.serializeRange(range, self.element, 'annotator-hl'));
+
+      self.loadButton(hrange.serializeRange(range, self.element, 'annotator-hl'), self.interactionPoint, event); //console.log("Should have loaded button to confirm annotation");
+    } else {
+      $.publishEvent('HxAlert', self.instance_id, ["You have a pinned annotation window. Close it to make a new annotation.", {
+        buttons: [],
+        time: 5
+      }]);
+    }
+  };
+
+  $.MouseSelector.prototype.hideConfirm = function () {
+    jQuery('.hx-confirm-button').remove();
+  };
+
+  $.MouseSelector.prototype.loadButton = function (range, iP, event) {
+    var self = this;
+
+    if (iP.top <= 48) {
+      iP.top = 49;
+    }
+
+    var confirmButtonTemplate = "<div class='hx-confirm-button' style='top:" + (iP.top - 10) + "px; left: " + iP.left + "px;'><button><span class='fas fa-highlighter'></span></button></div>";
+    jQuery('body').append(confirmButtonTemplate);
+    jQuery('.hx-confirm-button button').click(function () {
+      $.publishEvent('drawTemp', self.instance_id, [[range]]);
+      $.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [range], event]);
+      jQuery('.hx-confirm-button').remove();
+    });
+  };
+
+  $.selectors.push($.MouseSelector);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
+
+(function ($) {
+  $.XPathDrawer = function (element, inst_id, hClass, options) {
+    this.element = element;
+    this.instance_id = inst_id;
+    this.h_class = (hClass + ' annotator-hl').trim();
+    this.init();
+    this.drawnAnnotations = [];
+    this.tempHighlights = [];
+    this.options = options || {};
+  };
+
+  $.XPathDrawer.prototype.init = function () {
+    var self = this; // this.highlighter = new annotator.ui.highlighter.Highlighter(this.element, {
+    //     highlightClass: (self.h_class + ' annotator-hl')
+    // });
+
+    jQuery(self.element).on('mouseover', '.' + self.h_class.replace(' ', '.'), function (event) {
+      $.pauseEvent(event);
+      var annotations = self.getAnnotationsFromElement(event); //console.log("MOUSEOVER", annotations);
+
+      Hxighlighter.publishEvent('ViewerDisplayOpen', self.instance_id, [event, annotations]);
+    });
+    jQuery(self.element).on('mouseleave', '.' + self.h_class.replace(' ', '.'), function (event) {
+      Hxighlighter.publishEvent('ViewerDisplayClose', self.instance_id, [event]);
+    });
+    jQuery(self.element).on('click', '.' + self.h_class.replace(' ', '.'), function (event) {
+      var annotations = self.getAnnotationsFromElement(event);
+      Hxighlighter.publishEvent('DrawnSelectionClicked', self.instance_id, [event, annotations]);
+    });
+    Hxighlighter.subscribeEvent('StorageAnnotationDelete', self.instance_id, function (_, annotation) {
+      self.undraw(annotation);
+    });
+    Hxighlighter.subscribeEvent('GetAnnotationsData', self.instance_id, function (_, callback) {
+      callback(self.getAnnotationsData());
+    });
+    Hxighlighter.subscribeEvent('GetSpecificAnnotationData', self.instance_id, function (_, annotation_id, callback) {
+      callback(self.getSpecificAnnotationData(annotation_id));
+    });
+    Hxighlighter.subscribeEvent('changeDrawnColor', self.instance_id, function (_, annotation, color) {
+      if (annotation._local) {
+        jQuery.each(annotation._local.highlights, function (_, hl) {
+          setTimeout(function () {
+            jQuery(hl).css('background-color', color);
+          }, 250);
+        });
+      }
+    });
+    Hxighlighter.subscribeEvent('undrawAll', self.instance_id, function (_, callBack) {
+      var annotations = self.getAnnotationsData();
+      annotations.forEach(function (ann) {
+        self.undraw(ann);
+      });
+      callBack(annotations);
+    });
+    Hxighlighter.subscribeEvent('drawList', self.instance_id, function (_, annotations, callBack) {
+      annotations.forEach(function (ann) {
+        self.draw(ann);
+      });
+      callBack(annotations);
+    });
+    Hxighlighter.subscribeEvent('drawTemp', self.instance_id, function (_, range, callBack) {
+      var textNodes = hrange.getTextNodesFromAnnotationRanges(range, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
+
+      var spans = [];
+      textNodes.forEach(function (node) {
+        //console.log(node, jQuery(node));
+        jQuery(node).wrap('<span class="temp-ann ' + self.h_class + '"></span>');
+        spans.push(jQuery(node).parent()[0]);
+      });
+      self.tempHighlights = self.tempHighlights.concat(spans);
+    });
+  };
+
+  $.XPathDrawer.prototype.draw = function (annotation) {
+    var self = this; // console.log(self.options, annotation);
+    // console.log("Annotation Being Drawn", annotation);
+
+    self.tempHighlights.forEach(function (hl) {
+      jQuery(hl).contents().unwrap();
+    }); // the process for drawing is divided into 4 parts
+    // 1. Retrieve all discrete text nodes associated with annotation
+
+    var textNodes = hrange.getTextNodesFromAnnotationRanges(annotation.ranges, self.element); // 2. Wrap each node with a span tag that has a particular annotation value (this.h_class)
+
+    var spans = [];
+    var otherLabel = '';
+
+    if (self.options.user_id === annotation.creator.id) {
+      otherLabel += ' annotation-mine';
+    }
+
+    if (self.options.instructors.indexOf(annotation.creator.id) > -1) {
+      otherLabel += ' annotation-instructor';
+    }
+
+    var labelIt = true;
+    textNodes.forEach(function (node) {
+      //console.log(node, jQuery(node));
+      var node_id = "";
+
+      if (labelIt) {
+        labelIt = false;
+        node_id = ' id="first-node-' + annotation.id + '" ';
+      }
+
+      jQuery(node).wrap('<span' + node_id + ' class="' + self.h_class + otherLabel + '"></span>');
+      spans.push(jQuery(node).parent()[0]);
+    }); // 3. In a _local.highlights value, we store the list of span tags generated for the annotation.
+
+    annotation['_local'] = {
+      'highlights': spans
+    }; // 3. Store in each span tag the value of the annotation post-saving _local.highlights
+
+    spans.forEach(function (span) {
+      jQuery(span).data('annotation', annotation);
+    }); //console.log(annotation);
+
+    $.publishEvent('annotationDrawn', self.instance_id, [annotation]); // the annotation is then saved to the current list
+
+    self.drawnAnnotations.push(annotation); // code below allows you to undraw annotations by clicking on them, should this ever be needed in the future
+    // jQuery.each(annotation._local.highlights, function(_, high) {
+    //     jQuery(high).on('mouseover', function() {
+    //          $.publishEvent('toggleViewer')
+    //     });
+    // });
+  };
+
+  $.XPathDrawer.prototype.undraw = function (annotation) {
+    var self = this; //this.highlighter.undraw(annotation);
+
+    if (annotation._local) {
+      //console.log('Undrawing...', annotation._local.highlights)
+      annotation._local.highlights.forEach(function (hl) {
+        jQuery(hl).contents().unwrap();
+      });
+
+      annotation._local.highlights = [];
+    }
+
+    self.tempHighlights.forEach(function (hl) {
+      jQuery(hl).contents().unwrap();
+    });
+    self.drawnAnnotations = self.drawnAnnotations.filter(function (ann) {
+      if (ann.id !== annotation.id) {
+        return ann;
+      }
+    }); //console.log(self.drawnAnnotations);
+
+    $.publishEvent('annotationUndrawn', self.instance_id, [annotation]);
+  };
+
+  $.XPathDrawer.prototype.redraw = function (annotation) {
+    var self = this;
+    self.undraw(annotation);
+    self.draw(annotation); //this.highlighter.redraw(annotation);
+    //$.publishEvent('annotationRedrawn', self.instance_id, [annotation]);
+  };
+
+  $.XPathDrawer.prototype.getAnnotationsFromElement = function (event) {
+    return jQuery(event.target).parents('.annotator-hl').addBack().map(function (_, elem) {
+      return jQuery(elem).data('annotation');
+    }).toArray().sort(function (a, b) {
+      return a.created - b.created;
+    });
+  }; // found @ https://dev.to/saigowthamr/how-to-remove-duplicate-objects-from-an-array-javascript-48ok
+
+
+  $.XPathDrawer.prototype.getUnique = function (arr, comp) {
+    var unique = arr.map(function (e) {
+      return e[comp];
+    }) // store the keys of the unique objects
+    .map(function (e, i, _final) {
+      return _final.indexOf(e) === i && i;
+    }) // eliminate the dead keys & store unique objects
+    .filter(function (e) {
+      return arr[e];
+    }).map(function (e) {
+      return arr[e];
+    });
+    return unique;
+  };
+
+  $.XPathDrawer.prototype.getAnnotationsData = function () {
+    var self = this;
+    var all = self.getUnique(jQuery('.annotator-hl').parents('.annotator-hl').addBack().map(function (_, elem) {
+      return jQuery(elem).data('annotation');
+    }).toArray(), 'id');
+    all.sort(function (a, b) {
+      return b - a;
+    }); //console.log(all);
+
+    return all;
+  };
+
+  $.XPathDrawer.prototype.getSpecificAnnotationData = function (annotation_id) {
+    var self = this;
+    var currentAnnotations = self.getAnnotationsData();
+    var foundAnnotation = currentAnnotations.find(function (ann) {
+      if (ann.id === annotation_id) {
+        return ann;
+      }
+    });
+    return foundAnnotation;
+  };
+
+  $.drawers.push($.XPathDrawer);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 58 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(59);
+/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
+/* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
+/**
+ * 
+ */
+var annotator = annotator ? annotator : __webpack_require__(7);
+
+
+
+
+(function ($) {
+  $.FloatingViewer = function (options, inst_id) {
+    // sets default options
+    var defaultOptions = {
+      // set up template names that will be pulled
+      TEMPLATENAMES: ["editor", "viewer"],
+      TEMPLATES: {
+        editor: __webpack_require__(60),
+        viewer: __webpack_require__(61)
+      },
+      template_suffix: "floating",
+      template_urls: ""
+    };
+    this.options = jQuery.extend({}, defaultOptions, options);
+    console.log("Floating options", this.options);
+    this.instance_id = inst_id;
+    this.annotation_tool = {
+      interactionPoint: null,
+      editing: false,
+      updating: false,
+      editor: null,
+      viewer: null
+    };
+    this.element = jQuery(this.options.element);
+    this.hideTimer = null;
+    this.init();
+  };
+
+  $.FloatingViewer.prototype.init = function () {
+    var self = this;
+    self.setUpTemplates(self.options.template_suffix); // make sure the viewer doesn't disappear when the person moves their mouse over it
+
+    self.element.on('mouseover', '.annotation-viewer', function (event1) {
+      clearTimeout(self.hideTimer);
+    }); // once they leave the viewer hide it
+
+    self.element.on('mouseleave', '.annotation-viewer', function (event1) {
+      if (self.annotation_tool.isStatic) {
+        return;
+      }
+
+      clearTimeout(self.hideTimer);
+      self.ViewerDisplayClose();
+    });
+    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      clearTimeout(self.hideTimer);
+
+      try {
+        self.annotation_tool.viewer.addClass('static');
+        self.annotation_tool.isStatic = true;
+      } catch (e) {
+        self.ViewerDisplayOpen(event1, annotations);
+        self.annotation_tool.viewer.addClass('static');
+        self.annotation_tool.isStatic = true;
+      }
+    });
+    jQuery('body').on('click', '.annotation-username', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'User']);
+    });
+    jQuery('body').on('click', '.annotation-tag', function (e) {
+      $.publishEvent('autosearch', self.instance_id, [jQuery(this).text().trim(), 'Tag']);
+    });
+    this.setUpPinAndMove();
+  };
+
+  $.FloatingViewer.prototype.setUpTemplates = function (suffix) {
+    var self = this;
+    var deferreds = jQuery.map(self.options.TEMPLATENAMES, function (templateName) {
+      if (templateName in self.options.TEMPLATES) {
+        return;
+      }
+
+      var options = {
+        url: self.options.template_urls + templateName + '-' + suffix + '.html',
+        type: "GET",
+        contentType: "charset=utf-8",
+        success: function success(data) {
+          var template = _.template(data);
+
+          self.options.TEMPLATES[templateName] = template;
+        },
+        async: true
+      };
+      return jQuery.ajax(options);
+    });
+    jQuery.when.apply(jQuery, deferreds).done(function () {
+      self.annotation_tool.editorTemplate = self.options.TEMPLATES.editor({
+        editorid: self.instance_id.replace(/\W/g, '-')
+      });
+    });
+  };
+
+  $.FloatingViewer.prototype.TargetSelectionMade = function (annotation, event) {
+    // if (event && event instanceof MouseEvent) {
+    this.ViewerEditorOpen(event, annotation, false, $.mouseFixedPosition(event, annotation)); // }
+  };
+
+  $.FloatingViewer.prototype.ViewerEditorOpen = function (event, annotation, updating, interactionPoint) {
+    var self = this;
+
+    if (self.annotation_tool.editing && self.annotation_tool.updating && self.annotation_tool.isStatic && !updating) {
+      // there's already an open editor window for this instance so don't do anything
+      return;
+    }
+
+    if (self.annotation_tool.viewer) {
+      jQuery('.annotation-viewer').remove();
+      delete self.annotation_tool.viewer;
+      self.annotation_tool.isStatic = false;
+      self.annotation_tool.updating = false;
+      self.annotation_tool.editing = false;
+    }
+
+    jQuery('.edit').prop('disabled', true); // set editing mode
+
+    self.annotation_tool.editing = true;
+    self.annotation_tool.updating = updating; // actually set up and draw the Editor
+
+    var wrapperElement = self.element.find('.annotator-wrapper');
+    wrapperElement.after(self.annotation_tool.editorTemplate); // save the element to call upon later
+
+    self.annotation_tool.editor = jQuery('#annotation-editor-' + self.instance_id.replace(/\W/g, '-'));
+    var intPt = interactionPoint; // situate it on its proper location
+
+    self.annotation_tool.editor.css({
+      'top': intPt.top - jQuery(window).scrollTop(),
+      'left': intPt.left
+    }); // closes the editor tool and does not save annotation
+
+    self.annotation_tool.editor.find('.cancel').click(function () {
+      console.log("HERE", annotation, !updating, true);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
+    }); // closes the editor and does save annotations
+
+    self.annotation_tool.editor.find('.save').click(function () {
+      var text = self.annotation_tool.editor.find('#annotation-text-field').val();
+
+      if (updating) {
+        annotation.annotationText.pop();
+      }
+
+      annotation.annotationText.push(text);
+      $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, false]);
+    });
+    self.annotation_tool.editor.find('#annotation-text-field').val(annotation.annotationText);
+    setTimeout(function () {
+      self.annotation_tool.editor.find('#annotation-text-field')[0].focus();
+    }, 250);
+    self.checkOrientation(self.annotation_tool.editor);
+    $.publishEvent('editorShown', self.instance_id, [self.annotation_tool.editor, annotation]);
+  };
+
+  $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
+    var self = this;
+    jQuery('.edit').prop('disabled', false);
+    jQuery('.note-link-popover').remove();
+    $.publishEvent('editorHidden', self.instance_id, []);
+
+    if (self.annotation_tool.editor) {
+      self.annotation_tool.editor.remove();
+    }
+
+    delete self.annotation_tool.editor;
+    self.annotation_tool.editing = false;
+    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
+  };
+
+  $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
+    var self = this;
+    var annotations = anns.reverse(); // if the timer is set for the tool to be hidden, this intercepts it
+
+    if (self.hideTimer !== undefined) {
+      clearTimeout(self.hideTimer);
+    }
+
+    if (jQuery('.annotation-editor').is(':visible') || jQuery('.hx-confirm-button').is(':visible') || self.annotation_tool.editing || self.annotation_tool.updating || self.annotation_tool.isStatic && Hxighlighter.exists(self.annotation_tool.viewer)) {
+      // there's already an open editor window for this instance so don't do anything
+      return;
+    }
+
+    self.annotation_tool.viewerTemplate = self.options.TEMPLATES['viewer']({
+      'viewerid': self.instance_id.replace(/\W/g, '-'),
+      'annotations': annotations,
+      'instructor_ids': self.options.instructors,
+      'common_name': self.options.common_instructor_name && self.options.common_instructor_name !== "" ? self.options.common_instructor_name : ""
+    });
+
+    if (self.options.viewer_options.readonly) {
+      self.annotation_tool.viewerTemplate = self.annotation_tool.viewerTemplate.replace(/<button class="edit".*?<\/button>/g, '').replace(/<button class="delete".*?<\/button>/g, '');
+    } // add the viewer to the DOM
+
+
+    self.element.find('.annotator-wrapper').after(self.annotation_tool.viewerTemplate); // collect the object for manipulation and coordinates of where it should appear
+
+    if (self.annotation_tool.viewer) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+
+    self.annotation_tool.viewer = jQuery('#annotation-viewer-' + self.instance_id.replace(/\W/g, '-'));
+    var newTop = annotator.util.mousePosition(event).top - jQuery(window).scrollTop() + 20;
+    var newLeft = annotator.util.mousePosition(event).left + 30;
+    self.annotation_tool.viewer.css({
+      'top': newTop,
+      'left': newLeft
+    });
+    self.annotation_tool.viewer.data('annotations', annotations);
+    self.annotation_tool.viewer.find('.cancel').click(function (event1) {
+      self.annotation_tool.isStatic = false;
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer; // jQuery('body').css('overflow-y', 'scroll');
+    });
+    self.annotation_tool.viewer.find('.edit').click(function (event1) {
+      var annotation_id = jQuery(this).attr('id').replace('edit-', '');
+      var filtered_annotation = annotations.find(function (ann) {
+        if (ann.id === annotation_id) return ann;
+      });
+      self.ViewerEditorOpen(event1, filtered_annotation, true, {
+        top: parseInt(self.annotation_tool.viewer.css('top'), 10),
+        left: parseInt(self.annotation_tool.viewer.css('left'), 10)
+      }); //StorageAnnotationSave
+    });
+    self.annotation_tool.viewer.find('.delete').confirm({
+      title: 'Delete Annotation?',
+      content: 'Would you like to delete your annotation? This is permanent.',
+      buttons: {
+        confirm: function confirm() {
+          var annotation_id = this.$target[0].id.replace('delete-', '');
+          var filtered_annotation = annotations.find(function (ann) {
+            if (ann.id === annotation_id) return ann;
+          });
+          $.publishEvent('StorageAnnotationDelete', self.instance_id, [filtered_annotation]);
+          self.ViewerDisplayClose();
+
+          if (self.annotation_tool.viewer) {
+            jQuery('.annotation-viewer').remove();
+            delete self.annotation_tool.viewer;
+            self.annotation_tool.isStatic = false;
+            self.annotation_tool.updating = false;
+            self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+          }
+        },
+        cancel: function cancel() {}
+      }
+    }); // console.log(annotations);        
+
+    $.publishEvent('displayShown', self.instance_id, [self.annotation_tool.viewer, annotations]);
+    self.checkOrientation(self.annotation_tool.viewer);
+  };
+
+  $.FloatingViewer.prototype.ViewerDisplayClose = function (annotations) {
+    var self = this;
+
+    if (self.annotation_tool.isStatic) {
+      return;
+    }
+
+    console.log('should hide display');
+    clearTimeout(self.hideTimer);
+    self.hideTimer = setTimeout(function () {
+      if (self.hideTimer) {
+        $.publishEvent('displayHidden', self.instance_id, []);
+
+        if (self.annotation_tool.viewer) {
+          self.annotation_tool.viewer.remove();
+          delete self.annotation_tool.viewer;
+        }
+
+        self.annotation_tool.isStatic = false;
+        self.annotation_tool.updating = false;
+        self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+      }
+    }, 500);
+  };
+
+  $.FloatingViewer.prototype.StorageAnnotationSave = function (annotations) {};
+
+  $.FloatingViewer.prototype.StorageAnnotationLoad = function (first_argument) {
+    var self = this;
+
+    if (self.annotation_tool.viewer) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+
+    self.annotation_tool.isStatic = false;
+    self.annotation_tool.updating = false;
+    self.annotation_tool.editing = false; // jQuery('body').css('overflow-y', 'scroll');
+  };
+
+  $.FloatingViewer.prototype.StorageAnnotationDelete = function (annotation) {
+    var self = this;
+    jQuery('.annotation-viewer').remove();
+    delete self.annotation_tool.viewer;
+    self.annotation_tool.isStatic = false;
+    self.annotation_tool.updating = false;
+    self.annotation_tool.editing = false;
+  };
+
+  $.FloatingViewer.prototype.setUpPinAndMove = function () {
+    var self = this; // keeps track of when mouse button is pressed
+
+    jQuery('body').on('mousedown', function (event) {
+      self.buttonDown = true;
+    }); // keeps track of when mouse button is let go
+
+    jQuery('body').on('mouseup', function (event) {
+      self.buttonDown = false;
+    }); // handles moving the editor by clicking and dragging
+
+    jQuery('body').on('mousedown', '.annotation-editor-nav-bar', function (event) {
+      self.prepareToMove(true, event);
+    }); // handles moving the viewer by clicking and dragging
+
+    jQuery('body').on('mousedown', '.annotation-viewer-nav-bar', function (event) {
+      self.prepareToMove(false, event);
+    });
+    jQuery('body').on('mousemove', function (event) {
+      self.moving(event);
+    });
+    jQuery('body').on('mouseup', function (event) {
+      self.finishedMoving(event);
+    }); // jQuery('body').on('mouseover', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-editor', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+    // jQuery('body').on('mouseover', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'hidden');
+    // });
+    // jQuery('body').on('mouseleave', '.annotation-viewer', function(event) {
+    //     jQuery('body').css('overflow-y', 'scroll');
+    // });
+
+    jQuery('body').on('mouseleave', function (event) {
+      self.finishedMoving(event);
+    });
+  };
+
+  $.FloatingViewer.prototype.prepareToMove = function (isEditor, event) {
+    var self = this;
+    self.itemMoving = isEditor ? self.annotation_tool.editor : self.annotation_tool.viewer;
+
+    if (self.itemMoving) {
+      $.pauseEvent(event); //turns on moving mode
+
+      self.itemMoving.moving = true; // set initial mouse position offset by where on the editor the user clicked
+
+      var move = annotator.util.mousePosition(event);
+      var editorTop = parseInt(self.itemMoving.css('top'), 10);
+      var editorLeft = parseInt(self.itemMoving.css('left'), 10);
+      self.itemMoving.offsetTopBy = move.top - editorTop;
+      self.itemMoving.offsetLeftBy = move.left - editorLeft;
+    }
+  };
+
+  $.FloatingViewer.prototype.moving = function (event) {
+    var self = this;
+
+    if (self.itemMoving && self.itemMoving.moving) {
+      $.pauseEvent(event); // gets the userlocation (where they've dragged to)
+
+      var move = annotator.util.mousePosition(event);
+      var newTop = move.top - self.itemMoving.offsetTopBy;
+      var newLeft = move.left - self.itemMoving.offsetLeftBy; // var borderBox = self.element[0].getBoundingClientRect();
+
+      if (newTop < 0) {
+        newTop = 0;
+      }
+
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+
+      if (newTop + self.itemMoving.outerHeight() > window.innerHeight) {
+        newTop = window.innerHeight - self.itemMoving.outerHeight();
+      }
+
+      if (newLeft + self.itemMoving.outerWidth() > window.innerWidth) {
+        newLeft = window.innerWidth - self.itemMoving.outerWidth();
+      }
+      /* TODO: Set boundaries for far right and far down */
+      // sets the editor to that location (fixing offset)
+
+
+      self.itemMoving.css({
+        top: newTop,
+        left: newLeft
+      });
+    } else if (self.buttonDown && self.annotation_tool.viewer && !self.annotation_tool.viewer.hasClass('static')) {
+      self.annotation_tool.viewer.remove();
+      delete self.annotation_tool.viewer;
+    }
+  };
+
+  $.FloatingViewer.prototype.finishedMoving = function (event) {
+    var self = this;
+
+    if (self.itemMoving) {
+      $.pauseEvent(event); //turns on moving mode
+
+      self.itemMoving.moving = false;
+      var move = annotator.util.mousePosition(event);
+      self.annotation_tool.interactionPoint = {
+        top: move.top - self.itemMoving.offsetTopBy,
+        left: move.left - self.itemMoving.offsetLeftBy
+      };
+    }
+  };
+
+  $.FloatingViewer.prototype.checkOrientation = function (viewerElement) {
+    var self = this;
+    var newTop = parseInt(jQuery(viewerElement).css('top'), 10);
+    var newLeft = parseInt(jQuery(viewerElement).css('left'), 10);
+    var elWidth = parseInt(jQuery(viewerElement).outerWidth());
+    var elHeight = parseInt(jQuery(viewerElement).outerHeight());
+
+    if (newTop < 0) {
+      newTop = 0;
+    }
+
+    if (newLeft < 0) {
+      newLeft = 0;
+    }
+
+    if (newTop + elHeight > window.innerHeight) {
+      newTop = window.innerHeight - elHeight - 34 - 75; // 34 is the height of the save/cancel buttons that get cut off 
+    }
+
+    if (newLeft + elWidth > window.innerWidth) {
+      newLeft = window.innerWidth - elWidth - 12; // 12 is the width of the scroll bar
+    }
+
+    jQuery(viewerElement).css('top', newTop);
+    jQuery(viewerElement).css('left', newLeft);
+  };
+
+  $.viewers.push($.FloatingViewer);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports) {
+
+module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '';
+with (obj) {
+__p += '<div class="annotation-editor" id="annotation-editor-' +
+((__t = ( editorid )) == null ? '' : __t) +
+'">\n    <nav class=\'annotation-editor-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <textarea id="annotation-text-field"></textarea>\n    <div class="plugin-area">\n    </div>\n    <!-- <input type="text" id="annotation-tags-field" placeholder="Add tags..." /> -->\n    <button tabindex="0" class="btn btn-primary save action-button">Save</button>\n    <button tabindex="0" class="btn btn-default cancel action-button">Cancel</button>\n</div>\n';
+
+}
+return __p
+};
 
 
 /***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="annotation-viewer" id="annotation-viewer-' +
+((__t = ( viewerid )) == null ? '' : __t) +
+'">\n    <nav class=\'annotation-viewer-nav-bar\'>\n        <button class="cancel" tabindex="0" aria-label="Close Viewer" tile="Close Viewer"><i class="fas fa-times-circle"></i></button>\n    </nav>\n    <div class="plugin-area-top">\n    </div>\n    <div class="annotation-text-field">\n        ';
+ _.each(annotations, function(ann){ ;
+__p += '\n            <div class="ann-item item-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+' floating ';
+ if (instructor_ids.indexOf(ann.creator.id) > -1) {;
+__p += 'inst';
+};
+__p += '" id="annotation-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'">\n                <div class="annotation-username">';
+ if (instructor_ids.indexOf(ann.creator.id) > -1 && common_name !== "") { print(common_name);;
+__p += '&nbsp;<span class="fas fa-certificate-cap"></span>';
+} else {print(ann.creator.name);} ;
+__p += '</div>\n                <div class="annotation-date" title="' +
+((__t = ( ann.created )) == null ? '' : __t) +
+'">';
+ if (ann.created){print(jQuery.timeago(ann.created));} else {print(jQuery.timeago(new Date()))} ;
+__p += '</div>\n                <button class="edit" id="edit-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Edit Annotation" title="Edit Annotation"><i class="fas fa-edit"></i></button>\n                <button class="delete" id="delete-' +
+((__t = ( ann.id )) == null ? '' : __t) +
+'" tabindex="0" aria-label="Delete Annotation" title="Delete Annotation"><i class="fa fa-trash"></i></button>\n                <div class="annotation-quote">' +
+((__t = ( ann.exact )) == null ? '' : __t) +
+'</div>\n                <div class="annotation-text">' +
+((__t = ( ann.annotationText )) == null ? '' : __t) +
+'</div>\n                ';
+ if (ann.tags && ann.tags.length > 0) { ;
+__p += '\n                    <div class="annotation-tags">\n                        Tags: \n                        \n                        ';
+ _.each(ann.tags, function(tag){ ;
+__p += '\n                            <div class="annotation-tag">' +
+((__t = ( tag )) == null ? '' : __t) +
+'</div>\n                        ';
+ }); ;
+__p += '\n                    </div>\n                ';
+ } ;
+__p += '\n                <div class="plugin-area-bottom">\n                </div>\n            </div>\n        ';
+ }); ;
+__p += '\n    </div>\n</div>\n';
+
+}
+return __p
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  InstructionPanel Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(63);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.InstructionPanel = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID; // console.log("INSTRUCTION PANEL CREATED");
+
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.InstructionPanel.prototype.init = function () {
+    var self = this;
+    self.setUpInstructions();
+  };
+
+  $.InstructionPanel.prototype.setUpInstructions = function () {
+    var self = this;
+
+    if (!self.options.instructions || self.options.instructions.length == 0) {
+      return;
+    } // console.log(self.options.instructions, typeof(self.options.instructions));
+
+
+    var container = '<div class="instructions-container" style="display:block;"><div class="instructions-title">Instructions<span href="#" class="toggle-instructions" role="button" data-toggle="collapse" data-target=".instructions-body" id="toggle-instructions" aria-controls="annotation-instructions" tabindex="0" role="button">Collapse Instructions</span></div><section class="instructions-body collapse in" aria-expanded="true" aria-live="polite" id="annotation-instructions">' + self.options.instructions + '</section></div>';
+    jQuery(self.options.slot).prepend(container); // toggles the label for toggling instructions
+
+    var inst_area = jQuery(self.options.slot).find('.toggle-instructions');
+    inst_area.click(function () {
+      if (inst_area.html() == "Collapse Instructions") {
+        inst_area.html('Expand Instructions');
+      } else {
+        inst_area.html('Collapse Instructions');
+      }
+    });
+  };
+
+  $.InstructionPanel.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.InstructionPanel, 'name', {
+    value: "InstructionPanel"
+  });
+  $.plugins.push($.InstructionPanel);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  FontResize Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(65);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.FontResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.toggleTextSize(0);
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.FontResize.prototype.init = function () {
+    var self = this;
+    self.setUpButtons();
+  };
+
+  $.FontResize.prototype.setUpButtons = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<div class="btn-group hx-font-size" role="group" aria-label="Control Annotation Text Size" aria-live="polite" ><div class="pull-left" style="padding: 6px 12px;">Text Size <span id="annotations-text-size-label">(+0)</span>:</div><button aria-label="Increase font size" type="button" class="annotations-text-size-plus btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i></button><button aria-label="Decrease font size" type="button" class="annotations-text-size-minus btn btn-default" role="button"><i class="fa fa-minus" aria-hidden="true"></i></button>');
+    jQuery(self.options.slot).find('.annotations-text-size-plus').click(function () {
+      self.toggleTextSize(1);
+    });
+    jQuery(self.options.slot).find('.annotations-text-size-minus').click(function () {
+      self.toggleTextSize(-1);
+    });
+  };
+
+  $.FontResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.FontResize.prototype.toggleTextSize = function (step) {
+    var self = this;
+    step = isNaN(Number(step)) ? 0 : Number(step);
+    var $content = jQuery(self.options.slot).find('.annotator-wrapper');
+    var $label = jQuery("#annotations-text-size-label");
+    var nodes = [],
+        curnode,
+        stylesize,
+        styleunit,
+        computed;
+    var minsize = 8;
+    var sizediff = 0;
+
+    if (typeof this.defaultFontSize === "undefined") {
+      this.defaultFontSize = 14;
+    }
+
+    if (typeof this.targetFontSize === "undefined") {
+      this.targetFontSize = this.defaultFontSize;
+    }
+
+    this.targetFontSize += step;
+
+    if (this.targetFontSize < minsize) {
+      this.targetFontSize = minsize;
+    }
+
+    sizediff = this.targetFontSize - this.defaultFontSize;
+
+    if (sizediff === 0) {
+      $label.html("(+0)");
+      $content.css('fontSize', '');
+    } else {
+      $label.html("(" + (sizediff > 0 ? "+" + sizediff : sizediff) + ")");
+      $content.css('fontSize', String(this.targetFontSize) + "px");
+      nodes.push($content[0]);
+    } // walk the dom and find custom fontStyle declarations and adust as necessary
+    //console.log("updating font size to: ", this.targetFontSize, "step:", step);
+
+
+    while (nodes.length > 0) {
+      curnode = nodes.pop(); // handle case where a <font> is embedded (deprecated tag... but still out there in the wild)
+
+      if (curnode.tagName.toLowerCase() == 'font') {
+        computed = window.getComputedStyle(curnode);
+        curnode.style.fontSize = computed['font-size'];
+        curnode.size = "";
+      } // handle case where a class like "msoNormal" from an embedded stylesheet has applied a font size
+
+
+      if (curnode != $content[0] && curnode.className != "") {
+        curnode.style.fontSize = "inherit";
+      } // handle case with an inline style fontSize (only adjust absolute fontSize values)
+
+
+      stylesize = parseInt(curnode.style.fontSize, 10);
+
+      if (!isNaN(stylesize)) {
+        styleunit = curnode.style.fontSize.replace(stylesize, '');
+        stylesize += step;
+        stylesize = stylesize < minsize ? minsize : stylesize;
+
+        if (styleunit.indexOf("px") !== -1 || styleunit.indexOf("pt") !== -1) {
+          curnode.style.fontSize = stylesize + styleunit;
+        }
+      }
+
+      for (var i = curnode.children.length; i > 0; i--) {
+        nodes.push(curnode.children[i - 1]);
+      }
+    }
+  };
+
+  Object.defineProperty($.FontResize, 'name', {
+    value: "FontResize"
+  });
+  $.plugins.push($.FontResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
 /* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
+
+(function ($) {
+  $.KeyboardSelector = function (element, inst_id) {
+    this.element = element;
+
+    if (!jQuery(element).hasClass('annotator-wrapper')) {
+      this.element = jQuery(element).find('.annotator-wrapper');
+    }
+
+    this.instance_id = inst_id;
+    this.delimiter_list = ['*', '+', '#', '^'];
+    this.keyMaps = {
+      'BACKSPACE': 8,
+      'TAB': 9,
+      'ENTER': 13,
+      'SHIFT': 16,
+      'CTRL': 17,
+      'ALT': 18,
+      'ESC': 27,
+      'SPACE': 32,
+      'LEFT': 37,
+      'UP': 38,
+      'RIGHT': 39,
+      'DOWN': 40,
+      'DELETE': 46,
+      'MULTIPLY': 106,
+      'ADD': 107,
+      'PIPE': 220,
+      '*': 56,
+      '+': 187,
+      'HOME': 36,
+      'END': 35
+    };
+    this.init();
+  };
+
+  $.KeyboardSelector.prototype.init = function () {
+    var self = this;
+    this.delimiter = this.checkDelimiter(self.element);
+
+    if (!this.delimiter) {//console.log('Error in delimiter...no suitable delimiter found!');
+    }
+
+    this.start = undefined;
+    this.setUpButton();
+  };
+
+  $.KeyboardSelector.prototype.checkDelimiter = function (element) {
+    var textSearch = jQuery(element).text();
+
+    for (var i = 0; i < this.delimiter_list.length; i++) {
+      var testDelimiter = this.delimiter_list[i];
+
+      if (textSearch.indexOf(testDelimiter) == -1) {
+        return testDelimiter;
+      }
+    }
+
+    return undefined;
+  };
+
+  $.KeyboardSelector.prototype.setUpButton = function () {
+    var self = this;
+    jQuery(document).on('keydown', function (event) {
+      if (event.key == '1' && (event.altKey || event.ctrlKey) || event.key == '\'' && (event.altKey || event.ctrlKey)) {
+        event.preventDefault(); //move this to external button
+
+        if (!event.target.isContentEditable && !jQuery(event.target).hasClass('form-control')) {
+          self.turnSelectionModeOn();
+        }
+
+        return false;
+      } else if (event.key == 'Escape') {
+        //console.log("hello");
+        self.turnSelectionModeOff(); // } else if (event.key == ' ') {
+        //     event.preventDefault();
+        //     return false;
+      }
+
+      if (event.key == '2' && (event.altKey || event.ctrlKey)) {
+        event.preventDefault();
+        var currentInst = jQuery('.sr-alert').html();
+
+        if (currentInst.trim() === "") {
+          currentInst = 'Hit "Ctrl + 1" to beginning annotating the text by marking them with apostrophes.';
+        }
+
+        jQuery('.sr-alert').html('');
+        setTimeout(function () {
+          jQuery('.sr-alert').html(currentInst);
+        }, 250);
+      }
+
+      if (event.key == '3' && (event.altKey || event.ctrlKey)) {
+        var currVal = jQuery('#hx-sr-notifications').attr('aria-live');
+        var newVal = currVal == "off" ? 'assertive' : 'off';
+        var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
+
+        if (newVal == "off") {
+          jQuery('.sr-real-alert').html(newAlert);
+          setTimeout(function () {
+            jQuery('#hx-sr-notifications').attr('aria-live', newVal);
+            jQuery('.sr-real-alert').html('');
+          }, 500);
+          var currVal = jQuery('.sr-alert').html();
+          jQuery('.sr-alert').html('');
+          jQuery('.sr-alert').data('old', currVal);
+        } else {
+          jQuery('.sr-alert').html(jQuery('.sr-alert').data('old'));
+          jQuery('#hx-sr-notifications').attr('aria-live', newVal);
+          jQuery('.sr-real-alert').html(newAlert);
+        }
+
+        event.preventDefault();
+      }
+    });
+    jQuery(document).on('keyup', '*[role="button"]', function (evt) {
+      if (evt.key == 'Enter' || evt.key == ' ') {
+        jQuery(evt.currentTarget).click();
+        return $.pauseEvent(evt);
+        ;
+      }
+    }); // var slot = self.element;
+    // if (!self.element.hasClass('annotation-slot')) {
+    //     slot = self.element.find('.annotation-slot');
+    // }
+    // if (slot.length === 0) {
+    //     slot = self.element.closest('.annotation-slot');
+    // }
+    // jQuery(slot).prepend('<button class="hx-keyboard-toggle btn btn-default" style="margin-right: 10px;">Toggle Keyboard Input</button>');
+
+    jQuery(document).on('click', 'a[class*="keyboard-toggle"]', function (evt) {
+      jQuery('#key-help').toggleClass('sr-only');
+      jQuery(this).toggleClass('selected');
+      jQuery(self.element).closest('main').animate({
+        scrollTop: jQuery(self.element).closest('main').scrollTop() + jQuery('#key-help').offset().top - 50
+      }); // if (jQuery(this).hasClass('selection-mode-on')) {
+      // self.turnSelectionModeOff();
+      //jQuery(this).removeClass('selection-mode-on');
+      // } else {
+      // self.turnSelectionModeOn();
+      //jQuery(this).addClass('selection-mode-on');
+      // }
+    });
+    jQuery(document).on('click', 'button[class*="make-annotation-button"]', function (evt) {
+      if (jQuery(this).hasClass('selection-mode-on')) {
+        self.turnSelectionModeOff();
+        jQuery(this).removeClass('selection-mode-on');
+      } else {
+        self.turnSelectionModeOn();
+        jQuery(this).addClass('selection-mode-on');
+      }
+    });
+    $.subscribeEvent('wysiwygOpened', self.instance_id, function (e) {
+      if (self.currentSelection) {
+        var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
+        jQuery('.note-editable.card-block').attr('aria-label', 'The quote you have selected is: <em>' + ser.text.exact + '</em>. You are now in a text box. Add your annotation.');
+      }
+    });
+    $.subscribeEvent('focusOnContext', self.instance_id, function (_, ann) {
+      self.addMarkers(ann.ranges);
+    });
+  };
+
+  $.KeyboardSelector.prototype.turnSelectionModeOn = function () {
+    this.saveHTML = this.element.innerHTML;
+    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
+
+    if (!toggleButton.hasClass('should-show')) {
+      toggleButton.click();
+    }
+
+    if (window.navigator.platform.indexOf('Mac') !== -1) {
+      jQuery('.sr-alert').html('Enter the text box until editing text (usually VoiceOver Keys + Down Arrow) then move around using arrow keys without VoiceOver keys held down.');
+    }
+
+    jQuery(this.element).attr('contenteditable', 'true');
+    jQuery(this.element).attr('role', 'textbox');
+    jQuery(this.element).attr('tabindex', "0");
+    jQuery(this.element).attr('aria-label', 'You are now in the text to be annotated. Mark selection with asterisks.');
+    jQuery(this.element).attr('aria-multiline', 'true');
+    jQuery(this.element).attr('accesskey', 't');
+    jQuery('.hx-selector-img').remove();
+    jQuery(this.element).on('keydown', jQuery.proxy(this.filterKeys, this));
+    jQuery(this.element).on('keyup', jQuery.proxy(this.setSelection, this));
+    this.start = undefined;
+    this.currentSelection = undefined;
+    this.element.innerHTML = this.saveHTML;
+    this.element.focus();
+  };
+
+  $.KeyboardSelector.prototype.turnSelectionModeOff = function () {
+    var self = this;
+    var toggleButton = jQuery(this.element).parent().find('.hx-toggle-annotations');
+
+    if (toggleButton.hasClass('should-show')) {
+      toggleButton.click();
+    }
+
+    jQuery(this.element).off('keydown');
+    jQuery(this.element).off('keyup');
+    jQuery(this.element).attr('contenteditable', 'false');
+    jQuery(this.element).attr('role', '');
+    jQuery(this.element).attr('tabindex', '');
+    jQuery(this.element).attr('aria-multiline', 'false');
+    jQuery(this.element).attr('outline', '0px');
+    jQuery('.hx-selector-img').remove();
+    this.start = undefined;
+    this.currentSelection = undefined;
+    setTimeout(function () {
+      self.element.blur();
+    }, 250);
+  };
+  /* Credit to Rich Caloggero
+   * https://github.com/RichCaloggero/annotator/blob/master/annotator.html
+   */
+
+
+  $.KeyboardSelector.prototype.filterKeys = function (keyPressed) {
+    var self = this;
+    var key = keyPressed.key || keypressed.keyCode;
+
+    switch (key) {
+      case self.delimiter:
+        return false;
+
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "Up":
+      case "Down":
+      case "Left":
+      case "Right":
+      case 37:
+      case 38:
+      case 39:
+      case 40:
+      case "Home":
+      case "End":
+      case "Tab":
+        return true;
+
+      case "Backspace":
+        if (self.verifyBackspace()) {
+          self.start = undefined;
+          return true;
+        }
+
+      case "Escape":
+        self.turnSelectionModeOff();
+        keyPressed.preventDefault();
+        jQuery('.sr-real-alert').html("Keyboard Selection Mode is off.");
+        return false;
+
+      case "2":
+        if (keyPressed.altKey || keyPressed.ctrlKey) {
+          jQuery('.sr-alert').html(jQuery('.sr-alert').html());
+        }
+
+        keyPressed.preventDefault();
+        return false;
+
+      case "3":
+        if (keyPressed.altKey || keyPressed.ctrlKey) {
+          var currVal = jQuery('.sr-alert').attr('aria-live');
+          var newVal = currVal == "off" ? 'polite' : 'off';
+          jQuery('.sr-alert').attr('aria-live', newVal);
+          var newAlert = currVal == "off" ? 'Help text is on' : 'Help text is off';
+          jQuery('.sr-real-alert').html(newAlert);
+        }
+
+        keyPressed.preventDefault();
+        return false;
+
+      default:
+        keyPressed.preventDefault();
+        return false;
+    } // switch
+
+  };
+
+  $.KeyboardSelector.prototype.getBoundingClientRect = function (range) {
+    var newRange = range.cloneRange();
+
+    try {
+      newRange.setStart(range.startContainer, range.startOffset);
+      newRange.setEnd(range.startContainer, range.startOffset + 1);
+      return {
+        top: newRange.getBoundingClientRect().top,
+        left: newRange.getBoundingClientRect().left
+      };
+    } catch (e) {
+      newRange.setStart(range.startContainer, range.startOffset - 1);
+      newRange.setEnd(range.startContainer, range.startOffset);
+      return {
+        top: newRange.getBoundingClientRect().top,
+        left: newRange.getBoundingClientRect().right
+      };
+    }
+  };
+
+  $.KeyboardSelector.prototype.setSelection = function (keyPressed) {
+    var self = this;
+    var key = keyPressed.key || keyPressed.keyCode;
+
+    switch (key) {
+      case self.delimiter:
+        if (!self.start || typeof self.start == "undefined") {
+          self.start = self.copySelection(getSelection());
+          var bcr = self.getBoundingClientRect(self.start); //console.log($.mouseFixedPositionFromRange(self.start), bcr, jQuery(window).scrollTop());
+
+          jQuery('body').append('<div class="hx-selector-img"></div>');
+          jQuery('.hx-selector-img').css({
+            top: bcr.top + jQuery(window).scrollTop() - 5,
+            left: bcr.left - 5
+          });
+          jQuery('.sr-alert').html();
+          jQuery('.sr-alert').html('Move to end of text to be annotated and press "*" again.');
+        } else {
+          var end = self.copySelection(getSelection());
+          jQuery('.hx-selector-img').remove(); //console.log("Found end", end);
+
+          if (self.currentSelection) {//console.log(hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl'), self.currentSelection.toString());
+          } else {
+            var end = self.copySelection(getSelection());
+            var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
+            var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
+            var boundingBox = undefined;
+            self.currentSelection = document.createRange();
+
+            if (posStart.startOffset < posEnd.startOffset) {
+              self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
+              self.currentSelection.setEnd(end.startContainer, end.startOffset);
+            } else {
+              self.currentSelection.setStart(end.startContainer, end.startOffset);
+              self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
+            }
+          }
+
+          boundingBox = {
+            top: self.currentSelection.getBoundingClientRect().top + jQuery(window).scrollTop() - 5,
+            left: self.currentSelection.getBoundingClientRect().left - 5
+          };
+          var ser = hrange.serializeRange(self.currentSelection, self.element, 'annotator-hl');
+          jQuery('.sr-alert').html(''); //jQuery('.sr-alert').html('You are now in a text box. Add your annotation. The quote you have selected is: <em>' + ser.text.exact + "</em>");
+
+          Hxighlighter.publishEvent('TargetSelectionMade', self.instance_id, [self.element, [ser], boundingBox]); //console.log("Active Element", document.activeElement.className);
+
+          if (document.activeElement.className.indexOf('note-editable') == -1) {
+            //console.log("BLURRING");
+            self.element.blur();
+          } else {
+            setTimeout(function () {
+              jQuery('.note-editable.card-block')[0].focus(); //console.log("should be focusing on", document.activeElement);
+            }, 250);
+          }
+
+          self.turnSelectionModeOff(); // var startComesAfter = self.startComesAfter(self.start, end);
+          // console.log("Found other", startComesAfter);
+          // self.start = startComesAfter[0];
+          // self.processSelection(startComesAfter[0], startComesAfter[1]);
+        }
+
+        break;
+
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "Up":
+      case "Down":
+      case "Left":
+      case "Right":
+      case 37:
+      case 38:
+      case 39:
+      case 40:
+        if (self.start) {
+          var end = self.copySelection(getSelection());
+          var posStart = hrange.getGlobalOffset(self.start, self.element, 'annotator-hl');
+          var posEnd = hrange.getGlobalOffset(end, self.element, 'annotator-hl');
+          self.currentSelection = document.createRange();
+
+          if (posStart.startOffset < posEnd.startOffset) {
+            self.currentSelection.setStart(self.start.startContainer, self.start.startOffset);
+            self.currentSelection.setEnd(end.startContainer, end.startOffset);
+          } else {
+            self.currentSelection.setStart(end.startContainer, end.startOffset);
+            self.currentSelection.setEnd(self.start.startContainer, self.start.startOffset);
+          } // console.log(self.start, end);
+          // console.log(self.currentSelection, self.currentSelection.toString());
+          // var sel = window.getSelection();
+          // sel.removeAllRanges();
+          // sel.addRange(self.currentSelection);
+
+        }
+
+    }
+  };
+
+  $.KeyboardSelector.prototype.copySelection = function (selection) {
+    // const sel = {
+    //     anchorNode: selection.anchorNode,
+    //     anchorOffset: selection.anchorOffset,
+    //     focusNode: selection.focusNode,
+    //     focusOffset: selection.focusOffset,
+    //     parentElement: selection.anchorNode.parentElement
+    // };
+    return selection.getRangeAt(0);
+  };
+
+  $.KeyboardSelector.prototype.processSelection = function (start, end) {
+    var self = this;
+    var s = getSelection(); //console.log("LOOK HERE", start, end);
+
+    var r = this.removeMarkers(start, end);
+    self.start = undefined; //console.log("R!", r);
+
+    try {
+      var boundingBox = r.end.parentElement.getBoundingClientRect();
+    } catch (e) {
+      var boundingBox = r.endContainer.parentElement.getBoundingClientRect();
+    } //console.log(boundingBox);
+    // publish selection made
+
+
+    Hxighlighter.publishEvent('TargetSelectionMade', this.instance_id, [this.element, [hrange.serializeRange(r, self.element, 'annotator-hl')], boundingBox]); //console.log("Element Focused", document.activeElement);
+
+    if (document.activeElement.className.indexOf('note-editable') == -1) {
+      self.element.blur();
+    }
+
+    self.turnSelectionModeOff(); // this.element.focus();
+  };
+
+  $.KeyboardSelector.prototype.startComesAfter = function (start, end) {
+    if (start.anchorNode == end.anchorNode) {
+      if (start.anchorOffset > end.anchorOffset) {
+        start.anchorOffset += 1;
+        return [end, start];
+      } else {
+        return [start, end];
+      }
+    } // TODO: Handle other use cases (i.e. starting several nodes instead of within the same one)
+
+
+    var commonAncestor = this.getCommonAncestor(start.anchorNode, end.anchorNode);
+    var children = jQuery(commonAncestor).children();
+    var startCounter = 0;
+    jQuery.each(children, function (_, el) {
+      if (el == start.parentElement) {
+        startCounter += start.anchorOffset;
+        return false;
+      } else {
+        startCounter += jQuery(el).text().length;
+      }
+    });
+    var endCounter = 0;
+    jQuery.each(children, function (_, el) {
+      if (el == end.parentElement) {
+        endCounter += end.anchorOffset;
+        return false;
+      } else {
+        endCounter += jQuery(el).text().length;
+      }
+    });
+
+    if (startCounter > endCounter) {
+      return [end, start];
+    } else {
+      return [start, end];
+    }
+  };
+  /**
+   * Gets the common ancestor.
+   * Credit: https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
+   *
+   * @param      {<type>}  a       { parameter_description }
+   * @param      {<type>}  b       { parameter_description }
+   * @return     {Object}  The common ancestor.
+   */
+
+
+  $.KeyboardSelector.prototype.getCommonAncestor = function (a, b) {
+    $parentsa = jQuery(a).parents();
+    $parentsb = jQuery(b).parents();
+    var found = null;
+    $parentsa.each(function () {
+      var thisa = this;
+      $parentsb.each(function () {
+        if (thisa == this) {
+          found = this;
+          return false;
+        }
+      });
+      if (found) return false;
+    });
+    return found;
+  };
+
+  $.KeyboardSelector.prototype.removeMarkers = function (start, end) {
+    var self = this;
+    var _start = start.anchorNode;
+
+    var _startOffset = start.anchorOffset - 1;
+
+    var _end = end.anchorNode;
+
+    var _endOffset = end.anchorOffset - 1; //console.log(_start, _startOffset, _end, _endOffset);
+
+
+    var t2 = this.removeCharacter(_end.textContent, _endOffset);
+    _end.textContent = t2;
+    var t1 = this.removeCharacter(_start.textContent, _startOffset);
+    _start.textContent = t1;
+    var r = document.createRange();
+    r.setStart(_start, _startOffset);
+    var realRange = {
+      startContainer: _start,
+      startOffset: _startOffset,
+      endContainer: _end
+    };
+
+    if (start.anchorNode === end.anchorNode) {
+      realRange['endOffset'] = _endOffset - 1;
+      r.setEnd(_start, _endOffset - 1);
+    } else {
+      realRange['endOffset'] = _endOffset;
+      r.setEnd(_start, _endOffset);
+    } // getting common ancestors
+    // lonesomeday @ https://stackoverflow.com/questions/3960843/how-to-find-the-nearest-common-ancestors-of-two-or-more-nodes
+
+
+    realRange['commonAncestorContainer'] = jQuery(_start).parents().has(_end).first()[0];
+    realRange['exact'] = [r.toString()];
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r); // convert to xpath and then back to a range
+    // var sR = hrange.serializeRange(r, self.element, 'annotator-hl');
+    //var nR = hrange.normalizeRange(sR, self.element, 'annotator-hl');
+    // console.log(sR, nR);
+
+    return r;
+  };
+
+  $.KeyboardSelector.prototype.addMarkers = function (ranges) {
+    console.log(ranges);
+  };
+
+  $.KeyboardSelector.prototype.removeCharacter = function (s, offset) {
+    if (offset === 0) {
+      s = s.slice(1);
+    } else if (offset === s.length - 1) {
+      s = s.slice(0, -1);
+    } else {
+      s = s.slice(0, offset) + s.slice(offset + 1);
+    }
+
+    return s;
+  };
+
+  $.KeyboardSelector.prototype.verifyBackspace = function () {
+    var s = getSelection();
+    var r = document.createRange();
+    var startOffset = s.anchorOffset;
+
+    if (startOffset > 0) {
+      startOffset -= 1;
+    }
+
+    r.setStart(s.anchorNode, startOffset);
+    r.setEnd(s.anchorNode, startOffset + 1);
+    return r.toString() == this.delimiter;
+  };
+
+  $.selectors.push($.KeyboardSelector);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Toggle Annotations Plugin
+ *  
+ *
+ */
+__webpack_require__(68);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.ToggleAnnotations = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.on = true;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.ToggleAnnotations.prototype.init = function () {
+    var self = this;
+    self.setUpButton();
+  };
+
+  $.ToggleAnnotations.prototype.setUpButton = function () {
+    var self = this;
+    jQuery(self.options.slot).prepend('<button class="hx-toggle-annotations btn btn-default"></button>');
+    jQuery(self.options.slot).find('.hx-toggle-annotations').click(function () {
+      var toggleButton = jQuery(this);
+
+      if (!toggleButton.hasClass('should-show')) {
+        $.publishEvent('undrawAll', self.instanceID, [function (annList) {
+          self.tempAnnotationList = annList;
+          self.on = false;
+          toggleButton.addClass('should-show');
+        }]);
+      } else {
+        $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+          self.tempAnnotationList = [];
+          self.on = true;
+          toggleButton.removeClass('should-show');
+        }]);
+      }
+    });
+  };
+
+  $.ToggleAnnotations.prototype.editorShown = function () {
+    var self = this;
+
+    if (!self.on) {
+      $.publishEvent('drawList', self.instanceID, [self.tempAnnotationList, function () {
+        self.tempAnnotationList = [];
+        self.on = true;
+        jQuery(self.options.slot).find('.hx-toggle-annotations').removeClass('should-show');
+      }]);
+    }
+  };
+
+  $.ToggleAnnotations.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  Object.defineProperty($.ToggleAnnotations, 'name', {
+    value: "ToggleAnnotations"
+  });
+  $.plugins.push($.ToggleAnnotations);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  DisplayResize Annotations Plugin
+ *  
+ *
+ */
+var annotator = annotator ? annotator : __webpack_require__(7); //uncomment to add css file
+
+__webpack_require__(70);
+
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.DisplayResize = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    self.itemStretching = false;
+    this.init();
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.DisplayResize.prototype.init = function () {
+    var self = this;
+    self.setUpListeners();
+  };
+
+  $.DisplayResize.prototype.setUpListeners = function () {
+    var self = this;
+    Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      self.currentViewer.append('<div class="hx-resize resize-bar"></div>');
+      self.currentViewer.find('.hx-resize.resize-bar').on('mousedown', function (event) {
+        self.prepareToStretch(event);
+      });
+      jQuery(self.options.slot).on('mousemove', function (event) {
+        self.stretch(event);
+
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'hidden');
+        }
+      });
+      jQuery(self.options.slot).on('mouseup', function (event) {
+        if (self.itemStretching) {// jQuery('body').css('overflow', 'inherit');
+        }
+
+        self.finishedStretching(event);
+      });
+      jQuery(self.options.slot).on('mouseleave', function (event) {
+        self.finishedStretching(event);
+      });
+    });
+  };
+
+  $.DisplayResize.prototype.prepareToStretch = function (event) {
+    var self = this;
+    self.itemStretching = true;
+    $.pauseEvent(event);
+    self.initialPoint = annotator.util.mousePosition(event);
+    self.initialHeight = self.currentViewer.height(); // self.initialInnerHeight = self.currentViewer.find('.annotation-text-field').outerHeight() - 10;
+  };
+
+  $.DisplayResize.prototype.stretch = function (event) {
+    var self = this;
+
+    if (self.itemStretching) {
+      var newPoint = annotator.util.mousePosition(event);
+      var diff = newPoint.top - self.initialPoint.top;
+      var newHeight = self.initialHeight + diff;
+      var innerHeight = self.initialHeight + diff - 30;
+      self.currentViewer.css('height', newHeight);
+      self.currentViewer.find('.annotation-text-field').css({
+        'max-height': innerHeight,
+        'height': innerHeight
+      });
+    }
+  };
+
+  $.DisplayResize.prototype.finishedStretching = function (event) {
+    var self = this;
+    self.itemStretching = false;
+  };
+
+  $.DisplayResize.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.DisplayResize.prototype.displayShown = function (viewer, annotations) {
+    var self = this;
+
+    if (Array.isArray(annotations)) {
+      self.currentViewer = jQuery(viewer);
+    }
+  };
+
+  Object.defineProperty($.DisplayResize, 'name', {
+    value: "DisplayResize"
+  });
+  $.plugins.push($.DisplayResize);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+/* 71 */,
+/* 72 */,
+/* 73 */,
+/* 74 */,
+/* 75 */,
+/* 76 */,
+/* 77 */,
+/* 78 */,
+/* 79 */,
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */,
+/* 84 */,
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(86);
+
+
+/***/ }),
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45616,7 +45637,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(44);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(54);
 /* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -45632,22 +45653,22 @@ __webpack_require__(1);
 
 __webpack_require__(20);
 
-__webpack_require__(45);
+__webpack_require__(46);
 
-__webpack_require__(66);
+__webpack_require__(87);
 
-__webpack_require__(47);
+__webpack_require__(55);
 
-__webpack_require__(68);
+__webpack_require__(89);
 
 __webpack_require__(43);
 
-__webpack_require__(63);
+__webpack_require__(48);
 
-__webpack_require__(69);
+__webpack_require__(90);
 
 /***/ }),
-/* 66 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45656,7 +45677,7 @@ __webpack_require__(69);
  *
  */
 //uncomment to add css file
-__webpack_require__(67);
+__webpack_require__(88);
 
 (function ($) {
   /**
@@ -45740,13 +45761,13 @@ __webpack_require__(67);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 68 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45803,7 +45824,7 @@ __webpack_require__(67);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 69 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45812,7 +45833,7 @@ __webpack_require__(67);
  *
  */
 //uncomment to add css file
-__webpack_require__(70);
+__webpack_require__(91);
 
 (function ($) {
   /**
@@ -45871,7 +45892,7 @@ __webpack_require__(70);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 70 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin

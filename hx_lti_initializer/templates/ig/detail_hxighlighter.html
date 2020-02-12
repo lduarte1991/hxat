@@ -1,0 +1,170 @@
+{% extends 'hx_lti_initializer/hxighlighter_base.html' %}
+
+{% load staticfiles %}
+{% load list_of_ids %}
+
+{% block title %}
+Text Annotation Tool | {{ target_object.target_title }}
+{% endblock %}
+
+{% block cssfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'Hxighlighter/hxighlighter_image_m2.css' %}">
+{% endblock %}
+
+{% block mainapplication %}
+    <main class="hxighlighter-container" role="main">
+        <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
+            <aside aria-labelledby="aside-title" role="complementary" class="sr-only" accesskey="h" id="key-help">
+                    <h3 id='aside-title'>Keyboard Help</h3>
+                    <details>
+                        <summary>Quick Navigation Links</summary>
+                        <ul>
+                            <li><a href="#to-title">Image to be Annotated</a></li>
+                            <li><a href="#annotationsHolder">Annotation List</a></li>
+                        </ul>
+                    </details>
+                    
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="polite">
+                        <div class='sr-real-alert'></div>
+                        <div class="sr-alert"></div>
+                        <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
+                    </div>
+                </aside>
+            <div class='annotations-section'>
+                <div id="viewer" class="hx-mirador"></div>
+            </div>
+        </section>
+    </main>
+    <footer class="hx-footer"></footer>
+    <style>
+        .hx-footer {
+            width: 100%;
+            height: 15px;
+            height: var(--footer-height);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 9999999999999;
+            /* background: black; */
+            background: #ededed;
+            /*-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.39);*/
+            border: 1px solid #c0c0c0;
+        }
+
+        :root {
+            --footer-height: 15px;
+        };
+
+        #viewer { position: fixed; width: 100%; height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
+    </style>
+    <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_image_m2.js' %}"></script>
+    <script>
+            var tags = "{{ assignment.highlights_options }}".split(',');
+            var hide_sidebar = {{ hide_sidebar_instance | safe }};
+            var tagDict = {};
+            tags.forEach(function(tagval) {
+                var pair = tagval.split(':');
+                tagDict[pair[0]] = pair[1]
+            });
+            var tabsCounter = 1;
+            var tabsList = ['search'];
+            {% if assignment.include_mynotes_tab %}
+                if (hide_sidebar.indexOf('mine') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('mine');
+                }
+            {% endif %}
+
+            {% if assignment.include_instructor_tab %}
+                if (hide_sidebar.indexOf('instructor') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('instructor');
+                }
+            {% endif %}
+
+            {% if assignment.include_public_tab %}
+                if (hide_sidebar.indexOf('peer') == -1){
+                    tabsCounter += 1;
+                    tabsList.push('peer');
+            }
+            {% endif %}
+            var defTab = "{{ assignment.default_tab }}";
+            if (defTab == "Instructor") {
+                defTab = "instructor"
+            } else if (defTab == "MyNotes") {
+                defTab = "mine";
+            } else if (defTab == "Public") {
+                defTab = "peer"
+            }
+            var hxighlighter_object1 = {
+                "commonInfo": {
+                    "mediaType": "image",
+                    "context_id": "{{ course }}",
+                    "collection_id": "{{ collection }}",
+                    "object_id": "{{ target_object }}",
+                    "username": "{{ username }}",
+                    "user_id": "{{ user_id }}",
+                    "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
+                    "common_instructor_name": "{{assignment.common_inst_name}}"
+                },
+                "targets": [{
+                    'mediaType': "image",
+                    'method': 'inline',
+                    'manifest_url': "{{ target_object }}",
+                    'object_source': '.container1',
+                    "template_urls":  "{% static 'templates/dashboard/' %}",
+                    "DropdownTags": {
+                        'tags': Object.keys(tagDict),
+                        'folksonomy': true,
+                    },
+                    {% if instructions != "" %}
+                    "InstructionPanel": {
+                        'instructions': "{{ instructions | escapejs }}"
+                    },
+                    {% endif %}
+                    "ColorTags": tagDict,
+                    "SidebarTagTokens": {
+                        'tagList': Object.keys(tagDict),
+                    },
+                    "HxPermissions": {
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                    },
+                    viewerOptions: {
+                        filterTabCount: tabsCounter,
+                        defaultTab: defTab,
+                        tabsAvailable: tabsList,
+                        sidebarversion: 'sidemenu',
+                        pagination: {{ assignment.pagination_limit }}
+                    },
+                    Badges: {
+                    },
+                    
+                    AdminButton: {
+                        {% if is_instructor %}
+                        homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",
+                        has_staff_permissions: ("{{ is_instructor }}" === "True")
+                        {% endif %}
+                    },  
+                    PrevNextButton: {
+                        prevUrl: {% if prev_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
+                        nextUrl: {% if next_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
+                    },
+                    storageOptions: {
+                        external_url: {
+                            catchpy: "{% url 'annotation_store:api_root' %}"
+                        },
+                        token: "{{ token }}",
+                        pagination: {{ assignment.pagination_limit }},
+                        database_params: {
+                            resource_link_id: "{{ resource_link_id }}",
+                            utm_source: "{{ utm_source }}",
+                            version: 'catchpy'
+                        }
+                    }
+                }],
+            };
+            Hxighlighter(hxighlighter_object1);
+        </script>
+{% endblock %}
