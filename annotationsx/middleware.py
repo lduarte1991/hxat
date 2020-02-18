@@ -180,8 +180,6 @@ class CookielessSessionMiddleware(MiddlewareMixin):
             self.logger.info("Session does not exist. Creating new session.")
             request.session.create()
             self.logger.info("Created new session: %s" % request.session.session_key)
-            for k,v in vars(request.session).items():
-                self.logger.info("******** SESSION[{}]: {}".format(k,v))
 
         logged_ip = request.session.get('LOGGED_IP', None)
         if check_ip and logged_ip is not None:
