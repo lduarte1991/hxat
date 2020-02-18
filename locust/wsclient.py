@@ -97,6 +97,8 @@ class SocketClient(object):
             'sessionid': self.hxat_utm_source,
             'resourcelinkid': self.hxat_resource_link_id,
         } if as_cookie else {}
+        # expects a string!
+        cookie = 'sessionid={}'.format(self.hxat_utm_source) if as_cookie else ''
         self.log('-------------- CONNECT COOKIE={}'.format(cookie))
 
         try:
@@ -111,7 +113,7 @@ class SocketClient(object):
                     )
         except Exception as e:
             self.log('-------------- CONNECT exception [{}]: {}'.format(
-                e.status_code, e))  # response status_code == 403
+                e, e))  # response status_code == 403
 
             events.request_failure.fire(
                 request_type='ws', name='connection',

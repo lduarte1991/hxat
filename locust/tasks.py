@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import requests
 
 from lti import ToolConsumer
 
@@ -109,10 +110,13 @@ def hxat_get_static(locust, url_path):
             },
             verify=locust.ssl_verify,
     )
-    if response.content == '':
-        response.failure('no data')
+    if response.status_code == requests.codes.ok:
+        if response.content == '':
+            response.failure('no data')
+        else:
+            response.success()
     else:
-        response.success()
+        response.failure('status code: {}'.format(response.status_code))
 
 
 def hxat_lti_launch(locust):
@@ -125,8 +129,8 @@ def hxat_lti_launch(locust):
                 "lti_message_type": "basic-lti-launch-request",
                 "lti_version": "LTI-1p0",
                 "resource_link_id": locust.hxat_client.resource_link_id,
-                # TODO check if lis_* actually needed for hxat
-                #"lis_person_sourcedid": locust.hxat_client.user_name,
+                "lis_person_sourcedid": locust.hxat_client.user_name,
+                # lis_outcome_service_url sets graded assignment
                 #"lis_outcome_service_url": os.environ.get('LIS_OUTCOME_SERVICE_URL', 'fake_url'),
                 "user_id": locust.hxat_client.user_id,
                 "roles": locust.hxat_client.user_roles,
@@ -143,21 +147,27 @@ def hxat_lti_launch(locust):
             name='/lti_launch/', headers=headers, data=params,
             verify=locust.ssl_verify,
             )
-    if response.content == '':
-        response.failure('no data')
-    else:
 
-        locust.log('*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*')
-        locust.log(response.content)
-
-        cookie_sid = response.cookies.get('sessionid', None)
-        if not cookie_sid:
-            response.failure('missing session-id cookies')
+    if response.status_code == requests.codes.ok:
+        if response.content == '':
+            response.failure('no data')
             return False
         else:
-            locust.hxat_client.utm_source = cookie_sid
-            response.success()
-            return True
+
+            locust.log('*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*')
+            locust.log(response.content)
+
+            cookie_sid = response.cookies.get('sessionid', None)
+            if not cookie_sid:
+                response.failure('missing session-id cookies')
+                return False
+            else:
+                locust.hxat_client.utm_source = cookie_sid
+                response.success()
+                return True
+    else:
+        response.failure('status code: {}'.format(response.status_code))
+        return False
 
 
 def create_ws_and_connect(locust):
@@ -229,4 +239,11 @@ class WSJustConnect(TaskSet):
     def lurker(self):
         try_reconnect(self.locust)
 
+
+class WSJustLTI(TaskSet):
+    wait_time = between(15, 90)
+
+    @task(1)
+    def lurker(self):
+        hxat_lti_launch(self.locust)
 
