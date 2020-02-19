@@ -1,5 +1,6 @@
 
 import logging
+import re
 
 from importlib import import_module
 from urllib.parse import parse_qs
@@ -27,14 +28,20 @@ class SessionAuthMiddleware(object):
             self.log.debug('******************** scope({}) = ({})'.format(key,
                 scope.get(key)))
 
-        query_string = scope.get('query_string', '')
-        self.log.debug('******************** qs({})'.format(query_string)),
+        # not authorized yet
+        scope['hxat_auth'] = 'forbidden'
 
+        # parse path to get context_id, collection_id, target_source_id
+        path = scope.get('path')
+        room_name = path.split('/')[-2]  # assumes path ends with a '/'
+        (context, collection, target) = room_name.split('--')
+        self.log.debug('******************** context({}) collection({}) target({})'.format(context, collection, target))
+
+        query_string = scope.get('query_string', '')
         parsed_query = parse_qs(query_string)
         self.log.debug('******************** parsed({})'.format(parsed_query)),
 
         if not parsed_query:
-            scope['hxat_auth'] = 'forbiden'
             self.log.debug('******************** finished with middleware EARLY: no query string')
             return self.inner(scope)
 
@@ -44,58 +51,29 @@ class SessionAuthMiddleware(object):
         self.log.debug('******************** sid({}) rid({})'.format(session_id,
             resource_link_id))
 
-        if session_id is not None and resource_link_id is not None:
-            self.log.debug('******************** sid and rid NOT NONE')
-            session = SessionStore(session_id)
-            # -------------------------------------------------
-            '''
-            try:
-                session = Session.objects.get(pk=session_id)
-                self.log.debug('******************** session[{}] = ({})'.format(type(session), session))
-                for k,v in vars(session).items():
-                    self.log.debug('******************** session[{}] = ({})'.format(k,v))
-
-            except DoesNotExist as e:
-                self.log.debug('******************** unknown session-id({})'.format(session_id))
-                scope['hxat_auth'] = 'forbidden'
-
-
-            s = session.get_decoded()
-            self.log.debug('******************** SESSION({}) len({})'.format(s, len(s)))
-            for key, value in s.items():
-                self.log.debug('******************** SESSION[{}] = {}'.format(key, value))
-
-
-            '''
-            # -------------------------------------------------
-            if session.exists(session_id):
-                for attr, value in vars(session).items():
-                    self.log.debug('******************** SESSION[{}] = {}'.format(attr, value))
-
-                lti_launch = session.get('LTI_LAUNCH', {})
-                for attr, value in lti_launch.items():
-                    self.log.debug('******************** LTI_LAUTCH[{}] = {}'.format(attr, value))
-
-                lti_obj = lti_launch.get(resource_link_id, None)
-                if lti_obj is not None:
-                    for key in lti_obj.keys():
-                        self.log.debug('******************** lti-session[{}] = {}'.format(key, lti_obj[key]))
-                    scope['hxat_auth'] = 'authenticated'
-                else:
-                    self.log.debug(
-                            '******************** session({}) lti_obj({})'.format(session, lti_obj))
-
-            else:
-                # forbidden: unknown session id
-                self.log.debug('******************** unknown session-id({})'.format(session_id))
-                scope['hxat_auth'] = 'forbidden'
-                pass
-        else:
+        if session_id is None or resource_link_id is None:
             # forbidden: missing session id in query string
             self.log.debug('******************** missing session-id or resource-link-id')
-            scope['hxat_auth'] = 'forbidden'
-            pass
+            return self.inner(scope)
+
+        session = SessionStore(session_id)
+        if not session.exists(session_id):
+            # forbidden: unknown session id
+            self.log.debug('******************** unknown session-id({})'.format(session_id))
+        else:
+            multi_launch = session.get('LTI_LAUNCH', {})
+            lti_launch = multi_launch.get(resource_link_id, {})
+            lti_params = lti_launch.get('launch_params', {})
+
+            # check the context-id matches the channel being connected
+            clean_context_id = re.sub('[\W_]', '-', lti_params.get('context_id', ''))
+            self.log.debug('******************** context_id[{}] = {}'.format(clean_context_id, context))
+            if clean_context_id == context:
+                scope['hxat_auth'] = 'authenticated'
 
         self.log.debug('******************** finished with middleware')
         return self.inner(scope)
+
+
+
 
