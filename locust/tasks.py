@@ -3,6 +3,7 @@ import json
 import os
 import re
 import requests
+import time
 
 from lti import ToolConsumer
 
@@ -237,6 +238,34 @@ class WSJustConnect(TaskSet):
 
     @task(1)
     def lurker(self):
+        try_reconnect(self.locust)
+
+
+class WSConnectAndDie(TaskSet):
+    wait_time = between(15, 90)
+
+    def on_start(self):
+        # basic lti login for hxat text annotation
+        ret = hxat_lti_launch(self.locust)
+        if ret:
+            #hxat_get_static(self.locust, '/Hxighlighter/hxighlighter_text.css')
+            #hxat_get_static(self.locust, '/Hxighlighter/hxighlighter_text.js')
+            #hxat_search(self.locust)
+            create_ws_and_connect(self.locust)
+        else:
+            raise Exception('failed to lti login')
+
+    def on_stop(self):
+        if self.locust.ws_client is not None:
+            self.locust.ws_client.close()
+
+
+    @task(1)
+    def wait_and_stop(self):
+        self.locust.ws_client.log('************** about to close')
+        self.locust.ws_client.close()
+        time.sleep(2)
+        self.locust.ws_client.log('************** about to reconnect')
         try_reconnect(self.locust)
 
 
