@@ -67,11 +67,7 @@ class SocketClient(object):
             self.console.write('[{}] {}'.format(self.session_id, msg))
 
 
-    def connect(self, as_qs=False, as_header=False, as_cookie=False):
-        if self.ws is not None:
-            self.log('nothing to do: already connected')
-            # TODO: have to manage recv thread?
-            return
+    def _prep_connection(self, as_qs=False, as_header=False, as_cookie=False):
 
         self.log('-------------- CONNECT as_qs={} as_header={} as_cookie={}'.format(
             as_qs, as_header, as_cookie))
@@ -82,10 +78,7 @@ class SocketClient(object):
                     self.hxat_resource_link_id)
         else:
             conn_url = self.url
-
-        self.log('-------------- CONNECT TO URL={}'.format(self.url))
         self.log('-------------- CONNECT TO CONN_URL={}'.format(conn_url))
-        self.log('-------------- CONNECT TO HOST={}'.format(self.hostname))
 
         header = {
             'x_utm_source': self.hxat_utm_source,
@@ -97,12 +90,24 @@ class SocketClient(object):
             'sessionid': self.hxat_utm_source,
             'resourcelinkid': self.hxat_resource_link_id,
         } if as_cookie else {}
-        # expects a string!
+
+        # TODO expects a string!
         cookie = 'sessionid={}'.format(self.hxat_utm_source) if as_cookie else ''
         self.log('-------------- CONNECT COOKIE={}'.format(cookie))
 
+        return (conn_url, header, cookie)
+
+
+    def _get_connection(self, as_qs=False, as_header=False, as_cookie=False):
+        if self.ws is not None:
+            self.log('-------------- CONNECT ws already exists')
+            return self.ws
+
+        self.log('-------------- CONNECT must create ws connection')
+        (conn_url, header, cookie) = self._prep_connection(
+                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
         try:
-            self.ws = websocket.create_connection(
+            ws = websocket.create_connection(
                     url=conn_url,
                     sslopt={
                         'cert_reqs': ssl.CERT_NONE,  # do not check certs
@@ -123,8 +128,53 @@ class SocketClient(object):
             )
             # client should be smarter and know that if 403, it probably will
             # not be able to connect, ever, due to wrong creds
+            return None
         else:
             self.log('-------------- CONNECT SUCCESS')
+            events.request_success.fire(
+                request_type='ws', name='connection',
+                response_time=None,
+                response_length=0)
+            return ws
+
+
+    def connect(self, as_qs=False, as_header=False, as_cookie=False):
+
+        ws = self._get_connection(
+                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
+        if ws is None:
+            self.log('^-^-^-^-^-^-^- failed to get connection')
+            return
+        # have a ws connection!
+        self.ws = ws
+
+        if self.ws.connected:
+            self.log('nothing to do: already connected')
+            # TODO: have to manage recv thread?
+            return
+
+        (conn_url, header, cookie) = self._prep_connection(
+                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
+        try:
+            self.ws.connect(
+                    url=conn_url,
+                    header=header,
+                    cookie=cookie,
+                    )
+        except Exception as e:
+            self.log('^-^-^-^-^-^-^- CONNECT exception [{}]: {}'.format(
+                e, e))  # response status_code == 403
+
+            events.request_failure.fire(
+                request_type='ws', name='connection',
+                response_time=None,
+                response_length=0,
+                exception=e,
+            )
+            # client should be smarter and know that if 403, it probably will
+            # not be able to connect, ever, due to wrong creds
+        else:
+            self.log('^-^-^-^-^-^-^- CONNECT SUCCESS')
             events.request_success.fire(
                 request_type='ws', name='connection',
                 response_time=None,
@@ -173,14 +223,14 @@ class SocketClient(object):
     def recv(self):
         while True:
             opcode, data = self._recv()
-            self.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
+            self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
 
             if opcode == websocket.ABNF.OPCODE_TEXT and isinstance(
                     data, bytes):
                 # success
                 data = str(data, 'utf-8')
                 weba = json.loads(data)
-                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno_id: {}'.format(weba['message']['id']))
+                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno_id: {}'.format(weba['message']['id']))
                 created = iso8601.parse_date(weba['message']['created'])
                 ts_delta = (datetime.now(tz.tzutc()) - \
                         created) / (timedelta(microseconds=1) * 1000)
@@ -211,7 +261,7 @@ class SocketClient(object):
                     )
 
             elif opcode == websocket.ABNF.OPCODE_CLOSE:
-                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ recv CLOSE')
+                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv CLOSE')
                 break  # terminate loop
 
             elif opcode == websocket.ABNF.OPCODE_PING:
