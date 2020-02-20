@@ -19,18 +19,17 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         logging.getLogger(__name__).debug('--------------- room_name({}) room_group_name({})'.format(self.room_name, self.room_group_name))
         logging.getLogger(__name__).debug('--------------- channel_layer({})'.format(self.channel_layer))
 
-        # join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-        logging.getLogger(__name__).debug('--------------- added group to channel layer')
-
-        auth = self.scope.get('hxat_auth', 'forbidden')
+        auth = self.scope.get('hxat_auth', '403')
         if auth != 'authenticated':
             logging.getLogger(__name__).debug('--------------- ws auth FAILED, dropping connection')
             raise DenyConnection()  # return status_code=403
         else:
+            # join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            logging.getLogger(__name__).debug('--------------- added group to channel layer')
             await self.accept()
             logging.getLogger(__name__).debug('--------------- connection accepted')
 
