@@ -14,17 +14,36 @@ Text Annotation Tool | {{ target_object.target_title }}
 {% block mainapplication %}
     <main class="hxighlighter-container" role="main">
         <section class='container1' aria-labelledby='to-title' role="region" accesskey='t'>
-            <aside aria-labelledby="aside-title" role="complementary" class="sr-only" accesskey="h" id="key-help">
+            aside labelledby='aside-title' role="complementary" class="sr-only" accesskey="h" id='key-help' tabindex="-1">
                     <h3 id='aside-title'>Keyboard Help</h3>
                     <details>
                         <summary>Quick Navigation Links</summary>
                         <ul>
-                            <li><a href="#viewer">Image Viewer</a></li>
+                            <li><a href="#" class="focus-on-location" data-link-to=".openseadragon-canvas">Image Viewer</a></li>
+                            <li><a href="#" class="focus-on-location" data-link-to=".mirador-osd-up.hud-control">Image Viewer Controls</a></li>
                             <li><a href="#annotationsHolder">Annotation List</a></li>
                         </ul>
                     </details>
+                    <details>
+                        <summary>Making Annotations via Keyboard Instructions</summary>
+                        <ol>
+                            <li>Use instructor or peer annotations to guide you in selecting the region you would like to annotate. Each annotation in the annotation list has a button to zoom in to the region that annotation is marking.</li>
+                            <li>Once you are in the desired area, use the shortcut below or the <a href="#ma-button">Make Annotation</a> button to capture what is currently in the viewer.</li>
+                        </ol>
+                    </details>
+                    <details>
+                        <summary>Keyboard Shortcuts</summary>
+                        <ul>
+                            <li><strong>"Ctrl + 1"</strong>: Make annotation using what is currently in the viewer</li>
+                            <li><strong>"Ctrl + 2"</strong>: Repeat instructions/messages/hints from tool</li>
+                            <li><strong>"Ctrl + 3"</strong>: Toggle Hints on/off</li>
+                        </ul>
+                        When in the image viewer use the arrow keys to pan in the desired direction, or '-' to zoom out and '=' to zoom in.
+                    </details>
+                    <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
+
                     
-                    <div id="hx-sr-notifications" class='sr-only' aria-live="polite">
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="assertive">
                         <div class='sr-real-alert'></div>
                         <div class="sr-alert"></div>
                         <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
