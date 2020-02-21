@@ -105,7 +105,7 @@ def test_launchLti_user_course_ok():
                 #'roles': ['Learner'],
                 'context_id': course_id,
                 # 04feb20 naomi: context_title has to do with edx studio not
-                # sending user_id in launch params.
+                # sending user_id in launch params to create course user.
                 'context_title': '{}+title'.format(course_id),
                 },
             )
@@ -131,6 +131,59 @@ def test_launchLti_user_course_ok():
     assert(course is not None)
     assert(len(LTICourse.get_all_courses()) == 1)
     assert(course.course_admins.all()[0].anon_id == instructor_edxid)
+    assert(course.course_name == '{}+title'.format(course_id))
+
+
+@pytest.mark.django_db
+def test_launchLti_user_course_ok_no_context_title():
+    instructor_name = 'sylvia_plath'
+    instructor_edxid = '{}{}'.format(randint(1000, 65534), randint(1000, 65534))
+    course_id = 'hx+FANcyCourse+TermCode+Year'
+    target_path = reverse('hx_lti_initializer:launch_lti')
+    launch_url = 'http://testserver{}'.format(target_path)
+    resource_link_id = 'some_string_to_be_THE_FAKE_resource_link_id'
+    consumer = ToolConsumer(
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.LTI_SECRET,
+            launch_url=launch_url,
+            params={
+                'lti_message_type': 'basic-lti-launch-request',
+                'lti_version': 'LTI-1p0',
+                'resource_link_id': resource_link_id,
+                'lis_person_sourcedid': instructor_name,
+                'lis_outcome_service_url': 'fake_url',
+                'user_id': instructor_edxid,
+                'roles': ['Instructor', 'Administrator'],
+                #'roles': ['Learner'],
+                'context_id': course_id,
+                # 04feb20 naomi: context_title has to do with edx studio not
+                # sending user_id in launch params to create course user.
+                #'context_title': '{}+title'.format(course_id),
+                },
+            )
+    params = consumer.generate_launch_data()
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            target_path,
+            data=params,
+            )
+    assert(response.status_code == 200)
+    assert(response.cookies.get('sessionid'))
+
+    # check user was created
+    user = User.objects.get(username=instructor_name)
+    assert(user is not None)
+    lti_profile = LTIProfile.objects.get(anon_id=instructor_edxid)
+    assert(lti_profile is not None)
+    assert(lti_profile.user.username == user.username)
+
+    # check course was created
+    course = LTICourse.get_course_by_id(course_id)
+    assert(course is not None)
+    assert(len(LTICourse.get_all_courses()) == 1)
+    assert(course.course_admins.all()[0].anon_id == instructor_edxid)
+    assert(course.course_name.startswith('noname-'))
 
 
 @pytest.mark.django_db

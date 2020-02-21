@@ -34,6 +34,7 @@ except ImportError:
     class MiddlewareMixin(object):
         pass
 
+
 def ip_address(request):
     ''' Returns the real IP address from a request, or if that fails, returns 1.2.3.4.'''
     meta = request.META
@@ -41,8 +42,10 @@ def ip_address(request):
     # which is more prone to varying between requests from the same client
     return meta.get('HTTP_X_REAL_IP', meta.get('HTTP_CLIENT_IP', meta.get('REMOTE_ADDR', '1.2.3.4')))
 
+
 class LTILaunchError(Exception):
     pass
+
 
 class LTILaunchSession(object):
     '''
@@ -141,6 +144,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 self.logger.warning('Content-Security-Policy header not set')
         return response
 
+
 class CookielessSessionMiddleware(MiddlewareMixin):
     '''
     This middleware implements cookieless sessions by retrieving the session identifier
@@ -219,7 +223,9 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         # to exceptions raised from the view."
         #
         # so, middleware classes cannot rely on exceptions to short-circuit the
-        # request life-cycle in django anymore!
+        # request life-cycle in django anymore! 'unknown exceptions' return 500:
+        # - https://docs.djangoproject.com/en/2.2/topics/http/middleware/#exception-handling
+        # - https://code.djangoproject.com/ticket/12250#comment:18
 
     def process_request(self, request):
         self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
@@ -233,9 +239,12 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                 self._set_current_session(
                         request,
                         resource_link_id=request.POST.get('resource_link_id'))
-            except LTILaunchError:
+            except LTILaunchError as e:
+                self.logger.debug("LTILaunchError: {}".format(e))
                 return HttpResponseBadRequest()
-            except Exception:
+            except Exception as e:
+                self.logger.debug("Exception: {}".format(e))
+                # this potentially returns a 500:
                 raise
         else:
             self._set_current_session(
@@ -251,9 +260,10 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         consumer_key = getattr(settings, 'CONSUMER_KEY', None)
         try:
             secret = settings.LTI_SECRET_DICT[request.POST.get('context_id')]
-        except Exception:
+        except KeyError:
             secret = settings.LTI_SECRET
 
+        # 21feb20 naomi: note that we allow secret to be empty string!
         if consumer_key is None or secret is None:
             self.logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
             raise PermissionDenied
@@ -311,11 +321,12 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         for required_param in ('resource_link_id', 'context_id', 'user_id'):
             if required_param not in request.POST:
                 self.logger.error("Required LTI param '%s' was not present in request" % required_param)
-                raise LTILaunchError
+                raise LTILaunchError('missing LTI param {}'.format(required_param))
 
         if ('lis_person_sourcedid' not in request.POST and 'lis_person_name_full' not in request.POST and request.POST['user_id'] != "student"):
             self.logger.error('person identifier (i.e. username) or full name was not present in request')
-            raise LTILaunchError
+            raise LTILaunchError('missing LTI param: person identifier')
+
 
     def _update_session(self, request):
         '''

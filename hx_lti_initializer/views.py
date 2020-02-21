@@ -7,7 +7,7 @@ other information that will be rendered to the access/init screen to the user.
 """
 
 from django.http import HttpResponse
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import (MultipleObjectsReturned, PermissionDenied)
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -21,7 +21,7 @@ from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import (debug_printer, retrieve_token, save_session, create_new_user, fetch_annotations_by_course, DashboardAnnotations)
+from hx_lti_initializer.utils import (retrieve_token, save_session, create_new_user, fetch_annotations_by_course, DashboardAnnotations)
 from hx_lti_initializer import annotation_database
 from django.conf import settings
 from abstract_base_classes.target_object_database_api import TOD_Implementation
@@ -37,6 +37,7 @@ import os.path
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 @csrf_exempt
 def launch_lti(request):
@@ -96,13 +97,17 @@ def launch_lti(request):
     if not (display_name or external_user_id):
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
+        except LTIProfile.DoesNotExist:
+            logger.error('username({}) not found.'.format(course))
+            raise PermissionDenied('username not found in LTI launch')
+        except MultipleObjectsReturned as e:
+            logger.error('unable to guess username for course({}): {}'.format(course, e))
+            raise PermissionDenied('unable to find username')
+        else:
             roles = ['student']
             display_name = lti_profile.user.username
             messages.warning(request, "edX still has not fixed issue with no user_id in studio.")
             messages.error(request, "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.")
-        except Exception:
-            logger.debug('DEBUG - username not found in post.')
-            raise PermissionDenied('username not found in LTI launch')
     logger.debug("DEBUG - user name: " + display_name)
 
     # Check whether user is a admin, instructor or teaching assistant
@@ -115,7 +120,6 @@ def launch_lti(request):
             # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
             logger.debug('DEBUG - LTI Profile NOT found. New User to be created.')
             user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
-            logger.debug("DEBUG - new user{} profile{}".format(user, lti_profile))
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, lti_profile.user)
@@ -162,7 +166,7 @@ def launch_lti(request):
         )
 
     except LTICourse.DoesNotExist:
-        logger.debug( 'DEBUG - Course {} was NOT found. Will be created.'.format(course))
+        logger.debug('DEBUG - Course {} was NOT found. Will be created.'.format(course))
 
         # Put a message on the screen to indicate to the user that the course doesn't exist
         message_error = "Sorry, the course you are trying to reach does not exist."
@@ -175,10 +179,8 @@ def launch_lti(request):
             message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
             messages.warning(request, message_error)
 
-            # 04feb20 naomi: counting on canvas/edx to ALWAYS send the context_title
-            # otherwise, create_new_user will fail within exception handling...
             # create and save a new course for the instructor, with a default name of their canvas course's name
-            context_title = None
+            context_title = 'noname-{}'.format(time.time())  # random name as anon_id
             if 'context_title' in request.LTI['launch_params']:
                 context_title = request.LTI['launch_params']['context_title']
             course_object = LTICourse.create_course(course, lti_profile, name=context_title)
@@ -213,7 +215,7 @@ def launch_lti(request):
                 course_object.add_admin(lti_profile)
                 logger.info("CourseAdmin Pending found: %s" % userfound)
                 userfound.delete()
-            except Exception:
+            except:
                 logger.info("Not waiting to be added as admin")
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
         return access_annotation_target(request, course_id, assignment_id, object_id)
@@ -224,7 +226,7 @@ def launch_lti(request):
         logger.info('Proceed to the admin hub.')
     except PermissionDenied as e:
         raise e  # make sure to re-raise this exception since we shouldn't proceed
-    except Exception as e:
+    except:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
         # to be routed directly to an assignment given the correct POST parameters,
@@ -247,13 +249,13 @@ def launch_lti(request):
                     course_object.add_admin(lti_profile)
                     logger.info("CourseAdmin Pending found: %s" % userfound)
                     userfound.delete()
-                except Exception:
+                except:
                     logger.info("Not waiting to be added as admin")
                 return course_admin_hub(request)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
                 return access_annotation_target(request, course_id, assignment_id, object_id)
-        except Exception:
+        except:
             logger.debug("DEBUG - User wants the index")
 
     try:
@@ -264,7 +266,7 @@ def launch_lti(request):
         course_object.add_admin(lti_profile)
         logger.info("CourseAdmin Pending found: %s" % userfound)
         userfound.delete()
-    except Exception:
+    except:
         logger.debug("DEBUG - Not waiting to be added as admin")
 
     return course_admin_hub(request)
@@ -301,7 +303,7 @@ def edit_course(request, id):
                                 new_admin_course_id=course.course_id
                             )
                             new_course_admin.save()
-                        except Exception:
+                        except:
                             # admin already pending
                             logger.info("Admin already pending.")
 
@@ -318,7 +320,7 @@ def edit_course(request, id):
 
     try:
         pending_admins = LTICourseAdmin.objects.filter(new_admin_course_id=course.course_id)
-    except Exception:
+    except:
         pending_admins = None
 
     return render(
@@ -351,7 +353,7 @@ def course_admin_hub(request):
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
 
-    except Exception:
+    except:
         object_id = None
         collection_id = None
         to = None
@@ -399,17 +401,14 @@ def access_annotation_target(
     except Assignment.DoesNotExist or TargetObject.DoesNotExist:
         logger.error("User attempted to access an Assignment or Target Object that does not exist: assignment_id={assignment_id} object_id={object_id}".format(assignment_id=assignment_id, object_id=object_id))
         raise AnnotationTargetDoesNotExist('Assignment or target object does not exist')
-    try:
-        is_instructor = request.LTI['is_staff']
-    except Exception:
-        is_instructor = False
 
+    is_instructor = request.LTI.get('is_staff', False)
     if not is_instructor and not assignment.is_published:
         raise PermissionDenied('Permission to access unpublished assignment by a non-instructor is denied')
 
     try:
         hide_sidebar = request.LTI['launch_params']['custom_hide_sidebar_instance'].split(',')
-    except Exception:
+    except:
         hide_sidebar = []
 
     save_session(request, collection_id=assignment_id, object_id=object_id, object_uri=object_uri, context_id=course_id)
@@ -583,14 +582,13 @@ def delete_assignment(request):
         collection_id = request.POST['assignment_id']
         assignment = Assignment.objects.get(assignment_id=collection_id)
         assignment.delete()
-        logger.debug("DEBUG - Assignment Deleted: " + unicode(assignment))
-    except Exception:
+        logger.debug('DEBUG - Assignment Deleted: {}'.format(assignment))
+    except Exception as e:
+        logger.error('error in delete assignment({}): {}'.format(assignment, e))
         return error_view(request, "The assignment deletion may have failed")
 
     url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
     return redirect(url)
-
-
 
 
 @login_required
@@ -613,7 +611,7 @@ def change_starting_resource(request, assignment_id, object_id):
             config.object_id = object_id
             config.save()
             data['response'] = 'Success: Updated'
-        except Exception:
+        except:
             newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
             newConfig.save()
             data['response'] = 'Success: Created'
