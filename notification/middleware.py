@@ -65,12 +65,13 @@ class SessionAuthMiddleware(object):
             scope['hxat_auth'] = '403: unknown session-id({})'.format(session_id)
             self.log.debug('******************** {}'.format(scope['hxat_auth']))
         else:
+            # get lti launch params from session
             multi_launch = session.get('LTI_LAUNCH', {})
             lti_launch = multi_launch.get(resource_link_id, {})
             lti_params = lti_launch.get('launch_params', {})
 
             # check the context-id matches the channel being connected
-            clean_context_id = re.sub('[\W_]', '-', lti_params.get('context_id', ''))
+            clean_context_id = re.sub(r'[\W_]', '-', lti_params.get('context_id', ''))
             if clean_context_id == context:
                 scope['hxat_auth'] = 'authenticated'
             else:
