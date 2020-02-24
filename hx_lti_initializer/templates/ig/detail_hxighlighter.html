@@ -122,7 +122,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     "mediaType": "image",
                     "context_id": "{{ course }}",
                     "collection_id": "{{ collection }}",
-                    "object_id": "{{ target_object.pk }}",
+                    "object_id": "{{ canvas_id }}",
                     "username": "{{ username }}",
                     "user_id": "{{ user_id }}",
                     "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},

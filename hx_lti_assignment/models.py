@@ -1,8 +1,10 @@
 from django.db import models
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse
+import requests
 import uuid
 import sys
+import json
 
 
 class AssignmentTargets(models.Model):
@@ -71,7 +73,10 @@ class AssignmentTargets(models.Model):
         """
         options = self.get_target_external_options_list()
         if len(options) == 1:
-            return None
+            req = requests.get(self.target_object.all()[0].target_content)
+            manifest = json.load(req.text)
+            canv_id = manifest['sequences'][0]['canvases'][0]['@id']
+            return canv_id
         else:
             return options[1] if options[1] != '' else None
 
