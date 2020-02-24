@@ -5,6 +5,9 @@ import requests
 import uuid
 import sys
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AssignmentTargets(models.Model):
@@ -72,7 +75,8 @@ class AssignmentTargets(models.Model):
         """
         """
         options = self.get_target_external_options_list()
-        if len(options) == 1:
+        if len(options) <= 1:
+            logger.debug('Trying to get canvas id but none in list')
             req = requests.get(self.target_object.all()[0].target_content)
             manifest = json.load(req.text)
             canv_id = manifest['sequences'][0]['canvases'][0]['@id']
