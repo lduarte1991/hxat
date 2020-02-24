@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from rest_framework import generics
 
-from hx_lti_initializers.models import LTIProfile
+from hx_lti_initializer.models import LTIProfile
 from .models import TargetObject
 from .serializers import TargetObjectSerializer
 from .forms import SourceForm
