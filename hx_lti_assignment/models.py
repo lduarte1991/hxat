@@ -75,7 +75,7 @@ class AssignmentTargets(models.Model):
         """
         """
         options = self.get_target_external_options_list()
-        logger.debug("OPTIONS: " % len(options))
+        logger.debug("OPTIONS: %s " % options)
         if options is None or len(options) <= 1:
             logger.debug('Trying to get canvas id but none in list')
             req = requests.get(self.target_object.all()[0].target_content)
