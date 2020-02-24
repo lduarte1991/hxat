@@ -1,27 +1,39 @@
-from hx_lti_assignment.forms import AssignmentForm, AssignmentTargetsForm, AssignmentTargetsFormSet, DeleteAssignmentForm  # noqa
-from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.utils import debug_printer
-from hx_lti_initializer.models import LTICourse
+import json
+import logging
+import sys
+import uuid
+
 from django.contrib.auth.decorators import login_required
 from django.http import QueryDict, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response, redirect, render  # noqa
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render_to_response
+from django.shortcuts import redirect
+from django.shortcuts import render
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.core import serializers
-import uuid
-import json
-import sys
+
+from hx_lti_assignment.forms import AssignmentForm
+from hx_lti_assignment.forms import AssignmentTargetsForm
+from hx_lti_assignment.forms import AssignmentTargetsFormSet
+from hx_lti_assignment.forms import DeleteAssignmentForm
+from hx_lti_assignment.models import Assignment
+from hx_lti_assignment.models import AssignmentTargets
 from hx_lti_initializer.views import error_view  # should we centralize an error view?
+from hx_lti_initializer.models import LTICourse
+
+
+logger = logging.getLogger(__name__)
+
 
 def get_course_id(request):
-	return request.LTI['hx_lti_course_id']
+    return request.LTI['hx_lti_course_id']
+
 
 @login_required
 def create_new_assignment(request):
-    """
-    """
     debug = "Nothing"
     form = None
     if request.method == "POST":
@@ -52,7 +64,7 @@ def create_new_assignment(request):
                 target_num = 0 if assignment_targets is None else len(assignment_targets)
                 debug = "Assignment Form is NOT valid" +\
                     str(request.POST) + "What?"
-                debug_printer(form.errors)
+                logger.debug('form errors: {}'.format(form.errors))
                 template_used = 'hx_lti_assignment/create_new_assignment2.html'
                 if assignment and assignment.use_hxighlighter:
                     template_used = 'hx_lti_assignment/create_new_assignment_hxighlighter.html'
@@ -87,7 +99,7 @@ def create_new_assignment(request):
             target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
-            debug_printer(targets_form.errors)
+            logger.debug('Form Errors: {}'.format(target_form.errors))
             return error_view(request, "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.")
 
     # GET

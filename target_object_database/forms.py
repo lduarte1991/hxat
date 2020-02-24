@@ -1,6 +1,5 @@
 from django import forms
 from target_object_database.models import TargetObject
-from hx_lti_initializer.utils import debug_printer
 
 
 class SourceForm(forms.ModelForm):

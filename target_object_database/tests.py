@@ -1,16 +1,16 @@
+from django.contrib.auth.models import User
+from django.http import Http404
 from django.test import TestCase
+
 from target_object_database.models import TargetObject
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIProfile
-from hx_lti_initializer.test_helper import *
-from target_object_database.views import *
-from hx_lti_initializer.utils import *
-from django.http import Http404
+#from hx_lti_initializer.utils import *
+
+from .views import *
 
 
 class TODViewsTests(TestCase):
-    """
-    """
     def setUp(self):
         """
         1. Creates a test course.
