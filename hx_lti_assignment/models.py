@@ -83,7 +83,13 @@ class AssignmentTargets(models.Model):
             canv_id = manifest['sequences'][0]['canvases'][0]['@id']
             return canv_id
         else:
-            return options[1] if options[1] != '' else None
+            if options[1] == '':
+                req = requests.get(self.target_object.all()[0].target_content)
+                manifest = json.load(req.text)
+                canv_id = manifest['sequences'][0]['canvases'][0]['@id']
+                return canv_id
+            else:
+                return options[1]
 
     def get_dashboard_hidden(self):
         """
