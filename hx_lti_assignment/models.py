@@ -84,7 +84,7 @@ class AssignmentTargets(models.Model):
             return canv_id
         else:
             if options[1] == '':
-                req = requests.get(self.target_object.all()[0].target_content)
+                req = requests.get(self.target_object.objects.all()[0].target_content)
                 manifest = json.load(req.text)
                 canv_id = manifest['sequences'][0]['canvases'][0]['@id']
                 return canv_id
