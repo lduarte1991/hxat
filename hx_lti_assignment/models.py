@@ -78,13 +78,13 @@ class AssignmentTargets(models.Model):
         logger.debug("OPTIONS: %s " % options)
         if options is None or len(options) <= 1:
             logger.debug('Trying to get canvas id but none in list')
-            req = requests.get(self.target_object.all()[0].target_content)
+            req = requests.get(self.target_object.target_content)
             manifest = json.load(req.text)
             canv_id = manifest['sequences'][0]['canvases'][0]['@id']
             return canv_id
         else:
             if options[1] == '':
-                req = requests.get(self.target_object.objects.all()[0].target_content)
+                req = requests.get(self.target_object.target_content)
                 manifest = json.load(req.text)
                 canv_id = manifest['sequences'][0]['canvases'][0]['@id']
                 return canv_id
