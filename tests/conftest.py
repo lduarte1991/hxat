@@ -1,14 +1,21 @@
 
 import pytest
+import uuid
 
+from datetime import datetime
+from datetime import timedelta
+from dateutil import tz
 from lti import ToolConsumer
 from random import randint
 
 from django.conf import settings
 from django.urls import reverse
 
+from hx_lti_assignment.models import Assignment
+from hx_lti_assignment.models import AssignmentTargets
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import create_new_user
+from target_object_database.models import TargetObject
 
 
 @pytest.fixture
@@ -40,6 +47,35 @@ def course_instructor_factory(user_profile_factory):
         return course, instructor
 
     return _course_instructor_factory
+
+
+@pytest.fixture
+def assignment_target_factory():
+    def _assignment_target_factory(course):
+        target_object = TargetObject(
+                target_title='{} Title'.format(uuid.uuid4().hex),
+                target_author='John {}'.format(uuid.uuid4().int),
+                )
+        target_object.save()
+        assignment = Assignment(
+                course=course,
+                assignment_name='Assignment {}'.format(uuid.uuid4().hex),
+                pagination_limit=settings.ANNOTATION_PAGINATION_LIMIT_DEFAULT,
+                # default from settings, this is set by UI
+                annotation_database_url = settings.ANNOTATION_DB_URL,
+                annotation_database_apikey = settings.ANNOTATION_DB_API_KEY,
+                annotation_database_secret_token = settings.ANNOTATION_DB_SECRET_TOKEN,
+        )
+        assignment.save()
+        assignment_target = AssignmentTargets(
+                assignment=assignment,
+                target_object=target_object,
+                order=1,
+                )
+        assignment_target.save()
+        return assignment_target
+
+    return _assignment_target_factory
 
 
 @pytest.fixture(scope='module')
@@ -100,7 +136,7 @@ def course_user_lti_launch_params(
     course, i = course_instructor_factory()
     user_roles = ['Learner']
     user = user_profile_factory(roles=user_roles)
-    resource_link_id = 'some_string_to_be_the_FAKE_RESOURCE_link_id'
+    resource_link_id = uuid.uuid4().hex
     params = lti_launch_params_factory(
             course_id=course.course_id,
             user_name=user.name,
@@ -110,5 +146,81 @@ def course_user_lti_launch_params(
             launch_url=lti_launch_url,
     )
     return(course, user, params)
+
+
+@pytest.fixture
+def annotatorjs_annotation_factory():
+    def _annojs_factory(user_profile):
+        annojs = make_annotatorjs_object(
+                age_in_hours=1, user=user_profile.anon_id)
+        return annojs
+
+    return _annojs_factory
+
+
+@pytest.fixture
+def catchpy_search_result_shell(
+        user_profile_factory,
+        annotatorjs_annotation_factory
+        ):
+    result = dict()
+    result['total'] = 0
+    result['size'] = 0
+    result['limit'] = 50
+    result['offset'] = 0
+    result['size_failed'] = 0
+    result['failed'] = []
+    result['rows'] = []
+    return result
+
+
+
+
+#
+# some of this is copied from catchpy/anno/tests/conftest.py
+#
+def get_past_datetime(age_in_hours):
+    now = datetime.now(tz.tzutc())
+    delta = timedelta(hours=age_in_hours)
+    return (now - delta).replace(microsecond=0).isoformat()
+
+
+def make_annotatorjs_object(
+        age_in_hours=0, media='Text', user=None):
+    creator_id = user if user else uuid.uuid4().int
+    if age_in_hours > 0:
+        created_at = get_past_datetime(age_in_hours)
+        created = {
+            'id': uuid.uuid4().int,
+            'created': created_at,
+            'updated': created_at,
+            'user': {
+                'id': creator_id,
+                'name': 'user_{}'.format(creator_id),
+            },
+        }
+    else:
+        created = {}
+
+    wa = {
+        'contextId': 'fake_context',
+        'collectionId': 'fake_collection',
+        'permissions': {
+            'read': [],
+            'update': [creator_id],
+            'delete': [creator_id],
+            'admin': [creator_id],
+        },
+        'text': uuid.uuid4().hex,
+        'totalComments': 0,
+        'media': media.lower(),
+        'tags': [],
+        'ranges': [],
+        'uri': 'http://fake-{}.com'.format(uuid.uuid4().int),
+        'parent': '0',
+    }
+
+    wa.update(created)
+    return wa
 
 
