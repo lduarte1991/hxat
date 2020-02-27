@@ -23,3 +23,9 @@ LTI_SECRET_DICT = {
         TEST_COURSE: TEST_COURSE_LTI_SECRET,
         }
 
+ANNOTATION_DB_URL = 'http://default.annotation.db.url.org'
+ANNOTATION_DB_API_KEY = 'default_annotation_db_api_key'
+ANNOTATION_DB_SECRET_TOKEN = 'default_annotation_db_secret_token'
+
+
+
