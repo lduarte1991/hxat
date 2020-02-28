@@ -32,9 +32,6 @@ def test_api_root_default_ok(
     assignment_target = assignment_target_factory(course)
     target_object = assignment_target.target_object
     assignment = assignment_target.assignment
-    #assignment.annotation_database_url = 'http://funky.com'
-    #assignment.annotation_database_apikey = 'funky_key'
-    #assignment.annotation_database_secret_token = 'funky_secret'
     assignment.save()
 
     # 2. set starting resource
@@ -228,35 +225,84 @@ def test_api_root_backend_from_request_ok(
     # set responses to assert
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
-    result = catchpy_search_result_shell
-    result['total'] = 1
-    result['size'] = 1
-    result['rows'].append(annojs)
+    search_result = catchpy_search_result_shell
+    search_result['total'] = 1
+    search_result['size'] = 1
+    search_result['rows'].append(annojs)
 
-    annotation_store_request_url = '{}/{}'.format(
-            assignment.annotation_database_url,
-            annojs_id)
+    annotation_store_urls = {}
+    for op in ['search']:
+        annotation_store_urls[op] = '{}'.format(
+                assignment.annotation_database_url,
+                )
+    for op in ['create', 'update', 'delete']:
+        annotation_store_urls[op] = '{}/{}'.format(
+                assignment.annotation_database_url,
+                annojs_id)
+
     responses.add(
-            responses.PUT,
-            annotation_store_request_url,
-            json=result,
-            status=200,
+            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
             )
 
-    # search update
     path = reverse('annotation_store:api_root_prefix')
-    response = client.put(
-            '{}/{}?version=catchpy'.format(path, annojs_id),
+
+    # search request
+    response = client.get(
+            '{}?version=catchpy&resource_link_id={}'.format(path, resource_link_id),
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 1
+    assert content == search_result
+
+    # create request
+    response = client.post(
+            '{}/{}?version=catchpy&resource_link_id={}'.format(
+                path, annojs_id, resource_link_id),
             data=annojs,
             content_type='application/json',
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
-    content = json.loads(response.content.decode())
-
     assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 2
+    assert content == annojs
 
-    assert len(responses.calls) == 1
-    assert content == result
+    # update request
+    path_with_id = '{}/{}?version=catchpy'.format(path, annojs_id)
+    response = client.put(
+            path_with_id,
+            data=annojs,
+            content_type='application/json',
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 3
+    assert content == annojs
+
+
+    # delete request
+    response = client.delete(
+            path_with_id,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 4
+    assert content == annojs
+
+
 
 
 
