@@ -15,7 +15,6 @@ from hx_lti_initializer.models import LTIResourceLinkConfig
 from hx_lti_initializer.utils import retrieve_token
 
 
-@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_default_ok(
@@ -70,31 +69,27 @@ def test_api_root_default_ok(
     search_result['rows'].append(annojs)
 
     annotation_store_urls = {}
-    annotation_store_urls['create'] = '{}/{}?resource_link_id={}'.format(
-            assignment.annotation_database_url,
-            annojs_id,
-            resource_link_id)
-    annotation_store_urls['update'] = '{}/{}'.format(
-            assignment.annotation_database_url,
-            annojs_id)
-    annotation_store_urls['search'] = '{}/?resource_link_id={}'.format(
-            assignment.annotation_database_url,
-            resource_link_id)
+    for op in ['create', 'search']:
+        annotation_store_urls[op] = '{}/{}'.format(
+                assignment.annotation_database_url,
+                op)
+    for op in ['update', 'delete']:
+        annotation_store_urls[op] = '{}/{}/{}'.format(
+                assignment.annotation_database_url,
+                op,
+                annojs_id)
 
     responses.add(
             responses.POST, annotation_store_urls['create'], json=annojs, status=200,
             )
     responses.add(
-            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
+            responses.POST, annotation_store_urls['update'], json=annojs, status=200,
             )
     responses.add(
-            responses.GET, annotation_store_urls['update'], json=annojs, status=200,
+            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
             )
     responses.add(
-            responses.DELETE, annotation_store_urls['update'], json=annojs, status=200,
-            )
-    responses.add(
-            responses.GET, annotation_store_urls['search'], json=result, status=200,
+            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
             )
 
     path = reverse('annotation_store:api_root_prefix')
@@ -107,53 +102,43 @@ def test_api_root_default_ok(
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 1
-    assert content == result
+    assert content == search_result
 
     # create request
     response = client.post(
-            '{}/{}?resource_link_id={}'.format(path, resource_link_id),
-            annojs_id,
+            '{}/{}?resource_link_id={}'.format(
+                path, annojs_id, resource_link_id),
+            data=annojs,
+            content_type='application/json',
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
-    assert len(responses.calls) == 1
+    assert len(responses.calls) == 2
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}'.format(path, resource_link_id)
+    path_with_id = '{}/{}'.format(path, annojs_id)
     response = client.put(
             path_with_id,
-            annojs_id,
+            data=annojs,
+            content_type='application/json',
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
-    assert len(responses.calls) == 1
+    assert len(responses.calls) == 3
     assert content == annojs
 
-    # read request
-    path_with_id = '{}/{}'.format(path, resource_link_id)
-    response = client.get(
-            path_with_id,
-            annojs_id,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
-            )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 1
-    assert content == annojs
 
     # delete request
-    path_with_id = '{}/{}'.format(path, resource_link_id)
     response = client.delete(
             path_with_id,
-            annojs_id,
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
-    assert len(responses.calls) == 1
+    assert len(responses.calls) == 4
     assert content == annojs
 
 
