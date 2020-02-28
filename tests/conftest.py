@@ -99,7 +99,7 @@ def lti_launch_params_factory():
             resource_link_id,
             launch_url,
             course_name=None,
-        ):
+            ):
         params={
             'lti_message_type': 'basic-lti-launch-request',
             'lti_version': 'LTI-1p0',
@@ -156,6 +156,16 @@ def annotatorjs_annotation_factory():
         return annojs
 
     return _annojs_factory
+
+
+@pytest.fixture
+def webannotation_annotation_factory():
+    def _webann_factory(user_profile):
+        wa = make_wa_object(
+                age_in_hours=1, user=user_profile.anon_id)
+        return wa
+
+    return _webann_factory
 
 
 @pytest.fixture
@@ -224,3 +234,75 @@ def make_annotatorjs_object(
     return wa
 
 
+def make_wa_object(
+        age_in_hours=0, media='Text', user=None):
+    creator_id = user if user else uuid.uuid4().hex
+    if age_in_hours > 0:
+        created_at = get_past_datetime(age_in_hours)
+        created = {
+            'id': generate_uid(),
+            'created': created_at,
+            'modified': created_at,
+            'creator': {
+                'id': creator_id,
+                'name': 'user_{}'.format(creator_id),
+            },
+            'platform': {
+                'platform_name': 'CATCH_DEFAULT_PLATFORM_NAME',
+                'context_id': 'fake_context',
+                'collection_id': 'fake_collection',
+                'target_source_id': 'internal_reference_123',
+            },
+        }
+    else:
+        created = {}
+
+    body = {
+        'type': 'List',
+        'items': [{
+            'type': 'TextualBody',
+            'purpose': 'commenting',
+            'format': 'text/html',
+            'value': uuid.uuid4().hex,
+        }],
+    }
+    target = {
+        'type': 'List',
+        'items': [{
+            'type': media,
+            'source': 'http://fake-{}.com'.format(uuid.uuid4().int),
+            'selector': {
+                'type': 'Choice',
+                'items': [{
+                    'type': 'RangeSelector',
+                    'startSelector': {
+                        'type': 'XPathSelector', 'value': 'xxx'},
+                    'endSelector': {
+                        'type': 'XPathSelector', 'value': 'yyy'},
+                    'refinedBy': [{
+                        'type': 'TextPositionSelector',
+                        'start': randint(10, 300),
+                        'end': randint(350, 750),
+                    }]
+                }, {
+                    'type': 'TextQuoteSelector',
+                    'exact': uuid.uuid4().hex
+                }],
+            },
+        }],
+    }
+    wa = {
+        '@context': 'CATCH_JSONLD_CONTEXT_IRI',
+        'type': 'Annotation',
+        'schema_version': 'catch v1.0',
+        'permissions': {
+            'can_read': [],
+            'can_update': [creator_id],
+            'can_delete': [creator_id],
+            'can_admin': [creator_id],
+        },
+    }
+    wa.update(created)
+    wa['body'] = body
+    wa['target'] = target
+    return wa
