@@ -223,6 +223,7 @@ def test_api_root_backend_from_request_ok(
     jwt_token = parts[1].split('"')[1]
 
     # set responses to assert
+    # TODO: if using webannotation api, should send webannotation format
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
     search_result = catchpy_search_result_shell
@@ -301,6 +302,134 @@ def test_api_root_backend_from_request_ok(
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
     assert content == annojs
+
+
+@responses.activate
+@pytest.mark.django_db
+def test_api_root_backend_from_request_store_cfg_from_db_ok(
+        lti_path,
+        lti_launch_url,
+        course_user_lti_launch_params,
+        assignment_target_factory,
+        annotatorjs_annotation_factory,
+        catchpy_search_result_shell,
+        ):
+    '''webannotation api, configured from client search request.'''
+
+    # 1. create course, assignment, target_object, user
+    course, user, launch_params = course_user_lti_launch_params
+    assignment_target = assignment_target_factory(course)
+    target_object = assignment_target.target_object
+    assignment = assignment_target.assignment
+    assignment.annotation_database_url = 'http://funky.com'
+    assignment.annotation_database_apikey = 'funky_key'
+    assignment.annotation_database_secret_token = 'funky_secret'
+    assignment.save()
+
+    # 2. set starting resource
+    resource_link_id = launch_params['resource_link_id']
+    resource_config = LTIResourceLinkConfig(
+            resource_link_id=resource_link_id,
+            collection_id=assignment.assignment_id,
+            object_id=target_object.id,
+            )
+    resource_config.save()
+
+    # 3. lti launch
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=launch_params,
+            )
+    assert response.status_code == 200
+
+    # pluck the jwt token from lti-launch response
+    content = response.content.decode()
+    assert 'token:' in content
+    parts = content.split('token:')
+    jwt_token = parts[1].split('"')[1]
+
+    # set responses to assert
+    # TODO: if using webannotation api, should send webannotation format
+    annojs = annotatorjs_annotation_factory(user)
+    annojs_id = uuid.uuid4().int
+    search_result = catchpy_search_result_shell
+    search_result['total'] = 1
+    search_result['size'] = 1
+    search_result['rows'].append(annojs)
+
+    annotation_store_urls = {}
+    for op in ['search']:
+        annotation_store_urls[op] = '{}'.format(
+                assignment.annotation_database_url,
+                )
+    for op in ['create', 'update', 'delete']:
+        annotation_store_urls[op] = '{}/{}'.format(
+                assignment.annotation_database_url,
+                annojs_id)
+
+    responses.add(
+            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
+            )
+    responses.add(
+            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
+            )
+
+    path = reverse('annotation_store:api_root_prefix')
+
+    # create request
+    response = client.post(
+            '{}/{}?version=catchpy&resource_link_id={}'.format(
+                path, annojs_id, resource_link_id),
+            data=annojs,
+            content_type='application/json',
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 1
+    assert content == annojs
+
+    # update request
+    path_with_id = '{}/{}?version=catchpy'.format(path, annojs_id)
+    response = client.put(
+            path_with_id,
+            data=annojs,
+            content_type='application/json',
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 2
+    assert content == annojs
+
+
+    # delete request
+    response = client.delete(
+            path_with_id,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 3
+    assert content == annojs
+
+    # search request
+    response = client.get(
+            '{}?version=catchpy&resource_link_id={}'.format(path, resource_link_id),
+            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 4
+    assert content == search_result
+
 
 
 
