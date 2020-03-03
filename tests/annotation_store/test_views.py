@@ -353,20 +353,24 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     # TODO: if using webannotation api, should send webannotation format
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
+    annojs['collectionId'] = '{}'.format(assignment.assignment_id)  # convert uuid to str
     search_result = catchpy_search_result_shell
     search_result['total'] = 1
     search_result['size'] = 1
     search_result['rows'].append(annojs)
 
     annotation_store_urls = {}
-    for op in ['search']:
-        annotation_store_urls[op] = '{}'.format(
+    for op in ['search']:  # search preserve params request to hxat
+        annotation_store_urls[op] = '{}/?version=catchpy&collectionId={}&resource_link_id={}'.format(
                 assignment.annotation_database_url,
+                assignment.assignment_id,
+                resource_link_id,
                 )
     for op in ['create', 'update', 'delete']:
         annotation_store_urls[op] = '{}/{}'.format(
                 assignment.annotation_database_url,
-                annojs_id)
+                annojs_id,
+                )
 
     responses.add(
             responses.POST, annotation_store_urls['create'], json=annojs, status=200,
@@ -409,10 +413,12 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     assert len(responses.calls) == 2
     assert content == annojs
 
-
     # delete request
+    path_delete = '{}/{}?version=catchpy&collectionId={}'.format(
+            path, annojs_id, assignment.assignment_id)
+
     response = client.delete(
-            path_with_id,
+            path_delete,
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
@@ -421,8 +427,10 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     assert content == annojs
 
     # search request
+    # needs resource_link_id to access LTI params for pass_grade
     response = client.get(
-            '{}?version=catchpy&resource_link_id={}'.format(path, resource_link_id),
+            '{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
+                path, assignment.assignment_id, resource_link_id),
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
@@ -494,7 +502,11 @@ The annotation_store can be of 2 types:
 5. create and search need to have resource-link-id as parameter because of
    grade-passback (and search for lis_outcome_service_url)
 
+6. what is the behavior for a client that wants to update the collection_id?
 
+7. how much hxat should know about annotation format? reaching out into an
+   annotation for info? should this be a conversation between hxighlighter and
+   catchpy only?
 """
 
 

@@ -14,6 +14,7 @@ import json
 import requests
 import datetime
 import logging
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +63,14 @@ class AnnotationStore(object):
         backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
         backend_types = backend_type_setting.split(',')
         possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
-        if request.method == "GET" or request.method == "DELETE":
+        if request.method == "GET":
             version_requested = request.GET.get('version', None)
+        elif request.method == "DELETE":
+            qs = urllib.parse.parse_qs(request.META['QUERY_STRING'])
+            try:
+                version_requested = qs.get('version')[0]
+            except (KeyError, IndexError) as e:
+                version_requested = None
         else:
             body = json.loads(str(request.body, 'utf-8'))
             version_requested = body.get('version', None)
@@ -390,6 +397,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
             if response.status_code == 200:
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                self.logger.debug('************** passgrade url({})'.format(is_graded))
                 if is_graded:
                     self.lti_grade_passback(score=1)
                     self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id']) 
@@ -651,16 +659,38 @@ class WebAnnotationStoreBackend(StoreBackend):
         try:
             if self.request.method == "GET":
                 assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+                self.logger.debug('^^^^^^^^^^^^^^^^^^^^^^^^ SEARCH assignment_id({})'.format(assignment_id))
+            elif self.request.method == "DELETE":
+                qs = urllib.parse.parse_qs(self.request.META['QUERY_STRING'])
+                try:
+                    assignment_id = qs.get('collectionId')[0]
+                except (KeyError, IndexError) as e:
+                    assignment_id = None
+
             else:
                 body = self._get_request_body()
+                # 02mar20 naomi: TODO pulling collection_id from wrong place,
+                # this is a webannotation so body['platform']['collection_id']
+                # related to https://github.com/lduarte1991/hxat/issues/116
+                # 03mar20 naomi: if client tries to update the collection_id?
+                # what is the supposed behavior for hxat?
                 assignment_id = body.get('collectionId', body.get('collection_id', None))
+                #assignment_id = body['platform']['collection_id']
             if assignment_id:
                     assignment = self._get_assignment(assignment_id)
                     base_url = assignment.annotation_database_url
             else:
+                # 02mar20 naomi: if collection_id not present it is probably a
+                # search throughout course. In this case, search should iterate
+                # over all assignments and issue a search per assignment since,
+                # potentially, each assignment can be in a different store.
+                # _get_database_url() maybe returns a map of
+                # (collection_id, database_url) pairs and its clients have to
+                # deal with that.
                 base_url = str(ANNOTATION_DB_URL).strip()
-        except:
+        except Exception as e:
             self.logger.info("Default annotation_database_url used as assignment could not be found.")
+            self.logger.info("*************************************** {}".format(e))
             base_url = str(ANNOTATION_DB_URL).strip()
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
@@ -705,6 +735,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
             if response.status_code == 200:
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                self.logger.debug('*************************** passback grade({})'.format(is_graded))
                 if is_graded:
                     self.lti_grade_passback(score=1)
         except requests.exceptions.Timeout as e:
