@@ -440,7 +440,8 @@ def access_annotation_target(
         'org': settings.ORGANIZATION,
         'logger_url': settings.ANNOTATION_LOGGER_URL,
         'accessibility': settings.ACCESSIBILITY,
-        'hide_sidebar_instance': hide_sidebar
+        'hide_sidebar_instance': hide_sidebar,
+        'is_graded': request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
     }
     if not assignment.object_before(object_id) is None:
         original['prev_object'] = assignment.object_before(object_id)

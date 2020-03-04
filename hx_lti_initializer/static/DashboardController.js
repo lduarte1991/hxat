@@ -147,11 +147,13 @@
 		var replyDeleteClicked = self.__bind(self.replyDeleteClicked, self);
 		var instructionsClicked = self.__bind(self.instructionsClicked, self);
 		var fullscreenClicked = self.__bind(self.fullscreenClicked, self);
+		var grademeClicked = self.__bind(self.grademeClicked, self);
 		var el = self.element;
 		el.on("click", ".annotationItem", annotationClicked);
 		el.on("click", ".annotation-instructions", instructionsClicked);
 		el.on("click", ".annotation-fullscreen", fullscreenClicked);
 		el.on("click", ".replyItem .replyeditgroup #delete", replyDeleteClicked);
+		jQuery('nav#navigationBar').on("click", ".grade-me", grademeClicked);
 	};
 
 	$.DashboardController.prototype.loadMoreAnnotations = function() {
@@ -260,6 +262,33 @@
 
     $.DashboardController.prototype.fullscreenClicked = function(e) {
     	this.viewer.toggleFullscreen();
+    };
+
+    $.DashboardController.prototype.grademeClicked = function(e) {
+    	var self = this;
+        jQuery('.grade-me').tooltip('destroy');
+    	
+    	var options = {
+            url: self.initOptions.grademe_url,
+            success: function (data) {
+            	var itgraded = data['grade_request_sent'];
+            	if (itgraded) {
+            		jQuery('.grade-me').tooltip({'title': 'Grade was successfully recorded.', 'placement': 'bottom', 'container': 'body'});
+            		jQuery('.grade-me').tooltip('show');
+            		setTimeout(function() {
+            			jQuery('.grade-me').tooltip('hide');
+            		}, 3000);
+            	} else {
+            		jQuery('.grade-me').tooltip({'title': 'Error in recording grade. Make sure you have made at least one annotation before submitting', 'placement': 'bottom', 'container': 'body'});
+            		jQuery('.grade-me').tooltip('show');
+            		setTimeout(function() {
+            			jQuery('.grade-me').tooltip('hide');
+            		}, 3000);
+            	}
+            },
+            async: true,
+        };
+        jQuery.ajax(options);
     };
 
     $.DashboardController.prototype.replyDeleteClicked = function(e) {
