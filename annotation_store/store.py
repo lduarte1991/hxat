@@ -69,7 +69,7 @@ class AnnotationStore(object):
             qs = urllib.parse.parse_qs(request.META['QUERY_STRING'])
             try:
                 version_requested = qs.get('version')[0]
-            except (KeyError, IndexError) as e:
+            except (KeyError, IndexError, TypeError) as e:
                 version_requested = None
         else:
             body = json.loads(str(request.body, 'utf-8'))
