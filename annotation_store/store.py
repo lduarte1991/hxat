@@ -2,17 +2,12 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from django.db.models import F, Q
 from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
-from .models import Annotation, AnnotationTags
-
 import json
 import requests
-import datetime
 import logging
 import urllib
 
@@ -27,23 +22,23 @@ ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
 class AnnotationStore(object):
     '''
-    AnnotationStore implements a storage interface for annotations and is intended to 
+    AnnotationStore implements a storage interface for annotations and is intended to
     abstract the details of the backend that is actually going to be storing the annotations.
 
     The backend determines where/how annotations are stored. Possible backends include:
-    
+
     1) catch - The Common Annotation, Tagging, and Citation at Harvard (CATCH) project
                which is a separate, cloud-based instance with its own REST API.
-               See also: 
+               See also:
                    http://catcha.readthedocs.io/en/latest/
                    https://github.com/annotationsatharvard/catcha
 
     2) app   - This is an integrated django app that stores annotations in a local database.
-    
-    Client code should not instantiate backend classes directly. The choice of backend class is 
+
+    Client code should not instantiate backend classes directly. The choice of backend class is
     determined at runtime based on the django.settings configuration. This should
     include a setting such as:
-    
+
     ANNOTATION_STORE = {
         "backend": "catch"
     }
@@ -62,7 +57,7 @@ class AnnotationStore(object):
     def from_settings(cls, request):
         backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
         backend_types = backend_type_setting.split(',')
-        possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
+        possible_backend_types = {'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
         if request.method == "GET":
             version_requested = request.GET.get('version', None)
         elif request.method == "DELETE":
@@ -87,9 +82,7 @@ class AnnotationStore(object):
                 raise e
         else:
             return cls(request, possible_backend_types['catch'](request))
-        assert backend_type_setting in possible_backend_types
-        backend_instance = possible_backend_types[backend_type](request)
-        return cls(request, backend_instance)
+
 
     @classmethod
     def update_settings(cls, settings_dict):
@@ -329,7 +322,7 @@ class CatchStoreBackend(StoreBackend):
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)
-                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])  
+                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -347,8 +340,8 @@ class CatchStoreBackend(StoreBackend):
                 body = self._get_request_body()
                 assignment_id = body.get('collectionId', body.get('collection_id', None))
             if assignment_id:
-                    assignment = self._get_assignment(assignment_id)
-                    base_url = assignment.annotation_database_url
+                assignment = self._get_assignment(assignment_id)
+                base_url = assignment.annotation_database_url
             else:
                 base_url = str(ANNOTATION_DB_URL).strip()
         except:
@@ -400,7 +393,7 @@ class CatchStoreBackend(StoreBackend):
                 self.logger.debug('************** passgrade url({})'.format(is_graded))
                 if is_graded:
                     self.lti_grade_passback(score=1)
-                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id']) 
+                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -472,160 +465,6 @@ class CatchStoreBackend(StoreBackend):
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
 
 
-class AppStoreBackend(StoreBackend):
-    BACKEND_NAME = 'app'
-
-    def __init__(self, request):
-        super(AppStoreBackend, self).__init__(request)
-        self.date_format = '%Y-%m-%dT%H:%M:%S %Z'
-        self.max_limit = 1000
-
-    def read(self, annotation_id):
-        anno = get_object_or_404(Annotation, pk=annotation_id)
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def search(self):
-        user_id = self.request.LTI['hx_user_id']
-        is_staff = self.request.LTI['is_staff']
-
-        query_map = {
-            'contextId':            'context_id',
-            'collectionId':         'collection_id',
-            'uri':                  'uri',
-            'media':                'media',
-            'userid':               'user_id',
-            'username':             'user_name__icontains',
-            'parentid':             'parent_id',
-            'text':                 'text__icontains',
-            'quote':                'quote__icontains',
-            'tag':                  'tags__name__iexact',
-            'dateCreatedOnOrAfter': 'created_at__gte',
-            'dateCreatedOnOrBefore':'created_at__lte',
-        }
-
-        # Setup filters based on the search query
-        filters = {}
-        for param, filter_key in query_map.iteritems():
-            if param not in self.request.GET or self.request.GET[param] == '':
-                continue
-            value = self.request.GET[param]
-            if param.startswith('date'):
-                filters[filter_key] = datetime.datetime.strptime(str(value), self.date_format)
-            else:
-                filters[filter_key] = value
-
-        filter_conds = []
-        if not is_staff:
-            filter_conds.append(Q(is_private=False) | (Q(is_private=True) & Q(user_id=user_id)))
-
-        # Create the queryset with the filters applied and get a count of the total size
-        queryset = Annotation.objects.filter(*filter_conds, **filters)
-        total = queryset.count()
-
-        # Examine the user's requested limit and offset and check constraints
-        limit = -1
-        if 'limit' in self.request.GET and self.request.GET['limit'].isdigit():
-            requested_limit = int(self.request.GET['limit'])
-            limit = requested_limit if requested_limit <= self.max_limit else self.max_limit
-        else:
-            limit = self.max_limit
-
-        offset = 0
-        if 'offset' in self.request.GET and self.request.GET['offset'].isdigit():
-            requested_offset = int(self.request.GET['offset'])
-            offset = requested_offset if requested_offset < total else total
-
-        # Slice the queryset and return the selected rows
-        start, end = (offset, offset + limit if offset + limit < total else total)
-        if limit < 0:
-            queryset = queryset[start:]
-        else:
-            queryset = queryset[start:end]
-
-        rows = [self._serialize_annotation(anno) for anno in queryset]
-        result = {
-            'total': total,
-            'limit': limit,
-            'offset': offset,
-            'size': len(rows),
-            'rows': rows,
-        }
-
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def create(self, annotation_id):
-        anno = self._create_or_update(anno=None)
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def update(self, annotation_id):
-        anno = self._create_or_update(anno=Annotation.objects.get(pk=annotation_id))
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    @transaction.atomic
-    def delete(self, annotation_id):
-        anno = Annotation.objects.get(pk=annotation_id)
-        anno.is_deleted = True
-        anno.save()
-
-        if anno.parent_id:
-            parent_anno = Annotation.objects.get(pk=anno.parent_id)
-            parent_anno.total_comments = F('total_comments') - 1
-            parent_anno.save()
-
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    @transaction.atomic
-    def _create_or_update(self, anno=None):
-        create = anno is None
-        if create:
-            anno = Annotation()
-
-        body = self._get_request_body()
-        anno.context_id = body['contextId']
-        anno.collection_id = body['collectionId']
-        anno.uri = body['uri']
-        anno.media = body['media']
-        anno.user_id = body['user']['id']
-        anno.user_name = body['user']['name']
-        anno.is_private = False if len(body.get('permissions', {}).get('read', [])) == 0 else True
-        anno.text = body.get('text', '')
-        anno.quote = body.get('quote', '')
-        anno.json = json.dumps(body)
-
-        if 'parent' in body and body['parent'] != '0':
-            anno.parent_id = int(body['parent'])
-        anno.save()
-
-        if create and anno.parent_id:
-            parent_anno = Annotation.objects.get(pk=int(body['parent']))
-            parent_anno.total_comments = F('total_comments') + 1
-            parent_anno.save()
-
-        if not create:
-            anno.tags.clear()
-        for tag_name in body.get('tags', []):
-            tag_object, created = AnnotationTags.objects.get_or_create(name=tag_name.strip())
-            anno.tags.add(tag_object)
-
-        return anno
-
-    def _serialize_annotation(self, anno):
-        data = json.loads(anno.json)
-        data.update({
-            "id": anno.pk,
-            "deleted": anno.is_deleted,
-            "created": anno.created_at.strftime(self.date_format),
-            "updated": anno.updated_at.strftime(self.date_format),
-        })
-        if anno.parent_id is None:
-            data['totalComments'] = anno.total_comments
-        return data
-
-
 class WebAnnotationStoreBackend(StoreBackend):
     BACKEND_NAME = 'catchpy'
 
@@ -677,8 +516,8 @@ class WebAnnotationStoreBackend(StoreBackend):
                 assignment_id = body.get('collectionId', body.get('collection_id', None))
                 #assignment_id = body['platform']['collection_id']
             if assignment_id:
-                    assignment = self._get_assignment(assignment_id)
-                    base_url = assignment.annotation_database_url
+                assignment = self._get_assignment(assignment_id)
+                base_url = assignment.annotation_database_url
             else:
                 # 02mar20 naomi: if collection_id not present it is probably a
                 # search throughout course. In this case, search should iterate
