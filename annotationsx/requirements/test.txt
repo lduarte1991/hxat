@@ -1,9 +1,9 @@
 -r base.txt
 
-pytest
-pytest-django
-pytest-env
+pytest==5.3.5
+pytest-django==3.8.0
+pytest-env==0.6.2
 
-iso8601
-responses
+iso8601==0.1.12
+responses==0.10.11
 
