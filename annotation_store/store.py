@@ -498,7 +498,6 @@ class WebAnnotationStoreBackend(StoreBackend):
         try:
             if self.request.method == "GET":
                 assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
-                self.logger.debug('^^^^^^^^^^^^^^^^^^^^^^^^ SEARCH assignment_id({})'.format(assignment_id))
             elif self.request.method == "DELETE":
                 qs = urllib.parse.parse_qs(self.request.META['QUERY_STRING'])
                 try:
@@ -508,7 +507,7 @@ class WebAnnotationStoreBackend(StoreBackend):
 
             else:
                 body = self._get_request_body()
-                # 02mar20 naomi: TODO pulling collection_id from wrong place,
+                # 02mar20 naomi: pulling collection_id from wrong place,
                 # this is a webannotation so body['platform']['collection_id']
                 # related to https://github.com/lduarte1991/hxat/issues/116
                 # 03mar20 naomi: if client tries to update the collection_id?
@@ -522,10 +521,10 @@ class WebAnnotationStoreBackend(StoreBackend):
                 # 02mar20 naomi: if collection_id not present it is probably a
                 # search throughout course. In this case, search should iterate
                 # over all assignments and issue a search per assignment since,
-                # potentially, each assignment can be in a different store.
-                # _get_database_url() maybe returns a map of
-                # (collection_id, database_url) pairs and its clients have to
-                # deal with that.
+                # potentially, each assignment can be in a different store with
+                # different credentials. _get_database_url() maybe returns a
+                # map of (collection_id, database_url) pairs and its clients
+                # have to deal with that. (see bottom of file item1)
                 base_url = str(ANNOTATION_DB_URL).strip()
         except Exception as e:
             self.logger.info("Default annotation_database_url used as assignment could not be found.")
@@ -646,3 +645,13 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+
+"""
+05mar20 naomi: (item1) right now the assumption is that, at least at course
+level, all assignments use the same backend config (same url and credentials).
+This is tacit and not enforced in code, we are blindly trusting in the random
+goodness of users hearts. This requirement allows developers to create
+assignemnts with lti components pointing to other lti providers than prod and
+do debugging and tests.
+
+"""
