@@ -99,19 +99,22 @@ def lti_launch_params_factory():
             resource_link_id,
             launch_url,
             course_name=None,
+            with_grade=False,
             ):
         params={
             'lti_message_type': 'basic-lti-launch-request',
             'lti_version': 'LTI-1p0',
             'resource_link_id': resource_link_id,
             'lis_person_sourcedid': user_name,
-            'lis_outcome_service_url': 'fake_url',
             'user_id': user_id,
             'roles': user_roles,
             'context_id': course_id,
         }
         if course_name:
             params['context_title'] = course_name
+        if with_grade:
+            params['lis_outcome_service_url'] = 'http://fake_url.com/'
+            params['lis_result_sourcedid'] = '{}:{}:123'.format(course_id, resource_link_id)
 
         consumer = ToolConsumer(
                 consumer_key=settings.CONSUMER_KEY,
@@ -144,6 +147,29 @@ def course_user_lti_launch_params(
             user_roles=user_roles,
             resource_link_id=resource_link_id,
             launch_url=lti_launch_url,
+    )
+    return(course, user, params)
+
+@pytest.fixture
+def course_user_lti_launch_params_with_grade(
+        user_profile_factory,
+        course_instructor_factory,
+        lti_path,
+        lti_launch_url,
+        lti_launch_params_factory,
+        ):
+    course, i = course_instructor_factory()
+    user_roles = ['Learner']
+    user = user_profile_factory(roles=user_roles)
+    resource_link_id = uuid.uuid4().hex
+    params = lti_launch_params_factory(
+            course_id=course.course_id,
+            user_name=user.name,
+            user_id=user.anon_id,
+            user_roles=user_roles,
+            resource_link_id=resource_link_id,
+            launch_url=lti_launch_url,
+            with_grade=True,
     )
     return(course, user, params)
 
@@ -182,6 +208,32 @@ def catchpy_search_result_shell(
     result['failed'] = []
     result['rows'] = []
     return result
+
+
+@pytest.fixture
+def make_lti_replaceResultResponse():
+    resp = '''<?xml version="1.0" encoding="UTF-8"?>
+<imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXResponseHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>4560</imsx_messageIdentifier>
+      <imsx_statusInfo>
+        <imsx_codeMajor>success</imsx_codeMajor>
+        <imsx_severity>status</imsx_severity>
+        <imsx_description>Score for 3124567 is now 0.92</imsx_description>
+        <imsx_messageRefIdentifier>999999123</imsx_messageRefIdentifier>
+        <imsx_operationRefIdentifier>replaceResult</imsx_operationRefIdentifier>
+      </imsx_statusInfo>
+    </imsx_POXResponseHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultResponse/>
+  </imsx_POXBody>
+</imsx_POXEnvelopeResponse>
+'''
+    return resp
+
 
 
 
@@ -306,3 +358,8 @@ def make_wa_object(
     wa['body'] = body
     wa['target'] = target
     return wa
+
+
+
+
+

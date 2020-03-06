@@ -483,6 +483,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.before_search()
             response = self.search()
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)
             return response
@@ -527,9 +528,8 @@ class WebAnnotationStoreBackend(StoreBackend):
                 # have to deal with that. (see bottom of file item1)
                 base_url = str(ANNOTATION_DB_URL).strip()
         except Exception as e:
-            self.logger.info("Default annotation_database_url used as assignment could not be found.")
-            self.logger.info("*************************************** {}".format(e))
             base_url = str(ANNOTATION_DB_URL).strip()
+            self.logger.info("unknown assignment, fallback to ({}): {}".format(base_url, e))
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
     def _retrieve_annotator_token(self, user_id):
@@ -561,6 +561,9 @@ class WebAnnotationStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
+        # 06mar20 naomi: below code assumes that the search restricted within
+        # an assignment (collection_id, context_id present in search params)
+        # --- it doesn't check within the search result, but in the query params...
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', self.request.GET.getlist('userid', []))
         return retrieved_self and int(json.loads(response.content)['total']) > 0
 
@@ -573,7 +576,6 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
             if response.status_code == 200:
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
-                self.logger.debug('*************************** passback grade({})'.format(is_graded))
                 if is_graded:
                     self.lti_grade_passback(score=1)
         except requests.exceptions.Timeout as e:
@@ -624,12 +626,14 @@ class WebAnnotationStoreBackend(StoreBackend):
 
             return DjangoToolProvider.from_django_request(
                 lti_secret, request=self.request)
+
         return DjangoToolProvider.from_django_request(
             lti_secret, request=self.request)
 
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
+
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
