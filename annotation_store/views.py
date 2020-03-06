@@ -14,6 +14,7 @@ from .store import AnnotationStore
 import json
 import requests
 import urllib
+import urllib.parse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -104,7 +105,7 @@ def transfer(request, instructor_only="1"):
 
         if str(instructor_only) == "1":
             params.update({'userid': old_admins})
-        url_values = urllib.urlencode(params, True)
+        url_values = urllib.parse.urlencode(params, True)
         response = requests.get(search_database_url, headers=headers, params=url_values)
         if response.status_code == 200:
             annotations = json.loads(response.text)
@@ -124,3 +125,41 @@ def transfer(request, instructor_only="1"):
     #logger.debug("%s" % str(request.POST.getlist('assignment_inst[]')))
     data = dict()
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+@login_required
+def grade_me(request):
+    user_id = request.LTI['hx_user_id']
+    context_id = request.LTI['hx_context_id']
+    collection_id = request.LTI['hx_collection_id']
+    object_id = request.LTI['hx_object_id']
+
+    params = {
+        'source_id': object_id,
+        'collection_id': collection_id,
+        'context_id': context_id,
+        'userid': user_id
+    }
+
+    assignment = Assignment.objects.get(assignment_id=collection_id)
+    search_database_url = str(assignment.annotation_database_url).strip()
+    token = retrieve_token(
+            user_id,
+            assignment.annotation_database_apikey,
+            assignment.annotation_database_secret_token
+    )
+    headers = {
+        'x-annotator-auth-token': token,
+        'content-type': 'application/json',
+    }
+
+    response = requests.get(search_database_url, headers=headers, params=urllib.parse.urlencode(params, True))
+    request_sent = False
+    if response.status_code == 200:
+        logger.info('Grade me search was made successfully %s' % str(response.url))
+        annotations = json.loads(response.text)
+        if annotations['total'] > 0:
+            logger.info('Should get a grade back')
+            store = AnnotationStore.from_settings(request)
+            store.lti_grade_passback()
+            request_sent = True
+    return HttpResponse(json.dumps({'grade_request_sent': request_sent}), content_type="application/json")

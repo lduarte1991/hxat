@@ -143,15 +143,15 @@ class Assignment(models.Model):
         default=True
     )
     include_public_tab = models.BooleanField(
-        help_text="Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations.",
+        help_text="Include a tab for peer annotations. Used for private annotations. If you want users to view each other's annotations.",
         default=True
     )
     allow_highlights = models.BooleanField(
         help_text="Allow predetermined tags with colors.",
         default=False
     )
-    highlights_options = models.CharField(
-        max_length=255,
+    highlights_options = models.TextField(
+        max_length=1024,
         blank=True
     )
     allow_touch = models.BooleanField(
@@ -280,9 +280,14 @@ class Assignment(models.Model):
         else:
             collection = self.highlights_options.split(',')
             result = []
+            concat_tag_name = ""
             for col in collection:
                 res = col.split(':')
                 if len(res) %2 == 1:
                     res = col.split(';')
-                result.append((res[0], getColorValues(res[1])))
+                try:
+                    result.append((concat_tag_name + res[0], getColorValues(res[1])))
+                    concat_tag_name = ""
+                except:
+                    concat_tag_name += res[0] + " "
             return result

@@ -319,7 +319,10 @@ class CatchStoreBackend(StoreBackend):
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
-            self.after_search(response)
+            is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
+            if is_graded and self.after_search(response):
+                self.lti_grade_passback(score=1)
+                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])  
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -375,8 +378,8 @@ class CatchStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
-        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('user_id', '')
-        return retrieved_self and int(json.loads(str(response.content).decode('utf-8'))['total'] > 0)
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') == self.request.GET.get('userid', '')
+        return retrieved_self and int(json.loads(response.content)['total'] > 0)
 
     def create(self, annotation_id):
         body = self._get_request_body()
@@ -385,6 +388,11 @@ class CatchStoreBackend(StoreBackend):
         self.logger.info('create request: url=%s headers=%s data=%s' % (database_url, self.headers, data))
         try:
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
+            if response.status_code == 200:
+                is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                if is_graded:
+                    self.lti_grade_passback(score=1)
+                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id']) 
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -415,6 +423,45 @@ class CatchStoreBackend(StoreBackend):
         self.logger.info('delete response status_code=%s' % response.status_code)
         return HttpResponse(response)
 
+    def _get_tool_provider(self):
+        try:
+            lti_secret = settings.LTI_SECRET_DICT[self.request.LTI.get('hx_context_id')]
+        except KeyError:
+            lti_secret = settings.LTI_SECRET
+
+        if 'launch_params' in self.request.LTI:
+            params = self.request.LTI['launch_params']
+
+            # the middleware includes an LTI dict with all lti params for
+            # lti_grade_passback() -- an lti request that is not a lti-launch.
+            # py-lti only understands lti params that come directly in the POST
+            mutable_post = self.request.POST.copy()
+            mutable_post.update(params)
+            self.request.POST = mutable_post
+
+            return DjangoToolProvider.from_django_request(
+                lti_secret, request=self.request)
+        return DjangoToolProvider.from_django_request(
+            lti_secret, request=self.request)
+
+    def lti_grade_passback(self, score=1.0):
+        if score < 0 or score > 1.0 or isinstance(score, str):
+            return
+        tool_provider = self._get_tool_provider()
+        if not tool_provider.is_outcome_service():
+            self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
+            return
+        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+        try:
+            outcome = tool_provider.post_replace_result(score)
+            self.logger.info(vars(outcome))
+            if outcome.is_success():
+                self.logger.info(u"LTI grade request was successful. Description: %s" % outcome.description)
+            else:
+                self.logger.error(u"LTI grade request failed. Description: %s" % outcome.description)
+            self.outcome = outcome
+        except Exception as e:
+            self.logger.error("LTI post_replace_result request failed: %s" % str(e))
 
 
 class AppStoreBackend(StoreBackend):
@@ -646,8 +693,8 @@ class WebAnnotationStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
-        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', [])
-        return retrieved_self and int(json.loads(str(response.content.decode('utf-8')))['total'] > 0)
+        retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', self.request.GET.getlist('userid', []))
+        return retrieved_self and int(json.loads(response.content)['total']) > 0
 
     def create(self, annotation_id):
         body = self._get_request_body()
