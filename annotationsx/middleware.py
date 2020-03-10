@@ -15,14 +15,13 @@ load the iframe.
 import collections
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from lti.contrib.django import DjangoToolProvider
 import logging
-import time
 import json
 import importlib
-import oauth2
 
 from .lti_validators import LTIRequestValidator
 
@@ -35,6 +34,7 @@ except ImportError:
     class MiddlewareMixin(object):
         pass
 
+
 def ip_address(request):
     ''' Returns the real IP address from a request, or if that fails, returns 1.2.3.4.'''
     meta = request.META
@@ -42,10 +42,12 @@ def ip_address(request):
     # which is more prone to varying between requests from the same client
     return meta.get('HTTP_X_REAL_IP', meta.get('HTTP_CLIENT_IP', meta.get('REMOTE_ADDR', '1.2.3.4')))
 
+
 class LTILaunchError(Exception):
     pass
 
-class LTILaunchSession(MiddlewareMixin):
+
+class LTILaunchSession(object):
     '''
     Dict-like object that provides access to the session dict containing for the LTI Launch,
     which is keyed by the resource_link_id.
@@ -69,6 +71,10 @@ class LTILaunchSession(MiddlewareMixin):
 
     def assert_valid(self):
         '''Raises an exception if a valid launch session is not present, usually because the resource_link_id is not provided.'''
+
+        # 03feb20 naomi: these exceptions are raised in the view, when
+        # manipulating the session in request.LTI; so it will be handled by the
+        # process_exception()
         if not self.resource_link_id:
             raise LTILaunchError("Invalid LTI session: resource_link_id is not present")
         elif 'LTI_LAUNCH' not in self.session:
@@ -135,12 +141,13 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 response['Content-Security-Policy'] = policy
                 self.logger.info('Content-Security-Policy header set to: %s' % policy)
             else:
-                self.logger.warn('Content-Security-Policy header not set')
+                self.logger.warning('Content-Security-Policy header not set')
         return response
+
 
 class CookielessSessionMiddleware(MiddlewareMixin):
     '''
-    This middleware implements cookieless sessions by retrieving the session identifier 
+    This middleware implements cookieless sessions by retrieving the session identifier
     from  cookies (preferred, if available) or the request URL.
 
     This must be added to INSTALLED_APPS prior to other middleware that uses the session.
@@ -208,18 +215,42 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.error(exception)
             return HttpResponse("LTI launch error. Please try re-launching the tool.")
         return None
+        # when moving to django2 and replacing MIDDLEWARE_CLASSES to MIDDLEWARE in
+        # settings, the behavior of exceptions in middleware changed:
+        # https://docs.djangoproject.com/en/2.2/topics/http/middleware/#upgrading-pre-django-1-10-style-middleware
+        # "Under MIDDLEWARE_CLASSES, process_exception is applied to exceptions raised from a middleware
+        # process_request method. Under MIDDLEWARE, process_exception applies only
+        # to exceptions raised from the view."
+        #
+        # so, middleware classes cannot rely on exceptions to short-circuit the
+        # request life-cycle in django anymore! 'unknown exceptions' return 500:
+        # - https://docs.djangoproject.com/en/2.2/topics/http/middleware/#exception-handling
+        # - https://code.djangoproject.com/ticket/12250#comment:18
 
     def process_request(self, request):
         self.logger.info("Inside %s process_request: %s" % (self.__class__.__name__, request.path))
         is_basic_lti_launch = (request.method == 'POST' and request.POST.get('lti_message_type') == 'basic-lti-launch-request')
         self.logger.info("basic-lti-launch-request? %s" % is_basic_lti_launch)
         if is_basic_lti_launch:
-            self._validate_request(request)
-            self._update_session(request)
-            self._log_ip_address(request)
-            self._set_current_session(request, resource_link_id=request.POST.get('resource_link_id'), raise_exception=True)
+            try:
+                self._validate_request(request)
+                self._update_session(request)
+                self._log_ip_address(request)
+                self._set_current_session(
+                        request,
+                        resource_link_id=request.POST.get('resource_link_id'))
+            except LTILaunchError as e:
+                self.logger.debug("LTILaunchError: {}".format(e))
+                return HttpResponseBadRequest()
+            except Exception as e:
+                self.logger.debug("Exception: {}".format(e))
+                # this potentially returns a 500:
+                raise
         else:
-            self._set_current_session(request, resource_link_id=request.GET.get('resource_link_id'), raise_exception=False)
+            self._set_current_session(
+                    request,
+                    resource_link_id=request.GET.get('resource_link_id'))
+
         return self.get_response(request)
 
     def _validate_request(self, request):
@@ -229,21 +260,22 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         consumer_key = getattr(settings, 'CONSUMER_KEY', None)
         try:
             secret = settings.LTI_SECRET_DICT[request.POST.get('context_id')]
-        except:
+        except KeyError:
             secret = settings.LTI_SECRET
 
+        # 21feb20 naomi: note that we allow secret to be empty string!
         if consumer_key is None or secret is None:
             self.logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
-            raise ImproperlyConfigured("Unable to validate LTI launch. Missing setting: CONSUMER_KEY or LTI_SECRET")
+            raise PermissionDenied
 
         request_key = request.POST.get('oauth_consumer_key', None)
         if request_key is None:
             self.logger.error("request doesn't contain an oauth_consumer_key; can't continue.")
-            raise LTILaunchError
+            raise PermissionDenied
 
         if request_key != consumer_key:
             self.logger.error("could not get a secret for requested key: %s" % request_key)
-            raise LTILaunchError
+            raise PermissionDenied
 
         self.logger.debug('using key/secret %s/%s' % (request_key, secret))
         tool_provider = DjangoToolProvider.from_django_request(
@@ -259,47 +291,46 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.debug('META %s: %s' % (key, request.META.get(key)))
 
         self.logger.debug("about to check the signature")
-        try:
-            # NOTE: before validating the request, temporarily remove the
-            # QUERY_STRING to work around an issue with how Canvas signs requests
-            # that contain GET parameters. Before Canvas launches the tool, it duplicates the GET
-            # parameters as POST parameters, and signs the POST parameters (*not* the GET parameters).
-            # However, the oauth2 library that validates the request generates
-            # the oauth signature based on the combination of POST+GET parameters together,
-            # resulting in a signature mismatch. By removing the QUERY_STRING before
-            # validating the request, the library will generate the signature based only on
-            # the POST parameters like Canvas.
-            qs = request.META.pop('QUERY_STRING', '')
-            self.logger.debug('removed query string temporarily: %s' % qs)
-            request_is_valid = tool_provider.is_valid_request(validator)
-            request.META['QUERY_STRING'] = qs  # restore the query string
-            self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
-        except oauth2.Error as e:
+        # NOTE: before validating the request, temporarily remove the
+        # QUERY_STRING to work around an issue with how Canvas signs requests
+        # that contain GET parameters. Before Canvas launches the tool, it duplicates the GET
+        # parameters as POST parameters, and signs the POST parameters (*not* the GET parameters).
+        # However, the oauth2 library that validates the request generates
+        # the oauth signature based on the combination of POST+GET parameters together,
+        # resulting in a signature mismatch. By removing the QUERY_STRING before
+        # validating the request, the library will generate the signature based only on
+        # the POST parameters like Canvas.
+        #
+        # 03feb20 naomi: TODO check if removing query string still needed,
+        # since change to pylti/lti which uses oauthlib. It looks like oauthlib
+        # correctly disregards query string in
+        # oauthlib/oauth1/rfc5849/signature:base_string_uri()
+        # -- could not force a query string in unit tests using django.test.Client
+        qs = request.META.pop('QUERY_STRING', '')
+        self.logger.debug('removed query string temporarily: %s' % qs)
+        request_is_valid = tool_provider.is_valid_request(validator)
+        request.META['QUERY_STRING'] = qs  # restore the query string
+        self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
+
+        if not request_is_valid:
             self.logger.error("signature check failed")
-            self.logger.exception(e)
-            raise LTILaunchError('Authorization Error')
+            raise PermissionDenied
 
         self.logger.info("signature verified")
-
-        self.logger.debug("about to check the timestamp: %d" % int(tool_provider.oauth_timestamp))
-        if time.time() - int(tool_provider.oauth_timestamp) > 60 * 60:
-            self.logger.warning("OAuth timestamp is too old.")
-            # raise PermissionDenied
-        else:
-            self.logger.info("OAuth timestamp looks good")
 
         for required_param in ('resource_link_id', 'context_id', 'user_id'):
             if required_param not in request.POST:
                 self.logger.error("Required LTI param '%s' was not present in request" % required_param)
-                raise LTILaunchError
+                raise LTILaunchError('missing LTI param {}'.format(required_param))
 
         if ('lis_person_sourcedid' not in request.POST and 'lis_person_name_full' not in request.POST and request.POST['user_id'] != "student"):
             self.logger.error('person identifier (i.e. username) or full name was not present in request')
-            raise LTILaunchError
+            raise LTILaunchError('missing LTI param: person identifier')
+
 
     def _update_session(self, request):
         '''
-        Updates the session with the current LTI launch request. There may be multiple LTI launches associated with a 
+        Updates the session with the current LTI launch request. There may be multiple LTI launches associated with a
         single session. Each LTI launch is mapped to its POST parameters using the resource_link_id as the key.
 
         Example:
@@ -350,7 +381,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         request.session['LOGGED_IP'] = logged_ip
         self.logger.info("LTI launch IP address logged: %s" % logged_ip)
 
-    def _set_current_session(self, request, resource_link_id=None, raise_exception=False):
+    def _set_current_session(self, request, resource_link_id=None):
         '''
          Sets the current session on the request object based on the given resource_link_id.
          The current session is available via the 'LTI' attribute on the request (e.g. request.LTI).

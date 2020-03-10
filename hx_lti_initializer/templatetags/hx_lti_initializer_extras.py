@@ -5,7 +5,7 @@ from datetime import datetime
 from dateutil import tz
 from django import template
 from django.template.defaultfilters import stringfilter
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from re import sub
 
 from hx_lti_assignment.models import Assignment
