@@ -119,7 +119,9 @@ def launch_lti(request):
             user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
+        saved_lti_launches = request.session['LTI_LAUNCH']
         login(request, lti_profile.user)
+        request.session.setdefault('LTI_LAUNCH', saved_lti_launches)
         save_session(
             request,
             user_id=user_id,
