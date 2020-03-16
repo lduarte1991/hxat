@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Tuesday, January 28th, 2020, 2:37:16 PM  
+// [AIV_SHORT]  Version: 1.0.0 - Thursday, March 12th, 2020, 4:43:35 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 85);
+/******/ 	return __webpack_require__(__webpack_require__.s = 68);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -27864,7 +27864,7 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
   else {}
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(23)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(24)(module)))
 
 /***/ }),
 /* 3 */
@@ -39342,17 +39342,494 @@ module.exports = __webpack_amd_options__;
 
 /***/ }),
 /* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+ * Toastr
+ * Copyright 2012-2015
+ * Authors: John Papa, Hans Fjällemark, and Tim Ferrell.
+ * All Rights Reserved.
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and
+ * conditions of the MIT license, available at http://www.opensource.org/licenses/mit-license.php
+ *
+ * ARIA Support: Greta Krafsig
+ *
+ * Project: https://github.com/CodeSeven/toastr
+ */
+/* global define */
+(function (define) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0)], __WEBPACK_AMD_DEFINE_RESULT__ = (function ($) {
+        return (function () {
+            var $container;
+            var listener;
+            var toastId = 0;
+            var toastType = {
+                error: 'error',
+                info: 'info',
+                success: 'success',
+                warning: 'warning'
+            };
+
+            var toastr = {
+                clear: clear,
+                remove: remove,
+                error: error,
+                getContainer: getContainer,
+                info: info,
+                options: {},
+                subscribe: subscribe,
+                success: success,
+                version: '2.1.4',
+                warning: warning
+            };
+
+            var previousToast;
+
+            return toastr;
+
+            ////////////////
+
+            function error(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.error,
+                    iconClass: getOptions().iconClasses.error,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function getContainer(options, create) {
+                if (!options) { options = getOptions(); }
+                $container = $('#' + options.containerId);
+                if ($container.length) {
+                    return $container;
+                }
+                if (create) {
+                    $container = createContainer(options);
+                }
+                return $container;
+            }
+
+            function info(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.info,
+                    iconClass: getOptions().iconClasses.info,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function subscribe(callback) {
+                listener = callback;
+            }
+
+            function success(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.success,
+                    iconClass: getOptions().iconClasses.success,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function warning(message, title, optionsOverride) {
+                return notify({
+                    type: toastType.warning,
+                    iconClass: getOptions().iconClasses.warning,
+                    message: message,
+                    optionsOverride: optionsOverride,
+                    title: title
+                });
+            }
+
+            function clear($toastElement, clearOptions) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if (!clearToast($toastElement, options, clearOptions)) {
+                    clearContainer(options);
+                }
+            }
+
+            function remove($toastElement) {
+                var options = getOptions();
+                if (!$container) { getContainer(options); }
+                if ($toastElement && $(':focus', $toastElement).length === 0) {
+                    removeToast($toastElement);
+                    return;
+                }
+                if ($container.children().length) {
+                    $container.remove();
+                }
+            }
+
+            // internal functions
+
+            function clearContainer (options) {
+                var toastsToClear = $container.children();
+                for (var i = toastsToClear.length - 1; i >= 0; i--) {
+                    clearToast($(toastsToClear[i]), options);
+                }
+            }
+
+            function clearToast ($toastElement, options, clearOptions) {
+                var force = clearOptions && clearOptions.force ? clearOptions.force : false;
+                if ($toastElement && (force || $(':focus', $toastElement).length === 0)) {
+                    $toastElement[options.hideMethod]({
+                        duration: options.hideDuration,
+                        easing: options.hideEasing,
+                        complete: function () { removeToast($toastElement); }
+                    });
+                    return true;
+                }
+                return false;
+            }
+
+            function createContainer(options) {
+                $container = $('<div/>')
+                    .attr('id', options.containerId)
+                    .addClass(options.positionClass);
+
+                $container.appendTo($(options.target));
+                return $container;
+            }
+
+            function getDefaults() {
+                return {
+                    tapToDismiss: true,
+                    toastClass: 'toast',
+                    containerId: 'toast-container',
+                    debug: false,
+
+                    showMethod: 'fadeIn', //fadeIn, slideDown, and show are built into jQuery
+                    showDuration: 300,
+                    showEasing: 'swing', //swing and linear are built into jQuery
+                    onShown: undefined,
+                    hideMethod: 'fadeOut',
+                    hideDuration: 1000,
+                    hideEasing: 'swing',
+                    onHidden: undefined,
+                    closeMethod: false,
+                    closeDuration: false,
+                    closeEasing: false,
+                    closeOnHover: true,
+
+                    extendedTimeOut: 1000,
+                    iconClasses: {
+                        error: 'toast-error',
+                        info: 'toast-info',
+                        success: 'toast-success',
+                        warning: 'toast-warning'
+                    },
+                    iconClass: 'toast-info',
+                    positionClass: 'toast-top-right',
+                    timeOut: 5000, // Set timeOut and extendedTimeOut to 0 to make it sticky
+                    titleClass: 'toast-title',
+                    messageClass: 'toast-message',
+                    escapeHtml: false,
+                    target: 'body',
+                    closeHtml: '<button type="button">&times;</button>',
+                    closeClass: 'toast-close-button',
+                    newestOnTop: true,
+                    preventDuplicates: false,
+                    progressBar: false,
+                    progressClass: 'toast-progress',
+                    rtl: false
+                };
+            }
+
+            function publish(args) {
+                if (!listener) { return; }
+                listener(args);
+            }
+
+            function notify(map) {
+                var options = getOptions();
+                var iconClass = map.iconClass || options.iconClass;
+
+                if (typeof (map.optionsOverride) !== 'undefined') {
+                    options = $.extend(options, map.optionsOverride);
+                    iconClass = map.optionsOverride.iconClass || iconClass;
+                }
+
+                if (shouldExit(options, map)) { return; }
+
+                toastId++;
+
+                $container = getContainer(options, true);
+
+                var intervalId = null;
+                var $toastElement = $('<div/>');
+                var $titleElement = $('<div/>');
+                var $messageElement = $('<div/>');
+                var $progressElement = $('<div/>');
+                var $closeElement = $(options.closeHtml);
+                var progressBar = {
+                    intervalId: null,
+                    hideEta: null,
+                    maxHideTime: null
+                };
+                var response = {
+                    toastId: toastId,
+                    state: 'visible',
+                    startTime: new Date(),
+                    options: options,
+                    map: map
+                };
+
+                personalizeToast();
+
+                displayToast();
+
+                handleEvents();
+
+                publish(response);
+
+                if (options.debug && console) {
+                    console.log(response);
+                }
+
+                return $toastElement;
+
+                function escapeHtml(source) {
+                    if (source == null) {
+                        source = '';
+                    }
+
+                    return source
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function personalizeToast() {
+                    setIcon();
+                    setTitle();
+                    setMessage();
+                    setCloseButton();
+                    setProgressBar();
+                    setRTL();
+                    setSequence();
+                    setAria();
+                }
+
+                function setAria() {
+                    var ariaValue = '';
+                    switch (map.iconClass) {
+                        case 'toast-success':
+                        case 'toast-info':
+                            ariaValue =  'polite';
+                            break;
+                        default:
+                            ariaValue = 'assertive';
+                    }
+                    $toastElement.attr('aria-live', ariaValue);
+                }
+
+                function handleEvents() {
+                    if (options.closeOnHover) {
+                        $toastElement.hover(stickAround, delayedHideToast);
+                    }
+
+                    if (!options.onclick && options.tapToDismiss) {
+                        $toastElement.click(hideToast);
+                    }
+
+                    if (options.closeButton && $closeElement) {
+                        $closeElement.click(function (event) {
+                            if (event.stopPropagation) {
+                                event.stopPropagation();
+                            } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
+                                event.cancelBubble = true;
+                            }
+
+                            if (options.onCloseClick) {
+                                options.onCloseClick(event);
+                            }
+
+                            hideToast(true);
+                        });
+                    }
+
+                    if (options.onclick) {
+                        $toastElement.click(function (event) {
+                            options.onclick(event);
+                            hideToast();
+                        });
+                    }
+                }
+
+                function displayToast() {
+                    $toastElement.hide();
+
+                    $toastElement[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing, complete: options.onShown}
+                    );
+
+                    if (options.timeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.timeOut);
+                        progressBar.maxHideTime = parseFloat(options.timeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                        if (options.progressBar) {
+                            progressBar.intervalId = setInterval(updateProgress, 10);
+                        }
+                    }
+                }
+
+                function setIcon() {
+                    if (map.iconClass) {
+                        $toastElement.addClass(options.toastClass).addClass(iconClass);
+                    }
+                }
+
+                function setSequence() {
+                    if (options.newestOnTop) {
+                        $container.prepend($toastElement);
+                    } else {
+                        $container.append($toastElement);
+                    }
+                }
+
+                function setTitle() {
+                    if (map.title) {
+                        var suffix = map.title;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.title);
+                        }
+                        $titleElement.append(suffix).addClass(options.titleClass);
+                        $toastElement.append($titleElement);
+                    }
+                }
+
+                function setMessage() {
+                    if (map.message) {
+                        var suffix = map.message;
+                        if (options.escapeHtml) {
+                            suffix = escapeHtml(map.message);
+                        }
+                        $messageElement.append(suffix).addClass(options.messageClass);
+                        $toastElement.append($messageElement);
+                    }
+                }
+
+                function setCloseButton() {
+                    if (options.closeButton) {
+                        $closeElement.addClass(options.closeClass).attr('role', 'button');
+                        $toastElement.prepend($closeElement);
+                    }
+                }
+
+                function setProgressBar() {
+                    if (options.progressBar) {
+                        $progressElement.addClass(options.progressClass);
+                        $toastElement.prepend($progressElement);
+                    }
+                }
+
+                function setRTL() {
+                    if (options.rtl) {
+                        $toastElement.addClass('rtl');
+                    }
+                }
+
+                function shouldExit(options, map) {
+                    if (options.preventDuplicates) {
+                        if (map.message === previousToast) {
+                            return true;
+                        } else {
+                            previousToast = map.message;
+                        }
+                    }
+                    return false;
+                }
+
+                function hideToast(override) {
+                    var method = override && options.closeMethod !== false ? options.closeMethod : options.hideMethod;
+                    var duration = override && options.closeDuration !== false ?
+                        options.closeDuration : options.hideDuration;
+                    var easing = override && options.closeEasing !== false ? options.closeEasing : options.hideEasing;
+                    if ($(':focus', $toastElement).length && !override) {
+                        return;
+                    }
+                    clearTimeout(progressBar.intervalId);
+                    return $toastElement[method]({
+                        duration: duration,
+                        easing: easing,
+                        complete: function () {
+                            removeToast($toastElement);
+                            clearTimeout(intervalId);
+                            if (options.onHidden && response.state !== 'hidden') {
+                                options.onHidden();
+                            }
+                            response.state = 'hidden';
+                            response.endTime = new Date();
+                            publish(response);
+                        }
+                    });
+                }
+
+                function delayedHideToast() {
+                    if (options.timeOut > 0 || options.extendedTimeOut > 0) {
+                        intervalId = setTimeout(hideToast, options.extendedTimeOut);
+                        progressBar.maxHideTime = parseFloat(options.extendedTimeOut);
+                        progressBar.hideEta = new Date().getTime() + progressBar.maxHideTime;
+                    }
+                }
+
+                function stickAround() {
+                    clearTimeout(intervalId);
+                    progressBar.hideEta = 0;
+                    $toastElement.stop(true, true)[options.showMethod](
+                        {duration: options.showDuration, easing: options.showEasing}
+                    );
+                }
+
+                function updateProgress() {
+                    var percentage = ((progressBar.hideEta - (new Date().getTime())) / progressBar.maxHideTime) * 100;
+                    $progressElement.width(percentage + '%');
+                }
+            }
+
+            function getOptions() {
+                return $.extend({}, getDefaults(), toastr.options);
+            }
+
+            function removeToast($toastElement) {
+                if (!$container) { $container = getContainer(); }
+                if ($toastElement.is(':visible')) {
+                    return;
+                }
+                $toastElement.remove();
+                $toastElement = null;
+                if ($container.children().length === 0) {
+                    $container.remove();
+                    previousToast = undefined;
+                }
+            }
+
+        })();
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+}(__webpack_require__(49)));
+
+
+/***/ }),
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(24);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(25);
 /* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(25);
+/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
 /* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(timeago__WEBPACK_IMPORTED_MODULE_3__);
 /**
  * 
@@ -39374,10 +39851,10 @@ __webpack_require__(9);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(26),
-        viewer: __webpack_require__(27),
-        annotationSection: __webpack_require__(28),
-        annotationItem: __webpack_require__(29)
+        editor: __webpack_require__(27),
+        viewer: __webpack_require__(28),
+        annotationSection: __webpack_require__(29),
+        annotationItem: __webpack_require__(30)
       },
       template_suffix: "sidebar",
       template_urls: ""
@@ -39510,11 +39987,19 @@ __webpack_require__(9);
     jQuery('#search-submit').click(function () {
       var searchValue = jQuery('#srch-term').val().trim();
       var searchType = jQuery('.search-bar select').val();
+      console.log(searchValue, searchType);
       var ops = self.filterByType(searchValue, searchType, undefined);
       self.search(ops);
     }); // trigger new filter tab
 
-    jQuery('.btn.user-filter').click(function () {
+    jQuery('.btn.user-filter').click(function (event) {
+      // hitting enter apparently also triggers a mouse click event in html
+      // the difference between a real click event and a fake one is that real
+      // has originalEvent.detail set to 1 and a fake one is left to 0 (might be more nuanced?)
+      if (event && event.originalEvent && event.originalEvent.detail === 0) {
+        return;
+      }
+
       if (this.id === "search") {
         jQuery('.btn.user-filter').removeClass('active');
         jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
@@ -39549,6 +40034,7 @@ __webpack_require__(9);
             }
 
             jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
+            self.searchRequest = $.getUniqueId();
             return;
           }
 
@@ -39622,6 +40108,7 @@ __webpack_require__(9);
     jQuery('.sidebar-button#hide_label').click(function () {
       jQuery(':root').css('--sidebar-width', '0px');
       jQuery('.annotationSection').hide();
+      $.publishEvent('resizeWindow', self.instance_id, []);
       self.showSidebarTab(self.options.viewer_options.sidebarversion);
     });
     jQuery('.side.annotationsHolder').on('scroll', function () {
@@ -39677,7 +40164,7 @@ __webpack_require__(9);
               jQuery('.side.load-more').remove();
               jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
               $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, false]);
-            }, function () {}]);
+            }, function () {}, true]);
           });
         }
       } else if (self.load_more_open && jQuery(this).scrollTop() + jQuery(this).innerHeight() <= jQuery(this)[0].scrollHeight - 50) {
@@ -39691,8 +40178,8 @@ __webpack_require__(9);
 
   $.Sidebar.prototype.showSidebarTab = function (type) {
     // if (type === "smalltab") {
-    jQuery(':root').css('--sidebar-width', '55px');
-    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button" id="sidebaropen" aria-pressed="false" aria-label="Toggle sidebar" title="Toggle Sidebar"><span class="fas fa-comments"></span></div>'); // }
+    jQuery(':root').css('--sidebar-width', '40px');
+    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button" id="sidebaropen" aria-pressed="false" aria-label="Toggle sidebar" title="Toggle Sidebar"><span class="fas fa-angle-double-right"></span></div>'); // }
 
     jQuery('.open-sidebar').click(function () {
       jQuery('.open-sidebar').remove();
@@ -39708,12 +40195,18 @@ __webpack_require__(9);
       var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
         return button.id;
       });
+      console.log(filteroptions, filteroptions.indexOf('mine') > -1, filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1));
 
-      if (filteroptions.indexOf('mine') > -1 || filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1)) {
+      if (filteroptions.indexOf('mine') > -1 || filteroptions.indexOf('instructor') > -1 && self.options.instructors.indexOf(self.options.user_id) > -1) {
         self.addAnnotation(annotation, updating, false);
       } else {
-        jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
-        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+        console.log(annotation);
+
+        if (annotation.media !== "comment") {
+          jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
+          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+          self.search(self.lastSearchOption);
+        }
       }
     });
     $.subscribeEvent('searchTag', self.instance_id, function (_, tag) {
@@ -39778,8 +40271,15 @@ __webpack_require__(9);
               path.wrap('<clipPath id="' + img_id + '-clippath"></clipPath>');
               img.style = "display: none;";
               var img_url = img.src;
-              var viewBox = sv.getAttribute('viewBox').split(' ');
-              jQuery(sv)[0].innerHTML += '<image x="' + viewBox[0] + '" y="' + viewBox[1] + '" width="' + viewBox[2] + '" height="' + viewBox[3] + '" clip-path="url(#' + img_id + '-clippath)" class="annotation-thumbnail" href="' + img_url + '" />';
+              var viewBox;
+
+              try {
+                viewBox = sv.viewBox.split(' ');
+              } catch (e) {
+                viewBox = sv.getAttribute('viewBox').split(' ');
+              }
+
+              jQuery(sv)[0].innerHTML += '<image x="' + viewBox[0] + '" y="' + viewBox[1] + '" width="' + viewBox[2] + '" height="' + viewBox[3] + '" clip-path="url(#' + img_id + '-clippath)" class="annotation-thumbnail" href="' + img_url + '" xlink:href="' + img_url + '" />';
               sv.style['max-width'] = w + "px";
               sv.style['max-height'] = w + "px";
               sv.style['margin-left'] = "auto";
@@ -39798,6 +40298,12 @@ __webpack_require__(9);
               }
             }
           }
+        };
+
+        img.onerror = function (e) {
+          console.log('error', e);
+          img.style = 'display: none';
+          jQuery(img).after('<button class="zoom-to-error-button" style="background:#ededed; color: black; border-radius: 5px; border: 1px solid #333;">Zoom to annotation</button>');
         };
 
         img.src = img.dataset['src'];
@@ -39869,19 +40375,23 @@ __webpack_require__(9);
             $.publishEvent('focusOnContext', self.instance_id, [ann]);
           }, 350);
         } else if (self.options.mediaType.toLowerCase() === "image") {
-          var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
-          var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
-            return parseInt(val, 10);
-          });
-          var bounds = {
-            x: boundSplit[0],
-            y: boundSplit[1],
-            width: boundSplit[2],
-            height: boundSplit[3]
-          };
-          $.publishEvent('zoomTo', self.inst_id, [bounds, ann]); // console.log("Yup!");
+          var elementClass = e.target.getAttribute('class');
 
-          $.pauseEvent(e);
+          if (elementClass && elementClass.indexOf('zoom-to-error-button') > -1 || e.target.tagName.toLowerCase() === "image" || e.target.tagName.toLowerCase() === "svg" || e.target.tagName.toLowerCase() === "path") {
+            var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
+            var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
+              return parseInt(val, 10);
+            });
+            var bounds = {
+              x: boundSplit[0] - boundSplit[2] * .167,
+              y: boundSplit[1] - boundSplit[3] * .167,
+              width: boundSplit[2] + boundSplit[2] / 3.0,
+              height: boundSplit[3] + boundSplit[3] / 3.0
+            };
+            $.publishEvent('zoomTo', self.inst_id, [bounds, ann]);
+          } // console.log("Yup!");
+          // $.pauseEvent(e);
+
         }
       });
       jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
@@ -39938,9 +40448,24 @@ __webpack_require__(9);
   };
 
   $.Sidebar.prototype.search = function (options) {
-    // console.log('sidebar search', options);
+    var self = this; // console.log('sidebar search', options);
+
+    self.lastSearchOption = options;
+
+    if (jQuery('.loading-obj').is(':visible')) {
+      jQuery('.loading-obj').remove();
+    }
+
+    self.searchRequest = $.getUniqueId();
+    console.log(self.searchRequest, options);
+    var tempRequest = self.searchRequest;
     jQuery('.annotationsHolder').prepend('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
     $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
+      if (tempRequest !== self.searchRequest) {
+        return;
+      }
+
+      console.log("RETURN: ", tempRequest, self.searchRequest);
       jQuery('.annotationsHolder.side').html('');
       $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, true]);
       jQuery('.loading-obj').remove();
@@ -40014,6 +40539,7 @@ __webpack_require__(9);
   $.Sidebar.prototype.StorageAnnotationSave = function (annotations) {};
 
   $.Sidebar.prototype.StorageAnnotationDelete = function (annotation) {
+    console.log(arguments, annotation);
     jQuery('.item-' + annotation.id).remove();
 
     if (jQuery('.annotationItem').length == 0) {
@@ -40090,7 +40616,7 @@ __webpack_require__(9);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -40118,13 +40644,13 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -40360,7 +40886,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -40377,7 +40903,7 @@ return __p
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -40424,7 +40950,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -40527,7 +41053,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -40656,7 +41182,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -40671,7 +41197,7 @@ __webpack_require__(12);
 
 __webpack_require__(13);
 
-__webpack_require__(31);
+__webpack_require__(32);
 
 (function ($) {
   /**
@@ -40683,6 +41209,12 @@ __webpack_require__(31);
     var maxLength = 1000; // console.log("SummernoteRichText Options Sent:", options);
 
     this.options = options;
+    var toolbar = [['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]];
+
+    if (self.options.instructors.indexOf(self.options.user_id) > -1) {
+      toolbar = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
+    }
+
     this.summernoteOpts = jQuery.extend({
       height: 150,
       focus: true,
@@ -40694,6 +41226,18 @@ __webpack_require__(31);
       maxTextLength: maxLength,
       dialogsInBody: true,
       disableResizeEditor: true,
+      disableDragAndDrop: true,
+      onCreateLink: function onCreateLink(link) {
+        var linkValidator = /(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+/;
+
+        if (link.match(linkValidator)) {
+          linkUrl = /^([A-Za-z][A-Za-z0-9+-.]*\:|#|\/)/.test(link) ? link : 'http://' + link;
+          return linkUrl;
+        } else {
+          alert("You did not enter a valid URL, it has been removed.");
+          return 'http://example.org';
+        }
+      },
       callbacks: {
         onKeydown: function onKeydown(e) {
           var t = e.currentTarget.innerText;
@@ -40717,7 +41261,25 @@ __webpack_require__(31);
         },
         onPaste: function onPaste(e) {
           var t = e.currentTarget.innerText;
-          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text');
+          var bufferHTML = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
+
+          if (bufferHTML.indexOf('<img') > -1 && self.options.instructors.indexOf(self.options.user_id) == -1) {
+            var regex = new RegExp(/<img([\w\W ]+?)\/?>/g);
+            var inside = bufferHTML.match(regex);
+            jQuery.each(inside, function (_, image_tags) {
+              var new_img_url = image_tags.match(/src\s*=\s*["'](.+?)["']/)[1];
+              bufferHTML = bufferHTML.replace(image_tags, '<a title="' + new_img_url + '" href=\"' + new_img_url + "\">[External Image Link]</a>");
+            }); // bufferHTML = bufferHTML.replace(/img([\w\W]+?)\/?>/, "<a href=\"#\">[Link to external image]</a>");
+
+            console.log(bufferHTML);
+            setTimeout(function () {
+              // wrap in a timer to prevent issues in Firefox
+              self.elementObj.summernote('code', bufferHTML);
+              jQuery('#maxContentPost').text(maxLength);
+              alert('You may have pasted an image. It will be converted to a link.');
+            }, 100);
+          }
 
           if (t.length + bufferText.length >= maxLength) {
             e.preventDefault();
@@ -40730,13 +41292,19 @@ __webpack_require__(31);
             }, 10);
           }
         },
+        onChange: function onChange(contents, $editable) {
+          if ($editable && contents.length > maxLength) {
+            $editable.html(contents.trim().substring(0, maxLength));
+          }
+        },
         onFocus: function onFocus(e) {
           $.publishEvent('wysiwygOpened', self.instanceID, [e]);
         }
       },
-      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]]
+      toolbar: toolbar
     }, this.options); // console.log("After init options", this.options);
 
+    console.log('SUMMERNOTE', this.options);
     this.init();
     this.instanceID = instanceID;
     return this;
@@ -40856,20 +41424,18 @@ __webpack_require__(31);
     }.bind(self));
     $.subscribeEvent('editorHidden', self.instanceID, function () {
       self.destroy();
-    }.bind(self));
-    jQuery('body').on('mouseover', '.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function () {
-      var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
-      input.prop('type', 'url');
-      var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
-      var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-      var regex = new RegExp(expression);
-
-      if (chosen.match(regex)) {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
-      } else {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
-      }
-    });
+    }.bind(self)); // jQuery('body').on('mouseover','.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function() {
+    //     var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
+    //     input.prop('type', 'url');
+    //     var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
+    //     var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    //     var regex = new RegExp(expression);
+    //     if (chosen.match(regex)){
+    //         jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
+    //     } else {
+    //         jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
+    //     }
+    // });
   };
   /**
    * Code to run just before the annotation is saved to storage
@@ -40958,13 +41524,13 @@ __webpack_require__(31);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -40981,7 +41547,7 @@ __webpack_require__(8);
 
 __webpack_require__(9);
 
-__webpack_require__(33);
+__webpack_require__(34);
 
 (function ($) {
   /**
@@ -41205,13 +41771,13 @@ __webpack_require__(33);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41220,7 +41786,7 @@ __webpack_require__(33);
  *  Will create an area for inputting tags, just a textfield, no color
  *
  */
-__webpack_require__(35);
+__webpack_require__(36);
 
 (function ($) {
   /**
@@ -41427,13 +41993,13 @@ __webpack_require__(35);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41442,7 +42008,7 @@ __webpack_require__(35);
  *
  */
 //uncomment to add css file
-__webpack_require__(37);
+__webpack_require__(38);
 
 (function ($) {
   /**
@@ -41510,7 +42076,7 @@ __webpack_require__(37);
       self.first_time = false;
     }
 
-    var tokenHTML = "<div class='tag-token-list'><span>Available Tags:</span><br>";
+    var tokenHTML = "<div class='tag-token-list'><span>Instructor Tags:</span><br>";
     self.options.tagList.forEach(function (tag) {
       tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
     });
@@ -41544,13 +42110,13 @@ __webpack_require__(37);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41559,7 +42125,7 @@ __webpack_require__(37);
  *
  */
 //uncomment to add css file
-__webpack_require__(39);
+__webpack_require__(40);
 
 (function ($) {
   /**
@@ -41611,13 +42177,13 @@ __webpack_require__(39);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41676,12 +42242,12 @@ __webpack_require__(39);
     } // hide edit if the person does not have can_update permissions
 
 
-    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
+    if (!self.options.has_staff_permissions && self.options.instructors.indexOf(self.options.user_id) == -1 && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
       loc.find('#edit-' + ann.id).remove();
     } // hide delete if the person does not have can_delete permissions
 
 
-    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
+    if (!self.options.has_staff_permissions && self.options.instructors.indexOf(self.options.user_id) == -1 && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
       loc.find('#delete-' + ann.id).remove();
     }
   };
@@ -41694,7 +42260,7 @@ __webpack_require__(39);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41703,7 +42269,7 @@ __webpack_require__(39);
  *
  */
 //uncomment to add css file
-__webpack_require__(42);
+__webpack_require__(43);
 
 (function ($) {
   /**
@@ -41814,13 +42380,13 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41961,8 +42527,12 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 44 */,
-/* 45 */,
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
 /* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -41994,14 +42564,73 @@ __webpack_require__(47);
    * @params {Object} options - specific options for this plugin
    */
   $.Reply = function (options, instanceID) {
+    var self = this;
     this.options = jQuery.extend({
       height: 70,
       focus: true,
       width: 356,
       dialogsInBody: true,
+      maximumImageFileSize: 262144,
+      maxTextLength: 1000,
       // airMode: true,
       placeholder: "Reply to annotation...",
-      toolbar: [['font', ['bold', 'italic', 'underline', 'link']]]
+      toolbar: [['font', ['bold', 'italic', 'underline', 'link']]],
+      onCreateLink: function onCreateLink(link) {
+        var linkValidator = /(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+/;
+
+        if (link.match(linkValidator)) {
+          linkUrl = /^([A-Za-z][A-Za-z0-9+-.]*\:|#|\/)/.test(link) ? link : 'http://' + link;
+          return linkUrl;
+        } else {
+          alert("You did not enter a valid URL, it has been removed.");
+          return 'http://example.org';
+        }
+      },
+      callbacks: {
+        onPaste: function onPaste(e) {
+          var t = e.currentTarget.innerText;
+          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text');
+          var bufferHTML = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
+
+          if (bufferHTML.indexOf('<img') > -1 && self.options.instructors.indexOf(self.options.user_id) == -1) {
+            var regex = new RegExp(/<img([\w\W ]+?)\/?>/g);
+            var inside = bufferHTML.match(regex);
+            jQuery.each(inside, function (_, image_tags) {
+              var new_img_url = image_tags.match(/src\s*=\s*["'](.+?)["']/)[1];
+
+              if (new_img_url.indexOf('data:image') > -1) {
+                alert('You are not allowed to paste images in annotations. Add a descriptive link instead.');
+                bufferHTML = bufferHTML.replace(image_tags, '');
+              } else {
+                bufferHTML = bufferHTML.replace(image_tags, '<a title="' + new_img_url + '" href=\"' + new_img_url + "\">[External Image Link]</a>");
+              }
+            }); // bufferHTML = bufferHTML.replace(/img([\w\W]+?)\/?>/, "<a href=\"#\">[Link to external image]</a>");
+
+            console.log(bufferHTML);
+            setTimeout(function () {
+              // wrap in a timer to prevent issues in Firefox
+              self.elementObj.summernote('code', bufferHTML);
+              jQuery('#maxContentPost').text(1000);
+              alert('You may have pasted an image. It will be converted to a link.');
+            }, 100);
+          }
+
+          if (t.length + bufferText.length >= 1000) {
+            e.preventDefault();
+            var bufferTextAllowed = bufferText.trim().substring(0, 1000 - t.length);
+            setTimeout(function () {
+              // wrap in a timer to prevent issues in Firefox
+              document.execCommand('insertText', false, bufferTextAllowed);
+              jQuery('#maxContentPost').text(1000 - t.length);
+              alert('You have reached the character limit for this annotation (max 1000 characters). Your pasted text was trimmed to meet the 1000 character limit.');
+            }, 10);
+          }
+        },
+        onKeyup: function onKeyup(e) {
+          var t = e.currentTarget.innerText;
+          jQuery('#maxContentPost').text(1000 - t.trim().length);
+        }
+      }
     }, options);
     this.init();
     this.instanceID = instanceID;
@@ -42181,6 +42810,11 @@ __webpack_require__(47);
         result = result.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;');
       }
 
+      if (jQuery(result).text().length === 0) {
+        alert('replies must contain text');
+        return;
+      }
+
       var reply = {
         annotationText: [result],
         ranges: {
@@ -42289,9 +42923,13 @@ __webpack_require__(47);
     var delete_option = '';
     var display_name = reply.creator.name;
 
-    if (self.options.HxPermissions && self.options.HxPermissions.has_staff_permissions || annotation.permissions && annotation.permissions.can_delete && annotation.permissions.can_delete.indexOf(self.options.user_id) > -1) {
+    if (self.options.instructors.indexOf(reply.creator.id) > -1) {
       delete_option = "<button aria-label='delete reply' title='Delete Reply' class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button>";
       display_name = self.options.common_instructor_name;
+    }
+
+    if (reply.creator.id === self.options.user_id) {
+      delete_option = "<button aria-label='delete reply' title='Delete Reply' class='delete-reply' tabindex='0'><span class='fa fa-trash'></span></button>";
     }
 
     jQuery(viewer).find('.plugin-area-bottom div[class*=reply-list]').append("<div class='reply reply-item-" + reply.id + "'>" + delete_option + "<strong>" + display_name + "</strong> (" + jQuery.timeago(reply.created) + "):" + reply.annotationText.join('<br><br>') + "</div>");
@@ -42300,6 +42938,7 @@ __webpack_require__(47);
       'content': 'Would you like to delete your reply? This is permanent.',
       'buttons': {
         confirm: function confirm() {
+          console.log('deleting reply: ', annotation, reply);
           $.publishEvent('StorageAnnotationDelete', self.instanceID, [reply]);
           annotation.replies = annotation.replies.filter(function (ann) {
             if (ann.id !== reply.id) {
@@ -42308,9 +42947,11 @@ __webpack_require__(47);
           });
           annotation.totalReplies--;
 
-          annotation._local.highlights.forEach(function (high) {
-            jQuery(high).data('annotation', annotation);
-          });
+          if (annotation._local && annotation._local.highlights) {
+            annotation._local.highlights.forEach(function (high) {
+              jQuery(high).data('annotation', annotation);
+            });
+          }
 
           jQuery('.reply.reply-item-' + reply.id).remove();
           jQuery('.side.ann-item.item-' + annotation.id + ' .view-replies').html('View ' + self.pluralize(annotation.totalReplies, 'Reply', 'Replies'));
@@ -42352,856 +42993,160 @@ __webpack_require__(47);
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
-var hrange = __webpack_require__(4);
+/* WEBPACK VAR INJECTION */(function(jQuery, toastr) {/**
+ *  Badges Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+__webpack_require__(50);
 
 (function ($) {
-  $.CatchPy = function (options, inst_id) {
-    this.options = options; //console.log(options);
-
-    this.instance_id = inst_id;
-    this.store = [];
-    this.url_base = options.storageOptions.external_url.catchpy; //console.log(this.url_base);
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.Badges = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    return this;
   };
+  /**
+   * Initializes instance
+   */
 
-  $.CatchPy.prototype.onLoad = function (element, opts) {
-    var self = this;
-    self.element = element;
 
-    var callB = function callB(result) {
-      jQuery.each(result.rows, function (_, ann) {
-        var waAnnotation = self.convertFromWebAnnotation(ann, jQuery(element).find('.annotator-wrapper')); //console.log(waAnnotation);
+  $.Badges.prototype.init = function () {
+    var self = this; //console.log('test!');
 
-        setTimeout(function () {
-          // console.log('definitely getting to here');
-          $.publishEvent('annotationLoaded', self.instance_id, [waAnnotation]);
-          $.publishEvent('TargetAnnotationDraw', self.instance_id, [waAnnotation]);
-        }, 250);
-      });
+    self.setUpListeners();
+    toastr.options = {
+      progressBar: true,
+      preventDuplicates: true,
+      'showDuration': '400',
+      'hideDuration': '1000',
+      timeOut: '7000',
+      'positionClass': 'toast-top-left'
     };
-
-    self.search(opts, callB, function (errs) {//console.log("Error", errs);
-    });
   };
 
-  $.CatchPy.prototype.search = function (options, callBack, errfun) {
+  $.Badges.prototype.setUpListeners = function () {
     var self = this;
-    var data = jQuery.extend({}, {
-      limit: self.options.storageOptions.pagination,
-      offset: 0,
-      source_id: self.options.object_id,
-      context_id: self.options.context_id,
-      collection_id: self.options.collection_id,
-      resource_link_id: self.options.storageOptions.database_params.resource_link_id,
-      utm_source: self.options.storageOptions.database_params.utm_source
-    }, options);
-    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
-    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
-    params += '&version=' + this.options.storageOptions.database_params.version;
-    jQuery.ajax({
-      url: self.url_base + params,
-      method: 'GET',
-      data: data,
-      headers: {
-        'x-annotator-auth-token': self.options.storageOptions.token
-      },
-      success: function success(result) {
-        $.totalAnnotations = result.total; // console.log('Result: ', result)
-
-        callBack(result, self.convertFromWebAnnotation.bind(self));
-      },
-      error: function error(xhr, status, _error) {
-        if (xhr.status === 401) {
-          $.publishEvent('HxAlert', self.instance_id, ["You do not have permission to access the database. If refreshing page does not work contact instructor. (Error code 401)", {
-            buttons: [],
-            time: 5
-          }]);
-        } else if (xhr.status === 500) {
-          $.publishEvent('HxAlert', self.instance_id, ["Annotations Server is down for maintanence. Wait 10 minutes and try again. (Error code 500)", {
-            time: 0,
-            modal: true
-          }]);
-        } else if (xhr.status == 403) {
-          $.publishEvent('HxAlert', self.instance_id, ["I'm sorry, I'm afraid I cannot let you do that. User not authorized to perform action. (Error code 403)", {
-            buttons: [],
-            time: 5
-          }]);
-        } else {
-          if (self.options.instructors.indexOf(self.options.user_id) !== -1) {
-            if (xhr.status === 409) {
-              $.publishEvent('HxAlert', self.instance_id, ["If importing annotations check that user_id of the annotation matches your own. (Error code 409)", {
-                time: 0,
-                modal: true
-              }]);
-            } else if (xhr.status === 422) {
-              $.publishEvent('HxAlert', self.instance_id, ["If importing, something critical was removed in the process. (Error code 422)", {
-                time: 0,
-                modal: true
-              }]);
-            }
-          } else {
-            $.publishEvent('HxAlert', self.instance_id, ['Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor. (Error code ' + xhr.status + ')', {
-              time: 0
-            }]);
-          }
-        }
-
-        errfun([xhr, status, _error]);
+    $.subscribeEvent('addBadge', self.instanceID, function (_, elem, counter) {
+      if (jQuery(elem).data('hxbadge')) {
+        self.updateBadge(elem, counter);
+      } else {
+        self.createBadge(elem, counter);
       }
     });
-  };
+    $.subscribeEvent('increaseBadgeCount', self.instanceID, function (_, elem) {
+      toastr.info("Annotation was created and can be seen when 'Mine' filter is turned on.");
+      var count = jQuery(elem).data('hxbadge');
 
-  $.CatchPy.prototype.StorageAnnotationSave = function (ann_to_save, elem, updating, callBack, errorCallback) {
-    var self = this;
-
-    if (updating) {
-      self.StorageAnnotationUpdate(ann_to_save, elem);
-      return;
-    }
-
-    var save_ann = self.convertToWebAnnotation(ann_to_save, jQuery(elem).find('.annotator-wrapper')); // console.log("4. Converts to WebAnnotation to send to Catchpy: ", ann_to_save, save_ann);
-
-    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
-    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
-    params += '&version=' + this.options.storageOptions.database_params.version;
-    jQuery.ajax({
-      url: self.url_base + save_ann['id'] + params,
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(save_ann),
-      headers: {
-        'x-annotator-auth-token': self.options.storageOptions.token
-      },
-      success: function success(result) {
-        //console.log('ANNOTATION SAVED', result);
-        if (typeof callBack === "function") {
-          callBack(result); //callBack(self.convertFromWebAnnotation(result, jQuery(elem).find('.annotator-wrapper')));
-        }
-      },
-      error: function error(xhr, status, _error2) {
-        if (typeof errorCallback === "function") {
-          errorCallback();
-        } //console.log(xhr, status, error);
-
-
-        if (xhr.status === 401) {
-          $.publishEvent('HxAlert', self.instance_id, ["You do not have permission to access the database. Refreshing the page might reactivate your permissions. (Error code 401)", {
-            buttons: [],
-            time: 5
-          }]);
-        } else if (xhr.status === 500) {
-          $.publishEvent('HxAlert', self.instance_id, ["Annotations Server is down for maintanence. Wait 10 minutes and try again. (Error code 500)", {
-            time: 0,
-            modal: true
-          }]);
-        } else {
-          $.publishEvent('HxAlert', self.instance_id, ['Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', {
-            time: 0
-          }]);
-        }
+      if (count) {
+        self.updateBadge(elem, count + 1);
+      } else {
+        self.addBadge(elem, 1);
       }
+    });
+    $.subscribeEvent('updateBadge', self.instanceID, function (_, elem, counter) {
+      self.updateBadge(elem, counter);
+    });
+    $.subscribeEvent('clearBadge', self.instanceID, function (_, elem) {
+      self.clearBadge(elem, counter);
     });
   };
 
-  $.CatchPy.prototype.StorageAnnotationDelete = function (ann_to_delete, callBack, errCallBack) {
-    var self = this;
-    var params = '&resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
-    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
-    params += '&version=' + this.options.storageOptions.database_params.version;
-    params += '&collection_id=' + this.options.collection_id;
-    jQuery.ajax({
-      url: self.url_base + ann_to_delete['id'] + '?catchpy=true' + params,
-      method: 'DELETE',
-      headers: {
-        'x-annotator-auth-token': self.options.storageOptions.token
-      },
-      success: function success(result) {
-        if (typeof callBack === "function") {
-          callBack();
-        }
-      },
-      error: function error(xhr, status, _error3) {
-        if (typeof errCallBack === "function") {
-          errCallBack();
-        }
+  $.Badges.prototype.addBadge = function (elem, counter) {
+    var self = this; // create a badge to go in the top-right corner
 
-        if (xhr.status === 401) {
-          $.publishEvent('HxAlert', self.instance_id, ["You do not have permission to access the database. Refreshing the page might reactivate your permissions. (Error code 401)", {
-            buttons: [],
-            time: 5
-          }]);
-        } else if (xhr.status === 500) {
-          $.publishEvent('HxAlert', self.instance_id, ["Annotations Server is down for maintanence. Wait 10 minutes and try again. (Error code 500)", {
-            time: 0,
-            modal: true
-          }]);
-        } else {
-          $.publishEvent('HxAlert', self.instance_id, ['Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', {
-            time: 0
-          }]);
-        }
-      }
+    jQuery(elem).append('<span class="hx-badge" aria-label="' + counter + ' new unread">' + counter + "</span>"); // add counter to data('hxbadge')
+
+    jQuery(elem).data('hxbadge', counter); // add click event listener that will automatically clear badge when clicked
+
+    jQuery(elem).click(function () {
+      self.clearBadge(elem);
     });
   };
 
-  $.CatchPy.prototype.StorageAnnotationUpdate = function (ann_to_update, elem, callBack, errCallBack) {
-    var self = this;
-    var save_ann = self.convertToWebAnnotation(ann_to_update, jQuery(elem).find('.annotator-wrapper'));
-    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
-    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
-    params += '&version=' + this.options.storageOptions.database_params.version;
-    jQuery.ajax({
-      url: self.url_base + ann_to_update.id + params,
-      method: 'PUT',
-      contentType: 'application/json',
-      data: JSON.stringify(save_ann),
-      headers: {
-        'x-annotator-auth-token': self.options.storageOptions.token
-      },
-      success: function success(result) {
-        // console.log("Yup");
-        if (typeof callBack === "function") {
-          callBack(self.convertFromWebAnnotation(result));
-        } //console.log('ANNOTATION_UPDATED', result)
-
-      },
-      error: function error(xhr, status, _error4) {
-        if (xhr.status === 401) {
-          $.publishEvent('HxAlert', self.instance_id, ["You do not have permission to access the database. Refreshing the page might reactivate your permissions. (Error code 401)", {
-            buttons: [],
-            time: 5
-          }]);
-        } else if (xhr.status === 500) {
-          $.publishEvent('HxAlert', self.instance_id, ["Annotations Server is down for maintanence. Wait 10 minutes and try again. (Error code 500)", {
-            time: 0,
-            modal: true
-          }]);
-        } else {
-          $.publishEvent('HxAlert', self.instance_id, ['Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', {
-            time: 0
-          }]);
-        }
-
-        if (typeof errCallBack === "function") {
-          errCallBack();
-        }
-      }
-    });
+  $.Badges.prototype.updateBadge = function (elem, counter) {
+    jQuery(elem).find('.hx-badge').html(counter);
+    jQuery(elem).data('hxbadge', counter);
   };
 
-  $.CatchPy.prototype.convertToWebAnnotation = function (annotation, elem) {
-    var self = this;
-    var tags = [];
-    jQuery.each(annotation.tags, function (_, t) {
-      var t_el = {
-        'type': 'TextualBody',
-        'value': t,
-        'purpose': 'tagging'
-      };
-      tags.push(t_el);
-    });
-    var targetList = [];
-    var source_id = this.options.object_id;
-    var purpose = 'commenting';
-
-    if (annotation.media === "comment") {
-      targetList.push(annotation.ranges);
-      source_id = annotation.ranges.source; // jQuery.each(annotation.ranges, function(_, range){
-      //     targetList.push(range)
-      //     source_id = range.parent;
-      // });
-
-      purpose = 'replying';
-    } else {
-      // console.log('convert2wa', annotation.ranges, elem);
-      var serializedRanges = annotation.ranges; //self.serializeRanges(annotation.ranges, elem);
-
-      var mediatype = this.options.mediaType.charAt(0).toUpperCase() + this.options.mediaType.slice(1);
-      jQuery.each(serializedRanges, function (index, range) {
-        var rangeItem = range;
-
-        if (mediatype === "Text") {
-          rangeItem = [{
-            'type': 'RangeSelector',
-            'startSelector': {
-              'type': 'XPathSelector',
-              'value': range.xpath.start
-            },
-            'endSelector': {
-              'type': 'XPathSelector',
-              'value': range.xpath.end
-            },
-            'refinedBy': {
-              'type': 'TextPositionSelector',
-              'start': range.xpath.startOffset,
-              'end': range.xpath.endOffset
-            }
-          }, {
-            'type': 'TextPositionSelector',
-            'start': range.position.globalStartOffset,
-            'end': range.position.globalEndOffset
-          }, {
-            'type': 'TextQuoteSelector',
-            'exact': range.text.exact,
-            'prefix': range.text.prefix,
-            'suffix': range.text.suffix
-          }];
-        } else {
-          jQuery.each(range.items, function (idx, choice) {
-            if (choice.type === "Image") {
-              rangeItem = [{
-                'type': 'FragmentSelector',
-                'value': choice.selector.items[0].selector["default"].value
-              }, {
-                'type': 'SvgSelector',
-                'value': choice.selector.items[0].selector.item.value
-              }];
-            } else if (choice.type === "Thumbnail") {
-              targetList.push(choice);
-            }
-          });
-        }
-
-        targetList.push({
-          'source': source_id,
-          'type': mediatype,
-          'selector': {
-            'type': 'Choice',
-            'items': rangeItem
-          }
-        });
-      });
-    }
-
-    var webAnnotationVersion = {
-      "@context": "http://catchpy.harvardx.harvard.edu.s3.amazonaws.com/jsonld/catch_context_jsonld.json",
-      'type': 'Annotation',
-      'schema_version': '1.1.0',
-      'id': annotation['id'],
-      'creator': {
-        'id': self.options.user_id,
-        'name': this.options.username
-      },
-      'permissions': {
-        'can_read': [],
-        'can_update': [this.options.user_id],
-        'can_delete': [this.options.user_id],
-        'can_admin': [this.options.user_id]
-      },
-      'platform': {
-        'platform_name': 'edX',
-        'context_id': this.options.context_id,
-        'collection_id': this.options.collection_id,
-        'target_source_id': source_id
-      },
-      'body': {
-        'type': 'List',
-        'items': [{
-          'type': 'TextualBody',
-          'format': 'text/html',
-          'language': 'en',
-          'value': annotation.annotationText,
-          'purpose': purpose
-        }].concat(tags)
-      },
-      'target': {
-        'type': 'List',
-        'items': targetList
-      }
-    };
-    return webAnnotationVersion;
+  $.Badges.prototype.clearBadge = function (elem) {
+    jQuery(elem).find('.hx-badge').remove();
+    jQuery(elem).removeData('hxbadge');
   };
 
-  $.CatchPy.prototype.convertFromWebAnnotation = function (webAnn, element) {
-    var self = this;
-    var mediaFound = self.getMediaType(webAnn);
-    var annotation = {
-      annotationText: self.getAnnotationText(webAnn),
-      created: self.getAnnotationCreated(webAnn),
-      creator: self.getAnnotationCreator(webAnn),
-      exact: self.getAnnotationExact(webAnn),
-      id: self.getAnnotationId(webAnn),
-      media: mediaFound,
-      tags: self.getAnnotationTags(webAnn),
-      ranges: self.getAnnotationTarget(webAnn, jQuery(element), mediaFound),
-      totalReplies: webAnn.totalReplies,
-      permissions: webAnn.permissions
-    };
-
-    if (mediaFound.toLowerCase() === "image") {
-      jQuery.each(annotation['ranges'], function (index, range) {
-        if (range['type'].toLowerCase() === "thumbnail") {
-          annotation['thumbnail'] = range.source;
-        } else if (range['type'].toLowerCase() === "image") {
-          annotation['source_url'] = range.source;
-          var fragFound = false;
-          var svgExists = false;
-          var fragVal = "";
-          jQuery.each(range['selector']['items'], function (index, selector) {
-            if (selector['type'].toLowerCase() === "svgselector") {
-              var svgVal = selector.value;
-
-              if (fragFound) {
-                svgVal = svgVal.replace('svg xmlns', 'svg ' + fragVal + ' xmlns');
-              }
-
-              annotation['svg'] = svgVal;
-              svgExists = true;
-            } else {
-              fragVal = 'class="thumbnail-svg-' + annotation['id'] + '" viewBox="' + selector.value.replace('xywh=', '').split(',').join(' ') + '"';
-
-              if (svgExists) {
-                annotation['svg'] = annotation['svg'].replace('svg xmlns', 'svg ' + fragVal + ' xmlns');
-              }
-
-              fragFound = true;
-            }
-          });
-        }
-      });
-    }
-
+  $.Badges.prototype.saving = function (annotation) {
     return annotation;
   };
 
-  $.CatchPy.prototype.getMediaType = function (webAnn, element) {
-    var found = webAnn['target']['items'][0]['type'];
-    jQuery.each(webAnn['target']['items'], function (index, item) {
-      var m = item['type'].toLowerCase();
-
-      if (m === "image" || m === "video" || m === "text" || m === "audio") {
-        found = item['type'];
-      }
-    }); // console.log("FOUND IT", found);
-
-    return found;
-  };
-
-  $.CatchPy.prototype.getAnnotationTargetItems = function (webAnn) {
-    try {
-      var annType = webAnn['target']['items'][0]['type']; // console.log("reached getAnnotationTargetItems", webAnn);
-
-      if (annType === "Annotation") {
-        // console.log([{'parent':webAnn['target']['items'][0]['source']}]);
-        return [{
-          'parent': webAnn['target']['items'][0]['source']
-        }];
-      } else if (annType === "Image" || annType === "Thumbnail") {
-        return webAnn['target']['items'];
-      } // console.log("nope, something went wrong");
-
-
-      return webAnn['target']['items'][0]['selector']['items'];
-    } catch (e) {
-      // console.log(e);
-      return [];
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationTarget = function (webAnn, element, media) {
-    var self = this;
-
-    try {
-      // console.log(media);
-      if (media.toLowerCase() === "text") {
-        var ranges = [];
-        var xpathRanges = [];
-        var positionRanges = [];
-        var textRanges = [];
-        jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
-          if (!('parent' in targetItem)) {
-            if (targetItem['type'] === "RangeSelector") {
-              xpathRanges.push({
-                start: targetItem['startSelector'] ? targetItem['startSelector'].value : targetItem['oa:start'].value,
-                startOffset: targetItem['refinedBy'][0].start,
-                end: targetItem['endSelector'] ? targetItem['endSelector'].value : targetItem['oa:end'].value,
-                endOffset: targetItem['refinedBy'][0].end
-              });
-            } else if (targetItem['type'] === "TextPositionSelector") {
-              positionRanges.push({
-                globalStartOffset: targetItem['start'],
-                globalEndOffset: targetItem['end']
-              });
-            } else if (targetItem['type'] === "TextQuoteSelector") {
-              textRanges.push({
-                prefix: targetItem['prefix'] || '',
-                exact: targetItem['exact'],
-                suffix: targetItem['suffix'] || ''
-              });
-            }
-          } else {
-            return ranges.push(targetItem);
-          }
-        });
-
-        if (xpathRanges.length === positionRanges.length && xpathRanges.length === textRanges.length) {
-          for (var i = xpathRanges.length - 1; i >= 0; i--) {
-            ranges.push({
-              'xpath': xpathRanges[i],
-              'position': positionRanges[i],
-              'text': textRanges[i]
-            });
-          }
-        } else if (xpathRanges.length === 1 && positionRanges.length === 0 && textRanges.length === 0) {
-          var startNode = hrange.getNodeFromXpath(element, xpathRanges[0].start, xpathRanges[0].startOffset, 'annotator-hl');
-          var endNode = hrange.getNodeFromXpath(element, xpathRanges[0].end, xpathRanges[0].endOffset, 'annotator-hl');
-
-          if (startNode && endNode) {
-            var normalizedRange = document.createRange();
-            normalizedRange.setStart(startNode.node, startNode.offset);
-            normalizedRange.setEnd(endNode.node, endNode.offset);
-            var serializedRange = hrange.serializeRange(normalizedRange, element, 'annotator-hl');
-            ranges.push(serializedRange);
-          }
-        } else {
-          var rangeFound = {};
-
-          if (xpathRanges.length >= 1) {
-            rangeFound['xpath'] = xpathRanges[0];
-          }
-
-          if (positionRanges.length >= 1) {
-            rangeFound['position'] = positionRanges[0];
-          }
-
-          if (textRanges.length >= 1) {
-            rangeFound['text'] = textRanges[0];
-          }
-
-          ranges.push(rangeFound);
-        }
-      } else if (media.toLowerCase() == "image") {
-        // console.log(webAnn['target'])
-        return webAnn['target']['items'];
-      }
-
-      if (webAnn['target']['items'][0]['type'] == "Annotation") {
-        return ranges;
-      } //console.log('getAnnotationTarget', ranges, element);
-
-
-      return ranges;
-    } catch (e) {
-      // console.log(ranges, element[0]);
-      throw e; // console.log(ranges, element[0], this.getAnnotationTargetItems(webAnn));
-      //return self.normalizeRanges(ranges, window.document);
-      // console.log(e);
-
-      return [];
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationText = function (webAnn) {
-    try {
-      var found = [];
-      jQuery.each(webAnn['body']['items'], function (_, bodyItem) {
-        if (bodyItem.purpose == "commenting" || bodyItem.purpose == "replying") {
-          found.push(bodyItem.value);
-        }
-      });
-      return found;
-    } catch (e) {
-      return "";
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationCreated = function (webAnn) {
-    try {
-      return new Date(webAnn['created']);
-    } catch (e) {
-      return new Date();
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationCreator = function (webAnn) {
-    try {
-      return webAnn['creator'];
-    } catch (e) {
-      return {
-        name: 'Unknown',
-        id: 'error'
-      };
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationExact = function (webAnn) {
-    try {
-      var quote = '';
-      jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
-        if (targetItem['type'] == "TextQuoteSelector") {
-          quote += targetItem['exact'];
-        } else {
-          return '';
-        }
-      });
-      return quote;
-    } catch (e) {
-      return "";
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationId = function (webAnn) {
-    try {
-      return webAnn['id'];
-    } catch (e) {
-      return "";
-    }
-  };
-
-  $.CatchPy.prototype.getAnnotationTags = function (webAnn) {
-    try {
-      var tags = [];
-      jQuery.each(webAnn['body']['items'], function (_, bodyItem) {
-        if (bodyItem.purpose == "tagging") {
-          tags.push(bodyItem.value);
-        }
-      });
-      return tags;
-    } catch (e) {
-      return [];
-    }
-  };
-
-  $.CatchPy.prototype.storeCurrent = function () {};
-
-  $.CatchPy.prototype.serializeRanges = function (ranges, elem) {
-    var self = this;
-
-    if (ranges.length < 1) {
-      return {
-        ranges: []
-      };
-    }
-
-    var text = [],
-        serializedRanges = [],
-        previous = "",
-        next = "",
-        extraRanges = [],
-        contextEl = elem[0];
-
-    for (var i = 0, len = ranges.length; i < len; i++) {
-      text = [];
-      var r = ranges[i];
-
-      if (r.text !== undefined) {
-        text.push(Hxighlighter.trim(r.text()));
-      } else {
-        text.push(Hxighlighter.trim(self.text(r)));
-      }
-
-      try {
-        previous = ranges[i]['start']['previousSibling'] ? ranges[i]['start']['previousSibling'].textContent : '';
-        next = ranges[i]['end']['nextSibling'] ? ranges[i]['end']['nextSibling'].textContent : '';
-      } catch (e) {
-        previous = ranges[i]['startContainer']['previousSibling'] ? ranges[i]['startContainer']['previousSibling'].textContent : '';
-        next = ranges[i]['endContainer']['nextSibling'] ? ranges[i]['endContainer']['nextSibling'].textContent : '';
-      }
-
-      var exact = text.join(' / ');
-      var exactFullStart = jQuery(contextEl).text().indexOf(exact);
-      var fullTextRange = {
-        startOffset: exactFullStart,
-        endOffset: exactFullStart + exact.length,
-        exact: exact.replace('*', ''),
-        prefix: previous.substring(previous.length - 20, previous.length).replace('*', ''),
-        suffix: next.substring(0, 20).replace('*', '')
-      };
-
-      try {
-        // This is the annotatorjs way to serialize");
-        serializedRanges.push(r.serialize(contextEl, '.annotator-hl'));
-        extraRanges.push(fullTextRange);
-      } catch (e) {
-        // For the keyboard made annotations
-        // we are borrowing the xpath range library from annotatorjs
-        // to keep them consistent
-        //console.log("LOOK HERE:",r, hrange.serializeRange(r, contextEl, 'annotator-hl'));
-        serializedRange = hrange.serializeRange(r, contextEl, 'annotator-hl');
-        serializedRanges.push(serializedRange.xpath);
-        extraRanges.push({
-          startOffset: serializedRange.position.globalStartOffset,
-          endOffset: serializedRange.position.globalEndOffset,
-          prefix: serializedRange.text.prefix,
-          exact: serializedRange.text.exact,
-          suffix: serializedRange.text.suffix
-        });
-      } // console.log("SERIALIZED", serializedRanges, contextEl);
-
-    }
-
-    return {
-      serial: serializedRanges,
-      extra: extraRanges
-    };
-  };
-
-  $.CatchPy.prototype.normalizeRanges = function (ranges, elem) {
-    var self = this;
-    var normalizedRanges = [];
-    var foundRange;
-    jQuery.each(ranges, function (_, range) {
-      // try {
-      //    //console.log(xpathrange.toRange, elem.ownerDocument, range);
-      //    foundRange = xpathrange.toRange(elem, range);
-      // } catch(e) {
-      //     //console.log("trying toRange");
-      //console.log(elem, range.start, range.startOffset, range.end, range.endOffset);
-      var foundRange = hrange.normalizeRange(range, elem, 'annotator-hl'); // }
-      // console.log(elem);
-      // console.log(foundRange);
-
-      normalizedRanges.push(foundRange);
-    });
-    return normalizedRanges;
-  };
-
-  $.CatchPy.prototype.getElementViaXpath = function (xpath, rootElem) {
-    var res = document.evaluate('.' + xpath, jQuery(rootElem)[0], null, XPathResult.ANY_TYPE, null);
-    return res.iterateNext();
-  };
-
-  $.CatchPy.prototype.contains = function (elem1, elem2) {
-    if (document.compareDocumentPosition != null) {
-      return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_CONTAINED_BY;
-    }
-
-    return false;
-  };
-
-  $.CatchPy.prototype.flatten = function (array) {
-    var _flatten;
-
-    _flatten = function flatten(ary) {
-      var el, flat, _i, _len;
-
-      flat = [];
-
-      for (_i = 0, _len = ary.length; _i < _len; _i++) {
-        el = ary[_i];
-        flat = flat.concat(el && jQuery.isArray(el) ? _flatten(el) : el);
-      }
-
-      return flat;
-    };
-
-    return _flatten(array);
-  };
-
-  $.CatchPy.prototype.getTextNodes = function (nodeContainer) {
-    var self = this;
-
-    var _getTextNodes;
-
-    _getTextNodes = function getTextNodes(node) {
-      var nodes;
-
-      if (node && node.nodeType !== 3) {
-        nodes = [];
-
-        if (node.nodeType !== 8) {
-          node = node.lastChild;
-
-          while (node) {
-            nodes.push(_getTextNodes(node));
-            node = node.previousSibling;
-          }
-        }
-
-        return nodes.reverse();
-      } else {
-        return node;
-      }
-    };
-
-    return nodeContainer.map(function () {
-      return self.flatten(_getTextNodes(this));
-    });
-  };
-
-  $.CatchPy.prototype.getTextNodesFromRange = function (node) {
-    var end, start, textNodes, _ref;
-
-    var self = this;
-    textNodes = self.getTextNodes(jQuery(node.commonAncestorContainer));
-    _ref = [textNodes.index(node.start), textNodes.index(node.end)], start = _ref[0], end = _ref[1];
-    return jQuery.makeArray(textNodes.slice(start, +end + 1 || 9e9));
-  };
-
-  $.CatchPy.prototype.text = function (node) {
-    var self = this;
-    return function () {
-      var _i, _len, _ref, _results;
-
-      _ref = self.getTextNodesFromRange(node);
-      _results = [];
-
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        node = _ref[_i];
-
-        _results.push(node.nodeValue);
-      }
-
-      return _results;
-    }.call(this).join('');
-  };
-
-  $.storage.push($.CatchPy);
+  Object.defineProperty($.Badges, 'name', {
+    value: "Badges"
+  });
+  $.plugins.push($.Badges);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(22)))
 
 /***/ }),
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */
+/* 49 */
+/***/ (function(module, exports) {
+
+module.exports = function() {
+	throw new Error("define cannot be used indirect");
+};
+
+
+/***/ }),
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 55 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 //during deployment, this is what decides what gets instantiated, should be moved elsewhere
-__webpack_require__(56);
+__webpack_require__(52);
 
-__webpack_require__(57);
+__webpack_require__(53);
 
-__webpack_require__(22);
+__webpack_require__(23);
 
-__webpack_require__(58);
+__webpack_require__(54);
 
-__webpack_require__(30);
+__webpack_require__(31);
 
 __webpack_require__(10);
 
-__webpack_require__(32);
+__webpack_require__(33);
 
-__webpack_require__(34);
+__webpack_require__(35);
+
+__webpack_require__(58);
+
+__webpack_require__(60);
 
 __webpack_require__(62);
 
-__webpack_require__(64);
+__webpack_require__(63);
 
-__webpack_require__(66);
+__webpack_require__(65);
 
-__webpack_require__(67);
+__webpack_require__(37);
 
-__webpack_require__(69);
-
-__webpack_require__(36);
-
-__webpack_require__(38);
-
-__webpack_require__(40);
+__webpack_require__(39);
 
 __webpack_require__(41);
+
+__webpack_require__(42);
 
 (function ($) {
   /**
@@ -43737,7 +43682,7 @@ __webpack_require__(41);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 56 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -43860,7 +43805,7 @@ var hrange = __webpack_require__(4);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
 
 /***/ }),
-/* 57 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -44075,12 +44020,12 @@ var hrange = __webpack_require__(4);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 58 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(59);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(55);
 /* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
@@ -44101,8 +44046,8 @@ var annotator = annotator ? annotator : __webpack_require__(7);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(60),
-        viewer: __webpack_require__(61)
+        editor: __webpack_require__(56),
+        viewer: __webpack_require__(57)
       },
       template_suffix: "floating",
       template_urls: ""
@@ -44537,13 +44482,13 @@ var annotator = annotator ? annotator : __webpack_require__(7);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 59 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 60 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -44560,7 +44505,7 @@ return __p
 
 
 /***/ }),
-/* 61 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -44617,7 +44562,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44626,7 +44571,7 @@ return __p
  *
  */
 //uncomment to add css file
-__webpack_require__(63);
+__webpack_require__(59);
 
 (function ($) {
   /**
@@ -44683,13 +44628,13 @@ __webpack_require__(63);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 63 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 64 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44697,7 +44642,7 @@ __webpack_require__(63);
  *  
  *
  */
-__webpack_require__(65);
+__webpack_require__(61);
 
 (function ($) {
   /**
@@ -44817,13 +44762,13 @@ __webpack_require__(65);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 65 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 66 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -45407,7 +45352,7 @@ __webpack_require__(65);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45415,7 +45360,7 @@ __webpack_require__(65);
  *  
  *
  */
-__webpack_require__(68);
+__webpack_require__(64);
 
 (function ($) {
   /**
@@ -45485,13 +45430,13 @@ __webpack_require__(68);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 68 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 69 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45501,7 +45446,7 @@ __webpack_require__(68);
  */
 var annotator = annotator ? annotator : __webpack_require__(7); //uncomment to add css file
 
-__webpack_require__(70);
+__webpack_require__(66);
 
 (function ($) {
   /**
@@ -45599,34 +45544,804 @@ __webpack_require__(70);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 70 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(86);
+/* WEBPACK VAR INJECTION */(function(jQuery, toastr) {//var xpathrange = xpathrange ? xpathrange : require('xpath-range');
+var hrange = __webpack_require__(4);
+
+(function ($) {
+  $.CatchPy = function (options, inst_id) {
+    this.options = options; //console.log(options);
+
+    this.instance_id = inst_id;
+    this.store = [];
+    this.url_base = options.storageOptions.external_url.catchpy; //console.log(this.url_base);
+  };
+
+  $.CatchPy.prototype.onLoad = function (element, opts, callBack) {
+    var self = this;
+    self.element = element;
+
+    var callB = function callB(result) {
+      jQuery.each(result.rows, function (_, ann) {
+        var waAnnotation = self.convertFromWebAnnotation(ann, jQuery(element).find('.annotator-wrapper')); //console.log(waAnnotation);
+
+        setTimeout(function () {
+          // console.log('definitely getting to here');
+          $.publishEvent('annotationLoaded', self.instance_id, [waAnnotation]);
+          $.publishEvent('TargetAnnotationDraw', self.instance_id, [waAnnotation]);
+        }, 250);
+      });
+
+      if (typeof callBack !== "undefined") {
+        var wrapperFunc = function wrapperFunc(ann) {
+          return self.convertFromWebAnnotation(ann, jQuery(element).find('.annotator-wrapper'));
+        };
+
+        callBack(result.rows, wrapperFunc);
+      }
+    };
+
+    self.search(opts, callB, function (errs) {//console.log("Error", errs);
+    });
+  };
+
+  $.CatchPy.prototype.search = function (options, callBack, errfun) {
+    var self = this;
+    var data = jQuery.extend({}, {
+      limit: self.options.storageOptions.pagination,
+      offset: 0,
+      source_id: self.options.object_id,
+      context_id: self.options.context_id,
+      collection_id: self.options.collection_id,
+      resource_link_id: self.options.storageOptions.database_params.resource_link_id,
+      utm_source: self.options.storageOptions.database_params.utm_source
+    }, options);
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
+    jQuery.ajax({
+      url: self.url_base + params,
+      method: 'GET',
+      data: data,
+      headers: {
+        'x-annotator-auth-token': self.options.storageOptions.token
+      },
+      success: function success(result) {
+        $.totalAnnotations = result.total; // console.log('Result: ', result)
+
+        callBack(result, self.convertFromWebAnnotation.bind(self));
+      },
+      error: function error(xhr, status, _error) {
+        if (xhr.status === 401) {
+          toastr.error("You do not have permission to access the database. If refreshing page does not work contact instructor.", "(Error code 401)");
+        } else if (xhr.status === 500) {
+          toastr.error("Annotations Server is down for maintanence. Wait 10 minutes and try again.", "(Error code 500)");
+        } else if (xhr.status == 403) {
+          toastr.error("I'm sorry, I'm afraid I cannot let you do that. User not authorized to perform action.", "(Error code 403)");
+        } else {
+          if (self.options.instructors.indexOf(self.options.user_id) !== -1) {
+            if (xhr.status === 409) {
+              toastr.error("If importing annotations check that user_id of the annotation matches your own.", "(Error code 409)");
+            } else if (xhr.status === 422) {
+              toastr.error("If importing, something critical was removed in the process.", "(Error code 422)");
+            }
+          } else {
+            toastr.error('Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', '(Error code ' + xhr.status + ')');
+          }
+        }
+
+        errfun([xhr, status, _error]);
+      }
+    });
+  };
+
+  $.CatchPy.prototype.StorageAnnotationSave = function (ann_to_save, elem, updating, callBack, errorCallback) {
+    var self = this;
+
+    if (updating) {
+      self.StorageAnnotationUpdate(ann_to_save, elem);
+      return;
+    }
+
+    var save_ann = self.convertToWebAnnotation(ann_to_save, jQuery(elem).find('.annotator-wrapper')); // console.log("4. Converts to WebAnnotation to send to Catchpy: ", ann_to_save, save_ann);
+
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
+    jQuery.ajax({
+      url: self.url_base + save_ann['id'] + params,
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(save_ann),
+      headers: {
+        'x-annotator-auth-token': self.options.storageOptions.token
+      },
+      success: function success(result) {
+        //console.log('ANNOTATION SAVED', result);
+        if (typeof callBack === "function") {
+          callBack(result); //callBack(self.convertFromWebAnnotation(result, jQuery(elem).find('.annotator-wrapper')));
+        }
+      },
+      error: function error(xhr, status, _error2) {
+        if (typeof errorCallback === "function") {
+          errorCallback();
+        } //console.log(xhr, status, error);
+
+
+        if (xhr.status === 401) {
+          toastr.error("You do not have permission to access the database. Refreshing the page might reactivate your permissions.", "(Error code 401)");
+        } else if (xhr.status === 500) {
+          toastr.error("Annotations Server is down for maintanence. Wait 10 minutes and try again.", "(Error code 500)");
+        } else if (xhr.status === 409) {
+          if (xhr.responseJSON['payload'][0].indexOf('missing parent') > -1) {
+            toastr.error('Error: Item being annotated or replied to has been deleted so your annotation/reply was not saved.', '(Error 409)');
+          } else {
+            toastr.error("Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.", '(Error 409)');
+          }
+        } else {
+          toastr.error('Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', '(Error ' + xhr.status + ')');
+        }
+      }
+    });
+  };
+
+  $.CatchPy.prototype.StorageAnnotationDelete = function (ann_to_delete, callBack, errCallBack) {
+    var self = this;
+    var params = '&resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
+    params += '&collection_id=' + this.options.collection_id;
+    jQuery.ajax({
+      url: self.url_base + ann_to_delete['id'] + '?catchpy=true' + params,
+      method: 'DELETE',
+      headers: {
+        'x-annotator-auth-token': self.options.storageOptions.token
+      },
+      success: function success(result) {
+        if (typeof callBack === "function") {
+          callBack();
+        }
+      },
+      error: function error(xhr, status, _error3) {
+        if (typeof errCallBack === "function") {
+          errCallBack();
+        }
+
+        if (xhr.status === 401) {
+          toastr.error("You do not have permission to access the database. Refreshing the page might reactivate your permissions.", "(Error code 401)");
+        } else if (xhr.status === 500) {
+          toastr.error("Annotations Server is down for maintanence. Wait 10 minutes and try again.", "(Error code 500)");
+        } else {
+          toastr.error('Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', '(Error ' + xhr.status + ')');
+        }
+      }
+    });
+  };
+
+  $.CatchPy.prototype.StorageAnnotationUpdate = function (ann_to_update, elem, callBack, errCallBack) {
+    var self = this;
+    var save_ann = self.convertToWebAnnotation(ann_to_update, jQuery(elem).find('.annotator-wrapper'));
+    var params = '?resource_link_id=' + this.options.storageOptions.database_params.resource_link_id;
+    params += '&utm_source=' + this.options.storageOptions.database_params.utm_source;
+    params += '&version=' + this.options.storageOptions.database_params.version;
+    jQuery.ajax({
+      url: self.url_base + ann_to_update.id + params,
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify(save_ann),
+      headers: {
+        'x-annotator-auth-token': self.options.storageOptions.token
+      },
+      success: function success(result) {
+        // console.log("Yup");
+        if (typeof callBack === "function") {
+          callBack(self.convertFromWebAnnotation(result));
+        } //console.log('ANNOTATION_UPDATED', result)
+
+      },
+      error: function error(xhr, status, _error4) {
+        if (xhr.status === 401) {
+          toastr.error("You do not have permission to access the database. Refreshing the page might reactivate your permissions.", "(Error code 401)");
+        } else if (xhr.status === 500) {
+          toastr.error("Annotations Server is down for maintanence. Wait 10 minutes and try again.", "(Error code 500)");
+        } else {
+          toastr.error('Unknown Error. Your annotations were not saved. Copy them elsewhere to prevent loss. Notify instructor.', '(Error ' + xhr.status + ')');
+        }
+
+        if (typeof errCallBack === "function") {
+          errCallBack();
+        }
+      }
+    });
+  };
+
+  $.CatchPy.prototype.convertToWebAnnotation = function (annotation, elem) {
+    var self = this;
+    var tags = [];
+    jQuery.each(annotation.tags, function (_, t) {
+      var t_el = {
+        'type': 'TextualBody',
+        'value': t,
+        'purpose': 'tagging'
+      };
+      tags.push(t_el);
+    });
+    var targetList = [];
+    var source_id = this.options.object_id;
+    var purpose = 'commenting';
+
+    if (annotation.media === "comment") {
+      targetList.push(annotation.ranges);
+      source_id = annotation.ranges.source; // jQuery.each(annotation.ranges, function(_, range){
+      //     targetList.push(range)
+      //     source_id = range.parent;
+      // });
+
+      purpose = 'replying';
+    } else {
+      // console.log('convert2wa', annotation.ranges, elem);
+      var serializedRanges = annotation.ranges; //self.serializeRanges(annotation.ranges, elem);
+
+      var mediatype = this.options.mediaType.charAt(0).toUpperCase() + this.options.mediaType.slice(1);
+      jQuery.each(serializedRanges, function (index, range) {
+        var rangeItem = range;
+
+        if (mediatype === "Text") {
+          rangeItem = [{
+            'type': 'RangeSelector',
+            'startSelector': {
+              'type': 'XPathSelector',
+              'value': range.xpath.start
+            },
+            'endSelector': {
+              'type': 'XPathSelector',
+              'value': range.xpath.end
+            },
+            'refinedBy': {
+              'type': 'TextPositionSelector',
+              'start': range.xpath.startOffset,
+              'end': range.xpath.endOffset
+            }
+          }, {
+            'type': 'TextPositionSelector',
+            'start': range.position.globalStartOffset,
+            'end': range.position.globalEndOffset
+          }, {
+            'type': 'TextQuoteSelector',
+            'exact': range.text.exact,
+            'prefix': range.text.prefix,
+            'suffix': range.text.suffix
+          }];
+        } else {
+          jQuery.each(range.items, function (idx, choice) {
+            if (choice.type === "Image") {
+              rangeItem = [{
+                'type': 'FragmentSelector',
+                'value': choice.selector.items[0].selector["default"].value
+              }, {
+                'type': 'SvgSelector',
+                'value': choice.selector.items[0].selector.item.value
+              }];
+            } else if (choice.type === "Thumbnail") {
+              targetList.push(choice);
+            }
+          });
+        }
+
+        targetList.push({
+          'source': source_id,
+          'type': mediatype,
+          'selector': {
+            'type': 'Choice',
+            'items': rangeItem
+          }
+        });
+      });
+    }
+
+    var webAnnotationVersion = {
+      "@context": "http://catchpy.harvardx.harvard.edu.s3.amazonaws.com/jsonld/catch_context_jsonld.json",
+      'type': 'Annotation',
+      'schema_version': '1.1.0',
+      'id': annotation['id'],
+      'creator': {
+        'id': self.options.user_id,
+        'name': this.options.username
+      },
+      'permissions': {
+        'can_read': [],
+        'can_update': [this.options.user_id],
+        'can_delete': [this.options.user_id],
+        'can_admin': [this.options.user_id]
+      },
+      'platform': {
+        'platform_name': 'edX',
+        'context_id': this.options.context_id,
+        'collection_id': this.options.collection_id,
+        'target_source_id': source_id
+      },
+      'body': {
+        'type': 'List',
+        'items': [{
+          'type': 'TextualBody',
+          'format': 'text/html',
+          'language': 'en',
+          'value': annotation.annotationText,
+          'purpose': purpose
+        }].concat(tags)
+      },
+      'target': {
+        'type': 'List',
+        'items': targetList
+      }
+    };
+    return webAnnotationVersion;
+  };
+
+  $.CatchPy.prototype.convertFromWebAnnotation = function (webAnn, element) {
+    var self = this;
+    var mediaFound = self.getMediaType(webAnn);
+    var annotation = {
+      annotationText: self.getAnnotationText(webAnn),
+      created: self.getAnnotationCreated(webAnn),
+      creator: self.getAnnotationCreator(webAnn),
+      exact: self.getAnnotationExact(webAnn),
+      id: self.getAnnotationId(webAnn),
+      media: mediaFound,
+      tags: self.getAnnotationTags(webAnn),
+      ranges: self.getAnnotationTarget(webAnn, jQuery(element), mediaFound),
+      totalReplies: webAnn.totalReplies,
+      permissions: webAnn.permissions
+    };
+
+    if (mediaFound.toLowerCase() === "image") {
+      jQuery.each(annotation['ranges'], function (index, range) {
+        if (range['type'].toLowerCase() === "thumbnail") {
+          annotation['thumbnail'] = range.source;
+        } else if (range['type'].toLowerCase() === "image") {
+          annotation['source_url'] = range.source;
+          var fragFound = false;
+          var svgExists = false;
+          var fragVal = "";
+          jQuery.each(range['selector']['items'], function (index, selector) {
+            try {
+              if (selector['type'].toLowerCase() === "svgselector") {
+                var svgVal = selector.value;
+
+                if (fragFound) {
+                  svgVal = svgVal.replace('svg xmlns', 'svg ' + fragVal + ' xmlns');
+                }
+
+                annotation['svg'] = svgVal;
+                svgExists = true;
+              } else {
+                fragVal = 'class="thumbnail-svg-' + annotation['id'] + '" viewBox="' + selector.value.replace('xywh=', '').split(',').join(' ') + '"';
+
+                if (svgExists) {
+                  annotation['svg'] = annotation['svg'].replace('svg xmlns', 'svg ' + fragVal + ' xmlns');
+                }
+
+                fragFound = true;
+              }
+            } catch (e) {
+              if (typeof selector['@type'] !== "undefined") {
+                fragVal = 'class="thumbnail-svg-' + annotation['id'] + '" viewBox="' + selector['selector']['default']['value'].replace('xywh=', '').split(',').join(' ') + '"';
+                var svgVal = selector['selector']['item']['value'];
+                svgVal = svgVal.replace('svg xmlns', 'svg ' + fragVal + ' xmlns');
+                annotation['svg'] = svgVal;
+              }
+            }
+          });
+        }
+      });
+    }
+
+    return annotation;
+  };
+
+  $.CatchPy.prototype.getMediaType = function (webAnn, element) {
+    var found = webAnn['target']['items'][0]['type'];
+    jQuery.each(webAnn['target']['items'], function (index, item) {
+      var m = item['type'].toLowerCase();
+
+      if (m === "image" || m === "video" || m === "text" || m === "audio") {
+        found = item['type'];
+      }
+    }); // console.log("FOUND IT", found);
+
+    return found;
+  };
+
+  $.CatchPy.prototype.getAnnotationTargetItems = function (webAnn) {
+    try {
+      var annType = webAnn['target']['items'][0]['type']; // console.log("reached getAnnotationTargetItems", webAnn);
+
+      if (annType === "Annotation") {
+        // console.log([{'parent':webAnn['target']['items'][0]['source']}]);
+        return [{
+          'parent': webAnn['target']['items'][0]['source']
+        }];
+      } else if (annType === "Image" || annType === "Thumbnail") {
+        return webAnn['target']['items'];
+      } // console.log("nope, something went wrong");
+
+
+      return webAnn['target']['items'][0]['selector']['items'];
+    } catch (e) {
+      // console.log(e);
+      return [];
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationTarget = function (webAnn, element, media) {
+    var self = this;
+
+    try {
+      // console.log(media);
+      if (media.toLowerCase() === "text") {
+        var ranges = [];
+        var xpathRanges = [];
+        var positionRanges = [];
+        var textRanges = [];
+        jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
+          if (!('parent' in targetItem)) {
+            if (targetItem['type'] === "RangeSelector") {
+              xpathRanges.push({
+                start: targetItem['startSelector'] ? targetItem['startSelector'].value : targetItem['oa:start'].value,
+                startOffset: targetItem['refinedBy'][0].start,
+                end: targetItem['endSelector'] ? targetItem['endSelector'].value : targetItem['oa:end'].value,
+                endOffset: targetItem['refinedBy'][0].end
+              });
+            } else if (targetItem['type'] === "TextPositionSelector") {
+              positionRanges.push({
+                globalStartOffset: targetItem['start'],
+                globalEndOffset: targetItem['end']
+              });
+            } else if (targetItem['type'] === "TextQuoteSelector") {
+              textRanges.push({
+                prefix: targetItem['prefix'] || '',
+                exact: targetItem['exact'],
+                suffix: targetItem['suffix'] || ''
+              });
+            }
+          } else {
+            return ranges.push(targetItem);
+          }
+        });
+
+        if (xpathRanges.length === positionRanges.length && xpathRanges.length === textRanges.length) {
+          for (var i = xpathRanges.length - 1; i >= 0; i--) {
+            ranges.push({
+              'xpath': xpathRanges[i],
+              'position': positionRanges[i],
+              'text': textRanges[i]
+            });
+          }
+        } else if (xpathRanges.length === 1 && positionRanges.length === 0 && textRanges.length === 0) {
+          var startNode = hrange.getNodeFromXpath(element, xpathRanges[0].start, xpathRanges[0].startOffset, 'annotator-hl');
+          var endNode = hrange.getNodeFromXpath(element, xpathRanges[0].end, xpathRanges[0].endOffset, 'annotator-hl');
+
+          if (startNode && endNode) {
+            var normalizedRange = document.createRange();
+            normalizedRange.setStart(startNode.node, startNode.offset);
+            normalizedRange.setEnd(endNode.node, endNode.offset);
+            var serializedRange = hrange.serializeRange(normalizedRange, element, 'annotator-hl');
+            ranges.push(serializedRange);
+          }
+        } else {
+          var rangeFound = {};
+
+          if (xpathRanges.length >= 1) {
+            rangeFound['xpath'] = xpathRanges[0];
+          }
+
+          if (positionRanges.length >= 1) {
+            rangeFound['position'] = positionRanges[0];
+          }
+
+          if (textRanges.length >= 1) {
+            rangeFound['text'] = textRanges[0];
+          }
+
+          ranges.push(rangeFound);
+        }
+      } else if (media.toLowerCase() == "image") {
+        // console.log(webAnn['target'])
+        return webAnn['target']['items'];
+      }
+
+      if (webAnn['target']['items'][0]['type'] == "Annotation") {
+        return ranges;
+      } //console.log('getAnnotationTarget', ranges, element);
+
+
+      return ranges;
+    } catch (e) {
+      // console.log(ranges, element[0]);
+      throw e; // console.log(ranges, element[0], this.getAnnotationTargetItems(webAnn));
+      //return self.normalizeRanges(ranges, window.document);
+      // console.log(e);
+
+      return [];
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationText = function (webAnn) {
+    try {
+      var found = [];
+      jQuery.each(webAnn['body']['items'], function (_, bodyItem) {
+        if (bodyItem.purpose == "commenting" || bodyItem.purpose == "replying") {
+          found.push(bodyItem.value);
+        }
+      });
+      return found;
+    } catch (e) {
+      return "";
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationCreated = function (webAnn) {
+    try {
+      return new Date(webAnn['created']);
+    } catch (e) {
+      return new Date();
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationCreator = function (webAnn) {
+    try {
+      return webAnn['creator'];
+    } catch (e) {
+      return {
+        name: 'Unknown',
+        id: 'error'
+      };
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationExact = function (webAnn) {
+    try {
+      var quote = '';
+      jQuery.each(this.getAnnotationTargetItems(webAnn), function (_, targetItem) {
+        if (targetItem['type'] == "TextQuoteSelector") {
+          quote += targetItem['exact'];
+        } else {
+          return '';
+        }
+      });
+      return quote;
+    } catch (e) {
+      return "";
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationId = function (webAnn) {
+    try {
+      return webAnn['id'];
+    } catch (e) {
+      return "";
+    }
+  };
+
+  $.CatchPy.prototype.getAnnotationTags = function (webAnn) {
+    try {
+      var tags = [];
+      jQuery.each(webAnn['body']['items'], function (_, bodyItem) {
+        if (bodyItem.purpose == "tagging") {
+          tags.push(bodyItem.value);
+        }
+      });
+      return tags;
+    } catch (e) {
+      return [];
+    }
+  };
+
+  $.CatchPy.prototype.storeCurrent = function () {};
+
+  $.CatchPy.prototype.serializeRanges = function (ranges, elem) {
+    var self = this;
+
+    if (ranges.length < 1) {
+      return {
+        ranges: []
+      };
+    }
+
+    var text = [],
+        serializedRanges = [],
+        previous = "",
+        next = "",
+        extraRanges = [],
+        contextEl = elem[0];
+
+    for (var i = 0, len = ranges.length; i < len; i++) {
+      text = [];
+      var r = ranges[i];
+
+      if (r.text !== undefined) {
+        text.push(Hxighlighter.trim(r.text()));
+      } else {
+        text.push(Hxighlighter.trim(self.text(r)));
+      }
+
+      try {
+        previous = ranges[i]['start']['previousSibling'] ? ranges[i]['start']['previousSibling'].textContent : '';
+        next = ranges[i]['end']['nextSibling'] ? ranges[i]['end']['nextSibling'].textContent : '';
+      } catch (e) {
+        previous = ranges[i]['startContainer']['previousSibling'] ? ranges[i]['startContainer']['previousSibling'].textContent : '';
+        next = ranges[i]['endContainer']['nextSibling'] ? ranges[i]['endContainer']['nextSibling'].textContent : '';
+      }
+
+      var exact = text.join(' / ');
+      var exactFullStart = jQuery(contextEl).text().indexOf(exact);
+      var fullTextRange = {
+        startOffset: exactFullStart,
+        endOffset: exactFullStart + exact.length,
+        exact: exact.replace('*', ''),
+        prefix: previous.substring(previous.length - 20, previous.length).replace('*', ''),
+        suffix: next.substring(0, 20).replace('*', '')
+      };
+
+      try {
+        // This is the annotatorjs way to serialize");
+        serializedRanges.push(r.serialize(contextEl, '.annotator-hl'));
+        extraRanges.push(fullTextRange);
+      } catch (e) {
+        // For the keyboard made annotations
+        // we are borrowing the xpath range library from annotatorjs
+        // to keep them consistent
+        //console.log("LOOK HERE:",r, hrange.serializeRange(r, contextEl, 'annotator-hl'));
+        serializedRange = hrange.serializeRange(r, contextEl, 'annotator-hl');
+        serializedRanges.push(serializedRange.xpath);
+        extraRanges.push({
+          startOffset: serializedRange.position.globalStartOffset,
+          endOffset: serializedRange.position.globalEndOffset,
+          prefix: serializedRange.text.prefix,
+          exact: serializedRange.text.exact,
+          suffix: serializedRange.text.suffix
+        });
+      } // console.log("SERIALIZED", serializedRanges, contextEl);
+
+    }
+
+    return {
+      serial: serializedRanges,
+      extra: extraRanges
+    };
+  };
+
+  $.CatchPy.prototype.normalizeRanges = function (ranges, elem) {
+    var self = this;
+    var normalizedRanges = [];
+    var foundRange;
+    jQuery.each(ranges, function (_, range) {
+      // try {
+      //    //console.log(xpathrange.toRange, elem.ownerDocument, range);
+      //    foundRange = xpathrange.toRange(elem, range);
+      // } catch(e) {
+      //     //console.log("trying toRange");
+      //console.log(elem, range.start, range.startOffset, range.end, range.endOffset);
+      var foundRange = hrange.normalizeRange(range, elem, 'annotator-hl'); // }
+      // console.log(elem);
+      // console.log(foundRange);
+
+      normalizedRanges.push(foundRange);
+    });
+    return normalizedRanges;
+  };
+
+  $.CatchPy.prototype.getElementViaXpath = function (xpath, rootElem) {
+    var res = document.evaluate('.' + xpath, jQuery(rootElem)[0], null, XPathResult.ANY_TYPE, null);
+    return res.iterateNext();
+  };
+
+  $.CatchPy.prototype.contains = function (elem1, elem2) {
+    if (document.compareDocumentPosition != null) {
+      return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_CONTAINED_BY;
+    }
+
+    return false;
+  };
+
+  $.CatchPy.prototype.flatten = function (array) {
+    var _flatten;
+
+    _flatten = function flatten(ary) {
+      var el, flat, _i, _len;
+
+      flat = [];
+
+      for (_i = 0, _len = ary.length; _i < _len; _i++) {
+        el = ary[_i];
+        flat = flat.concat(el && jQuery.isArray(el) ? _flatten(el) : el);
+      }
+
+      return flat;
+    };
+
+    return _flatten(array);
+  };
+
+  $.CatchPy.prototype.getTextNodes = function (nodeContainer) {
+    var self = this;
+
+    var _getTextNodes;
+
+    _getTextNodes = function getTextNodes(node) {
+      var nodes;
+
+      if (node && node.nodeType !== 3) {
+        nodes = [];
+
+        if (node.nodeType !== 8) {
+          node = node.lastChild;
+
+          while (node) {
+            nodes.push(_getTextNodes(node));
+            node = node.previousSibling;
+          }
+        }
+
+        return nodes.reverse();
+      } else {
+        return node;
+      }
+    };
+
+    return nodeContainer.map(function () {
+      return self.flatten(_getTextNodes(this));
+    });
+  };
+
+  $.CatchPy.prototype.getTextNodesFromRange = function (node) {
+    var end, start, textNodes, _ref;
+
+    var self = this;
+    textNodes = self.getTextNodes(jQuery(node.commonAncestorContainer));
+    _ref = [textNodes.index(node.start), textNodes.index(node.end)], start = _ref[0], end = _ref[1];
+    return jQuery.makeArray(textNodes.slice(start, +end + 1 || 9e9));
+  };
+
+  $.CatchPy.prototype.text = function (node) {
+    var self = this;
+    return function () {
+      var _i, _len, _ref, _results;
+
+      _ref = self.getTextNodesFromRange(node);
+      _results = [];
+
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        node = _ref[_i];
+
+        _results.push(node.nodeValue);
+      }
+
+      return _results;
+    }.call(this).join('');
+  };
+
+  $.storage.push($.CatchPy);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(22)))
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(69);
 
 
 /***/ }),
-/* 86 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45637,7 +46352,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(54);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(45);
 /* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -45655,119 +46370,20 @@ __webpack_require__(20);
 
 __webpack_require__(46);
 
-__webpack_require__(87);
-
-__webpack_require__(55);
-
-__webpack_require__(89);
-
-__webpack_require__(43);
-
 __webpack_require__(48);
 
-__webpack_require__(90);
+__webpack_require__(51);
+
+__webpack_require__(70);
+
+__webpack_require__(44);
+
+__webpack_require__(67);
+
+__webpack_require__(71);
 
 /***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/**
- *  Badges Annotations Plugin
- *  
- *
- */
-//uncomment to add css file
-__webpack_require__(88);
-
-(function ($) {
-  /**
-   * @constructor
-   * @params {Object} options - specific options for this plugin
-   */
-  $.Badges = function (options, instanceID) {
-    this.options = jQuery.extend({}, options);
-    this.instanceID = instanceID;
-    this.init();
-    return this;
-  };
-  /**
-   * Initializes instance
-   */
-
-
-  $.Badges.prototype.init = function () {
-    var self = this; //console.log('test!');
-
-    self.setUpListeners();
-  };
-
-  $.Badges.prototype.setUpListeners = function () {
-    var self = this;
-    $.subscribeEvent('addBadge', self.instanceID, function (_, elem, counter) {
-      if (jQuery(elem).data('hxbadge')) {
-        self.updateBadge(elem, counter);
-      } else {
-        self.createBadge(elem, counter);
-      }
-    });
-    $.subscribeEvent('increaseBadgeCount', self.instanceID, function (_, elem) {
-      var count = jQuery(elem).data('hxbadge');
-
-      if (count) {
-        self.updateBadge(elem, count + 1);
-      } else {
-        self.addBadge(elem, 1);
-      }
-    });
-    $.subscribeEvent('updateBadge', self.instanceID, function (_, elem, counter) {
-      self.updateBadge(elem, counter);
-    });
-    $.subscribeEvent('clearBadge', self.instanceID, function (_, elem) {
-      self.clearBadge(elem, counter);
-    });
-  };
-
-  $.Badges.prototype.addBadge = function (elem, counter) {
-    var self = this; // create a badge to go in the top-right corner
-
-    jQuery(elem).append('<span class="hx-badge" aria-label="' + counter + ' new unread">' + counter + "</span>"); // add counter to data('hxbadge')
-
-    jQuery(elem).data('hxbadge', counter); // add click event listener that will automatically clear badge when clicked
-
-    jQuery(elem).click(function () {
-      self.clearBadge(elem);
-    });
-  };
-
-  $.Badges.prototype.updateBadge = function (elem, counter) {
-    jQuery(elem).find('.hx-badge').html(counter);
-    jQuery(elem).data('hxbadge', counter);
-  };
-
-  $.Badges.prototype.clearBadge = function (elem) {
-    jQuery(elem).find('.hx-badge').remove();
-    jQuery(elem).removeData('hxbadge');
-  };
-
-  $.Badges.prototype.saving = function (annotation) {
-    return annotation;
-  };
-
-  Object.defineProperty($.Badges, 'name', {
-    value: "Badges"
-  });
-  $.plugins.push($.Badges);
-})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
-
-/***/ }),
-/* 88 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 89 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45824,7 +46440,7 @@ __webpack_require__(88);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 90 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45833,7 +46449,7 @@ __webpack_require__(88);
  *
  */
 //uncomment to add css file
-__webpack_require__(91);
+__webpack_require__(72);
 
 (function ($) {
   /**
@@ -45892,7 +46508,7 @@ __webpack_require__(91);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 91 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
