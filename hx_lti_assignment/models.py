@@ -242,7 +242,6 @@ class Assignment(models.Model):
                     assignment=self,
                     target_object=obj
                 )
-                logger.debug("CURRENT_ORDER: %d - Total: %d" % (assignment_target.order, len(self.assignment_objects.all())))
                 if assignment_target.order == len(self.assignment_objects.all()):  # noqa
                     return None
                 else:
