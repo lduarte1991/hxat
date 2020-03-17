@@ -1,8 +1,13 @@
 from django.db import models
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTICourse
+import requests
 import uuid
 import sys
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AssignmentTargets(models.Model):
@@ -70,10 +75,21 @@ class AssignmentTargets(models.Model):
         """
         """
         options = self.get_target_external_options_list()
-        if len(options) == 1:
-            return None
+        logger.debug("OPTIONS: %s " % options)
+        if options is None or len(options) <= 1:
+            logger.debug('Trying to get canvas id but none in list')
+            req = requests.get(self.target_object.target_content)
+            manifest = json.load(req.text)
+            canv_id = manifest['sequences'][0]['canvases'][0]['@id']
+            return canv_id
         else:
-            return options[1] if options[1] != '' else None
+            if options[1] == '':
+                req = requests.get(self.target_object.target_content)
+                manifest = json.loads(req.text)
+                canv_id = manifest['sequences'][0]['canvases'][0]['@id']
+                return canv_id
+            else:
+                return options[1]
 
     def get_dashboard_hidden(self):
         """

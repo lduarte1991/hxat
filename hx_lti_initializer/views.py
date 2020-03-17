@@ -464,6 +464,7 @@ def access_annotation_target(
         original.update({'osd_json': targ_obj.target_content})
         viewtype = assignment_target.get_view_type_for_mirador()
         canvas_id = assignment_target.get_canvas_id_for_mirador()
+        logger.debug("CANVAS: %s" % canvas_id)
 
         if viewtype is not None:
             original.update({'viewType': viewtype})
@@ -500,7 +501,7 @@ def access_annotation_target(
         get_paras[k] = request.GET[k]
 
     original.update(get_paras)
-    if targ_obj.target_type == "tx" and assignment.use_hxighlighter:
+    if (targ_obj.target_type == "tx" or targ_obj.target_type == "ig") and assignment.use_hxighlighter:
         return render(request, '%s/detail_hxighlighter.html' % targ_obj.target_type, original)
     else:
         return render(request, '%s/detail.html' % targ_obj.target_type, original)
