@@ -91,12 +91,13 @@ def handle_file_upload(data, files, lti_params):
         ValidationError
     '''
     title = "Annotation: %s" % data.get('target_title', 'Untitled Target Object')
-    uploaded_file = files['target_file']
+    # it is a MultiValueDict, and a list of values can be returned with getlist
+    list_of_files = files.getlist('target_file')
 
     try:
         image_backend_class = getattr(image_store.backends, settings.IMAGE_STORE_BACKEND)
         image_backend = image_backend_class(settings.IMAGE_STORE_BACKEND_CONFIG, lti_params)
-        manifest_url = image_backend.store([uploaded_file], title)
+        manifest_url = image_backend.store([file for file in list_of_files], title)
     except image_store.backends.ImageStoreBackendException as e:
         raise ValidationError("Error uploading image. Details: %s" % e)
 
