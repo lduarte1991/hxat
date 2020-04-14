@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Tuesday, January 28th, 2020, 2:37:16 PM  
+// [AIV_SHORT]  Version: 1.1.0 - Tuesday, April 14th, 2020, 5:06:38 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 92);
+/******/ 	return __webpack_require__(__webpack_require__.s = 73);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -27864,7 +27864,7 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
   else {}
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(23)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(24)(module)))
 
 /***/ }),
 /* 3 */
@@ -39341,18 +39341,19 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(this, {}))
 
 /***/ }),
-/* 22 */
+/* 22 */,
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(24);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(25);
 /* harmony import */ var _css_sidebar_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_sidebar_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
 /* harmony import */ var jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm_css_jquery_confirm_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(25);
+/* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
 /* harmony import */ var timeago__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(timeago__WEBPACK_IMPORTED_MODULE_3__);
 /**
  * 
@@ -39374,10 +39375,10 @@ __webpack_require__(9);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(26),
-        viewer: __webpack_require__(27),
-        annotationSection: __webpack_require__(28),
-        annotationItem: __webpack_require__(29)
+        editor: __webpack_require__(27),
+        viewer: __webpack_require__(28),
+        annotationSection: __webpack_require__(29),
+        annotationItem: __webpack_require__(30)
       },
       template_suffix: "sidebar",
       template_urls: ""
@@ -39509,12 +39510,20 @@ __webpack_require__(9);
     });
     jQuery('#search-submit').click(function () {
       var searchValue = jQuery('#srch-term').val().trim();
-      var searchType = jQuery('.search-bar select').val();
+      var searchType = jQuery('.search-bar select').val(); // console.log(searchValue, searchType);
+
       var ops = self.filterByType(searchValue, searchType, undefined);
       self.search(ops);
     }); // trigger new filter tab
 
-    jQuery('.btn.user-filter').click(function () {
+    jQuery('.btn.user-filter').click(function (event) {
+      // hitting enter apparently also triggers a mouse click event in html
+      // the difference between a real click event and a fake one is that real
+      // has originalEvent.detail set to 1 and a fake one is left to 0 (might be more nuanced?)
+      if (event && event.originalEvent && event.originalEvent.detail === 0) {
+        return;
+      }
+
       if (this.id === "search") {
         jQuery('.btn.user-filter').removeClass('active');
         jQuery('.btn.user-filter').find('.fas.fa-toggle-on').addClass('fa-flip-horizontal'); //.removeClass('fa-toggle-on').addClass('fa-toggle-off');
@@ -39549,6 +39558,7 @@ __webpack_require__(9);
             }
 
             jQuery('.side.annotationsHolder').append('<div id="empty-alert" style="padding:20px;text-align:center;"><strong>No Annotations Selected</strong><br>Use the filter buttons above to view ' + messageVals + '.' + pluralMessage);
+            self.searchRequest = $.getUniqueId();
             return;
           }
 
@@ -39622,6 +39632,7 @@ __webpack_require__(9);
     jQuery('.sidebar-button#hide_label').click(function () {
       jQuery(':root').css('--sidebar-width', '0px');
       jQuery('.annotationSection').hide();
+      $.publishEvent('resizeWindow', self.instance_id, []);
       self.showSidebarTab(self.options.viewer_options.sidebarversion);
     });
     jQuery('.side.annotationsHolder').on('scroll', function () {
@@ -39677,7 +39688,7 @@ __webpack_require__(9);
               jQuery('.side.load-more').remove();
               jQuery('.side.annotationsHolder').css('padding-bottom', '0px');
               $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, false]);
-            }, function () {}]);
+            }, function () {}, true]);
           });
         }
       } else if (self.load_more_open && jQuery(this).scrollTop() + jQuery(this).innerHeight() <= jQuery(this)[0].scrollHeight - 50) {
@@ -39691,8 +39702,8 @@ __webpack_require__(9);
 
   $.Sidebar.prototype.showSidebarTab = function (type) {
     // if (type === "smalltab") {
-    jQuery(':root').css('--sidebar-width', '55px');
-    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button" id="sidebaropen" aria-pressed="false" aria-label="Toggle sidebar" title="Toggle Sidebar"><span class="fas fa-comments"></span></div>'); // }
+    jQuery(':root').css('--sidebar-width', '40px');
+    jQuery('.resize-handle.side').append('<div class="' + type + ' open-sidebar" tabindex="0" role="button" id="sidebaropen" aria-pressed="false" aria-label="Toggle sidebar" title="Toggle Sidebar"><span class="fas fa-angle-double-right"></span></div>'); // }
 
     jQuery('.open-sidebar').click(function () {
       jQuery('.open-sidebar').remove();
@@ -39707,13 +39718,17 @@ __webpack_require__(9);
       // console.log("6. Got Annotation in Viewer", annotation, self.options);
       var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
         return button.id;
-      });
+      }); // console.log(filteroptions, filteroptions.indexOf('mine') > -1, (filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1)))
 
-      if (filteroptions.indexOf('mine') > -1 || filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1)) {
+      if (filteroptions.indexOf('mine') > -1 || filteroptions.indexOf('instructor') > -1 && self.options.instructors.indexOf(self.options.user_id) > -1) {
         self.addAnnotation(annotation, updating, false);
       } else {
-        jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
-        $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+        // console.log(annotation);
+        if (annotation.media !== "comment") {
+          jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
+          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+          self.search(self.lastSearchOption);
+        }
       }
     });
     $.subscribeEvent('searchTag', self.instance_id, function (_, tag) {
@@ -39778,8 +39793,15 @@ __webpack_require__(9);
               path.wrap('<clipPath id="' + img_id + '-clippath"></clipPath>');
               img.style = "display: none;";
               var img_url = img.src;
-              var viewBox = sv.getAttribute('viewBox').split(' ');
-              jQuery(sv)[0].innerHTML += '<image x="' + viewBox[0] + '" y="' + viewBox[1] + '" width="' + viewBox[2] + '" height="' + viewBox[3] + '" clip-path="url(#' + img_id + '-clippath)" class="annotation-thumbnail" href="' + img_url + '" />';
+              var viewBox;
+
+              try {
+                viewBox = sv.viewBox.split(' ');
+              } catch (e) {
+                viewBox = sv.getAttribute('viewBox').split(' ');
+              }
+
+              jQuery(sv)[0].innerHTML += '<image x="' + viewBox[0] + '" y="' + viewBox[1] + '" width="' + viewBox[2] + '" height="' + viewBox[3] + '" clip-path="url(#' + img_id + '-clippath)" class="annotation-thumbnail" href="' + img_url + '" xlink:href="' + img_url + '" />';
               sv.style['max-width'] = w + "px";
               sv.style['max-height'] = w + "px";
               sv.style['margin-left'] = "auto";
@@ -39798,6 +39820,12 @@ __webpack_require__(9);
               }
             }
           }
+        };
+
+        img.onerror = function (e) {
+          console.log('error', e);
+          img.style = 'display: none';
+          jQuery(img).after('<button class="zoom-to-error-button" style="background:#ededed; color: black; border-radius: 5px; border: 1px solid #333;">Zoom to annotation</button>');
         };
 
         img.src = img.dataset['src'];
@@ -39836,7 +39864,6 @@ __webpack_require__(9);
         content: 'Would you like to delete your annotation? This is permanent.',
         buttons: {
           confirm: function confirm() {
-            // console.log("I got to the delete from sidebar.")
             $.publishEvent('StorageAnnotationDelete', self.instance_id, [annotation]);
           },
           cancel: function cancel() {}
@@ -39869,19 +39896,23 @@ __webpack_require__(9);
             $.publishEvent('focusOnContext', self.instance_id, [ann]);
           }, 350);
         } else if (self.options.mediaType.toLowerCase() === "image") {
-          var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
-          var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
-            return parseInt(val, 10);
-          });
-          var bounds = {
-            x: boundSplit[0],
-            y: boundSplit[1],
-            width: boundSplit[2],
-            height: boundSplit[3]
-          };
-          $.publishEvent('zoomTo', self.inst_id, [bounds, ann]); // console.log("Yup!");
+          var elementClass = e.target.getAttribute('class');
 
-          $.pauseEvent(e);
+          if (elementClass && elementClass.indexOf('zoom-to-error-button') > -1 || e.target.tagName.toLowerCase() === "image" || e.target.tagName.toLowerCase() === "svg" || e.target.tagName.toLowerCase() === "path") {
+            var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
+            var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
+              return parseInt(val, 10);
+            });
+            var bounds = {
+              x: boundSplit[0] - boundSplit[2] * .167,
+              y: boundSplit[1] - boundSplit[3] * .167,
+              width: boundSplit[2] + boundSplit[2] / 3.0,
+              height: boundSplit[3] + boundSplit[3] / 3.0
+            };
+            $.publishEvent('zoomTo', self.inst_id, [bounds, ann]);
+          } // console.log("Yup!");
+          // $.pauseEvent(e);
+
         }
       });
       jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
@@ -39938,9 +39969,24 @@ __webpack_require__(9);
   };
 
   $.Sidebar.prototype.search = function (options) {
-    // console.log('sidebar search', options);
+    var self = this; // console.log('sidebar search', options);
+
+    self.lastSearchOption = options;
+
+    if (jQuery('.loading-obj').is(':visible')) {
+      jQuery('.loading-obj').remove();
+    }
+
+    self.searchRequest = $.getUniqueId(); // console.log(self.searchRequest, options);
+
+    var tempRequest = self.searchRequest;
     jQuery('.annotationsHolder').prepend('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
     $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
+      if (tempRequest !== self.searchRequest) {
+        return;
+      } // console.log("RETURN: ", tempRequest, self.searchRequest)
+
+
       jQuery('.annotationsHolder.side').html('');
       $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, true]);
       jQuery('.loading-obj').remove();
@@ -40090,7 +40136,7 @@ __webpack_require__(9);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -40118,13 +40164,13 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -40360,7 +40406,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -40377,7 +40423,7 @@ return __p
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -40424,7 +40470,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj) {
@@ -40527,7 +40573,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)))
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -40656,7 +40702,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -40671,7 +40717,7 @@ __webpack_require__(12);
 
 __webpack_require__(13);
 
-__webpack_require__(31);
+__webpack_require__(32);
 
 (function ($) {
   /**
@@ -40683,6 +40729,12 @@ __webpack_require__(31);
     var maxLength = 1000; // console.log("SummernoteRichText Options Sent:", options);
 
     this.options = options;
+    var toolbar = [['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]];
+
+    if (self.options.instructors.indexOf(self.options.user_id) > -1) {
+      toolbar = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
+    }
+
     this.summernoteOpts = jQuery.extend({
       height: 150,
       focus: true,
@@ -40694,6 +40746,18 @@ __webpack_require__(31);
       maxTextLength: maxLength,
       dialogsInBody: true,
       disableResizeEditor: true,
+      disableDragAndDrop: true,
+      onCreateLink: function onCreateLink(link) {
+        var linkValidator = /(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+/;
+
+        if (link.match(linkValidator)) {
+          linkUrl = /^([A-Za-z][A-Za-z0-9+-.]*\:|#|\/)/.test(link) ? link : 'http://' + link;
+          return linkUrl;
+        } else {
+          alert("You did not enter a valid URL, it has been removed.");
+          return 'http://example.org';
+        }
+      },
       callbacks: {
         onKeydown: function onKeydown(e) {
           var t = e.currentTarget.innerText;
@@ -40701,7 +40765,7 @@ __webpack_require__(31);
           if ('Escape' === e.key) {
             $.publishEvent('ViewerEditorClose', self.instanceID, [self.currentAnnotation, true, true]);
             jQuery('.sr-real-alert').html('You have closed the editor and unselected text for annotation.');
-          } else if (t.trim().length >= maxLength) {
+          } else if (t.trim().length >= maxLength && self.options.instructors.indexOf(self.options.user_id) == -1) {
             // prevents everything that could add a new character
             var allowedKeys = 'ArrowLeftArrowRightArrowDownDeleteArrowUpMetaControlAltBackspace';
 
@@ -40717,9 +40781,26 @@ __webpack_require__(31);
         },
         onPaste: function onPaste(e) {
           var t = e.currentTarget.innerText;
-          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text');
+          var bufferHTML = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
 
-          if (t.length + bufferText.length >= maxLength) {
+          if (bufferHTML.indexOf('<img') > -1 && self.options.instructors.indexOf(self.options.user_id) == -1) {
+            var regex = new RegExp(/<img([\w\W ]+?)\/?>/g);
+            var inside = bufferHTML.match(regex);
+            jQuery.each(inside, function (_, image_tags) {
+              var new_img_url = image_tags.match(/src\s*=\s*["'](.+?)["']/)[1];
+              bufferHTML = bufferHTML.replace(image_tags, '<a title="' + new_img_url + '" href=\"' + new_img_url + "\">[External Image Link]</a>");
+            }); // bufferHTML = bufferHTML.replace(/img([\w\W]+?)\/?>/, "<a href=\"#\">[Link to external image]</a>");
+
+            setTimeout(function () {
+              // wrap in a timer to prevent issues in Firefox
+              self.elementObj.summernote('code', bufferHTML);
+              jQuery('#maxContentPost').text(maxLength);
+              alert('You may have pasted an image. It will be converted to a link.');
+            }, 100);
+          }
+
+          if (t.length + bufferText.length >= maxLength && self.options.instructors.indexOf(self.options.user_id) == -1) {
             e.preventDefault();
             var bufferTextAllowed = bufferText.trim().substring(0, maxLength - t.length);
             setTimeout(function () {
@@ -40730,13 +40811,19 @@ __webpack_require__(31);
             }, 10);
           }
         },
+        onChange: function onChange(contents, $editable) {
+          if ($editable && contents.length > maxLength) {
+            $editable.html(contents.trim().substring(0, maxLength));
+          }
+        },
         onFocus: function onFocus(e) {
           $.publishEvent('wysiwygOpened', self.instanceID, [e]);
         }
       },
-      toolbar: [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]]
+      toolbar: toolbar
     }, this.options); // console.log("After init options", this.options);
 
+    console.log('SUMMERNOTE', this.options);
     this.init();
     this.instanceID = instanceID;
     return this;
@@ -40856,20 +40943,18 @@ __webpack_require__(31);
     }.bind(self));
     $.subscribeEvent('editorHidden', self.instanceID, function () {
       self.destroy();
-    }.bind(self));
-    jQuery('body').on('mouseover', '.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function () {
-      var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
-      input.prop('type', 'url');
-      var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
-      var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-      var regex = new RegExp(expression);
-
-      if (chosen.match(regex)) {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
-      } else {
-        jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
-      }
-    });
+    }.bind(self)); // jQuery('body').on('mouseover','.btn.btn-primary.note-btn.note-btn-primary.note-link-btn', function() {
+    //     var input = jQuery('.note-link-url.form-control.note-form-control.note-input');
+    //     input.prop('type', 'url');
+    //     var chosen = jQuery('.note-link-url.form-control.note-form-control.note-input').val();
+    //     var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+    //     var regex = new RegExp(expression);
+    //     if (chosen.match(regex)){
+    //         jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', false);
+    //     } else {
+    //         jQuery('.btn.btn-primary.note-btn.note-btn-primary.note-link-btn').prop('disabled', true);
+    //     }
+    // });
   };
   /**
    * Code to run just before the annotation is saved to storage
@@ -40958,13 +41043,13 @@ __webpack_require__(31);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -40981,7 +41066,7 @@ __webpack_require__(8);
 
 __webpack_require__(9);
 
-__webpack_require__(33);
+__webpack_require__(34);
 
 (function ($) {
   /**
@@ -41205,13 +41290,13 @@ __webpack_require__(33);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41220,7 +41305,7 @@ __webpack_require__(33);
  *  Will create an area for inputting tags, just a textfield, no color
  *
  */
-__webpack_require__(35);
+__webpack_require__(36);
 
 (function ($) {
   /**
@@ -41427,13 +41512,13 @@ __webpack_require__(35);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41442,7 +41527,7 @@ __webpack_require__(35);
  *
  */
 //uncomment to add css file
-__webpack_require__(37);
+__webpack_require__(38);
 
 (function ($) {
   /**
@@ -41510,7 +41595,7 @@ __webpack_require__(37);
       self.first_time = false;
     }
 
-    var tokenHTML = "<div class='tag-token-list'><span>Available Tags:</span><br>";
+    var tokenHTML = "<div class='tag-token-list'><span>Instructor Tags:</span><br>";
     self.options.tagList.forEach(function (tag) {
       tokenHTML += '<div role="button" tabIndex="0" class="tag-token-tag">' + tag + '</div>';
     });
@@ -41544,13 +41629,13 @@ __webpack_require__(37);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41559,7 +41644,7 @@ __webpack_require__(37);
  *
  */
 //uncomment to add css file
-__webpack_require__(39);
+__webpack_require__(40);
 
 (function ($) {
   /**
@@ -41611,13 +41696,13 @@ __webpack_require__(39);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41676,12 +41761,12 @@ __webpack_require__(39);
     } // hide edit if the person does not have can_update permissions
 
 
-    if (!self.options.has_staff_permissions && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
+    if (!self.options.has_staff_permissions && self.options.instructors.indexOf(self.options.user_id) == -1 && ann.permissions.can_update.indexOf(self.options.user_id) == -1) {
       loc.find('#edit-' + ann.id).remove();
     } // hide delete if the person does not have can_delete permissions
 
 
-    if (!self.options.has_staff_permissions && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
+    if (!self.options.has_staff_permissions && self.options.instructors.indexOf(self.options.user_id) == -1 && ann.permissions.can_delete.indexOf(self.options.user_id) == -1) {
       loc.find('#delete-' + ann.id).remove();
     }
   };
@@ -41694,7 +41779,7 @@ __webpack_require__(39);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41703,7 +41788,7 @@ __webpack_require__(39);
  *
  */
 //uncomment to add css file
-__webpack_require__(42);
+__webpack_require__(43);
 
 (function ($) {
   /**
@@ -41814,13 +41899,13 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -41961,62 +42046,57 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 55 */
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 //during deployment, this is what decides what gets instantiated, should be moved elsewhere
-__webpack_require__(56);
+__webpack_require__(52);
 
-__webpack_require__(57);
+__webpack_require__(53);
 
-__webpack_require__(22);
+__webpack_require__(23);
 
-__webpack_require__(58);
+__webpack_require__(54);
 
-__webpack_require__(30);
+__webpack_require__(31);
 
 __webpack_require__(10);
 
-__webpack_require__(32);
+__webpack_require__(33);
 
-__webpack_require__(34);
+__webpack_require__(35);
+
+__webpack_require__(58);
+
+__webpack_require__(60);
 
 __webpack_require__(62);
 
-__webpack_require__(64);
+__webpack_require__(63);
 
-__webpack_require__(66);
+__webpack_require__(65);
 
-__webpack_require__(67);
+__webpack_require__(37);
 
-__webpack_require__(69);
-
-__webpack_require__(36);
-
-__webpack_require__(38);
-
-__webpack_require__(40);
+__webpack_require__(39);
 
 __webpack_require__(41);
+
+__webpack_require__(42);
 
 (function ($) {
   /**
@@ -42529,7 +42609,7 @@ __webpack_require__(41);
   $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
     var self = this;
     jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationDelete();
+      viewer.StorageAnnotationDelete(annotation);
     });
     jQuery.each(self.storage, function (_, store) {
       store.StorageAnnotationDelete(annotation);
@@ -42552,7 +42632,7 @@ __webpack_require__(41);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 56 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -42675,7 +42755,7 @@ var hrange = __webpack_require__(4);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
 
 /***/ }),
-/* 57 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -42890,12 +42970,12 @@ var hrange = __webpack_require__(4);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 58 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(59);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(55);
 /* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
@@ -42916,8 +42996,8 @@ var annotator = annotator ? annotator : __webpack_require__(7);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(60),
-        viewer: __webpack_require__(61)
+        editor: __webpack_require__(56),
+        viewer: __webpack_require__(57)
       },
       template_suffix: "floating",
       template_urls: ""
@@ -43352,13 +43432,13 @@ var annotator = annotator ? annotator : __webpack_require__(7);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 59 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 60 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -43375,7 +43455,7 @@ return __p
 
 
 /***/ }),
-/* 61 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -43432,7 +43512,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43441,7 +43521,7 @@ return __p
  *
  */
 //uncomment to add css file
-__webpack_require__(63);
+__webpack_require__(59);
 
 (function ($) {
   /**
@@ -43498,13 +43578,13 @@ __webpack_require__(63);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 63 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 64 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43512,7 +43592,7 @@ __webpack_require__(63);
  *  
  *
  */
-__webpack_require__(65);
+__webpack_require__(61);
 
 (function ($) {
   /**
@@ -43632,13 +43712,13 @@ __webpack_require__(65);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 65 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 66 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -44222,7 +44302,7 @@ __webpack_require__(65);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44230,7 +44310,7 @@ __webpack_require__(65);
  *  
  *
  */
-__webpack_require__(68);
+__webpack_require__(64);
 
 (function ($) {
   /**
@@ -44300,13 +44380,13 @@ __webpack_require__(68);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 68 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 69 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44316,7 +44396,7 @@ __webpack_require__(68);
  */
 var annotator = annotator ? annotator : __webpack_require__(7); //uncomment to add css file
 
-__webpack_require__(70);
+__webpack_require__(66);
 
 (function ($) {
   /**
@@ -44414,41 +44494,26 @@ __webpack_require__(70);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 70 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */,
 /* 71 */,
 /* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */,
-/* 89 */,
-/* 90 */,
-/* 91 */,
-/* 92 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(93);
+module.exports = __webpack_require__(74);
 
 
 /***/ }),
-/* 93 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44459,7 +44524,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(54);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(45);
 /* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -44475,20 +44540,20 @@ __webpack_require__(1);
 
 __webpack_require__(20);
 
-__webpack_require__(55);
+__webpack_require__(51);
 
-__webpack_require__(43);
+__webpack_require__(44);
 
-__webpack_require__(94);
+__webpack_require__(75);
 
-__webpack_require__(95);
+__webpack_require__(76);
 
-__webpack_require__(96);
+__webpack_require__(77);
 
-__webpack_require__(97);
+__webpack_require__(78);
 
 /***/ }),
-/* 94 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -45057,7 +45122,7 @@ __webpack_require__(97);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 95 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45128,7 +45193,7 @@ __webpack_require__(97);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 96 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {(function ($) {
@@ -45223,7 +45288,7 @@ window.hxighlighter_launcher = new Hxighlighter.Launcher();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 97 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin

@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.0.0 - Thursday, March 12th, 2020, 4:43:35 PM  
+// [AIV_SHORT]  Version: 1.1.0 - Tuesday, April 14th, 2020, 5:06:38 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -39986,8 +39986,8 @@ __webpack_require__(9);
     });
     jQuery('#search-submit').click(function () {
       var searchValue = jQuery('#srch-term').val().trim();
-      var searchType = jQuery('.search-bar select').val();
-      console.log(searchValue, searchType);
+      var searchType = jQuery('.search-bar select').val(); // console.log(searchValue, searchType);
+
       var ops = self.filterByType(searchValue, searchType, undefined);
       self.search(ops);
     }); // trigger new filter tab
@@ -40194,14 +40194,12 @@ __webpack_require__(9);
       // console.log("6. Got Annotation in Viewer", annotation, self.options);
       var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
         return button.id;
-      });
-      console.log(filteroptions, filteroptions.indexOf('mine') > -1, filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1));
+      }); // console.log(filteroptions, filteroptions.indexOf('mine') > -1, (filteroptions.indexOf('instructor' > -1 && self.options.instructors.indexOf(self.options.user_id) > -1)))
 
       if (filteroptions.indexOf('mine') > -1 || filteroptions.indexOf('instructor') > -1 && self.options.instructors.indexOf(self.options.user_id) > -1) {
         self.addAnnotation(annotation, updating, false);
       } else {
-        console.log(annotation);
-
+        // console.log(annotation);
         if (annotation.media !== "comment") {
           jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
           $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
@@ -40342,7 +40340,6 @@ __webpack_require__(9);
         content: 'Would you like to delete your annotation? This is permanent.',
         buttons: {
           confirm: function confirm() {
-            // console.log("I got to the delete from sidebar.")
             $.publishEvent('StorageAnnotationDelete', self.instance_id, [annotation]);
           },
           cancel: function cancel() {}
@@ -40456,16 +40453,16 @@ __webpack_require__(9);
       jQuery('.loading-obj').remove();
     }
 
-    self.searchRequest = $.getUniqueId();
-    console.log(self.searchRequest, options);
+    self.searchRequest = $.getUniqueId(); // console.log(self.searchRequest, options);
+
     var tempRequest = self.searchRequest;
     jQuery('.annotationsHolder').prepend('<div class="loading-obj" style="margin-top: 15px; text-align: center"><span class="make-spin fa fa-spinner"></span></div>');
     $.publishEvent('StorageAnnotationSearch', self.instance_id, [options, function (results, converter) {
       if (tempRequest !== self.searchRequest) {
         return;
-      }
+      } // console.log("RETURN: ", tempRequest, self.searchRequest)
 
-      console.log("RETURN: ", tempRequest, self.searchRequest);
+
       jQuery('.annotationsHolder.side').html('');
       $.publishEvent('StorageAnnotationLoad', self.instance_id, [results.rows, converter, true]);
       jQuery('.loading-obj').remove();
@@ -40539,7 +40536,6 @@ __webpack_require__(9);
   $.Sidebar.prototype.StorageAnnotationSave = function (annotations) {};
 
   $.Sidebar.prototype.StorageAnnotationDelete = function (annotation) {
-    console.log(arguments, annotation);
     jQuery('.item-' + annotation.id).remove();
 
     if (jQuery('.annotationItem').length == 0) {
@@ -41245,7 +41241,7 @@ __webpack_require__(32);
           if ('Escape' === e.key) {
             $.publishEvent('ViewerEditorClose', self.instanceID, [self.currentAnnotation, true, true]);
             jQuery('.sr-real-alert').html('You have closed the editor and unselected text for annotation.');
-          } else if (t.trim().length >= maxLength) {
+          } else if (t.trim().length >= maxLength && self.options.instructors.indexOf(self.options.user_id) == -1) {
             // prevents everything that could add a new character
             var allowedKeys = 'ArrowLeftArrowRightArrowDownDeleteArrowUpMetaControlAltBackspace';
 
@@ -41272,7 +41268,6 @@ __webpack_require__(32);
               bufferHTML = bufferHTML.replace(image_tags, '<a title="' + new_img_url + '" href=\"' + new_img_url + "\">[External Image Link]</a>");
             }); // bufferHTML = bufferHTML.replace(/img([\w\W]+?)\/?>/, "<a href=\"#\">[Link to external image]</a>");
 
-            console.log(bufferHTML);
             setTimeout(function () {
               // wrap in a timer to prevent issues in Firefox
               self.elementObj.summernote('code', bufferHTML);
@@ -41281,7 +41276,7 @@ __webpack_require__(32);
             }, 100);
           }
 
-          if (t.length + bufferText.length >= maxLength) {
+          if (t.length + bufferText.length >= maxLength && self.options.instructors.indexOf(self.options.user_id) == -1) {
             e.preventDefault();
             var bufferTextAllowed = bufferText.trim().substring(0, maxLength - t.length);
             setTimeout(function () {
@@ -42938,7 +42933,6 @@ __webpack_require__(47);
       'content': 'Would you like to delete your reply? This is permanent.',
       'buttons': {
         confirm: function confirm() {
-          console.log('deleting reply: ', annotation, reply);
           $.publishEvent('StorageAnnotationDelete', self.instanceID, [reply]);
           annotation.replies = annotation.replies.filter(function (ann) {
             if (ann.id !== reply.id) {
@@ -43659,7 +43653,7 @@ __webpack_require__(42);
   $.TextTarget.prototype.StorageAnnotationDelete = function (annotation) {
     var self = this;
     jQuery.each(self.viewers, function (_, viewer) {
-      viewer.StorageAnnotationDelete();
+      viewer.StorageAnnotationDelete(annotation);
     });
     jQuery.each(self.storage, function (_, store) {
       store.StorageAnnotationDelete(annotation);
