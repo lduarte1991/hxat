@@ -196,7 +196,7 @@
 		</div>
 		<div class="form-group tx">
 			<label for="id_target_author">Source Author:</label> 
-			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value }}">
+			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value | default_if_none:'--'}}">
 		</div>
 		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 
