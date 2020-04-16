@@ -124,7 +124,7 @@ $(document).ready(function() {
 
     <div class="assignment-option-block hxighlighter instructor options options">
         <label for='common_inst_name'>Instructor Display Name:</label>
-        <input type='text' value="{{form.common_inst_name.value}}" id='common_inst_name'>
+        <input type='text' value="{{form.common_inst_name.value | default_if_none:'Instructor'}}" id='common_inst_name'>
     </div>
     <div class="assignment-option-block publishing-options">
         <input type="checkbox" id="assignment-published" {% if form.is_published.value %} checked {% endif %}>
