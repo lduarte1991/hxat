@@ -176,9 +176,9 @@ $(document).ready(function() {
         {% for id, choice in form.fields.default_tab.choices %}
         <option value="{{id}}" {% if id == form.default_tab.value %}selected{% endif %}>
         {% if choice == "Public" %}
-            "Peer"
+            Peer
         {% elif choice == "My Notes" %}
-            "Mine"
+            Mine
         {% else %}
         {{choice}}
         {% endif %}
