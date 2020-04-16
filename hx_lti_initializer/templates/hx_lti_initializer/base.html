@@ -34,7 +34,9 @@
                 {% if is_instructor %}
                     {% get_annotation_manual  default_url="pages/instructor_manual/hxat-instructor-manual.html" default_target="_self" as annotation_manual %}
                     <a target="{{ annotation_manual.target }}" href="{{ annotation_manual.url }}">Manual</a>
+                    {% if org == "ATG" %}
                     <a role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}">Dashboard</a>
+                    {% endif %}
                 {% endif %}
             </nav>
         </header>
