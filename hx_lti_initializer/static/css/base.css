@@ -431,6 +431,10 @@ footer {
 	width: 100%;
 }
 
+.add-source-popup-background .dropdown-menu {
+    width: 84%!important;
+}
+
 .full-width {
 	width: 100%;
 }
