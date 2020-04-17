@@ -5005,9 +5005,9 @@ vjs.Html5.canControlVolume = function(){
 };
 
 vjs.Html5.canControlPlaybackRate = function(){
-  var playbackRate = Html5.TEST_VID.playbackRate;
-  Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
-  return playbackRate !== Html5.TEST_VID.playbackRate;
+  var playbackRate = vjs.TEST_VID.playbackRate;
+  vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== vjs.TEST_VID.playbackRate;
 };
 
 // List of all HTML5 events (various uses).
