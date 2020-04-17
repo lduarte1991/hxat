@@ -34,7 +34,7 @@
 		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 
-		{% if form.target_type == 'vd' %}
+		{% if form.target_type.value == 'vd' %}
 		var links = "{{form.target_content.value | escapejs}}".split(';');
 		window.youtubeLink =  "";
 		window.html5Link = "";
@@ -49,7 +49,7 @@
 		// window.html5Link = "{{form.target_content.value | just_the_html5_vid_link:form.target_type | escapejs}}";
 		// window.transcript_link = "{{form.target_content.value | just_the_transcript_link:form.target_type | escapejs}}";
 
-		{% if form.target_type == 'ig' and form.target_content.value != None and form.target_content.value != "None" %}
+		{% if form.target_type.value == 'ig' and form.target_content.value != None and form.target_content.value != "None" %}
 		var jqxhr = $.ajax( "{{ form.target_content.value|escapejs }}")
 		  .done(function(html) {
 		  	var manifest = html;
