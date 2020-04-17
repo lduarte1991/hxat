@@ -42,12 +42,16 @@
         </header>
 
         <main class="container" role="main">
-            {% if org != "HARVARDX" or is_instructor or 'studio.edx' in request.path %}
-            {% block content %}{% endblock %}	
-            {% else %}
-            <p></p>
-            <p></p>
-            <p>ObjectID is missing: Contact your instructor immediately.</p>
+            {% if org != "HARVARDX" or is_instructor %}
+                {% block content %}{% endblock %}	
+                {% else %}
+                <p></p>
+                <p></p>
+                {% if 'studio.edx' in request.META.HTTP_REFERER or 'studio.edge.edx' in request.META.HTTP_REFERER %}
+                   You are in Studio, please use live or preview to access the admin hub.
+                {% else  %}
+                <p>ObjectID is missing: Contact your instructor immediately.</p>
+                {% endif %}
             {% endif %}
         </main>
 
