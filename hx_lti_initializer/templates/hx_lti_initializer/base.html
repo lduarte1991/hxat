@@ -42,7 +42,7 @@
         </header>
 
         <main class="container" role="main">
-            {% if org != "HARVARDX" or is_instructor %}
+            {% if org != "HARVARDX" or is_instructor or 'studio.edx' in request.path %}
             {% block content %}{% endblock %}	
             {% else %}
             <p></p>
