@@ -46,8 +46,8 @@
         		<label for='canvas-id-<%= count %>' class='subheading'>Open to Page (Canvas ID):</label>
 		 		<input maxlength="255" id="canvas-id-<%= count %>" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
         	<% } %>
-        	<input id="dashboard_hidden-<%= count %>" type="checkbox" class="form-control" value=""></input>
-	 		<label for="dashboard_hidden-<%= count %>" class='subheading'>Hide Dashboard on Load</label>
+        	<input id="dashboard_hidden-<%= count %>" type="checkbox" class="form-control" value="" style="display:none;"></input>
+	 		<label for="dashboard_hidden-<%= count %>" class='subheading' style="display: none;">Hide Dashboard on Load</label>
 	 		<% if (target_type == 'vd') { %>
 		 		<br>
 		 		<input id="transcript_hidden-<%= count %>" type="checkbox" class="videojs_option form-control" value=""></input>

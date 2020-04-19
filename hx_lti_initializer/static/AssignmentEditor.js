@@ -233,7 +233,7 @@ AssignmentEditor.prototype = {
             <label for="assignment-css">Assignment CSS:</label>\
             <input class="hx-textfield form-control popup" id="assignment-css" type="text">\
             <div class="other_options"></div>\
-            <div><input type="checkbox" id="hide_dash"><label for="hide_dash">Hide dashboard on load</label></div>\
+            <div style="display:none;"><input type="checkbox" id="hide_dash"><label for="hide_dash">Hide dashboard on load</label></div>\
             <div id="add-source-popup-confirm" class="popup" type="submit" role="button">Add Source</div><div id="delete-popup-cancel">Cancel</div></form></div></div>';
 
             jQuery('body').append(html);

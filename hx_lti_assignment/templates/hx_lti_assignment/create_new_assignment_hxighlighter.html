@@ -93,8 +93,8 @@ $(document).ready(function() {
                                 <label for='canvas-id-{{forloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
                                 <input maxlength="255" id="canvas-id-{{forloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
                             {% endif %}
-                            <input id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.instance.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
-                            <label for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
+                            <input style="display: none;" id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.instance.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
+                            <label style="display: none;" for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
                             {% if source.instance.target_object.target_type == 'vd' %}
                                 <br>
                                 <input id="transcript_hidden-{{forloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.instance.target_external_options|just_transcript_hidden %} checked {% endif %}></input>
