@@ -5,3 +5,7 @@
 .vjs-default-skin .vjs-volume-control {
     margin-right: 20px;
 }
+
+.video-js video {
+    height: 100%!important;
+}
