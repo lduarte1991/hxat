@@ -34,7 +34,8 @@
 		$('select[name=target_courses]').val(courseValue);
 		$('.selectpicker').selectpicker('refresh');
 
-		{% if form.target_type == 'vd' %}
+		{% if form.target_type.value == 'vd' %}
+		console.log("{{form.target_content.value | escapejs}}")
 		var links = "{{form.target_content.value | escapejs}}".split(';');
 		window.youtubeLink =  "";
 		window.html5Link = "";
@@ -43,13 +44,17 @@
 			window.youtubeLink = links[0] || "";
 			window.html5Link = links[1] || "";
 			window.transcript_link = links[2] || "";
+		} else {
+			window.youtubeLink = links[0] || "";
+			window.html5Link = links[0] || "";
+			window.transcript_link = links[1] || "";
 		}
 		{% endif %}
 		// window.youtubeLink = "{{form.target_content.value | just_the_youtube_vid_link:form.target_type | escapejs}}";
 		// window.html5Link = "{{form.target_content.value | just_the_html5_vid_link:form.target_type | escapejs}}";
 		// window.transcript_link = "{{form.target_content.value | just_the_transcript_link:form.target_type | escapejs}}";
 
-		{% if form.target_type == 'ig' and form.target_content.value != None and form.target_content.value != "None" %}
+		{% if form.target_type.value == 'ig' and form.target_content.value != None and form.target_content.value != "None" %}
 		var jqxhr = $.ajax( "{{ form.target_content.value|escapejs }}")
 		  .done(function(html) {
 		  	var manifest = html;
@@ -71,9 +76,6 @@
 
 	var createVideoFields = function() {
 		jQuery('.vdchange').before("<div class='form-group vd'>\
-			<label for=\"id_youtube_vid_link\">Youtube Video Link:</label>\
-			<input id=\"id_youtube_vid_link\" maxlength=\"255\" name=\"youtube_vid_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+(window.youtubeLink || "")+"\">\
-			<div class=\"help_text\">If you don't include an HTML5-approved video (e.g. .mp4), you must include a youtube video.</div>\
 			</div><div class='form-group vd'>\
 			<label for=\"id_html5_vid_link\">HTML5 Video Link:</label>\
 			<input id=\"id_html5_vid_link\" maxlength=\"255\" name=\"html5_vid_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+ (window.html5Link || "")+"\">\
@@ -83,24 +85,9 @@
 			<input id=\"id_transcript_link\" maxlength=\"255\" name=\"transcript_link\" class=\"form-control video_option hx-textfield\" type=\"text\" value=\""+(window.transcript_link || "")+"\">\
 			</div>");
 		jQuery('.video_option').change(function (e){
-        	var youtube_vid_link = jQuery('#id_youtube_vid_link').val();
         	var html5_vid_link = jQuery('#id_html5_vid_link').val();
         	var transcript_link = jQuery('#id_transcript_link').val();
-        	if (html5_vid_link == "") {
-        		if (transcript_link == "") {
-        			jQuery('#id_target_content').html(youtube_vid_link);
-        		} else {
-        			jQuery('#id_target_content').html(youtube_vid_link + ';' + transcript_link);
-        		}
-        	} else if (youtube_vid_link == "") {
-        		if (transcript_link == "") {
-        			jQuery('#id_target_content').html(html5_vid_link);
-        		} else {
-        			jQuery('#id_target_content').html(html5_vid_link + ';' + transcript_link);
-        		}
-        	} else {
-        		jQuery('#id_target_content').html(youtube_vid_link + ';' + html5_vid_link + ";" + transcript_link);
-        	}
+                jQuery('#id_target_content').html(html5_vid_link + ";" + transcript_link);
         });
 	}
 
@@ -196,7 +183,7 @@
 		</div>
 		<div class="form-group tx">
 			<label for="id_target_author">Source Author:</label> 
-			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value }}">
+			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value | default_if_none:'--'}}">
 		</div>
 		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 

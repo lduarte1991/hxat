@@ -20,6 +20,14 @@ $(document).ready(function() {
    }
 });
 </script>
+<style>
+    .bootstrap-select .filter-option.pull-left {
+        width: 95%!important;
+        white-space: nowrap;
+        overflow: hidden!important;
+        text-overflow: ellipsis;
+    }
+</style>
 <div class='main-page'>
     <h3>Assignment Editor</h3>
 
@@ -85,8 +93,8 @@ $(document).ready(function() {
                                 <label for='canvas-id-{{forloop.counter0}}' class='subheading'>Open to Page (Canvas ID):</label>
                                 <input maxlength="255" id="canvas-id-{{forloop.counter0}}" type="text" class="mirador_option canvas-id hx-textfield full-width" value=""></input>
                             {% endif %}
-                            <input id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.instance.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
-                            <label for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
+                            <input style="display: none;" id="dashboard_hidden-{{forloop.counter0}}" type="checkbox" class="form-control dashboard-hidden" {% if source.instance.target_external_options|just_dashboard_hidden %} checked {% endif %}></input>
+                            <label style="display: none;" for="dashboard_hidden-{{forloop.counter0}}" class='subheading'>Hide Dashboard on Load</label>
                             {% if source.instance.target_object.target_type == 'vd' %}
                                 <br>
                                 <input id="transcript_hidden-{{forloop.counter0}}" type="checkbox" class="videojs_option form-control transcript-hidden" {% if source.instance.target_external_options|just_transcript_hidden %} checked {% endif %}></input>
@@ -113,7 +121,7 @@ $(document).ready(function() {
         <span class='inline-label'>Advanced options:</span>
         <ul>
             <li><a href='#' id='annotation-settings-button' alt="Annotation dashboard settings">Annotation Settings</a></li>
-            <li><a href='#' id='database-settings-button' alt="Annotation database settings">Database Settings</a></li>
+            <li style="display:none;"><a href='#' id='database-settings-button' alt="Annotation database settings">Database Settings</a></li>
         </ul>
         <br style="clear:both">
     </div>
@@ -124,7 +132,7 @@ $(document).ready(function() {
 
     <div class="assignment-option-block hxighlighter instructor options options">
         <label for='common_inst_name'>Instructor Display Name:</label>
-        <input type='text' value="{{form.common_inst_name.value}}" id='common_inst_name'>
+        <input type='text' value="{{form.common_inst_name.value | default_if_none:'Instructor'}}" id='common_inst_name'>
     </div>
     <div class="assignment-option-block publishing-options">
         <input type="checkbox" id="assignment-published" {% if form.is_published.value %} checked {% endif %}>
@@ -167,7 +175,13 @@ $(document).ready(function() {
 
         {% for id, choice in form.fields.default_tab.choices %}
         <option value="{{id}}" {% if id == form.default_tab.value %}selected{% endif %}>
+        {% if choice == "Public" %}
+            Peer
+        {% elif choice == "My Notes" %}
+            Mine
+        {% else %}
         {{choice}}
+        {% endif %}
         </option>
         {% endfor %}
     </select>

@@ -15,7 +15,8 @@
 			<label for="id_course_name" class='course_name'>Course name:</label><br>
 			<input id="id_course_name" maxlength="255" name="course_name" class="form-control hx-textfield" type="text" value="{{form.course_name.value}}">
 		</div>
-		<h4 class='edit_course_subheading'>Course administrators:</h4>
+		<h4 class='edit_course_subheading'>Users Labeled "Instructor":</h4>
+
 	    <div id='ro-to-remove'>
 			<div class='hx-textfield readonlyfield' id='ro-course-admins'>Loading...</div>
 			<a href='#' id='add-remove-button' onclick='jQuery("#ro-to-remove").hide(); jQuery(".editing").show();'> <i class='fa fa-pencil' style='margin-right:4px;'></i>Add/Remove</a>
@@ -50,6 +51,7 @@
 			</select> 
 		</div>
 		</div>
+		<p class="help">List of admins who should appear in the Instructor tab in sidebar and may have their display names changed.</p>
 		<!-- TODO: Add example of how to use-->
 		<div class="form-group">
 			<label for="id_course_external_css_default" class="edit_course_subheading">External CSS Default:</label>

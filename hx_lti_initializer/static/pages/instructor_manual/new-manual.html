@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <title>HxAT Instructor Manual</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0" />
+  <link rel="stylesheet" href="/static/vendors/development/css/font-awesome.css">
+  <link href="css/corporate.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="wrapper">
+        <header class="header" role="banner">
+            <div id="banner-logo-left">
+                <div class="logo" aria-label="HarvardX Logo">
+                    <img src="/static/css/images/hx_inv.png" style="height:40px;">
+                </div>
+                <div class="site-title">
+                    <a href="/lti_init/admin_hub/">The HarvardX Annotation Tool</a>
+                </div>
+            </div>
+            <nav class="navigation" role="navigation" aria-label="Main Menu">
+                <a href="/lti_init/admin_hub/"><i class="fa fa-home"></i>  Home</a>   
+                <a target="_self" href="/static/pages/instructor_manual/hxat-instructor-manual.html" class="selected">Manual</a>
+            </nav>
+        </header>
+        <div id="clarify-article-content">
+            <h1 class="clarify-article-title">HxAT Instructor Manual</h1>
+            <div class="clarify-article-description">
+                <p>The following manual will guide the instructor through setting up the HxAT in edX. It will also go through the steps of setting up the tool in the Admin Hub. A <a href="../HxAT Instructor Manual.pdf">PDF version of this manual</a> is also available.</p>
+            </div>
+            <div class="clarify-steps-container">
+                <div id="clarify-step-1" class="clarify-step-container">
+                    <h2 class="clarify-step-title">1. Adding LTI module to edX</h2> 
+                    <div class="clarify-step-instructions"><p>First thing you need to do is head over to the &quot;Advanced Settings&quot; page in Studio.</p></div>
+                    <div class="clarify-step-image-wrapper">
+                        <div class="clarify-step-image-container">
+                            <img src="./images/docs/hxat-instructor-manual/adding-lti-module-to-edx.png" width="823" height="166" class="clarify-step-image" alt="" />
+                        </div>
+                    </div>
+                    <div class="clarify-sub-steps-container">
+                        <div id="clarify-step-2" class="clarify-sub-step-container">
+                            <h3 class="clarify-step-title">1.1 Advanced Settings - Advanced Module List</h3>
+                            <div class="clarify-step-instructions">
+                                <p>Add &quot;lti_consumer&quot; (all lowercase!) to the &quot;Advanced Module List&quot;.</p>
+                            </div>
+                            <div class="clarify-step-image-wrapper">
+                                <div class="clarify-step-image-container">
+                                    <img src="./images/docs/hxat-instructor-manual/advanced-settings---advanced-module-list.png" width="768" height="676" class="clarify-step-image" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-sub-steps-container">
+                        <div id="clarify-step-3" class="clarify-sub-step-container">
+                            <h3 class="clarify-step-title">1.2 Advanced Settings - LTI Passports</h3>
+                            <div class="clarify-step-instructions">
+                                <p>Now scroll down to the LTI Passports option. Here you will have to input an ID (could be anything you like, I call it &quot;hxat&quot; or &quot;hx_annotations&quot;) followed by a colon, followed by the key for the LTI tool (ask tech for this information) and the secret password for the LTI tool (also ask tech for this) after a second colon.</p>
+                            </div>
+                            <div class="clarify-step-image-wrapper">
+                                <div class="clarify-step-image-container">
+                                    <img src="./images/docs/hxat-instructor-manual/advanced-settings---lti-passports.png" width="768" height="244" class="clarify-step-image" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-sub-steps-container">
+                        <div id="clarify-step-4" class="clarify-sub-step-container">
+                            <h3 class="clarify-step-title">1.3 Save</h3>
+                            <div class="clarify-step-instructions">
+                                <p>Once you save, studio scrolls you all the way to the top. Check to ensure the information you added was saved correctly.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-clear"></div>
+                </div>
+                <div id="clarify-step-5" class="clarify-step-container">
+                    <h2 class="clarify-step-title">2. Setting Up HxAT in LTI Module</h2>
+                    <div class="clarify-step-instructions">
+                        <p>Now head over to the section in the course where you want the annotation tool to appear. Once you've created a new unit, you will see an &quot;Advanced&quot; button as an option to add a new component.</p>
+                    </div>
+                    <div class="clarify-step-image-wrapper">
+                        <div class="clarify-step-image-container">
+                            <img src="./images/docs/hxat-instructor-manual/setting-up-hxat-in-lti-module.png" width="763" height="276" class="clarify-step-image" alt="" />
+                        </div>
+                    </div>
+                    <div class="clarify-sub-steps-container">
+                        <div id="clarify-step-6" class="clarify-sub-step-container">
+                            <h3 class="clarify-step-title">2.1 Add LTI Module</h3>
+                            <div class="clarify-step-instructions">
+                                <p>Now click on the &quot;LTI Consumer&quot; module option.</p>
+                            </div>
+                            <div class="clarify-step-image-wrapper">
+                                <div class="clarify-step-image-container">
+                                    <img src="./images/docs/hxat-instructor-manual/add-lti-module.png" width="995" height="359" class="clarify-step-image" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                    <div class="clarify-clear"></div>
+                        <div id="clarify-step-7" class="clarify-sub-step-container">
+                            <h3 class="clarify-step-title">2.2 Editing the LTI Settings</h3>
+                            <div class="clarify-step-instructions">
+                                <p>Now you will see a generic component for LTIs we will go into edit mode to set up the appropriate settings.</p>
+                            </div>
+                            <div class="clarify-step-image-wrapper">
+                            <div class="clarify-step-image-container">
+                                <img src="./images/docs/hxat-instructor-manual/editing-the-lti-settings.png" width="761" height="242" class="clarify-step-image" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-clear"></div>
+                    <div id="clarify-step-8" class="clarify-sub-step-container">
+                        <h3 class="clarify-step-title">2.3 Settings - Part 1</h3>
+                        <div class="clarify-step-instructions">
+                            <p>LTI should be the first part of what you put into the LTI Passport.<br> Change the LTI URL to the one below <strong><a href="https://hxat.harvardx.harvard.edu/lti_init/launch_lti/.">https://hxat.harvardx.harvard.edu/lti_init/launch_lti/</a></strong>.<br>There are other options like opening the tool in a new page or making the tool send back a grade (participation grade online), but for the most part you can leave this untouched.</p>
+                        </div>
+                        <div class="clarify-step-image-wrapper">
+                            <div class="clarify-step-image-container">
+                                <img src="./images/docs/hxat-instructor-manual/settings---part-1.png" width="920" height="398" class="clarify-step-image" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-clear"></div>
+                    <div id="clarify-step-9" class="clarify-sub-step-container">
+                        <h3 class="clarify-step-title">2.4 Settings - Part 2</h3>
+                        <div class="clarify-step-instructions">
+                            <p>The last option you <strong>must</strong> turn on is to change request user's username to <pre>True</pre>. <strong>** It will not work without this. **</strong></p>
+                        </div>
+                        <div class="clarify-step-image-wrapper">
+                            <div class="clarify-step-image-container">
+                                <img src="./images/docs/hxat-instructor-manual/settings---part-2.png" width="1042" height="587" class="clarify-step-image" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clarify-clear"></div>
+                </div>
+                <!-- <div id="clarify-step-5" class="clarify-step-container">
+                    <h2 class="clarify-step-title">3. Admin Hub</h2>
+                    <div class="clarify-step-instructions">
+                        <p><strong>FOR THE REST OF THESE INSTRUCTIONS, DO NOT WORK IN STUDIO!</strong></p>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</body>

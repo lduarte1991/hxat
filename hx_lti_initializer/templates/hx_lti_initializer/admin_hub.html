@@ -8,7 +8,7 @@
         <h2 class="course-name">{{ course.course_name }}</h2>
         {% if is_instructor %}
             <a class="settingslink" href="{% url 'hx_lti_initializer:edit_course' id=course.pk %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}"><i class='fa fa-pencil' style='margin-right:4px'></i>Edit course settings</a>
-            <div class='starting-resource'><strong>Starting Resource:</strong>
+            <div class='starting-resource' style='color: #004085; background-color: #cce5ff; border-color: #b8daff; position: relative; padding: .75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent;border-radius: .25rem;'><strong>Starting Resource:</strong>
               <span class="starting-resource-object">{% if starter_object %}{{starter_object | safe}}{%else %}None{% endif %}</span>
               <span class="starting-resource-object-none" style="display:{% if starter_object %}none{% else %}inline{% endif %};">
               {% spaceless %}
@@ -61,7 +61,7 @@
                                 {% endif %}
                                 <a href="{% url 'hx_lti_initializer:access_annotation_target' object_id=file.id course_id=course.course_id assignment_id=assignment.assignment_id %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}">{{file.target_title}}</a>
                                 {% if is_instructor %}
-                                <a style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}">
+                                <a style="display:none;" style='float:right' href='#' class='setupButton' data-assignment-id="{{assignment.assignment_id}}" data-object-id="{{file.id}}" data-object-name="{{file.target_title}}">
                                     <i class='fa fa-cog' style='margin-right:4px'></i> Setup info
                                 </a>
                                 {% endif %}
