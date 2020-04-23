@@ -8,7 +8,7 @@ Text Annotation Tool | {{ target_object.target_title }}
 {% endblock %}
 
 {% block cssfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'Hxighlighter/hxighlighter_text.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'hxighlighter/hxighlighter_text.css' %}">
 {% endblock %}
 
 {% block mainapplication %}
@@ -80,7 +80,7 @@ Text Annotation Tool | {{ target_object.target_title }}
             --footer-height: 15px;
         };
     </style>
-    <script type="text/javascript" src="{% static 'Hxighlighter/hxighlighter_text.js' %}"></script>
+    <script type="text/javascript" src="{% static 'hxighlighter/hxighlighter_text.js' %}"></script>
     <script>
             var tags = "{{ assignment.highlights_options }}".split(',');
             var hide_sidebar = {{ hide_sidebar_instance | safe }};
