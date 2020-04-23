@@ -26,11 +26,11 @@
 
         <h3 class='assignment-header'>Assignments</h3>
         <div id="assignment-items">
-            {% if course.assignments.all|only_published:is_instructor|length == 0 %}
+            {% if assignment in course.get_assignments|only_published:is_instructor|length == 0 %}
                 <div class='assignment-item empty-assignment'>You have no annotation assignments in this course.</div>
             {% endif %}
 
-            {% for assignment in course.assignments.all|only_published:is_instructor %}
+            {% for assignment in course.get_assignments|only_published:is_instructor %}
                 <div class='assignment-item assignment-item-{% if assignment.is_published %}published{% else %}unpublished{% endif %} item-{{forloop.counter0}}'>
                     <div class='first-row'>
                         <div style="float: left; min-width: 300px; width: 66%; margin-bottom: 10px;">
