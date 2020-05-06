@@ -4,6 +4,7 @@ import logging
 from oauthlib.oauth1 import RequestValidator
 from oauthlib.oauth1 import SIGNATURE_HMAC
 from oauthlib.common import to_unicode
+from uuid import uuid4
 
 from django.conf import settings
 from django.http import HttpRequest
@@ -25,8 +26,8 @@ class LTIRequestValidator(RequestValidator):
 
     @property
     def dummy_secret(self):
-        secret = getattr(settings, 'HXLTI_DUMMY_SECRET', 'DUMMY_SECRET')
-        return to_unicode(secret)
+        secret = getattr(settings, 'HXLTI_DUMMY_SECRET', uuid4())
+        return to_unicode(str(secret))
 
     def check_client_key(self, key):
         # redefine: any non-empty string is OK as a client key
@@ -55,15 +56,27 @@ class LTIRequestValidator(RequestValidator):
 
 
     def get_client_secret(self, client_key, request):
-        c = getattr(settings.LTI_SECRET_DICT, client_key, None)
-        if c:
-            return to_unicode(getattr(setting.LTI_SECRET_DICT[c], None))  # make sure secret val is unicode
+        # hxat uses context_id as implicit consumer-key
+        context_id = request.body.get('context_id', None)
 
-        # assumes that if CONSUMER_KEY not defined, then LTI_SECRET also not defined
-        if client_key == getattr(settings, 'CONSUMER_KEY', self.dummy_client):
-            return to_unicode(getattr(settings, 'LTI_SECRET', self.dummy_secret))
+        if context_id is None:
+            log.error('missing lti-param "context_id"; dummy.')
+            return self.dummy_secret
+
+        try:
+            secret = to_unicode(settings.LTI_SECRET_DICT[context_id])
+        except KeyError:  # context_id not in LTI_SECRET_DICT
+            if client_key == settings.CONSUMER_KEY:
+                return to_unicode(settings.LTI_SECRET)
+            else:  # oauth_consumer_key not a known value
+                log.error(
+                        'unknown client-key({}) in lti-params; dummy.'.format(
+                            client_key))
+                return self.dummy_secret
+        else:  # all went well
+            return secret
 
 
-# TODO: for a better example on how to use pylti, check validators in
+# TODO: for another example on how to use pylti, check validators in
 # https://github.com/nmaekawa/hxlti-djapp
 

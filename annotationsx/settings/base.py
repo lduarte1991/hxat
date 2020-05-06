@@ -228,6 +228,11 @@ LOGGING = {
             'handlers': ['default', 'console'],
             'propagate': False,
         },
+        'annotationsx.lti_validators': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
     },
 }
 

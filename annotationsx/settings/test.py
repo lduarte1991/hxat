@@ -14,6 +14,41 @@ DATABASES = {
     },
 }
 
+logging = LOGGING['loggers'].update({
+    'oauthlib.oauth1.rfc5849': {
+        'level': 'DEBUG',
+        'handlers': ['default', 'console'],
+        'propagate': False,
+    },
+
+    'oauthlib.oauth1.rfc5849.request_validator': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.utils': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints.base': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints.signature_only': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+
+})
+
 # test lti consumer keys
 CONSUMER_KEY = 'consumer_key_for_test'
 LTI_SECRET = 'lti_secret_for_test'
