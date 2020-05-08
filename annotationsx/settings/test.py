@@ -1,3 +1,4 @@
+import logging
 from .base import *
 
 # for harvardx tests
@@ -84,7 +85,7 @@ LOGGING = {
         },
     },
     'root': {
-        'level': logging.INFO,
+        'level': 'INFO',
         'handlers': ['console'],
     },
     'loggers': {
