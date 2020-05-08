@@ -4,40 +4,14 @@ import pytest
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.models import LTIProfile
 
-from .conftest import random_instructor
-from .conftest import random_learner
-
 
 @pytest.mark.django_db
-def test_LTIProfile_create(random_instructor):
-    """
-    Checks that an LTIProfile object was automatically created
-    as soon as a user object was created in setup.
-    """
-    instructor = LTIProfile.objects.get(user=random_instructor['user'])
-
-    assert(isinstance(instructor, LTIProfile))
-    assert(instructor.__unicode__() == instructor.user.username)
-
-
-@pytest.mark.django_db
-def test_LTICourse_create_course(random_instructor):
-    """
-    Checks that you can make a course given a course id and an instructor
-    """
-    instructor = random_instructor['profile']
-
-    course_object = LTICourse.create_course('test_course_id', instructor)
-    assert(isinstance(course_object, LTICourse))
-    assert(course_object.__unicode__() == course_object.course_name)
-
-
-@pytest.mark.django_db
-def test_LTICourse_get_course_by_id(random_instructor):
+def test_LTICourse_get_course_by_id(user_profile_factory):
     """
     Checks that you can get a course given an id.
     """
-    instructor = random_instructor['profile']
+    # TODO: chack that is ok to add 'Learner' as admin to course
+    instructor = user_profile_factory()
     course_object = LTICourse.create_course('test_course_id', instructor)
     course_to_test = LTICourse.get_course_by_id('test_course_id')
 
@@ -47,11 +21,11 @@ def test_LTICourse_get_course_by_id(random_instructor):
 
 
 @pytest.mark.django_db
-def test_LTICourse_get_courses_of_admin(random_instructor):
+def test_LTICourse_get_courses_of_admin(user_profile_factory):
     """
     Checks that it returns a list of all the courses for that admin.
     """
-    instructor = random_instructor['profile']
+    instructor = user_profile_factory(roles=['Instructor'])
 
     course_object = LTICourse.create_course('test_course_id', instructor)
     list_of_courses = LTICourse.get_courses_of_admin(instructor)
@@ -66,23 +40,26 @@ def test_LTICourse_get_courses_of_admin(random_instructor):
 
 
 @pytest.mark.django_db
-def test_LTICourse_get_all_courses(random_instructor, random_learner):
+def test_LTICourse_get_all_courses(user_profile_factory):
     """
     Checks that all courses are returned regardless of admin user
     """
-    instructor1 = LTIProfile.objects.get(user_id=random_instructor['user'].pk)
-    instructor2 = LTIProfile.objects.get(user_id=random_learner['user'].pk)
+    profile1 = user_profile_factory(roles=['Instructor'])
+    profile2 = user_profile_factory()
+
+    user1 = LTIProfile.objects.get(user_id=profile1.user.pk)
+    user2 = LTIProfile.objects.get(user_id=profile2.user.pk)
 
     list_of_courses = LTICourse.get_all_courses()
     assert(isinstance(list_of_courses, list))
     assert(len(list_of_courses) == 0)
 
-    LTICourse.create_course('test_course_id', instructor1)
+    LTICourse.create_course('test_course_id', user1)
     list_of_courses2 = LTICourse.get_all_courses()
     assert(isinstance(list_of_courses2, list))
     assert(len(list_of_courses2) == 1)
 
-    LTICourse.create_course('test_course_id2', instructor2)
+    LTICourse.create_course('test_course_id2', user2)
     list_of_courses3 = LTICourse.get_all_courses()
     assert(isinstance(list_of_courses3, list))
     assert(len(list_of_courses3) == 2)

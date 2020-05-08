@@ -1,27 +1,37 @@
+
+import logging
+
 from django.shortcuts import get_object_or_404, render_to_response, render, redirect  # noqa
 from django.urls import reverse
-from django.template import RequestContext
 from django.http import Http404, HttpResponse
 from django.utils.html import escape
 from django.forms import ValidationError
-from .models import *
-from .serializers import *
-from .forms import SourceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from rest_framework import generics
-from hx_lti_initializer.utils import debug_printer
+
+from hx_lti_initializer.models import LTIProfile
+from .models import TargetObject
+from .serializers import TargetObjectSerializer
+from .forms import SourceForm
+
+
+logger = logging.getLogger(__name__)
+
 
 def get_course_id(request):
-	return request.LTI['hx_lti_course_id']
+    return request.LTI['hx_lti_course_id']
+
 
 def get_lti_profile(request):
     return LTIProfile.objects.get(anon_id=request.LTI['hx_user_id'])
 
+
 def get_lti_profile_id(request):
     lti_profile = get_lti_profile(request)
     return lti_profile.id
+
 
 def open_target_object(request, collection_id, target_obj_id):
     try:
@@ -49,7 +59,7 @@ def create_new_source(request):
             url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
         else:
-            debug_printer(form.errors)
+            logger.debug('form errors: {}'.format(form.errors))
     else:
         form = SourceForm()
     return render(
@@ -79,7 +89,7 @@ def edit_source(request, id):
             url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id=%s' % request.LTI['resource_link_id']
             return redirect(url)
         else:
-            debug_printer(form.errors)
+            logger.debug('Form Errors: {}'.format(form.errors))
     else:
         form = SourceForm(instance=source)
     return render(
@@ -102,8 +112,9 @@ def handlePopAdd(request, addForm, field):
         if form.is_valid():
             try:
                 newObject = form.save()
-            except (ValidationError, error):
+            except ValidationError as error:
                 newObject = None
+                logger.debug('PopAdd Error: {}'.format(error))
             if newObject:
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s", "%s", "%s", "%s");</script>' % (escape(newObject._get_pk_val()), escape(newObject.target_title), escape(newObject.target_author), escape(newObject.target_created), escape(newObject.target_type)))  # noqa
     else:

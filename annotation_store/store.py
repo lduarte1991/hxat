@@ -2,18 +2,14 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from django.db.models import F, Q
 from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
-from .models import Annotation, AnnotationTags
-
 import json
 import requests
-import datetime
 import logging
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -26,23 +22,23 @@ ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
 class AnnotationStore(object):
     '''
-    AnnotationStore implements a storage interface for annotations and is intended to 
+    AnnotationStore implements a storage interface for annotations and is intended to
     abstract the details of the backend that is actually going to be storing the annotations.
 
     The backend determines where/how annotations are stored. Possible backends include:
-    
+
     1) catch - The Common Annotation, Tagging, and Citation at Harvard (CATCH) project
                which is a separate, cloud-based instance with its own REST API.
-               See also: 
+               See also:
                    http://catcha.readthedocs.io/en/latest/
                    https://github.com/annotationsatharvard/catcha
 
     2) app   - This is an integrated django app that stores annotations in a local database.
-    
-    Client code should not instantiate backend classes directly. The choice of backend class is 
+
+    Client code should not instantiate backend classes directly. The choice of backend class is
     determined at runtime based on the django.settings configuration. This should
     include a setting such as:
-    
+
     ANNOTATION_STORE = {
         "backend": "catch"
     }
@@ -61,9 +57,15 @@ class AnnotationStore(object):
     def from_settings(cls, request):
         backend_type_setting = cls.SETTINGS.get('backend', 'catchpy')
         backend_types = backend_type_setting.split(',')
-        possible_backend_types = {'app': AppStoreBackend, 'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
-        if request.method == "GET" or request.method == "DELETE":
+        possible_backend_types = {'catch': CatchStoreBackend, 'catchpy': WebAnnotationStoreBackend}
+        if request.method == "GET":
             version_requested = request.GET.get('version', None)
+        elif request.method == "DELETE":
+            qs = urllib.parse.parse_qs(request.META['QUERY_STRING'])
+            try:
+                version_requested = qs.get('version')[0]
+            except (KeyError, IndexError, TypeError) as e:
+                version_requested = None
         else:
             body = json.loads(str(request.body, 'utf-8'))
             version_requested = body.get('version', None)
@@ -80,9 +82,7 @@ class AnnotationStore(object):
                 raise e
         else:
             return cls(request, possible_backend_types['catch'](request))
-        assert backend_type_setting in possible_backend_types
-        backend_instance = possible_backend_types[backend_type](request)
-        return cls(request, backend_instance)
+
 
     @classmethod
     def update_settings(cls, settings_dict):
@@ -322,7 +322,7 @@ class CatchStoreBackend(StoreBackend):
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', None) is not None
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)
-                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])  
+                self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])
             return response
         elif self.request.method == "POST":
             return self.create(annotation_id)
@@ -340,8 +340,8 @@ class CatchStoreBackend(StoreBackend):
                 body = self._get_request_body()
                 assignment_id = body.get('collectionId', body.get('collection_id', None))
             if assignment_id:
-                    assignment = self._get_assignment(assignment_id)
-                    base_url = assignment.annotation_database_url
+                assignment = self._get_assignment(assignment_id)
+                base_url = assignment.annotation_database_url
             else:
                 base_url = str(ANNOTATION_DB_URL).strip()
         except:
@@ -390,9 +390,10 @@ class CatchStoreBackend(StoreBackend):
             response = requests.post(database_url, data=data, headers=self.headers, timeout=self.timeout)
             if response.status_code == 200:
                 is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+                self.logger.debug('************** passgrade url({})'.format(is_graded))
                 if is_graded:
                     self.lti_grade_passback(score=1)
-                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id']) 
+                    self.logger.info("Grade sent back for user %s" % self.request.LTI['hx_user_id'])
         except requests.exceptions.Timeout as e:
             self.logger.error("requested timed out!")
             return self._response_timeout()
@@ -464,160 +465,6 @@ class CatchStoreBackend(StoreBackend):
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
 
 
-class AppStoreBackend(StoreBackend):
-    BACKEND_NAME = 'app'
-
-    def __init__(self, request):
-        super(AppStoreBackend, self).__init__(request)
-        self.date_format = '%Y-%m-%dT%H:%M:%S %Z'
-        self.max_limit = 1000
-
-    def read(self, annotation_id):
-        anno = get_object_or_404(Annotation, pk=annotation_id)
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def search(self):
-        user_id = self.request.LTI['hx_user_id']
-        is_staff = self.request.LTI['is_staff']
-
-        query_map = {
-            'contextId':            'context_id',
-            'collectionId':         'collection_id',
-            'uri':                  'uri',
-            'media':                'media',
-            'userid':               'user_id',
-            'username':             'user_name__icontains',
-            'parentid':             'parent_id',
-            'text':                 'text__icontains',
-            'quote':                'quote__icontains',
-            'tag':                  'tags__name__iexact',
-            'dateCreatedOnOrAfter': 'created_at__gte',
-            'dateCreatedOnOrBefore':'created_at__lte',
-        }
-
-        # Setup filters based on the search query
-        filters = {}
-        for param, filter_key in query_map.iteritems():
-            if param not in self.request.GET or self.request.GET[param] == '':
-                continue
-            value = self.request.GET[param]
-            if param.startswith('date'):
-                filters[filter_key] = datetime.datetime.strptime(str(value), self.date_format)
-            else:
-                filters[filter_key] = value
-
-        filter_conds = []
-        if not is_staff:
-            filter_conds.append(Q(is_private=False) | (Q(is_private=True) & Q(user_id=user_id)))
-
-        # Create the queryset with the filters applied and get a count of the total size
-        queryset = Annotation.objects.filter(*filter_conds, **filters)
-        total = queryset.count()
-
-        # Examine the user's requested limit and offset and check constraints
-        limit = -1
-        if 'limit' in self.request.GET and self.request.GET['limit'].isdigit():
-            requested_limit = int(self.request.GET['limit'])
-            limit = requested_limit if requested_limit <= self.max_limit else self.max_limit
-        else:
-            limit = self.max_limit
-
-        offset = 0
-        if 'offset' in self.request.GET and self.request.GET['offset'].isdigit():
-            requested_offset = int(self.request.GET['offset'])
-            offset = requested_offset if requested_offset < total else total
-
-        # Slice the queryset and return the selected rows
-        start, end = (offset, offset + limit if offset + limit < total else total)
-        if limit < 0:
-            queryset = queryset[start:]
-        else:
-            queryset = queryset[start:end]
-
-        rows = [self._serialize_annotation(anno) for anno in queryset]
-        result = {
-            'total': total,
-            'limit': limit,
-            'offset': offset,
-            'size': len(rows),
-            'rows': rows,
-        }
-
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def create(self, annotation_id):
-        anno = self._create_or_update(anno=None)
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    def update(self, annotation_id):
-        anno = self._create_or_update(anno=Annotation.objects.get(pk=annotation_id))
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    @transaction.atomic
-    def delete(self, annotation_id):
-        anno = Annotation.objects.get(pk=annotation_id)
-        anno.is_deleted = True
-        anno.save()
-
-        if anno.parent_id:
-            parent_anno = Annotation.objects.get(pk=anno.parent_id)
-            parent_anno.total_comments = F('total_comments') - 1
-            parent_anno.save()
-
-        result = self._serialize_annotation(anno)
-        return HttpResponse(json.dumps(result), status=200, content_type='application/json')
-
-    @transaction.atomic
-    def _create_or_update(self, anno=None):
-        create = anno is None
-        if create:
-            anno = Annotation()
-
-        body = self._get_request_body()
-        anno.context_id = body['contextId']
-        anno.collection_id = body['collectionId']
-        anno.uri = body['uri']
-        anno.media = body['media']
-        anno.user_id = body['user']['id']
-        anno.user_name = body['user']['name']
-        anno.is_private = False if len(body.get('permissions', {}).get('read', [])) == 0 else True
-        anno.text = body.get('text', '')
-        anno.quote = body.get('quote', '')
-        anno.json = json.dumps(body)
-
-        if 'parent' in body and body['parent'] != '0':
-            anno.parent_id = int(body['parent'])
-        anno.save()
-
-        if create and anno.parent_id:
-            parent_anno = Annotation.objects.get(pk=int(body['parent']))
-            parent_anno.total_comments = F('total_comments') + 1
-            parent_anno.save()
-
-        if not create:
-            anno.tags.clear()
-        for tag_name in body.get('tags', []):
-            tag_object, created = AnnotationTags.objects.get_or_create(name=tag_name.strip())
-            anno.tags.add(tag_object)
-
-        return anno
-
-    def _serialize_annotation(self, anno):
-        data = json.loads(anno.json)
-        data.update({
-            "id": anno.pk,
-            "deleted": anno.is_deleted,
-            "created": anno.created_at.strftime(self.date_format),
-            "updated": anno.updated_at.strftime(self.date_format),
-        })
-        if anno.parent_id is None:
-            data['totalComments'] = anno.total_comments
-        return data
-
-
 class WebAnnotationStoreBackend(StoreBackend):
     BACKEND_NAME = 'catchpy'
 
@@ -636,6 +483,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.before_search()
             response = self.search()
             is_graded = self.request.LTI['launch_params'].get('lis_outcome_service_url', False)
+
             if is_graded and self.after_search(response):
                 self.lti_grade_passback(score=1)
             return response
@@ -651,17 +499,37 @@ class WebAnnotationStoreBackend(StoreBackend):
         try:
             if self.request.method == "GET":
                 assignment_id = self.request.GET.get('collectionId', self.request.GET.get('collection_id', None))
+            elif self.request.method == "DELETE":
+                qs = urllib.parse.parse_qs(self.request.META['QUERY_STRING'])
+                try:
+                    assignment_id = qs.get('collectionId')[0]
+                except (KeyError, IndexError) as e:
+                    assignment_id = None
+
             else:
                 body = self._get_request_body()
+                # 02mar20 naomi: pulling collection_id from wrong place,
+                # this is a webannotation so body['platform']['collection_id']
+                # related to https://github.com/lduarte1991/hxat/issues/116
+                # 03mar20 naomi: if client tries to update the collection_id?
+                # what is the supposed behavior for hxat?
                 assignment_id = body.get('collectionId', body.get('collection_id', None))
+                #assignment_id = body['platform']['collection_id']
             if assignment_id:
-                    assignment = self._get_assignment(assignment_id)
-                    base_url = assignment.annotation_database_url
+                assignment = self._get_assignment(assignment_id)
+                base_url = assignment.annotation_database_url
             else:
+                # 02mar20 naomi: if collection_id not present it is probably a
+                # search throughout course. In this case, search should iterate
+                # over all assignments and issue a search per assignment since,
+                # potentially, each assignment can be in a different store with
+                # different credentials. _get_database_url() maybe returns a
+                # map of (collection_id, database_url) pairs and its clients
+                # have to deal with that. (see bottom of file item1)
                 base_url = str(ANNOTATION_DB_URL).strip()
-        except:
-            self.logger.info("Default annotation_database_url used as assignment could not be found.")
+        except Exception as e:
             base_url = str(ANNOTATION_DB_URL).strip()
+            self.logger.info("unknown assignment, fallback to ({}): {}".format(base_url, e))
         return '{base_url}{path}'.format(base_url=base_url, path=path)
 
     def _retrieve_annotator_token(self, user_id):
@@ -693,6 +561,9 @@ class WebAnnotationStoreBackend(StoreBackend):
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def after_search(self, response):
+        # 06mar20 naomi: below code assumes that the search restricted within
+        # an assignment (collection_id, context_id present in search params)
+        # --- it doesn't check within the search result, but in the query params...
         retrieved_self = self.request.LTI['launch_params'].get('user_id', '*') in self.request.GET.getlist('userid[]', self.request.GET.getlist('userid', []))
         return retrieved_self and int(json.loads(response.content)['total']) > 0
 
@@ -755,12 +626,14 @@ class WebAnnotationStoreBackend(StoreBackend):
 
             return DjangoToolProvider.from_django_request(
                 lti_secret, request=self.request)
+
         return DjangoToolProvider.from_django_request(
             lti_secret, request=self.request)
 
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
+
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug("LTI consumer does not expect a grade for the current user and assignment")
@@ -776,3 +649,13 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+
+"""
+05mar20 naomi: (item1) right now the assumption is that, at least at course
+level, all assignments use the same backend config (same url and credentials).
+This is tacit and not enforced in code, we are blindly trusting in the random
+goodness of users hearts. This requirement allows developers to create
+assignemnts with lti components pointing to other lti providers than prod and
+do debugging and tests.
+
+"""

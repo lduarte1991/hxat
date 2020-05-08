@@ -53,12 +53,13 @@ def create_new_user(anon_id=None, username=None, display_name=None, roles=None, 
         user.save()
     except User.MultipleObjectsReturned:
         user = User.objects.filter(username=username).order_by('id')[0]
-    
+
     lti_profile.user = user
     lti_profile.save(update_fields=['user'])
-    
+
     logger.debug('create_new_user: LTIProfile.%s associated with User.%s' % (lti_profile.id, user.id))
     return user, lti_profile
+
 
 def save_session(request, **kwargs):
     session_map = {
@@ -89,10 +90,12 @@ def save_session(request, **kwargs):
         request.session['LTI_LAUNCH'][resource_link_id][session_key] = session_value
         request.session.modified = True
 
+
 def get_session_value(request, key, default_value=None):
     resource_link_id = request.LTI['resource_link_id']
     value = request.session['LTI_LAUNCH'][resource_link_id].get(key, default_value)
     return value
+
 
 def get_lti_value(key, request):
     """Returns the LTI parameter from the request otherwise None."""
@@ -100,10 +103,6 @@ def get_lti_value(key, request):
     logger.debug("get_lti_value: %s=%s" % (key, value))
     return value
 
-def debug_printer(debug_text):
-    """Logs debug information to the logging system"""
-    if settings.LTI_DEBUG:
-        logger.debug(str(debug_text))
 
 def retrieve_token(userid, apikey, secret):
     '''
@@ -130,6 +129,7 @@ def retrieve_token(userid, apikey, secret):
     }, secret)
     return str(token, 'utf-8')
 
+
 def get_admin_ids(context_id):
     """
         Returns a set of the user ids of all users with an admin role
@@ -140,12 +140,14 @@ def get_admin_ids(context_id):
 
     return admin_ids
 
+
 class simple_utc(datetime.tzinfo):
     def tzname(self):
         return "UTC"
 
     def utcoffset(self, dt):
         return datetime.timedelta(0)
+
 
 def get_annotation_db_credentials_by_course(context_id):
     '''
@@ -173,7 +175,7 @@ def get_annotation_db_credentials_by_course(context_id):
     '''
     fields = ['annotation_database_url', 'annotation_database_apikey', 'annotation_database_secret_token']
     values = Assignment.objects.filter(course__course_id=context_id).values(*fields).distinct(*fields).order_by(*fields)
-    
+
     # The list of database entries might not be unique (despite the *select distinct*) if any of
     # the URLs contain whitespace. The code below accounts for that possibility.
     k, values_by_url = ('annotation_database_url', {})
@@ -187,14 +189,14 @@ def get_annotation_db_credentials_by_course(context_id):
 def fetch_annotations_by_course(context_id, user_id):
     '''
     Fetches annotations for all assignments in a course as given by the LTI context ID.
-    
+
     This function accounts for the fact that annotation database credentials are stored
     on a per-assignment level, so if course assignments have different annotation database
     settings, they will be included in the results. In general, it's expected that a
     course will have one annotation database setting used across assignments (URL, API KEY, SECRET),
     but it's possible that this assumption could change by the simple fact that the settings
     are saved on assignment models, and not on course models.
-    
+
     Returns: [{"rows": [], "totalCount": 0 }]
     '''
     annotation_db_credentials = get_annotation_db_credentials_by_course(context_id)
@@ -214,6 +216,7 @@ def fetch_annotations_by_course(context_id, user_id):
             results['totalCount'] += int(data['totalCount'])
 
     return results
+
 
 def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token, **kwargs):
     '''
@@ -245,7 +248,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         # where each row represents an annotation object.
         # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
-        
+
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
@@ -253,6 +256,7 @@ def _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_t
         annotations = {'rows':[], 'totalCount': 0}
 
     return annotations
+
 
 def get_distinct_users_from_annotations(annotations, sort_key=None):
     '''
@@ -269,6 +273,7 @@ def get_distinct_users_from_annotations(annotations, sort_key=None):
         sort_key = lambda user: user['id']
     users = list(sorted(annotations_by_user.values(), key=sort_key))
     return users
+
 
 def get_distinct_assignment_objects(annotations):
     '''
@@ -287,6 +292,7 @@ def get_distinct_assignment_objects(annotations):
     assignment_objects = list(sorted(assignment_set))
     return assignment_objects
 
+
 def get_annotations_for_user_id(annotations, user_id):
     '''
     Given a set of annotation objects returned by the CATCH database
@@ -295,6 +301,7 @@ def get_annotations_for_user_id(annotations, user_id):
     '''
     rows = annotations['rows']
     return [r for r in rows if r['user']['id'] == user_id]
+
 
 def get_annotations_keyed_by_user_id(annotations):
     '''
@@ -308,12 +315,13 @@ def get_annotations_keyed_by_user_id(annotations):
         annotations_by_user.setdefault(user_id, []).append(r)
     return annotations_by_user
 
+
 def get_annotations_keyed_by_annotation_id(annotations):
     '''
     Given a set of annotation objects returned by the CATCH database,
     this function returns a dictionary that maps annotation IDs to
     annotation objects.
-    
+
     The intended usage is for when you have an annotation that is a
     reply to another annotation, and you want to lookup the parent
     annotation by its ID.
@@ -326,16 +334,16 @@ class DashboardAnnotations(object):
     '''
     This class is used to transform annotations retrieved from the CATCH DB into
     a data structure that can be rendered on the instructor dashboard.
-    
+
     The intended use case is to take a set of course annotations, group them by user,
     and then augment them with additional information that is useful on the dashboard.
     That includes things like the Assignment and TargetObject names associated with the
     annotations, etc.
-    
+
     Example usage:
-    
+
         user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
-    
+
     Notes:
 
     This class is designed to minimize database hits by loading data up front.
@@ -357,18 +365,23 @@ class DashboardAnnotations(object):
         }
         self.preview_url_cache = {}
 
+
     def get_annotations_by_id(self):
         return get_annotations_keyed_by_annotation_id(self.annotations)
+
 
     def get_distinct_users(self):
         sort_key = lambda user: user.get('name', '').strip().lower()
         return get_distinct_users_from_annotations(self.annotations, sort_key)
 
+
     def get_assignments_dict(self, ):
         return dict(Assignment.objects.values_list('assignment_id', 'assignment_name'))
 
+
     def get_target_objects_list(self):
         return TargetObject.objects.values('id', 'target_title', 'target_content', 'target_type')
+
 
     def get_annotations_by_user(self):
         annotations_by_user = get_annotations_keyed_by_user_id(self.annotations)
@@ -395,6 +408,7 @@ class DashboardAnnotations(object):
                 })
         return users
 
+
     def get_target_id(self, media_type, object_id):
         target_id = ''
         if media_type == 'image':
@@ -405,13 +419,15 @@ class DashboardAnnotations(object):
             if object_id in self.target_objects_by_id:
                 target_id = object_id
         return target_id
-    
+
+
     def get_assignment_name(self, annotation):
         collection_id = annotation['collectionId']
         if collection_id in self.assignment_name_of:
             return self.assignment_name_of[collection_id]
         return ''
-    
+
+
     def get_target_object_name(self, annotation):
         media_type = annotation.get('media', None)
         object_id = annotation['uri']
@@ -419,6 +435,7 @@ class DashboardAnnotations(object):
         if target_id in self.target_objects_by_id:
             return self.target_objects_by_id[target_id]['target_title']
         return ''
+
 
     def get_target_preview_url(self, annotation):
         annotation_id = annotation['id']
@@ -449,13 +466,15 @@ class DashboardAnnotations(object):
             preview_url = url_format % (preview_url, annotation_id)
 
         return preview_url
-    
+
+
     def assignment_object_exists(self, annotation):
         media_type = annotation.get('media', None)
         collection_id = annotation['collectionId']
         object_id = annotation['uri']
         target_id = self.get_target_id(media_type, object_id)
         return (collection_id in self.assignment_name_of) and target_id
+
 
     def get_annotation_parent_value(self, annotation, attr):
         parent_value = None
@@ -465,6 +484,7 @@ class DashboardAnnotations(object):
             if parent_annotation is not None and attr in parent_annotation:
                 parent_value = parent_annotation[attr]
         return parent_value
+
 
     def get_annotation_by_id(self, annotation_id):
         annotation_id = int(annotation_id)

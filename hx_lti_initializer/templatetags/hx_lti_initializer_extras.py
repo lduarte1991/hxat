@@ -9,7 +9,6 @@ from django.templatetags.static import static
 from re import sub
 
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.utils import debug_printer
 from abstract_base_classes.target_object_database_api import TOD_Implementation
 from target_object_database.models import TargetObject
 import re
