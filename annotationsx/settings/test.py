@@ -53,8 +53,8 @@ logging = LOGGING['loggers'].update({
 # test lti consumer keys
 CONSUMER_KEY = 'consumer_key_for_test'
 LTI_SECRET = 'lti_secret_for_test'
-TEST_COURSE = 'test_course'
-TEST_COURSE_LTI_SECRET = 'lti_secret_for_test_course'
+TEST_COURSE = 'test_course_from_LTI_SECRET_DICT'
+TEST_COURSE_LTI_SECRET = 'lti_secret_from_LTI_SECRET_DICT'
 LTI_SECRET_DICT = {
         TEST_COURSE: TEST_COURSE_LTI_SECRET,
         }

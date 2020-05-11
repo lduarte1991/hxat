@@ -100,6 +100,8 @@ def lti_launch_params_factory():
             launch_url,
             course_name=None,
             with_grade=False,
+            consumer_key=None,
+            consumer_secret=None,
             ):
         params={
             'lti_message_type': 'basic-lti-launch-request',
@@ -117,8 +119,8 @@ def lti_launch_params_factory():
             params['lis_result_sourcedid'] = '{}:{}:123'.format(course_id, resource_link_id)
 
         consumer = ToolConsumer(
-                consumer_key=settings.CONSUMER_KEY,
-                consumer_secret=settings.LTI_SECRET,
+                consumer_key=consumer_key if consumer_key else settings.CONSUMER_KEY,
+                consumer_secret=consumer_secret if consumer_secret else settings.LTI_SECRET,
                 launch_url=launch_url,
                 params=params,
         )
@@ -159,6 +161,9 @@ def course_user_lti_launch_params_with_grade(
         lti_launch_params_factory,
         ):
     course, i = course_instructor_factory()
+    course.course_id = settings.TEST_COURSE  # force secret from LTI_SECRET_DICT
+    course.save()
+
     user_roles = ['Learner']
     user = user_profile_factory(roles=user_roles)
     resource_link_id = uuid.uuid4().hex
@@ -170,6 +175,8 @@ def course_user_lti_launch_params_with_grade(
             resource_link_id=resource_link_id,
             launch_url=lti_launch_url,
             with_grade=True,
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.LTI_SECRET_DICT[settings.TEST_COURSE]
     )
     return(course, user, params)
 

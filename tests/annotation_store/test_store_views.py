@@ -622,8 +622,8 @@ The annotations can have 2 formats:
           - webannotation
 
 The annotation_store can be of 2 types:
-    1. local database (atg requirement)
-      supports annotatorjs only
+    X1. local database (atg requirement) -- removed on sha e3c72db
+    X  supports annotatorjs only
     2. external api, which has to versions:
           - catch
             supports annotatorjs only
@@ -667,6 +667,18 @@ The annotation_store can be of 2 types:
 7. how much hxat should know about annotation format? reaching out into an
    annotation for info? should this be a conversation between hxighlighter and
    catchpy only?
+
+
+---------------------
+~11may20 naomi notes:
+    in debugging signature failure had test_api_root_webanno_grade_ok() changed
+    to be always using settings.TEST_COURSE and settings.TEST_COURSE_LTI_SECRET
+    (see tests.conftest.course_user_lti_launch_params_with_grade()), instead of
+    the default consumer key and secret.
+    It's tricky to test that the passback lti call is using proper credentials,
+    but since it is copying launch-params from the session (see
+    annotation_store.store.WebAnnotationStoreBackend._get_tool_provider()),
+    then we are ok.
 """
 
 
