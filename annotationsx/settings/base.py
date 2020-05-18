@@ -326,3 +326,8 @@ CHANNEL_LAYERS = {
         },
     }
 }
+
+# time-to-live for ws auth
+WS_JWT_TTL = os.environ.get('WS_JWT_TTL', 300)
+
+
