@@ -215,8 +215,8 @@ def launch_lti(request):
                 course_object.add_admin(lti_profile)
                 logger.info("CourseAdmin Pending found: %s" % userfound)
                 userfound.delete()
-            except:
-                logger.info("Not waiting to be added as admin")
+            except Exception as e:
+                logger.info("Not waiting to be added as Admin: {}".format(e))
         logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
         return access_annotation_target(request, course_id, assignment_id, object_id)
     except AnnotationTargetDoesNotExist as e:
@@ -226,7 +226,7 @@ def launch_lti(request):
         logger.info('Proceed to the admin hub.')
     except PermissionDenied as e:
         raise e  # make sure to re-raise this exception since we shouldn't proceed
-    except:
+    except Exception as e:
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
         # to be routed directly to an assignment given the correct POST parameters,
@@ -249,14 +249,14 @@ def launch_lti(request):
                     course_object.add_admin(lti_profile)
                     logger.info("CourseAdmin Pending found: %s" % userfound)
                     userfound.delete()
-                except:
-                    logger.info("Not waiting to be added as admin")
+                except Exception as e:
+                    logger.info("Not waiting to be added as admin: {}".format(e), exc_info=False)
                 return course_admin_hub(request)
             else:
-                logger.debug("DEBUG - User wants to go directly to annotations for a specific target object")
+                logger.debug("DEBUG - User wants to go directly to annotations for a specific target object({}--{}--{}".format(course_id, assignment_id,object_id))
                 return access_annotation_target(request, course_id, assignment_id, object_id)
-        except:
-            logger.debug("DEBUG - User wants the index")
+        except Exception as e:
+            logger.debug("DEBUG - User wants the index: {} --- {}".format(type(e), e), exc_info=False)
 
     try:
         userfound = LTICourseAdmin.objects.get(
@@ -266,8 +266,9 @@ def launch_lti(request):
         course_object.add_admin(lti_profile)
         logger.info("CourseAdmin Pending found: %s" % userfound)
         userfound.delete()
-    except:
-        logger.debug("DEBUG - Not waiting to be added as admin")
+    except Exception as e:
+        logger.debug("DEBUG - Not waiting to be added as admin: {}".format(e),
+                exc_info=False)
 
     return course_admin_hub(request)
 
@@ -385,6 +386,7 @@ def access_annotation_target(
     """
     Renders an assignment page
     """
+    logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxx in access_annotation_target')
     if user_id is None:
         user_name = request.LTI['hx_user_name']
         user_id = request.LTI['hx_user_id']
