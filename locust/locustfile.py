@@ -4,6 +4,7 @@
 #
 
 from hxat_client import HxatLocust
+from tasks import WSConnectAndChangePage
 from tasks import WSConnectAndDie
 from tasks import WSJustConnect
 from tasks import WSJustLTI
@@ -14,13 +15,18 @@ from tasks import WSJustLTI
 #    task_set = WSConnectAndDie
 
 
-class WSUserJustConnect(HxatLocust):
-    weight = 3
-    task_set = WSJustConnect
+#class WSUserJustConnect(HxatLocust):
+#    weight = 3
+#    task_set = WSJustConnect
 
 
 #class WSUserJustLTI(HxatLocust):
 #    weight = 3
 #    task_set = WSJustLTI
+
+class WSUserConnectAndChangePage(HxatLocust):
+    weight = 3
+    task_set = WSConnectAndChangePage
+
 
 

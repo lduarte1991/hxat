@@ -175,22 +175,25 @@ def hxat_lti_launch(locust):
 
 
 def hxat_change_page(locust):
-    # TODO: decide if client keeps one ws connection at time or multiple
+    # make sure we are really changing the page
     target_source_id = random.randint(1, 4)
-    target_path = '/lti_init/admin_hub/{}/{}/{}/preview/?utm_source={}&resource_link_id={}',
+    while target_source_id == locust.hxat_client.target_source_id:
+        target_source_id = random.randint(1, 4)
+
+    target_path = '/lti_init/admin_hub/{}/{}/{}/preview/?utm_source={}&resource_link_id={}'.format(
             locust.hxat_client.context_id,
             locust.hxat_client.collection_id,
-            target_object_id,
+            target_source_id,
             locust.hxat_client.utm_source,
             locust.hxat_client.resource_link_id,
     )
     response = locust.client.get(
             target_path, catch_response=True,
             cookies={'sessionid': locust.hxat_client.utm_source},
-            name='/page/{}'.format(),
+            name='/page/{}'.format(target_source_id),
             headers={
                 'Accept': 'text/css,*/*;q=0.1',
-                'Referer': '{}/lti_init/launch_lti/'.locust.host,
+                'Referer': '{}/lti_init/launch_lti/'.format(locust.host),
             },
             verify=locust.ssl_verify,
     )
@@ -199,8 +202,23 @@ def hxat_change_page(locust):
             response.failure('no data')
         else:
             response.success()
+
+            # managing single ws connection
+            if locust.ws_client is not None:
+                locust.ws_client.close()
+            # change object and ws reconnect
+            locust.hxat_client.target_source_id = target_source_id
+            try_reconnect(locust)
     else:
         response.failure('status code: {}'.format(response.status_code))
+
+
+def make_ws_app_url_path(locust):
+    return '/ws/notification/{}--{}--{}'.format(
+            re.sub('[\W_]', '-', locust.hxat_client.context_id),
+            re.sub('[\W_]', '-', locust.hxat_client.collection_id),
+            locust.hxat_client.target_source_id,
+    )
 
 
 def create_ws_and_connect(locust):
@@ -209,11 +227,7 @@ def create_ws_and_connect(locust):
     if locust.ws_client is None:
         # to create ws client, it has to have a successful lti-launch
         if locust.hxat_client.utm_source is not None:
-            url_path = '/ws/notification/{}--{}--{}'.format(
-                    re.sub('[\W_]', '-', locust.hxat_client.context_id),
-                    re.sub('[\W_]', '-', locust.hxat_client.collection_id),
-                    locust.hxat_client.target_source_id,
-            )
+            url_path = make_ws_app_url_path(locust)
             locust.log('-------------- URL_PATH={}'.format(url_path))
             locust.ws_client = SocketClient(
                    host=locust.host,
@@ -241,6 +255,7 @@ def try_reconnect(locust):
     if locust.ws_client.ws and locust.ws_client.ws.connected:
         pass
     else:
+        locust.ws_client.app_url_path = make_ws_app_url_path(locust)
         locust.ws_client.connect(as_qs=True)
         if locust.ws_client.ws and locust.ws_client.ws.connected:
             locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws RECONNECTED')
@@ -327,7 +342,7 @@ class WSConnectAndChangePage(TaskSet):
 
     @task(1)
     def lurker(self):
-        try_reconnect(self.locust)
+        hxat_change_page(self.locust)
 
 
 

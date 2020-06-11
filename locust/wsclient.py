@@ -53,14 +53,17 @@ class SocketClient(object):
         h = urlparse(self.host)
         self.hostname = h.netloc
 
-        self.url = '{}://{}{}/'.format(
-                self.protocol, self.hostname, app_url_path)
+        self.app_url_path = app_url_path
 
         self.ws = None
         self.thread = None
 
         events.quitting += self.on_close
 
+    @property
+    def url(self):
+        return '{}://{}{}/'.format(
+                self.protocol, self.hostname, self.app_url_path)
 
     def log(self, msg):
         if self.verbose:
