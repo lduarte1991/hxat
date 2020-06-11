@@ -74,7 +74,8 @@ class SessionAuthMiddleware(object):
             )
             if clean_context_id == context:
                 if clean_collection_id == collection:
-                    if lti_launch.get('hx_object_id', None) == target:
+                    # from urls.py, object_id is an int!
+                    if str(lti_launch.get('hx_object_id', None)) == target:
                         scope['hxat_auth'] = 'authenticated'
                     else:
                         scope[
