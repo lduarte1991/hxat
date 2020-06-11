@@ -18,7 +18,7 @@ from wsclient import SocketClient
 
 
 def hxat_create(locust):
-    catcha = fresh_ann()
+    catcha = fresh_ann(locust.hxat_client)
 
     anno_id = catcha['id']
     params = {
@@ -158,8 +158,8 @@ def hxat_lti_launch(locust):
             return False
         else:
 
-            locust.log('*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*')
-            locust.log(response.content)
+            #locust.log('*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*')
+            #locust.log(response.content)
 
             cookie_sid = response.cookies.get('sessionid', None)
             if not cookie_sid:
@@ -176,9 +176,9 @@ def hxat_lti_launch(locust):
 
 def hxat_change_page(locust):
     # make sure we are really changing the page
-    target_source_id = random.randint(1, 4)
+    target_source_id = str(random.randint(1, 4))
     while target_source_id == locust.hxat_client.target_source_id:
-        target_source_id = random.randint(1, 4)
+        target_source_id = str(random.randint(1, 4))
 
     target_path = '/lti_init/admin_hub/{}/{}/{}/preview/?utm_source={}&resource_link_id={}'.format(
             locust.hxat_client.context_id,
@@ -258,9 +258,9 @@ def try_reconnect(locust):
         locust.ws_client.app_url_path = make_ws_app_url_path(locust)
         locust.ws_client.connect(as_qs=True)
         if locust.ws_client.ws and locust.ws_client.ws.connected:
-            locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws RECONNECTED')
+            locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws RECONNECTED')
         else:
-            locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws reconnect FAILED')
+            locust.ws_client.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ws reconnect FAILED')
 
 
 # behavior
@@ -343,6 +343,7 @@ class WSConnectAndChangePage(TaskSet):
     @task(1)
     def lurker(self):
         hxat_change_page(self.locust)
+        hxat_create(self.locust)
 
 
 

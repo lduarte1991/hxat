@@ -2,6 +2,7 @@
 # ws heavily based on
 # https://github.com/websocket-client/websocket-client/blob/master/bin/wsdump.py
 #
+import ast
 import iso8601
 import json
 import os
@@ -226,15 +227,16 @@ class SocketClient(object):
     def recv(self):
         while True:
             opcode, data = self._recv()
-            self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
+            #self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
 
             if opcode == websocket.ABNF.OPCODE_TEXT and isinstance(
                     data, bytes):
                 # success
                 data = str(data, 'utf-8')
-                weba = json.loads(data)
-                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno_id: {}'.format(weba['message']['id']))
-                created = iso8601.parse_date(weba['message']['created'])
+                ws_msg = json.loads(data)
+                weba = ast.literal_eval(ws_msg['message'])
+                self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno: {}'.format(weba['id']))
+                created = iso8601.parse_date(weba['created'])
                 ts_delta = (datetime.now(tz.tzutc()) - \
                         created) / (timedelta(microseconds=1) * 1000)
                 response_length = self.calc_response_length(data)
