@@ -1,6 +1,7 @@
 
 import json
 import os
+import random
 import re
 import requests
 import time
@@ -137,6 +138,8 @@ def hxat_lti_launch(locust):
                 "roles": locust.hxat_client.user_roles,
                 "context_id": locust.hxat_client.context_id,
                 "context_title": locust.hxat_client.context_title,
+                #"custom_collection_id": locust.hxat_client.collection_id,
+                #"custom_object_id": locust.hxat_client.target_source_id,
                 },
             )
     headers = {
@@ -169,6 +172,35 @@ def hxat_lti_launch(locust):
     else:
         response.failure('status code: {}'.format(response.status_code))
         return False
+
+
+def hxat_change_page(locust):
+    # TODO: decide if client keeps one ws connection at time or multiple
+    target_source_id = random.randint(1, 4)
+    target_path = '/lti_init/admin_hub/{}/{}/{}/preview/?utm_source={}&resource_link_id={}',
+            locust.hxat_client.context_id,
+            locust.hxat_client.collection_id,
+            target_object_id,
+            locust.hxat_client.utm_source,
+            locust.hxat_client.resource_link_id,
+    )
+    response = locust.client.get(
+            target_path, catch_response=True,
+            cookies={'sessionid': locust.hxat_client.utm_source},
+            name='/page/{}'.format(),
+            headers={
+                'Accept': 'text/css,*/*;q=0.1',
+                'Referer': '{}/lti_init/launch_lti/'.locust.host,
+            },
+            verify=locust.ssl_verify,
+    )
+    if response.status_code == requests.codes.ok:
+        if response.content == '':
+            response.failure('no data')
+        else:
+            response.success()
+    else:
+        response.failure('status code: {}'.format(response.status_code))
 
 
 def create_ws_and_connect(locust):
@@ -275,4 +307,34 @@ class WSJustLTI(TaskSet):
     @task(1)
     def lurker(self):
         hxat_lti_launch(self.locust)
+
+
+class WSConnectAndChangePage(TaskSet):
+    wait_time = between(15, 90)
+
+    def on_start(self):
+        # basic lti login for hxat text annotation
+        ret = hxat_lti_launch(self.locust)
+        if ret:
+            create_ws_and_connect(self.locust)
+        else:
+            raise Exception('failed to lti login')
+
+    def on_stop(self):
+        if self.locust.ws_client is not None:
+            self.locust.ws_client.close()
+
+
+    @task(1)
+    def lurker(self):
+        try_reconnect(self.locust)
+
+
+
+"""
+notes:
+    to change to next target-object in the same assignment
+    GET /lti_init/admin_hub/[context-id]/[collection-id]/[target-object-id]/preview/?utm_source=[sid]&resource_link_id=[resource-link-id]
+"""
+
 

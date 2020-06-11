@@ -1,4 +1,3 @@
-
 import logging
 import re
 
@@ -16,17 +15,11 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 class SessionAuthMiddleware(object):
     """auth via session_id in query string."""
 
-
     def __init__(self, inner):
         self.inner = inner
         self.log = logging.getLogger(__name__)
 
-
     def __call__(self, scope):
-        for key in scope.keys():
-            self.log.debug('******************** scope({}) = ({})'.format(key,
-                scope.get(key)))
-
         # not authorized yet
         scope['hxat_auth'] = '403'
 
@@ -34,27 +27,24 @@ class SessionAuthMiddleware(object):
         path = scope.get('path')
         room_name = path.split('/')[-2]  # assumes path ends with a '/'
         (context, collection, target) = room_name.split('--')
-        self.log.debug('******************** context({}) collection({}) target({})'.format(context, collection, target))
 
         # parse query string for session-id and resource-link-id
         query_string = scope.get('query_string', '')
         parsed_query = parse_qs(query_string)
-        self.log.debug('******************** parsed({})'.format(parsed_query)),
 
         if not parsed_query:
-            self.log.debug('******************** finished with middleware EARLY: no query string')
             scope['hxat_auth'] = '403: missing querystring'
+            self.log.debug('NOTIFY {}'.format(scope['hxat_auth']))
             return self.inner(scope)
 
         session_id = parsed_query.get(b'utm_source', [b''])[0].decode()
         resource_link_id = parsed_query.get(b'resource_link_id', [b''])[0].decode()
 
-        self.log.debug('******************** sid({}) rid({})'.format(session_id,
-            resource_link_id))
+        self.log.debug('NOTIFY sid({}) rid({})'.format(session_id, resource_link_id))
 
         if not session_id or not resource_link_id:
             scope['hxat_auth'] = '403: missing session-id or resource-link-id'
-            self.log.debug('******************** {}'.format(scope['hxat_auth']))
+            self.log.debug('NOTIFY {}'.format(scope['hxat_auth']))
             return self.inner(scope)
 
         # close old db conn to prevent usage of timed out conn
@@ -63,24 +53,58 @@ class SessionAuthMiddleware(object):
         session = SessionStore(session_id)
         if not session.exists(session_id):
             scope['hxat_auth'] = '403: unknown session-id({})'.format(session_id)
-            self.log.debug('******************** {}'.format(scope['hxat_auth']))
         else:
-            # get lti launch params from session
+            # get lti params from session
             multi_launch = session.get('LTI_LAUNCH', {})
             lti_launch = multi_launch.get(resource_link_id, {})
             lti_params = lti_launch.get('launch_params', {})
 
-            # check the context-id matches the channel being connected
-            clean_context_id = re.sub(r'[\W_]', '-', lti_params.get('context_id', ''))
-            if clean_context_id == context:
-                scope['hxat_auth'] = 'authenticated'
-            else:
-                scope['hxat_auth'] = '403: unknown context-id({})'.format(context)
-                self.log.debug('******************** {}'.format(scope['hxat_auth']))
+            for key in lti_launch:
+                self.log.debug('NOTIFY LTI_LAUNCH[{}]: {}'.format(key, lti_launch[key]))
 
-        self.log.debug('******************** finished with middleware')
+            # get used_id
+            scope['hx_user_id'] = lti_launch.get('hx_user_id', 'anonymous')
+
+            # check the context-id matches the channel being connected
+            clean_context_id = re.sub(
+                r'[\W_]', '-', lti_launch.get('hx_context_id', '')
+            )
+            clean_collection_id = re.sub(
+                r'[\W_]', '-', lti_launch.get('hx_collection_id', '')
+            )
+            if clean_context_id == context:
+                if clean_collection_id == collection:
+                    if lti_launch.get('hx_object_id', None) == target:
+                        scope['hxat_auth'] = 'authenticated'
+                    else:
+                        scope[
+                            'hxat_auth'
+                        ] = '403: unknown target-object-id({}|{})'.format(
+                            target, lti_launch.get('hx_object_id', None)
+                        )
+                else:
+                    scope['hxat_auth'] = '403: unknown collection-id({}|{})'.format(
+                        collection, clean_collection_id
+                    )
+            else:
+                scope['hxat_auth'] = '403: unknown context-id({}|{})'.format(
+                    context, clean_context_id
+                )
+
+        self.log.debug('NOTIFY {}'.format(scope['hxat_auth']))
+        self.log.debug('NOTIFY finished with middleware')
         return self.inner(scope)
 
 
+"""
+09jun20 naomi:
+empirically, found that, to be in the target_object page the ui client has to
+have to go through a workflow that guarantees that the session object has:
+    session['resource_link_id']
+    session['hx_context_id']
+    session['hx_collection_id']
+    session['hx_object_id']
+    session['hx_user_id']
+so, using these to validate the ws connect request.
 
-
+"""
