@@ -33,7 +33,7 @@ def fetch_fortune():
 
 
 def fresh_ann(hxat_client):
-    ptag = randint(1, len(target_doc))
+    ptag = randint(1, (len(target_doc)-1))
     sel_start = randint(0, target_doc[ptag])
     sel_end = randint(sel_start, target_doc[ptag])
     x = {
