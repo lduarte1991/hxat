@@ -135,7 +135,7 @@ class HxatLocust(HttpLocust):
         self.hxat_client = get_hxat_client(cat='from_env', random_user=random_user)
 
         # TODO: this dumps lots of message for each http request
-        self.ssl_verify = False
+        self.ssl_verify = os.environ.get('HXAT_LOCUST_SSL_VERIFY', 'false').lower() == 'true'
 
         # check if should use ssl (for ws)
         self.use_ssl = self.host.startswith('https')
@@ -145,6 +145,8 @@ class HxatLocust(HttpLocust):
 
         for attr, value in vars(self.hxat_client).items():
             self.console.write('----- {} = {} '.format(attr, value))
+        for attr, value in vars(self).items():
+            self.console.write('***** {} = {}'.format(attr, value))
 
     def log(self, msg):
         # TODO: locust has a instance id?
