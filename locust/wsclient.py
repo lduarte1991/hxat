@@ -131,6 +131,7 @@ class SocketClient(object):
             return None
         else:
             self.log('-------------- WEBSOCKET SUCCESS')
+            ws.settimeout = self.ws_timeout
             return ws
 
     def connect(self, as_qs=False, as_header=False, as_cookie=False):
