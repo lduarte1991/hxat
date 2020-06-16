@@ -73,7 +73,7 @@ class SocketClient(object):
     def _prep_connection(self, as_qs=False, as_header=False, as_cookie=False):
 
         self.log(
-            '-------------- CONNECT as_qs={} as_header={} as_cookie={}'.format(
+            '-------------- PREP as_qs={} as_header={} as_cookie={}'.format(
                 as_qs, as_header, as_cookie
             )
         )
@@ -84,7 +84,7 @@ class SocketClient(object):
             )
         else:
             conn_url = self.url
-        self.log('-------------- CONNECT TO CONN_URL={}'.format(conn_url))
+        self.log('-------------- PREP TO CONN_URL={}'.format(conn_url))
 
         header = (
             {
@@ -94,7 +94,7 @@ class SocketClient(object):
             if as_header
             else {}
         )
-        self.log('-------------- CONNECT HEADER={}'.format(header))
+        self.log('-------------- PREP HEADER={}'.format(header))
 
         cookie = (
             {
@@ -117,9 +117,6 @@ class SocketClient(object):
             return self.ws
 
         self.log('-------------- WEBSOCKET must create ws connection')
-        (conn_url, header, cookie) = self._prep_connection(
-            as_qs=as_qs, as_header=as_header, as_cookie=as_cookie
-        )
         try:
             ws = websocket.WebSocket(
                 sslopt={
@@ -130,7 +127,7 @@ class SocketClient(object):
         except Exception as e:
             self.log(
                 '-------------- WEBSOCKET exception [{}]: {}'.format(e, e)
-            )  # response status_code == 403
+            )
             return None
         else:
             self.log('-------------- WEBSOCKET SUCCESS')
@@ -141,7 +138,7 @@ class SocketClient(object):
         if ws is None:
             self.log('^-^-^-^-^-^-^- failed to get connection')
             return
-        # have a ws connection!
+        # have a ws object!
         self.ws = ws
 
         if self.ws.connected:
