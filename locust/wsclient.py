@@ -113,50 +113,30 @@ class SocketClient(object):
 
     def _get_connection(self, as_qs=False, as_header=False, as_cookie=False):
         if self.ws is not None:
-            self.log('-------------- CONNECT ws already exists')
+            self.log('-------------- WEBSOCKET ws already exists')
             return self.ws
 
-        self.log('-------------- CONNECT must create ws connection')
+        self.log('-------------- WEBSOCKET must create ws connection')
         (conn_url, header, cookie) = self._prep_connection(
             as_qs=as_qs, as_header=as_header, as_cookie=as_cookie
         )
         try:
-            ws = websocket.create_connection(
-                url=conn_url,
+            ws = websocket.WebSocket(
                 sslopt={
                     'cert_reqs': ssl.CERT_NONE,  # do not check certs
                     'check_hostname': False,  # do not check hostname
                 },
-                header=header,
-                cookie=cookie,
             )
         except Exception as e:
             self.log(
-                '-------------- CONNECT exception [{}]: {}'.format(e, e)
+                '-------------- WEBSOCKET exception [{}]: {}'.format(e, e)
             )  # response status_code == 403
-
-            events.request_failure.fire(
-                request_type='ws',
-                name='connection',
-                response_time=None,
-                response_length=0,
-                exception=e,
-            )
-            # client should be smarter and know that if 403, it probably will
-            # not be able to connect, ever, due to wrong creds
             return None
         else:
-            self.log('-------------- CONNECT SUCCESS')
-            events.request_success.fire(
-                request_type='ws',
-                name='connection',
-                response_time=None,
-                response_length=0,
-            )
+            self.log('-------------- WEBSOCKET SUCCESS')
             return ws
 
     def connect(self, as_qs=False, as_header=False, as_cookie=False):
-
         ws = self._get_connection(as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
         if ws is None:
             self.log('^-^-^-^-^-^-^- failed to get connection')
