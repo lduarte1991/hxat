@@ -10,10 +10,7 @@ from locust import HttpLocust
 from utils import Console
 
 
-def make_jwt(
-        apikey, secret, user,
-        iat=None, ttl=36000, override=[],
-        backcompat=False):
+def make_jwt(apikey, secret, user, iat=None, ttl=36000, override=[], backcompat=False):
     payload = {
         'consumerKey': apikey if apikey else str(uuid4()),
         'userId': user if user else str(uuid4()),
@@ -27,23 +24,22 @@ def make_jwt(
 
 
 class HxatClient(object):
-
     def __init__(
-            self,
-            user_id,
-            user_name,
-            user_roles,
-            collection_id,
-            context_id,
-            context_title,
-            target_source_id,
-            resource_link_id,
-            consumer_key,
-            secret_key,
-            store_consumer,
-            store_secret,
-            utm_source=None,
-            ):
+        self,
+        user_id,
+        user_name,
+        user_roles,
+        collection_id,
+        context_id,
+        context_title,
+        target_source_id,
+        resource_link_id,
+        consumer_key,
+        secret_key,
+        store_consumer,
+        store_secret,
+        utm_source=None,
+    ):
         self.user_id = user_id
         self.user_name = user_name
         self.user_roles = user_roles
@@ -61,11 +57,8 @@ class HxatClient(object):
     @property
     def store_token(self):
         return make_jwt(
-                apikey=self.store_consumer,
-                secret=self.store_secret,
-                user=self.user_id
-                )
-
+            apikey=self.store_consumer, secret=self.store_secret, user=self.user_id
+        )
 
 
 FAKE_USER_ID = 'fake_user'
@@ -85,41 +78,41 @@ FAKE_STORE_SECRET = 'fake-store-secret'
 def get_hxat_client(cat='fake'):
     if cat == 'from_env':
         return HxatClient(
-                user_id=os.environ.get('USER_ID', FAKE_USER_ID),
-                user_name=os.environ.get('USER_NAME', FAKE_USER_NAME),
-                user_roles=[r.strip() for r in  \
-                        os.environ.get('USER_ROLES', FAKE_USER_ROLES).split(',')],
-                collection_id=os.environ.get('COLLECTION_ID', FAKE_COLLECTION_ID),
-                context_id=os.environ.get('CONTEXT_ID', FAKE_CONTEXT_ID),
-                context_title=os.environ.get('CONTEXT_TITLE', FAKE_CONTEXT_TITLE),
-                target_source_id=os.environ.get('TARGET_SOURCE_ID', FAKE_TARGET_SOURCE_ID),
-                resource_link_id=os.environ.get('RESOURCE_LINK_ID', FAKE_RESOURCE_LINK_ID),
-                consumer_key=os.environ.get('HXAT_CONSUMER', FAKE_HXAT_CONSUMER),
-                secret_key=os.environ.get('HXAT_SECRET', FAKE_HXAT_SECRET),
-                store_consumer=os.environ.get('STORE_CONSUMER', FAKE_STORE_CONSUMER),
-                store_secret=os.environ.get('STORE_SECRET', FAKE_STORE_SECRET),
+            user_id=os.environ.get('USER_ID', FAKE_USER_ID),
+            user_name=os.environ.get('USER_NAME', FAKE_USER_NAME),
+            user_roles=[
+                r.strip()
+                for r in os.environ.get('USER_ROLES', FAKE_USER_ROLES).split(',')
+            ],
+            collection_id=os.environ.get('COLLECTION_ID', FAKE_COLLECTION_ID),
+            context_id=os.environ.get('CONTEXT_ID', FAKE_CONTEXT_ID),
+            context_title=os.environ.get('CONTEXT_TITLE', FAKE_CONTEXT_TITLE),
+            target_source_id=os.environ.get('TARGET_SOURCE_ID', FAKE_TARGET_SOURCE_ID),
+            resource_link_id=os.environ.get('RESOURCE_LINK_ID', FAKE_RESOURCE_LINK_ID),
+            consumer_key=os.environ.get('HXAT_CONSUMER', FAKE_HXAT_CONSUMER),
+            secret_key=os.environ.get('HXAT_SECRET', FAKE_HXAT_SECRET),
+            store_consumer=os.environ.get('STORE_CONSUMER', FAKE_STORE_CONSUMER),
+            store_secret=os.environ.get('STORE_SECRET', FAKE_STORE_SECRET),
         )
     else:
         return HxatClient(
-                user_id=FAKE_USER_ID,
-                user_name=FAKE_USER_NAME,
-                user_roles=[r.strip() for r in FAKE_USER_ROLES.split(',')],
-                collection_id=FAKE_COLLECTION_ID,
-                context_id=FAKE_CONTEXT_ID,
-                context_title=FAKE_CONTEXT_TITLE,
-                target_source_id=FAKE_TARGET_SOURCE_ID,
-                resource_link_id=FAKE_RESOURCE_LINK_ID,
-                consumer_key=FAKE_HXAT_CONSUMER,
-                secret_key=FAKE_HXAT_SECRET,
-                store_consumer=FAKE_STORE_CONSUMER,
-                store_secret=FAKE_STORE_SECRET,
+            user_id=FAKE_USER_ID,
+            user_name=FAKE_USER_NAME,
+            user_roles=[r.strip() for r in FAKE_USER_ROLES.split(',')],
+            collection_id=FAKE_COLLECTION_ID,
+            context_id=FAKE_CONTEXT_ID,
+            context_title=FAKE_CONTEXT_TITLE,
+            target_source_id=FAKE_TARGET_SOURCE_ID,
+            resource_link_id=FAKE_RESOURCE_LINK_ID,
+            consumer_key=FAKE_HXAT_CONSUMER,
+            secret_key=FAKE_HXAT_SECRET,
+            store_consumer=FAKE_STORE_CONSUMER,
+            store_secret=FAKE_STORE_SECRET,
         )
-
 
 
 # locust client
 class HxatLocust(HttpLocust):
-
     def __init__(self, *args, **kwargs):
         super(HxatLocust, self).__init__(*args, **kwargs)
 
@@ -144,9 +137,7 @@ class HxatLocust(HttpLocust):
         for attr, value in vars(self.hxat_client).items():
             self.console.write('----- {} = {} '.format(attr, value))
 
-
     def log(self, msg):
         # TODO: locust has a instance id?
         if self.verbose:
             self.console.write(msg)
-

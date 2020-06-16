@@ -1,5 +1,4 @@
 -r ../annotationsx/requirements/test.txt
 
-iso8601
-locustio
+locustio==0.14.6
 websocket-client
