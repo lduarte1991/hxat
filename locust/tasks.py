@@ -358,9 +358,16 @@ class WSConnectAndChangeObject(TaskSet):
             self.locust.ws_client.close()
 
     @task(1)
-    def lurker(self):
+    def change_object(self):
         hxat_change_object(self.locust)
+
+    @task(10)
+    def create_annotation(self):
         hxat_create(self.locust)
+
+    @task(40)
+    def search_annotation(self):
+        hxat_search(self.locust)
 
 
 """
