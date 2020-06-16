@@ -24,7 +24,7 @@ from utils import Console
 
 # valid codes for ws read
 OPCODE_DATA = (websocket.ABNF.OPCODE_TEXT, websocket.ABNF.OPCODE_BINARY)
-#websocket.enableTrace(True)
+# websocket.enableTrace(True)
 
 
 class SocketClient(object):
@@ -32,16 +32,17 @@ class SocketClient(object):
 
     connects and reads from ws; does not send anything; ever.
     '''
+
     def __init__(
-            self,
-            host,
-            hxat_utm_source,
-            hxat_resource_link_id,
-            app_url_path='',
-            timeout=2,
-            verbose=False,
-            use_ssl=True,
-            ):
+        self,
+        host,
+        hxat_utm_source,
+        hxat_resource_link_id,
+        app_url_path='',
+        timeout=2,
+        verbose=False,
+        use_ssl=True,
+    ):
         self.console = Console()
         self.host = host
         self.hxat_utm_source = hxat_utm_source
@@ -63,44 +64,52 @@ class SocketClient(object):
 
     @property
     def url(self):
-        return '{}://{}{}/'.format(
-                self.protocol, self.hostname, self.app_url_path)
+        return '{}://{}{}/'.format(self.protocol, self.hostname, self.app_url_path)
 
     def log(self, msg):
         if self.verbose:
             self.console.write('[{}] {}'.format(self.session_id, msg))
 
-
     def _prep_connection(self, as_qs=False, as_header=False, as_cookie=False):
 
-        self.log('-------------- CONNECT as_qs={} as_header={} as_cookie={}'.format(
-            as_qs, as_header, as_cookie))
+        self.log(
+            '-------------- CONNECT as_qs={} as_header={} as_cookie={}'.format(
+                as_qs, as_header, as_cookie
+            )
+        )
 
         if as_qs:
             conn_url = '{}?utm_source={}&resource_link_id={}'.format(
-                    self.url, self.hxat_utm_source,
-                    self.hxat_resource_link_id)
+                self.url, self.hxat_utm_source, self.hxat_resource_link_id
+            )
         else:
             conn_url = self.url
         self.log('-------------- CONNECT TO CONN_URL={}'.format(conn_url))
 
-        header = {
-            'x_utm_source': self.hxat_utm_source,
-            'x_lid_source': self.hxat_resource_link_id,
-        } if as_header else {}
+        header = (
+            {
+                'x_utm_source': self.hxat_utm_source,
+                'x_lid_source': self.hxat_resource_link_id,
+            }
+            if as_header
+            else {}
+        )
         self.log('-------------- CONNECT HEADER={}'.format(header))
 
-        cookie = {
-            'sessionid': self.hxat_utm_source,
-            'resourcelinkid': self.hxat_resource_link_id,
-        } if as_cookie else {}
+        cookie = (
+            {
+                'sessionid': self.hxat_utm_source,
+                'resourcelinkid': self.hxat_resource_link_id,
+            }
+            if as_cookie
+            else {}
+        )
 
         # TODO expects a string!
         cookie = 'sessionid={}'.format(self.hxat_utm_source) if as_cookie else ''
         self.log('-------------- CONNECT COOKIE={}'.format(cookie))
 
         return (conn_url, header, cookie)
-
 
     def _get_connection(self, as_qs=False, as_header=False, as_cookie=False):
         if self.ws is not None:
@@ -109,23 +118,26 @@ class SocketClient(object):
 
         self.log('-------------- CONNECT must create ws connection')
         (conn_url, header, cookie) = self._prep_connection(
-                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
+            as_qs=as_qs, as_header=as_header, as_cookie=as_cookie
+        )
         try:
             ws = websocket.create_connection(
-                    url=conn_url,
-                    sslopt={
-                        'cert_reqs': ssl.CERT_NONE,  # do not check certs
-                        'check_hostname': False,     # do not check hostname
-                        },
-                    header=header,
-                    cookie=cookie,
-                    )
+                url=conn_url,
+                sslopt={
+                    'cert_reqs': ssl.CERT_NONE,  # do not check certs
+                    'check_hostname': False,  # do not check hostname
+                },
+                header=header,
+                cookie=cookie,
+            )
         except Exception as e:
-            self.log('-------------- CONNECT exception [{}]: {}'.format(
-                e, e))  # response status_code == 403
+            self.log(
+                '-------------- CONNECT exception [{}]: {}'.format(e, e)
+            )  # response status_code == 403
 
             events.request_failure.fire(
-                request_type='ws', name='connection',
+                request_type='ws',
+                name='connection',
                 response_time=None,
                 response_length=0,
                 exception=e,
@@ -136,16 +148,16 @@ class SocketClient(object):
         else:
             self.log('-------------- CONNECT SUCCESS')
             events.request_success.fire(
-                request_type='ws', name='connection',
+                request_type='ws',
+                name='connection',
                 response_time=None,
-                response_length=0)
+                response_length=0,
+            )
             return ws
-
 
     def connect(self, as_qs=False, as_header=False, as_cookie=False):
 
-        ws = self._get_connection(
-                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
+        ws = self._get_connection(as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
         if ws is None:
             self.log('^-^-^-^-^-^-^- failed to get connection')
             return
@@ -158,19 +170,20 @@ class SocketClient(object):
             return
 
         (conn_url, header, cookie) = self._prep_connection(
-                as_qs=as_qs, as_header=as_header, as_cookie=as_cookie)
+            as_qs=as_qs, as_header=as_header, as_cookie=as_cookie
+        )
         try:
             self.ws.connect(
-                    url=conn_url,
-                    header=header,
-                    cookie=cookie,
-                    )
+                url=conn_url, header=header, cookie=cookie,
+            )
         except Exception as e:
-            self.log('^-^-^-^-^-^-^- CONNECT exception [{}]: {}'.format(
-                e, e))  # response status_code == 403
+            self.log(
+                '^-^-^-^-^-^-^- CONNECT exception [{}]: {}'.format(e, e)
+            )  # response status_code == 403
 
             events.request_failure.fire(
-                request_type='ws', name='connection',
+                request_type='ws',
+                name='connection',
                 response_time=None,
                 response_length=0,
                 exception=e,
@@ -180,18 +193,16 @@ class SocketClient(object):
         else:
             self.log('^-^-^-^-^-^-^- CONNECT SUCCESS')
             events.request_success.fire(
-                request_type='ws', name='connection',
+                request_type='ws',
+                name='connection',
                 response_time=None,
-                response_length=0)
+                response_length=0,
+            )
 
             # if server closes the connection, the thread dies, but
             # if thread dies, it closes the connection?
-            self.thread = threading.Thread(
-                    target=self.recv,
-                    daemon=True
-                    )
+            self.thread = threading.Thread(target=self.recv, daemon=True)
             self.thread.start()
-
 
     def close(self):
         if self.ws is not None:
@@ -202,7 +213,6 @@ class SocketClient(object):
     def on_close(self):
         self.close()
 
-
     def _recv(self):
         try:
             frame = self.ws.recv_frame()
@@ -210,7 +220,7 @@ class SocketClient(object):
             return websocket.ABNF.OPCODE_CLOSE, None
 
         if not frame:
-            return 0xb, None  # invented code for invalid frame
+            return 0xB, None  # invented code for invalid frame
         elif frame.opcode in OPCODE_DATA:
             return frame.opcode, frame.data
         elif frame.opcode == websocket.ABNF.OPCODE_CLOSE:
@@ -223,47 +233,48 @@ class SocketClient(object):
 
         return frame.opcode, frame.data
 
-
     def recv(self):
         while True:
             opcode, data = self._recv()
-            #self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
+            # self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ RECEIVE({})'.format(opcode))
 
-            if opcode == websocket.ABNF.OPCODE_TEXT and isinstance(
-                    data, bytes):
+            if opcode == websocket.ABNF.OPCODE_TEXT and isinstance(data, bytes):
                 # success
                 data = str(data, 'utf-8')
                 ws_msg = json.loads(data)
                 weba = ast.literal_eval(ws_msg['message'])
                 self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno: {}'.format(weba['id']))
                 created = iso8601.parse_date(weba['created'])
-                ts_delta = (datetime.now(tz.tzutc()) - \
-                        created) / (timedelta(microseconds=1) * 1000)
+                ts_delta = (datetime.now(tz.tzutc()) - created) / (
+                    timedelta(microseconds=1) * 1000
+                )
                 response_length = self.calc_response_length(data)
                 events.request_success.fire(
-                    request_type='ws', name='receive',
+                    request_type='ws',
+                    name='receive',
                     response_time=ts_delta,
-                    response_length=response_length)
+                    response_length=response_length,
+                )
 
             elif opcode == websocket.ABNF.OPCODE_BINARY:
                 # failure: don't understand binary
                 events.request_failure.fire(
-                    request_type='ws', name='receive',
+                    request_type='ws',
+                    name='receive',
                     response_time=None,
                     response_length=0,
-                    exception=websocket.WebSocketException(
-                        'Unexpected binary frame'),
-                    )
+                    exception=websocket.WebSocketException('Unexpected binary frame'),
+                )
 
-            elif opcode == 0xb:
+            elif opcode == 0xB:
                 # failure: invalid frame
                 events.request_failure.fire(
-                    request_type='ws', name='receive',
+                    request_type='ws',
+                    name='receive',
                     response_time=None,
                     response_length=0,
-                    exception=websocket.WebSocketException(
-                        'Invalid frame'),
-                    )
+                    exception=websocket.WebSocketException('Invalid frame'),
+                )
 
             elif opcode == websocket.ABNF.OPCODE_CLOSE:
                 self.log('^^^^^^^^^^^^^^^^^^^^^^^^^ recv CLOSE')
@@ -276,18 +287,17 @@ class SocketClient(object):
             else:
                 # failure: unknown
                 events.request_failure.fire(
-                    request_type='ws', name='receive',
+                    request_type='ws',
+                    name='receive',
                     response_time=None,
                     response_length=0,
                     exception=websocket.WebSocketException(
                         '{}| Unknown error for opcode({})'.format(
-                            self.session_id, opcode)),
-                    )
-
+                            self.session_id, opcode
+                        )
+                    ),
+                )
 
     def calc_response_length(self, response):
         json_data = json.dumps(response)
         return len(json_data)
-
-
-
