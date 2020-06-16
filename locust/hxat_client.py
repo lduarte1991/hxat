@@ -75,11 +75,17 @@ FAKE_STORE_CONSUMER = 'fake-store-consumer'
 FAKE_STORE_SECRET = 'fake-store-secret'
 
 
-def get_hxat_client(cat='fake'):
+def get_hxat_client(cat='fake', random_user=True):
     if cat == 'from_env':
+        if random_user:
+            user_id = uuid4().hex
+            user_name = 'naomi-{}'.format(user_id)
+        else:
+            user_id = os.environ.get('USER_ID')
+            user_name = os.environ.get('USER_NAME')
         return HxatClient(
-            user_id=os.environ.get('USER_ID', FAKE_USER_ID),
-            user_name=os.environ.get('USER_NAME', FAKE_USER_NAME),
+            user_id=user_id,
+            user_name=user_name,
             user_roles=[
                 r.strip()
                 for r in os.environ.get('USER_ROLES', FAKE_USER_ROLES).split(',')
@@ -95,9 +101,11 @@ def get_hxat_client(cat='fake'):
             store_secret=os.environ.get('STORE_SECRET', FAKE_STORE_SECRET),
         )
     else:
+        user_id = uuid4().hex
+        user_name = 'naomi-{}'.format(user_id)
         return HxatClient(
-            user_id=FAKE_USER_ID,
-            user_name=FAKE_USER_NAME,
+            user_id=user_id,
+            user_name=user_name,
             user_roles=[r.strip() for r in FAKE_USER_ROLES.split(',')],
             collection_id=FAKE_COLLECTION_ID,
             context_id=FAKE_CONTEXT_ID,
@@ -123,7 +131,8 @@ class HxatLocust(HttpLocust):
         self.verbose = os.environ.get('HXAT_LOCUST_VERBOSE', 'true').lower() == 'true'
 
         # settings for this hxat user instance
-        self.hxat_client = get_hxat_client(cat='from_env')
+        random_user = os.environ.get('FORCE_SINGLE_USER', 'false').lower() == 'false'
+        self.hxat_client = get_hxat_client(cat='from_env', random_user=random_user)
 
         # TODO: this dumps lots of message for each http request
         self.ssl_verify = False
