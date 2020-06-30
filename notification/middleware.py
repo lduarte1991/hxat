@@ -22,6 +22,7 @@ class SessionAuthMiddleware(object):
     def __call__(self, scope):
         # not authorized yet
         scope['hxat_auth'] = '403'
+        scope['hx_user_id'] = 'anonymous'
 
         # parse path to get context_id, collection_id, target_source_id
         path = scope.get('path')
@@ -66,22 +67,19 @@ class SessionAuthMiddleware(object):
             scope['hx_user_id'] = lti_launch.get('hx_user_id', 'anonymous')
 
             # check the context-id matches the channel being connected
-            clean_context_id = re.sub(
-                r'[\W_]', '-', lti_launch.get('hx_context_id', '')
-            )
-            clean_collection_id = re.sub(
-                r'[\W_]', '-', lti_launch.get('hx_collection_id', '')
-            )
+            pat = re.compile('[^a-zA-Z0-9-.]')
+            clean_context_id = pat.sub('-', lti_launch.get('hx_context_id', ''))
+            clean_collection_id = pat.sub('-', lti_launch.get('hx_collection_id', ''))
+            clean_target_id = pat.sub('', lti_launch.get('hx_object_id', ''))
             if clean_context_id == context:
                 if clean_collection_id == collection:
-                    # from urls.py, object_id is an int!
-                    if str(lti_launch.get('hx_object_id', None)) == target:
+                    if clean_target_id == target:
                         scope['hxat_auth'] = 'authenticated'
                     else:
                         scope[
                             'hxat_auth'
                         ] = '403: unknown target-object-id({}|{})'.format(
-                            target, lti_launch.get('hx_object_id', None)
+                            target, clean_target_id
                         )
                 else:
                     scope['hxat_auth'] = '403: unknown collection-id({}|{})'.format(

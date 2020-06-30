@@ -24,6 +24,7 @@ ANNOTATION_DB_SECRET_TOKEN = settings.ANNOTATION_DB_SECRET_TOKEN
 ANNOTATION_STORE_SETTINGS = getattr(settings, 'ANNOTATION_STORE', {})
 ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
 
+
 class AnnotationStore(object):
     '''
     AnnotationStore implements a storage interface for annotations and is intended to
@@ -674,14 +675,13 @@ class WebAnnotationStoreBackend(StoreBackend):
 
 
     def send_annotation_notification(self, message_type, annotation):
-        platform = annotation.get('platform', {
-            "collection_id": 'unkonwn_collection',
-            "context_id": 'unknown_context',
-            "target_source_id": 'unknown_target_source_id'
-        })
-        collection_id = platform["collection_id"]
-        context_id = platform["context_id"]
-        target_source_id = platform["target_source_id"]
+        # target_source_id from session guarantees it's a sequential integer id from
+        # hxat db; image annotations have the uri as target_source_id in `platform`
+        pat = re.compile('[^a-zA-Z0-9-.]')
+        context_id = pat.sub('-', self.request.LTI["hx_context_id"])
+        collection_id = pat.sub('-', self.request.LTI["hx_collection_id"])
+        target_source_id = pat.sub('', self.request.LTI["hx_object_id"])
+
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
         self.logger.info("###################### group({}) id({})".format(
             group, annotation.get('id', 'unknown_id')))
