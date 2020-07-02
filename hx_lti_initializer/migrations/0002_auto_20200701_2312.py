@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                     FROM hx_lti_initializer_ltiresourcelinkconfig_20200701 c
                             JOIN hx_lti_assignment_assignment a ON (c.collection_id = a.assignment_id)
                             JOIN hx_lti_assignment_assignmenttargets at
-                                ON (a.id = at.assignment_id AND at.target_object_id = c.object_id::INTEGER)
+                                ON (a.id = at.assignment_id AND at.target_object_id = CAST(c.object_id AS int))
 
                     ORDER BY c.id, c.resource_link_id, at.id
             ) x
