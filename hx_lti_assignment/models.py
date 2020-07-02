@@ -127,6 +127,26 @@ class AssignmentTargets(models.Model):
         else:
             return options[5] if options[5] != '' else "false"
 
+    @classmethod
+    def get_by_assignment_id(cls, assignment_id, target_object_id):
+        assignment = None
+        try:
+            assignment = Assignment.objects.get(assignment_id=assignment_id)
+        except Assignment.DoesNotExist:
+            return None
+        
+        assignment_target = None
+        try:
+            assignment_target = cls.objects.get(assignment=assignment, target_object_id=target_object_id)
+        except AssignmentTargets.DoesNotExist:
+            return None
+        
+        return assignment_target
+
+    def __str__(self):
+        return '%s - %s' % (self.assignment.assignment_name, self.target_object.target_title)
+
+
 class Assignment(models.Model):
     """
     This object will contain the objects and settings for the annotation tool

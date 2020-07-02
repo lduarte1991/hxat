@@ -202,9 +202,9 @@ def launch_lti(request):
     try:
         logger.debug("DEBUG *-* resource_link_id={}".format(resource_link_id))
         config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
-        assignment_id = config.collection_id
-        object_id = config.object_id
-        logger.debug("DEBUG - LTIResourceLinkConfig: resource_link_id=%s collection_id=%s object_id=%s" % (resource_link_id, config.collection_id, config.object_id))
+        collection_id = config.assignment_target.assignment.assignment_id
+        object_id = config.assignment_target.target_object_id
+        logger.debug("DEBUG - LTIResourceLinkConfig: resource_link_id=%s collection_id=%s object_id=%s" % (resource_link_id, collection_id, object_id))
         course_id = str(course)
         if set(roles) & set(settings.ADMIN_ROLES):
             try:
@@ -349,8 +349,8 @@ def course_admin_hub(request):
     logger.debug("course_admin_hub view")
     try:
         config = LTIResourceLinkConfig.objects.get(resource_link_id=request.LTI['resource_link_id'])
-        object_id = int(config.object_id)
-        collection_id = config.collection_id
+        collection_id = config.assignment_target.assignment.assignment_id
+        object_id = config.assignment_target.target_object_id
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
 
@@ -608,18 +608,20 @@ def change_starting_resource(request, assignment_id, object_id):
     logger.info("change_starting_resource (%s): %s" % (request.method, data))
 
     if request.method == 'POST':
+        assignment_target = AssignmentTargets.get_by_assignment_id(assignment_id=assignment_id, target_object_id=int(object_id))
+        if not assignment_target:
+            return HttpResponse(json.dumps({'response': 'Failure: AssignmentTarget not found'}), content_type='application/json')
         try:
             config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
-            config.collection_id = assignment_id
-            config.object_id = object_id
-            config.save()
-            data['response'] = 'Success: Updated'
+            config.assignment_target = assignment_target
+            created = False
         except:
-            newConfig = LTIResourceLinkConfig(resource_link_id=resource_link_id, collection_id=assignment_id, object_id=object_id)
-            newConfig.save()
-            data['response'] = 'Success: Created'
+            config = LTIResourceLinkConfig(resource_link_id=resource_link_id, assignment_target=assignment_target)
+            created = True
+        config.save()
+        data['response'] = 'Success: Created' if created else 'Success: Updated'
     elif request.method == 'DELETE':
-        if LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists():
-            LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id).delete()
+        LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
         data['response'] = 'Success: Deleted'
+    
     return HttpResponse(json.dumps(data), content_type='application/json')
