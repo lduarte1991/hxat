@@ -3,6 +3,7 @@ import pytest
 
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.models import LTIProfile
+from hx_lti_initializer.models import LTIResourceLinkConfig
 
 from .conftest import random_instructor
 from .conftest import random_learner
@@ -87,4 +88,16 @@ def test_LTICourse_get_all_courses(random_instructor, random_learner):
     assert(isinstance(list_of_courses3, list))
     assert(len(list_of_courses3) == 2)
 
+@pytest.mark.django_db
+def test_LTIResourceLinkConfig_create(random_assignment_target):
+    assignment = random_assignment_target['assignment']
+    target_object = random_assignment_target['target_object']
+    assignment_target = random_assignment_target['assignment_target']
 
+    lti_resource_link_config = LTIResourceLinkConfig(
+        assignment_target=assignment_target, 
+    )
+    lti_resource_link_config.save()
+    assert(isinstance(lti_resource_link_config, LTIResourceLinkConfig))
+    assert(assignment_target.assignment.pk == assignment.pk)
+    assert(assignment_target.target_object.pk == target_object.pk)
