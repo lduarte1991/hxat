@@ -107,7 +107,7 @@ def test_launchLti_user_course_created_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
 
     # check user was created
@@ -155,7 +155,7 @@ def test_launchLti_user_course_ok_no_context_title(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
 
     # check user was created
