@@ -14,6 +14,7 @@ from django.urls import reverse
 
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.models import LTIProfile
+from hx_lti_initializer.models import LTIResourceLinkConfig
 from .conftest import random_instructor
 
 
@@ -49,8 +50,10 @@ def test_launchLti_session_ok(random_course_instructor):
             target_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check some info in session
     assert(client.session is not None)
@@ -116,8 +119,10 @@ def test_launchLti_user_course_ok():
             target_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -168,8 +173,10 @@ def test_launchLti_user_course_ok_no_context_title():
             target_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -421,3 +428,50 @@ def test_launchLti(random_course_instructor):
 
     assert(response.status_code == 403)
     assert(response.content == 'hey')
+
+
+@pytest.mark.django_db
+def test_launchLti_starting_resource(random_assignment_target):
+    course = random_assignment_target['course']
+    assignment = random_assignment_target['assignment']
+    target_object = random_assignment_target['target_object']
+    assignment_target = random_assignment_target['assignment_target']
+    instructor = random_assignment_target['profile']
+
+    course_id = course.course_id
+    resource_link_id = 'FakeResourceLinkIDStartingResource'
+    target_path = '/lti_init/launch_lti/'
+    launch_url = 'http://testserver{}'.format(target_path)
+
+    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target, 
+    )
+
+    consumer = ToolConsumer(
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.LTI_SECRET,
+            launch_url=launch_url,
+            params={
+                'lti_message_type': 'basic-lti-launch-request',
+                'lti_version': 'LTI-1p0',
+                'resource_link_id': resource_link_id,
+                'lis_person_sourcedid': instructor.name,
+                'lis_outcome_service_url': 'fake_url',
+                'user_id': instructor.anon_id,
+                'roles': ['Instructor'],
+                'context_id': course_id,
+                'context_title': '{}-title'.format(course_id),
+                },
+            )
+    params = consumer.generate_launch_data()
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            target_path,
+            data=params,
+            )
+    assert(response.status_code == 302)
+
+    expected_url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,assignment.assignment_id,target_object.pk]) + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)

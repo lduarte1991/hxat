@@ -209,6 +209,5 @@ class LTICourseAdmin(models.Model):
 
 
 class LTIResourceLinkConfig(models.Model):
-    resource_link_id = models.CharField(max_length=255)
-    object_id = models.CharField(max_length=255)
-    collection_id = models.CharField(max_length=255)
+    resource_link_id = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    assignment_target = models.ForeignKey('hx_lti_assignment.AssignmentTargets', null=False, on_delete=models.CASCADE)

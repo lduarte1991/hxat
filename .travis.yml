@@ -6,7 +6,7 @@ env:
 services:
   - postgresql
 install:
-    - pip install -r requirements.txt
+    - pip install -r annotationsx/requirements/test.txt
     - psql -c 'DROP DATABASE IF EXISTS annotationsx;' -U postgres
     - psql -c "CREATE USER annotationsx WITH PASSWORD 'password';" -U postgres
     - psql -c 'ALTER USER annotationsx CREATEDB;' -U postgres
@@ -16,3 +16,4 @@ install:
 script:
     - python manage.py migrate --noinput
     - python manage.py test
+    - pytest -v
