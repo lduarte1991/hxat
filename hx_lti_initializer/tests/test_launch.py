@@ -52,6 +52,8 @@ def test_launchLti_session_ok(random_course_instructor):
             )
     assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check some info in session
     assert(client.session is not None)
@@ -119,6 +121,8 @@ def test_launchLti_user_course_ok():
             )
     assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -171,6 +175,8 @@ def test_launchLti_user_course_ok_no_context_title():
             )
     assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
