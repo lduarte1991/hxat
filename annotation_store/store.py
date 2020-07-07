@@ -680,7 +680,7 @@ class WebAnnotationStoreBackend(StoreBackend):
         pat = re.compile('[^a-zA-Z0-9-.]')
         context_id = pat.sub('-', self.request.LTI["hx_context_id"])
         collection_id = pat.sub('-', self.request.LTI["hx_collection_id"])
-        target_source_id = pat.sub('', self.request.LTI["hx_object_id"])
+        target_source_id = self.request.LTI["hx_object_id"]
 
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
         self.logger.info("###################### group({}) id({})".format(

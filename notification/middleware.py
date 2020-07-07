@@ -70,7 +70,7 @@ class SessionAuthMiddleware(object):
             pat = re.compile('[^a-zA-Z0-9-.]')
             clean_context_id = pat.sub('-', lti_launch.get('hx_context_id', ''))
             clean_collection_id = pat.sub('-', lti_launch.get('hx_collection_id', ''))
-            clean_target_id = pat.sub('', lti_launch.get('hx_object_id', ''))
+            clean_target_id = str(lti_launch.get('hx_object_id', ''))
             if clean_context_id == context:
                 if clean_collection_id == collection:
                     if clean_target_id == target:
