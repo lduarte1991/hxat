@@ -326,6 +326,7 @@ CHANNEL_LAYERS = {
         },
     }
 }
+HXAT_NOTIFY_ERRORLOG = os.environ.get('HXAT_NOTIFY_ERRORLOG', 'false').lower() == 'true'
 
 # time-to-live for ws auth
 WS_JWT_TTL = os.environ.get('WS_JWT_TTL', 300)

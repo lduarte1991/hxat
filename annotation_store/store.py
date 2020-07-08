@@ -588,11 +588,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('create response status_code=%s' % response.status_code)
-        self.logger.info("###################### about to send create notification")
         if response.status_code == 200:
             cleaned_annotation = json.loads(response.content)
             self.send_annotation_notification('annotation_created', cleaned_annotation)
-        self.logger.info("###################### done with notification")
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def update(self, annotation_id):
@@ -606,11 +604,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('update response status_code=%s' % response.status_code)
-        self.logger.info("###################### about to send update notification")
         if response.status_code == 200:
             cleaned_annotation = json.loads(response.content)
             self.send_annotation_notification('annotation_updated', cleaned_annotation)
-        self.logger.info("###################### done with notification")
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
@@ -622,11 +618,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('delete response status_code=%s' % response.status_code)
-        self.logger.info("###################### about to send delete notification")
         if response.status_code == 200:
             cleaned_annotation = json.loads(response.content)
             self.send_annotation_notification('annotation_deleted', cleaned_annotation)
-        self.logger.info("###################### done with notification")
         return HttpResponse(response)
 
 
@@ -683,13 +677,22 @@ class WebAnnotationStoreBackend(StoreBackend):
         target_source_id = self.request.LTI["hx_object_id"]
 
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
-        self.logger.info("###################### group({}) id({})".format(
-            group, annotation.get('id', 'unknown_id')))
-        async_to_sync(self.channel_layer.group_send)(group, {
-            'type': 'annotation_notification',
-            'message': annotation,
-            'action': message_type,
-        })
+        self.logger.info("###################### action({}) group({}) id({})".format(
+            message_type, group, annotation.get('id', 'unknown_id')))
+        try:
+            async_to_sync(self.channel_layer.group_send)(group, {
+                'type': 'annotation_notification',
+                'message': annotation,
+                'action': message_type,
+            })
+        except Exception as e:
+            # while transitioning to websockets, it might be that a redis backend is not
+            # available and notifications are not really being used; to avoid clogging
+            # logs, just printing error; to print the error stack set env var
+            # "HXAT_NOTIFY_ERRORLOG=true"
+            msg = "###################### action({}) group({}) id({}): {}".format(
+                    message_type, group, annotation.get('id', 'unknown_id'), e)
+            self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
 
 """
 05mar20 naomi: (item1) right now the assumption is that, at least at course
