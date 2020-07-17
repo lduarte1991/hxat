@@ -677,7 +677,7 @@ class WebAnnotationStoreBackend(StoreBackend):
         target_source_id = self.request.LTI["hx_object_id"]
 
         group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
-        self.logger.info("###################### action({}) group({}) id({})".format(
+        self.logger.info("###### action({}) group({}) id({})".format(
             message_type, group, annotation.get('id', 'unknown_id')))
         try:
             async_to_sync(self.channel_layer.group_send)(group, {
@@ -690,7 +690,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             # available and notifications are not really being used; to avoid clogging
             # logs, just printing error; to print the error stack set env var
             # "HXAT_NOTIFY_ERRORLOG=true"
-            msg = "###################### action({}) group({}) id({}): {}".format(
+            msg = "##### unable to notify: action({}) group({}) id({}): {}".format(
                     message_type, group, annotation.get('id', 'unknown_id'), e)
             self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
 
