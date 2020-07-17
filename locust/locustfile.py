@@ -5,6 +5,7 @@
 
 from hxat_client import HxatLocust
 from tasks import WSConnectAndChangeObject
+from tasks import WSConnectAndCreate
 from tasks import WSConnectAndDie
 from tasks import WSJustConnect
 from tasks import WSJustLTI
@@ -25,6 +26,11 @@ from tasks import WSJustLTI
 #    task_set = WSJustLTI
 
 
-class WSUserConnectAndChangeObject(HxatLocust):
+#class WSUserConnectAndChangeObject(HxatLocust):
+#    weight = 3
+#    task_set = WSConnectAndChangeObject
+
+
+class WSUserConnectAndCreate(HxatLocust):
     weight = 3
-    task_set = WSConnectAndChangeObject
+    task_set = WSConnectAndCreate

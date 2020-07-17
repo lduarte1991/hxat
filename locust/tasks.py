@@ -144,8 +144,8 @@ def hxat_lti_launch(locust):
             "roles": locust.hxat_client.user_roles,
             "context_id": locust.hxat_client.context_id,
             "context_title": locust.hxat_client.context_title,
-            # "custom_collection_id": locust.hxat_client.collection_id,
-            # "custom_object_id": locust.hxat_client.target_source_id,
+            "custom_collection_id": locust.hxat_client.collection_id,
+            "custom_object_id": locust.hxat_client.target_source_id,
         },
     )
     headers = {
@@ -189,11 +189,14 @@ def hxat_change_object(locust):
         0, len(COLLECTION_TARGET_DICT[locust.hxat_client.collection_id]) - 1
     )
     target_source_id = COLLECTION_TARGET_DICT[locust.hxat_client.collection_id][ix]
-    while target_source_id == locust.hxat_client.target_source_id:
-        ix = random.randint(
-            0, len(COLLECTION_TARGET_DICT[locust.hxat_client.collection_id]) - 1
-        )
+    # TARGET_DICT has to have more than 1 element, otherwise infinite loop!
+    if len(COLLECTION_TARGET_DICT[locust.hxat_client.collection_id]) > 1:
+        while target_source_id == locust.hxat_client.target_source_id:
+            ix = random.randint(
+                0, len(COLLECTION_TARGET_DICT[locust.hxat_client.collection_id]) - 1
+            )
         target_source_id = COLLECTION_TARGET_DICT[locust.hxat_client.collection_id][ix]
+
 
     target_path = '/lti_init/admin_hub/{}/{}/{}/preview/?utm_source={}&resource_link_id={}'.format(
         locust.hxat_client.context_id,
@@ -369,6 +372,29 @@ class WSConnectAndChangeObject(TaskSet):
     def search_annotation(self):
         hxat_search(self.locust)
 
+
+class WSConnectAndCreate(TaskSet):
+    wait_time = between(15, 90)
+
+    def on_start(self):
+        # basic lti login for hxat text annotation
+        ret = hxat_lti_launch(self.locust)
+        if ret:
+            create_ws_and_connect(self.locust)
+        else:
+            raise Exception('failed to lti login')
+
+    def on_stop(self):
+        if self.locust.ws_client is not None:
+            self.locust.ws_client.close()
+
+    @task(10)
+    def create_annotation(self):
+        hxat_create(self.locust)
+
+    @task(40)
+    def search_annotation(self):
+        hxat_search(self.locust)
 
 """
 notes:
