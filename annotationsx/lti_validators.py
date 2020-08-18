@@ -67,6 +67,8 @@ class LTIRequestValidator(RequestValidator):
             secret = to_unicode(settings.LTI_SECRET_DICT[context_id])
         except KeyError:  # context_id not in LTI_SECRET_DICT
             if client_key == settings.CONSUMER_KEY:
+                log.error('----------------- lti({} -- {}):'.format(
+                    client_key, to_unicode(settings.LTI_SECRET)))
                 return to_unicode(settings.LTI_SECRET)
             else:  # oauth_consumer_key not a known value
                 log.error(
@@ -74,6 +76,8 @@ class LTIRequestValidator(RequestValidator):
                             client_key))
                 return self.dummy_secret
         else:  # all went well
+            log.error('--------------*** lti({} -- {}):'.format(
+                client_key, to_unicode(settings.LTI_SECRET)))
             return secret
 
 

@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.1.0 - Sunday, April 19th, 2020, 4:41:21 PM  
+// [AIV_SHORT]  Version: 1.2.0 - Tuesday, July 28th, 2020, 3:11:30 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 73);
+/******/ 	return __webpack_require__(__webpack_require__.s = 74);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10773,7 +10773,7 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.15';
+  var VERSION = '4.17.19';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -14480,8 +14480,21 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * @returns {Array} Returns the new sorted array.
      */
     function baseOrderBy(collection, iteratees, orders) {
+      if (iteratees.length) {
+        iteratees = arrayMap(iteratees, function(iteratee) {
+          if (isArray(iteratee)) {
+            return function(value) {
+              return baseGet(value, iteratee.length === 1 ? iteratee[0] : iteratee);
+            }
+          }
+          return iteratee;
+        });
+      } else {
+        iteratees = [identity];
+      }
+
       var index = -1;
-      iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
+      iteratees = arrayMap(iteratees, baseUnary(getIteratee()));
 
       var result = baseMap(collection, function(value, key, collection) {
         var criteria = arrayMap(iteratees, function(iteratee) {
@@ -14738,6 +14751,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
         var key = toKey(path[index]),
             newValue = value;
 
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return object;
+        }
+
         if (index != lastIndex) {
           var objValue = nested[key];
           newValue = customizer ? customizer(objValue, key, nested) : undefined;
@@ -14890,11 +14907,14 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      *  into `array`.
      */
     function baseSortedIndexBy(array, value, iteratee, retHighest) {
-      value = iteratee(value);
-
       var low = 0,
-          high = array == null ? 0 : array.length,
-          valIsNaN = value !== value,
+          high = array == null ? 0 : array.length;
+      if (high === 0) {
+        return 0;
+      }
+
+      value = iteratee(value);
+      var valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
           valIsUndefined = value === undefined;
@@ -16379,10 +16399,11 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
       if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
         return false;
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(array);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var arrStacked = stack.get(array);
+      var othStacked = stack.get(other);
+      if (arrStacked && othStacked) {
+        return arrStacked == other && othStacked == array;
       }
       var index = -1,
           result = true,
@@ -16544,10 +16565,11 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
           return false;
         }
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var objStacked = stack.get(object);
+      var othStacked = stack.get(other);
+      if (objStacked && othStacked) {
+        return objStacked == other && othStacked == object;
       }
       var result = true;
       stack.set(object, other);
@@ -19928,6 +19950,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * // The `_.property` iteratee shorthand.
      * _.filter(users, 'active');
      * // => objects for ['barney']
+     *
+     * // Combining several predicates using `_.overEvery` or `_.overSome`.
+     * _.filter(users, _.overSome([{ 'age': 36 }, ['age', 40]]));
+     * // => objects for ['fred', 'barney']
      */
     function filter(collection, predicate) {
       var func = isArray(collection) ? arrayFilter : baseFilter;
@@ -20677,15 +20703,15 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * var users = [
      *   { 'user': 'fred',   'age': 48 },
      *   { 'user': 'barney', 'age': 36 },
-     *   { 'user': 'fred',   'age': 40 },
+     *   { 'user': 'fred',   'age': 30 },
      *   { 'user': 'barney', 'age': 34 }
      * ];
      *
      * _.sortBy(users, [function(o) { return o.user; }]);
-     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
+     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 30]]
      *
      * _.sortBy(users, ['user', 'age']);
-     * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
+     * // => objects for [['barney', 34], ['barney', 36], ['fred', 30], ['fred', 48]]
      */
     var sortBy = baseRest(function(collection, iteratees) {
       if (collection == null) {
@@ -25560,11 +25586,11 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
 
       // Use a sourceURL for easier debugging.
       // The sourceURL gets injected into the source that's eval-ed, so be careful
-      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
-      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
+      // to normalize all kinds of whitespace, so e.g. newlines (and unicode versions of it) can't sneak in
+      // and escape the comment, thus injecting code that gets evaled.
       var sourceURL = '//# sourceURL=' +
         (hasOwnProperty.call(options, 'sourceURL')
-          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
+          ? (options.sourceURL + '').replace(/\s/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -25597,8 +25623,6 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      // Like with sourceURL, we take care to not check the option's prototype,
-      // as this configuration is a code injection vector.
       var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
@@ -26305,6 +26329,9 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * values against any array or object value, respectively. See `_.isEqual`
      * for a list of supported value comparisons.
      *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
+     *
      * @static
      * @memberOf _
      * @since 3.0.0
@@ -26320,6 +26347,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      *
      * _.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
+     *
+     * // Checking for several possible values
+     * _.filter(users, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
       return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
@@ -26333,6 +26364,9 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * **Note:** Partial comparisons will match empty array and empty object
      * `srcValue` values against any array or object value, respectively. See
      * `_.isEqual` for a list of supported value comparisons.
+     *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
      *
      * @static
      * @memberOf _
@@ -26350,6 +26384,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      *
      * _.find(objects, _.matchesProperty('a', 4));
      * // => { 'a': 4, 'b': 5, 'c': 6 }
+     *
+     * // Checking for several possible values
+     * _.filter(users, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
       return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
@@ -26573,6 +26611,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * Creates a function that checks if **all** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -26599,6 +26641,10 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      * Creates a function that checks if **any** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -26618,6 +26664,9 @@ Hxighlighter.storage = []; // comment out following line when not webpacking
      *
      * func(NaN);
      * // => false
+     *
+     * var matchesFunc = _.overSome([{ 'a': 1 }, { 'a': 2 }])
+     * var matchesPropertyFunc = _.overSome([['a', 1], ['a', 2]])
      */
     var overSome = createOver(arraySome);
 
@@ -28572,7 +28621,7 @@ var $ = __webpack_require__(0);
 var window = (window || {});
 window.jQuery = __webpack_require__(0);
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 (function (f) {
   if (( false ? undefined : _typeof(exports)) === "object" && typeof module !== "undefined") {
@@ -31912,7 +31961,7 @@ var editor = renderer.create('<div class="note-editor note-frame card"/>');
 var toolbar = renderer.create('<div class="note-toolbar-wrapper"><div class="note-toolbar card-header"></div></div>');
 var editingArea = renderer.create('<div class="note-editing-area"/>');
 var codable = renderer.create('<textarea class="note-codable"/>');
-var editable = renderer.create('<div class="note-editable card-block" aria-label="Add annotation text" contentEditable="true"/>');
+var editable = renderer.create('<div class="note-editable card-block" contentEditable="true"/>');
 var statusbar = renderer.create([
     '<div class="note-statusbar">',
     '  <div class="note-resizebar">',
@@ -32045,9 +32094,7 @@ var ui = {
         return renderer.create('<button type="button" class="note-btn btn btn-light btn-sm" tabindex="-1">', function ($node, options) {
             if (options && options.tooltip) {
                 $node.attr({
-                    title: options.tooltip,
-                    "aria-label": options.tooltip,
-                    role: "button"
+                    title: options.tooltip
                 }).tooltip({
                     container: options.container,
                     trigger: 'hover',
@@ -39725,8 +39772,13 @@ __webpack_require__(9);
       } else {
         // console.log(annotation);
         if (annotation.media !== "comment") {
-          jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
-          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+          // console.log(annotation, self.options)
+          // console.log(annotation.creator.id == self.options.user_id);
+          if (annotation.creator.id == self.options.user_id) {
+            jQuery('.sr-real-alert').html('Your annotation was saved but the annotation list is not currently showing your annotations. Toggle "Mine" button to view your annotation.');
+          } //$.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine')]);
+
+
           self.search(self.lastSearchOption);
         }
       }
@@ -39737,6 +39789,66 @@ __webpack_require__(9);
         'tag': tag
       };
       self.search(options);
+    });
+    $.subscribeEvent('wsAnnotationDeleted', self.instance_id, function (_, annotation) {
+      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+        return button.id;
+      });
+      var isMine = annotation.creator.id === self.options.user_id;
+      var isInstructor = self.options.instructors.indexOf(annotation.creator.id) > -1;
+      var isPeer = !isMine && !isInstructor;
+
+      if (isMine && filteroptions.indexOf('mine') == -1) {
+        $.publishEvent('decreaseBadgeCount', self.instance_id, [jQuery('#mine'), annotation.id]);
+      } else if (isInstructor && filteroptions.indexOf('instructor') == -1) {
+        $.publishEvent('decreaseBadgeCount', self.instance_id, [jQuery('#instructor'), annotation.id]);
+      } else if (isPeer && filteroptions.indexOf('peer') == -1) {
+        $.publishEvent('decreaseBadgeCount', self.instance_id, [jQuery('#peer'), annotation.id]);
+      }
+    });
+    $.subscribeEvent('wsAnnotationLoaded', self.instance_id, function (_, annotation, callback, isUpdating) {
+      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+        return button.id;
+      });
+      var isMine = annotation.creator.id === self.options.user_id;
+      var isInstructor = self.options.instructors.indexOf(annotation.creator.id) > -1;
+      var isPeer = !isMine && !isInstructor;
+
+      if (isMine && filteroptions.indexOf('mine') > -1) {
+        self.addAnnotation(annotation, false, false);
+        callback();
+      } else if (isInstructor && filteroptions.indexOf('instructor') > -1) {
+        self.addAnnotation(annotation, false, false);
+        callback();
+      } else if (isPeer && filteroptions.indexOf('peer') > -1) {
+        self.addAnnotation(annotation, false, false);
+        callback();
+      } else if (!isUpdating) {
+        if (isMine) {
+          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#mine'), annotation.id]);
+        } else if (isInstructor) {
+          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#instructor'), annotation.id]);
+        } else if (isPeer) {
+          $.publishEvent('increaseBadgeCount', self.instance_id, [jQuery('#peer'), annotation.id]);
+        }
+      } // console.log("WS Annotation added", annotation);
+
+    });
+    $.subscribeEvent('shouldDraw', self.instance_id, function (_, annotation, callback) {
+      var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
+        return button.id;
+      });
+      var isMine = annotation.creator.id === self.options.user_id;
+      var isInstructor = self.options.instructors.indexOf(annotation.creator.id) > -1;
+      var isPeer = !isMine && !isInstructor;
+
+      if (isMine && filteroptions.indexOf('mine') > -1) {
+        callback();
+      } else if (isInstructor && filteroptions.indexOf('instructor') > -1) {
+        callback();
+      } else if (isPeer && filteroptions.indexOf('peer') > -1) {
+        callback();
+      }
     });
     $.subscribeEvent('annotationLoaded', self.instance_id, function (_, annotation) {
       self.addAnnotation(annotation, false, true);
@@ -39823,7 +39935,7 @@ __webpack_require__(9);
         };
 
         img.onerror = function (e) {
-          console.log('error', e);
+          // console.log('error', e);
           img.style = 'display: none';
           jQuery(img).after('<button class="zoom-to-error-button" style="background:#ededed; color: black; border-radius: 5px; border: 1px solid #333;">Zoom to annotation</button>');
         };
@@ -39837,7 +39949,7 @@ __webpack_require__(9);
   $.Sidebar.prototype.addAnnotation = function (annotation, updating, shouldAppend) {
     var self = this; // console.log("7. Should add Annotation to viewer", annotation)
 
-    if (annotation.media !== "comment" && annotation.text !== "" && $.exists(annotation.tags)) {
+    if (annotation.media !== "comment" && annotation.media !== "Annotation" && $.exists(annotation.tags)) {
       var ann = annotation;
       ann.index = jQuery('.ann-item').length;
       ann.instructor_ids = self.options.instructors;
@@ -39942,6 +40054,37 @@ __webpack_require__(9);
       $.publishEvent('displayShown', self.instance_id, [jQuery('.item-' + ann.id), ann]);
       jQuery('#empty-alert').css('display', 'none');
       self.lazyLoadImages();
+    } else {
+      // console.log('Trying to add a comment', annotation);
+      try {
+        var ranges = annotation.ranges;
+        var source;
+
+        if (Array.isArray(ranges)) {
+          source = ranges[0].source;
+        } else {
+          source = ranges.source;
+        }
+
+        var parent_id = source;
+        $.publishEvent('GetSpecificAnnotationData', self.instance_id, [parent_id, function (annotation_data) {
+          // console.log(annotation_data);
+          annotation_data.totalReplies++;
+
+          if (annotation_data.media === "text") {
+            annotation_data._local.highlights.forEach(function (high) {
+              jQuery(high).data('annotation', annotation_data);
+            });
+          }
+
+          var viewers = jQuery('.item-' + annotation_data.id);
+          jQuery.each(viewers, function (index, viewer) {
+            $.publishEvent('addReplyToViewer', self.instance_id, [viewer, annotation, '', annotation_data]);
+          });
+        }]);
+      } catch (e) {
+        console.log("Error", annotation, e);
+      }
     }
   };
 
@@ -40044,8 +40187,7 @@ __webpack_require__(9);
   $.Sidebar.prototype.ViewerEditorClose = function (annotation, redraw, should_erase, editor) {
     jQuery('.editor-area.side').remove();
     jQuery('.edit').prop('disabled', false);
-    jQuery('.note-link-popover').remove();
-    $.publishEvent('editorHidden', self.instance_id, []);
+    jQuery('.note-link-popover').remove(); //$.publishEvent('editorHidden', self.instance_id, []);
 
     if (editor) {
       editor.find('.side.body').show();
@@ -40614,6 +40756,8 @@ __p += '" aria-label="last updated ';
 __p += '">\n            created ';
  print(jQuery.timeago(date)); ;
 __p += '\n        </div>\n    ';
+ } else { ;
+__p += '\n        <div class="saving-message"><i class="fas fa-spinner fa-spin"></i> Saving... </div>\n    ';
  } ;
 __p += '\n    </div>\n    <button class="edit" id="edit-' +
 ((__t = ( id )) == null ? '' : __t) +
@@ -40673,7 +40817,11 @@ __e( tagItem.replace(/"/g, '&quot;') ) +
  }); ;
 __p += '\n        </div>\n    ';
  } ;
-__p += '\n\n    <div class="plugin-area-bottom"></div>\n        <!-- ';
+__p += '\n    ';
+ if( typeof(created) !== 'undefined') { ;
+__p += '\n    <div class="plugin-area-bottom"></div>\n    ';
+ } ;
+__p += '\n        <!-- ';
  if (typeof(totalReplies) == "undefined" || totalReplies === 0) { ;
 __p += '\n            <button class=\'create-reply\'>Reply to Annotation</button>\n        ';
  } else { ;
@@ -40705,7 +40853,7 @@ return __p
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+/* WEBPACK VAR INJECTION */(function(jQuery) {function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 /**
  *  Summernote RichText Plugin
@@ -40822,8 +40970,8 @@ __webpack_require__(32);
       },
       toolbar: toolbar
     }, this.options); // console.log("After init options", this.options);
+    // console.log('SUMMERNOTE', this.options);
 
-    console.log('SUMMERNOTE', this.options);
     this.init();
     this.instanceID = instanceID;
     return this;
@@ -41664,12 +41812,10 @@ __webpack_require__(40);
 
   $.AdminButton.prototype.init = function () {
     var self = this;
-    console.log("here");
 
     if (self.options.AdminButton) {
       self.url = self.options.AdminButton.homeURL;
-      self.allowed = self.options.AdminButton.has_staff_permissions;
-      console.log(self.url, self.allowed);
+      self.allowed = self.options.AdminButton.has_staff_permissions; // console.log(self.url, self.allowed);
 
       if (self.allowed && self.url && self.url != '') {
         self.setUpButtons();
@@ -41909,6 +42055,195 @@ __webpack_require__(43);
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
+ *  Websockets Annotations Plugin
+ *  
+ *
+ */
+//uncomment to add css file
+//require('./filaname.css');
+(function ($) {
+  /**
+   * @constructor
+   * @params {Object} options - specific options for this plugin
+   */
+  $.Websockets = function (options, instanceID) {
+    this.options = jQuery.extend({}, options);
+    this.instanceID = instanceID;
+    this.init();
+    this.timerRetryInterval;
+    this.socket = null;
+    this.maxConnections = 10;
+    this.currentConnections = 0;
+    return this;
+  };
+  /**
+   * Initializes instance
+   */
+
+
+  $.Websockets.prototype.init = function () {
+    var self = this;
+    var valid_object_id = self.options.ws_object_id || self.options.object_id;
+    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + valid_object_id.replace(/[^a-zA-Z0-9-]/g, '');
+    self.setUpConnection();
+  };
+
+  $.Websockets.prototype.saving = function (annotation) {
+    return annotation;
+  };
+
+  $.Websockets.prototype.setUpConnection = function () {
+    var self = this;
+    self.currentConnections += 1;
+
+    if (self.currentConnections >= self.maxConnections) {
+      clearInterval(self.timerRetryInterval);
+      console.log("Reached max connection value");
+      return;
+    } // console.log("WS Options: ", self.slot_id, self.options, self.options.Websockets);
+
+
+    self.socket = self.openWs(self.slot_id, self.options.Websockets.wsUrl);
+
+    self.socket.onopen = function (e) {
+      self.onWsOpen(e);
+      self.currentConnections = 0;
+    };
+
+    self.socket.onmessage = function (e) {
+      var data = JSON.parse(e.data);
+      self.receiveWsMessage(data);
+    };
+
+    self.socket.onclose = function (e) {
+      self.onWsClose(e);
+    };
+  };
+
+  $.Websockets.prototype.receiveWsMessage = function (response) {
+    var self = this;
+    var message = response['message'];
+    var annotation = eval("(" + message + ")"); // console.log("WS:" + message)
+
+    self.convertAnnotation(annotation, function (wa) {
+      // console.log("YEH", response)
+      if (response['type'] === 'annotation_deleted') {
+        $.publishEvent('GetSpecificAnnotationData', self.instanceID, [wa.id, function (annotationFound) {
+          if (typeof annotationFound === "undefined") {
+            return;
+          }
+
+          if (wa.media !== 'comment') {
+            $.publishEvent('TargetAnnotationUndraw', self.instanceID, [annotationFound]);
+            jQuery('.item-' + wa.id).remove();
+          } else {
+            $.publishEvent('removeReply', self.instanceID, [wa]);
+            jQuery('.reply-item-' + wa.id).remove();
+          }
+        }]);
+        $.publishEvent('wsAnnotationDeleted', self.instanceID, [wa]);
+      } else {
+        $.publishEvent('wsAnnotationLoaded', self.instanceID, [wa, function () {
+          if (wa.media !== 'comment') {
+            if (response['type'] === 'annotation_updated') {
+              $.publishEvent('GetSpecificAnnotationData', self.instanceID, [wa.id, function (annotationFound) {
+                $.publishEvent('TargetAnnotationUndraw', self.instanceID, [annotationFound]);
+                $.publishEvent('TargetAnnotationDraw', self.instanceID, [wa]);
+              }]);
+            } else {
+              $.publishEvent('TargetAnnotationDraw', self.instanceID, [wa]);
+            }
+          }
+        }, response['type'] === 'annotation_updated']); // console.log("HERE:", wa)
+      }
+    });
+  };
+
+  $.Websockets.prototype.openWs = function (slot_id, wsUrl) {
+    var self = this;
+    var notificationSocket = new WebSocket('wss://' + wsUrl + '/ws/notification/' + slot_id + '/?utm_source=' + self.options.Websockets.utm + '&resource_link_id=' + self.options.Websockets.resource);
+    return notificationSocket;
+  };
+
+  $.Websockets.prototype.onWsOpen = function () {
+    var self = this;
+
+    if (self.timerRetryInterval) {
+      clearInterval(self.timerRetryInterval);
+      self.timerRetryInterval = undefined;
+    }
+  };
+
+  $.Websockets.prototype.onWsClose = function () {
+    var self = this;
+
+    if (!self.timerRetryInterval) {
+      self.timerRetryInterval = setInterval(function () {
+        // console.log('intervalrunning');
+        self.setUpConnection();
+      }, 30000);
+    }
+  };
+
+  Object.defineProperty($.Websockets, 'name', {
+    value: "Websockets"
+  });
+
+  $.Websockets.prototype.convertAnnotation = function (annotation, callBack) {
+    var self = this;
+
+    if (annotation && annotation.schema_version) {
+      // console.log("option 1");
+      return self.convertingFromWebAnnotations(annotation, callBack);
+    } else {
+      // console.log("option 2");
+      return self.convertingFromAnnotatorJS(annotation, callBack);
+    }
+  };
+
+  $.Websockets.prototype.convertingFromWebAnnotations = function (annotation, callBack) {
+    var self = this;
+    $.publishEvent('convertFromWebAnnotation', self.instanceID, [self.options.slot, annotation, callBack]);
+  };
+
+  $.Websockets.prototype.convertingFromAnnotatorJS = function (annotation, callBack) {
+    var self = this;
+    var ranges = annotation.ranges;
+    var rangeList = [];
+    ranges.forEach(function (range) {
+      rangeList.push({
+        'xpath': range,
+        'text': {
+          prefix: '',
+          exact: annotation.quote,
+          suffix: ''
+        }
+      });
+    });
+    var annotation = {
+      annotationText: [annotation.text],
+      created: annotation.created,
+      creator: annotation.user,
+      exact: annotation.quote,
+      id: annotation.id,
+      media: annotation.media,
+      tags: annotation.tags,
+      ranges: rangeList,
+      totalReplies: annotation.totalComments,
+      permissions: annotation.permissions
+    };
+    callBack(annotation);
+  };
+
+  $.plugins.push($.Websockets);
+})(Hxighlighter ? Hxighlighter : __webpack_require__(1));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 (function ($) {
@@ -41975,6 +42310,11 @@ __webpack_require__(43);
   $.Core.prototype.TargetAnnotationDraw = function (message) {
     var self = this;
     self.callFuncInList(this.targets, 'TargetAnnotationDraw', message);
+  };
+
+  $.Core.prototype.TargetAnnotationUndraw = function (message) {
+    var self = this;
+    self.callFuncInList(this.targets, 'TargetAnnotationUndraw', message);
   };
 
   $.Core.prototype.ViewerEditorOpen = function (message) {
@@ -42046,31 +42386,31 @@ __webpack_require__(43);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 46 */,
 /* 47 */,
 /* 48 */,
 /* 49 */,
 /* 50 */,
-/* 51 */
+/* 51 */,
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
  * 
  */
 //during deployment, this is what decides what gets instantiated, should be moved elsewhere
-__webpack_require__(52);
-
 __webpack_require__(53);
+
+__webpack_require__(54);
 
 __webpack_require__(23);
 
-__webpack_require__(54);
+__webpack_require__(55);
 
 __webpack_require__(31);
 
@@ -42080,15 +42420,15 @@ __webpack_require__(33);
 
 __webpack_require__(35);
 
-__webpack_require__(58);
+__webpack_require__(59);
 
-__webpack_require__(60);
-
-__webpack_require__(62);
+__webpack_require__(61);
 
 __webpack_require__(63);
 
-__webpack_require__(65);
+__webpack_require__(64);
+
+__webpack_require__(66);
 
 __webpack_require__(37);
 
@@ -42097,6 +42437,8 @@ __webpack_require__(39);
 __webpack_require__(41);
 
 __webpack_require__(42);
+
+__webpack_require__(44);
 
 (function ($) {
   /**
@@ -42353,7 +42695,9 @@ __webpack_require__(42);
       var optionsForStorage;
 
       try {
-        optionsForStorage = jQuery.extend({}, self.options, self.options[storage.name]) || {};
+        optionsForStorage = jQuery.extend({
+          'media': 'text'
+        }, self.options, self.options[storage.name]) || {};
       } catch (e) {
         optionsForStorage = {};
       }
@@ -42439,6 +42783,11 @@ __webpack_require__(42);
 
   $.TextTarget.prototype.TargetAnnotationDraw = function (annotation) {
     var self = this;
+
+    if (Object.keys(annotation.ranges[0]).indexOf('parent') > -1) {
+      return;
+    }
+
     jQuery.each(self.drawers, function (_, drawer) {
       drawer.draw(annotation);
     });
@@ -42462,9 +42811,12 @@ __webpack_require__(42);
 
   $.TextTarget.prototype.TargetAnnotationUndraw = function (annotation) {
     var self = this;
-    jQuery.each(self.drawers, function (_, drawer) {
-      drawer.undraw(annotation);
-    });
+
+    if (annotation.media !== "Annotation") {
+      jQuery.each(self.drawers, function (_, drawer) {
+        drawer.undraw(annotation);
+      });
+    }
   };
   /**
    * { function_description }
@@ -42513,8 +42865,12 @@ __webpack_require__(42);
     }
 
     jQuery.each(self.viewers, function (_, viewer) {
-      viewer.ViewerEditorClose(annotation);
+      var timer = new Date();
+      viewer.ViewerEditorClose(annotation); // console.log("Finished: " + (new Date() - timer) + 'ms')
     });
+    setTimeout(function () {
+      $.publishEvent('editorHidden', self.instance_id, []);
+    }, 50);
     return annotation;
   };
   /**
@@ -42632,7 +42988,7 @@ __webpack_require__(42);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -42755,7 +43111,7 @@ var hrange = __webpack_require__(4);
 })(Hxighlighter ? Hxighlighter : __webpack_require__(1));
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -42834,8 +43190,20 @@ var hrange = __webpack_require__(4);
   };
 
   $.XPathDrawer.prototype.draw = function (annotation) {
-    var self = this; // console.log(self.options, annotation);
+    var self = this;
+
+    if (annotation.media.toLowerCase() !== "text") {
+      return;
+    } // console.log(self.options, annotation);
     // console.log("Annotation Being Drawn", annotation);
+    // checks to see if annotation has already been drawn, if so it undraws it
+
+
+    var existing_drawn_annotation = self.getSpecificAnnotationData(annotation.id);
+
+    if (existing_drawn_annotation) {
+      self.undraw(existing_drawn_annotation);
+    }
 
     self.tempHighlights.forEach(function (hl) {
       jQuery(hl).contents().unwrap();
@@ -42970,12 +43338,12 @@ var hrange = __webpack_require__(4);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(55);
+/* WEBPACK VAR INJECTION */(function(jQuery, _) {/* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(56);
 /* harmony import */ var _css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_floatingviewer_css__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var jquery_confirm__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_confirm__WEBPACK_IMPORTED_MODULE_1__);
@@ -42996,14 +43364,14 @@ var annotator = annotator ? annotator : __webpack_require__(7);
       // set up template names that will be pulled
       TEMPLATENAMES: ["editor", "viewer"],
       TEMPLATES: {
-        editor: __webpack_require__(56),
-        viewer: __webpack_require__(57)
+        editor: __webpack_require__(57),
+        viewer: __webpack_require__(58)
       },
       template_suffix: "floating",
       template_urls: ""
     };
-    this.options = jQuery.extend({}, defaultOptions, options);
-    console.log("Floating options", this.options);
+    this.options = jQuery.extend({}, defaultOptions, options); // console.log("Floating options", this.options);
+
     this.instance_id = inst_id;
     this.annotation_tool = {
       interactionPoint: null,
@@ -43119,11 +43487,11 @@ var annotator = annotator ? annotator : __webpack_require__(7);
     }); // closes the editor tool and does not save annotation
 
     self.annotation_tool.editor.find('.cancel').click(function () {
-      console.log("HERE", annotation, !updating, true);
       $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, true]);
     }); // closes the editor and does save annotations
 
     self.annotation_tool.editor.find('.save').click(function () {
+      var timer = new Date();
       var text = self.annotation_tool.editor.find('#annotation-text-field').val();
 
       if (updating) {
@@ -43131,7 +43499,9 @@ var annotator = annotator ? annotator : __webpack_require__(7);
       }
 
       annotation.annotationText.push(text);
+      var timer2 = new Date();
       $.publishEvent('ViewerEditorClose', self.instance_id, [annotation, !updating, false]);
+      var end = new Date(); // console.log("Finished Save Call: " + (end - timer) + " ms : " + (end - timer2) + 'ms');
     });
     self.annotation_tool.editor.find('#annotation-text-field').val(annotation.annotationText);
     setTimeout(function () {
@@ -43143,9 +43513,9 @@ var annotator = annotator ? annotator : __webpack_require__(7);
 
   $.FloatingViewer.prototype.ViewerEditorClose = function (annotation, redraw, should_erase) {
     var self = this;
+    var timer = new Date();
     jQuery('.edit').prop('disabled', false);
     jQuery('.note-link-popover').remove();
-    $.publishEvent('editorHidden', self.instance_id, []);
 
     if (self.annotation_tool.editor) {
       self.annotation_tool.editor.remove();
@@ -43153,7 +43523,8 @@ var annotator = annotator ? annotator : __webpack_require__(7);
 
     delete self.annotation_tool.editor;
     self.annotation_tool.editing = false;
-    self.annotation_tool.updating = false; // jQuery('body').css('overflow-y', 'scroll');
+    self.annotation_tool.updating = false; //$.publishEvent('editorHidden', self.instance_id, []);
+    // jQuery('body').css('overflow-y', 'scroll');
   };
 
   $.FloatingViewer.prototype.ViewerDisplayOpen = function (event, anns) {
@@ -43246,7 +43617,6 @@ var annotator = annotator ? annotator : __webpack_require__(7);
       return;
     }
 
-    console.log('should hide display');
     clearTimeout(self.hideTimer);
     self.hideTimer = setTimeout(function () {
       if (self.hideTimer) {
@@ -43432,13 +43802,13 @@ var annotator = annotator ? annotator : __webpack_require__(7);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = function(obj) {
@@ -43455,7 +43825,7 @@ return __p
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(_, jQuery) {module.exports = function(obj) {
@@ -43512,7 +43882,7 @@ return __p
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2), __webpack_require__(0)))
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43521,7 +43891,7 @@ return __p
  *
  */
 //uncomment to add css file
-__webpack_require__(59);
+__webpack_require__(60);
 
 (function ($) {
   /**
@@ -43578,13 +43948,13 @@ __webpack_require__(59);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -43592,7 +43962,7 @@ __webpack_require__(59);
  *  
  *
  */
-__webpack_require__(61);
+__webpack_require__(62);
 
 (function ($) {
   /**
@@ -43712,13 +44082,13 @@ __webpack_require__(61);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -44267,8 +44637,7 @@ __webpack_require__(61);
     return r;
   };
 
-  $.KeyboardSelector.prototype.addMarkers = function (ranges) {
-    console.log(ranges);
+  $.KeyboardSelector.prototype.addMarkers = function (ranges) {// console.log(ranges);
   };
 
   $.KeyboardSelector.prototype.removeCharacter = function (s, offset) {
@@ -44302,7 +44671,7 @@ __webpack_require__(61);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44310,7 +44679,7 @@ __webpack_require__(61);
  *  
  *
  */
-__webpack_require__(64);
+__webpack_require__(65);
 
 (function ($) {
   /**
@@ -44380,13 +44749,13 @@ __webpack_require__(64);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -44396,7 +44765,7 @@ __webpack_require__(64);
  */
 var annotator = annotator ? annotator : __webpack_require__(7); //uncomment to add css file
 
-__webpack_require__(66);
+__webpack_require__(67);
 
 (function ($) {
   /**
@@ -44494,26 +44863,26 @@ __webpack_require__(66);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
-/* 67 */,
 /* 68 */,
 /* 69 */,
 /* 70 */,
 /* 71 */,
 /* 72 */,
-/* 73 */
+/* 73 */,
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(74);
+module.exports = __webpack_require__(75);
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44524,7 +44893,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bootstrap_dist_css_bootstrap_theme_min_css__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
 /* harmony import */ var _fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_css_all_min_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(45);
+/* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(46);
 /* harmony import */ var _css_text_css__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_css_text_css__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -44540,11 +44909,9 @@ __webpack_require__(1);
 
 __webpack_require__(20);
 
-__webpack_require__(51);
+__webpack_require__(52);
 
-__webpack_require__(44);
-
-__webpack_require__(75);
+__webpack_require__(45);
 
 __webpack_require__(76);
 
@@ -44552,8 +44919,10 @@ __webpack_require__(77);
 
 __webpack_require__(78);
 
+__webpack_require__(79);
+
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {var hrange = __webpack_require__(4);
@@ -44618,8 +44987,7 @@ __webpack_require__(78);
 
     ann_to_save.created = new Date();
     var save_ann = self.convertToWebAnnotation(ann_to_save, jQuery(elem).find('.annotator-wrapper'));
-    self.store.push(save_ann);
-    console.log(self.store);
+    self.store.push(save_ann); // console.log(self.store);
   };
 
   $.TempJSON.prototype.StorageAnnotationDelete = function (ann_to_delete, elem) {
@@ -44635,8 +45003,7 @@ __webpack_require__(78);
       }
 
       return ann;
-    });
-    console.log(self.store);
+    }); // console.log(self.store);
   };
 
   $.TempJSON.prototype.convertToWebAnnotation = function (annotation, elem) {
@@ -45122,7 +45489,7 @@ __webpack_require__(78);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/**
@@ -45193,7 +45560,7 @@ __webpack_require__(78);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {(function ($) {
@@ -45288,7 +45655,7 @@ window.hxighlighter_launcher = new Hxighlighter.Launcher();
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)))
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin

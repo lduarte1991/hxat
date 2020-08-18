@@ -125,6 +125,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     "context_id": "{{ course }}",
                     "collection_id": "{{ collection }}",
                     "object_id": "{{ object }}",
+	            "ws_object_id": "{{ object }}",
                     "username": "{{ username }}",
                     "user_id": "{{ user_id }}",
                     "instructors": {{ assignment.course.course_admins | list_of_ids | safe }},
@@ -161,7 +162,9 @@ Text Annotation Tool | {{ target_object.target_title }}
                     Badges: {
                     },
                     Websockets: {
-                        wsUrl: window.location.hostname
+                        wsUrl: window.location.hostname,
+                        utm: "{{ utm_source }}",
+                        resource: "{{ resource_link_id }}"
                     },
                     AdminButton: {
                         {% if is_instructor %}
