@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.2.0 - Tuesday, July 28th, 2020, 3:11:30 PM  
+// [AIV_SHORT]  Version: 1.3.1 - Wednesday, August 19th, 2020, 9:58:45 AM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -28331,7 +28331,9 @@ function getNodeFromXpath(root, xpath, offset, ignoreSelector) {
   tree.forEach(function (it) {
     var selector = it.replace(/\[.*\]/g, '');
     var counter = parseInt(it.replace(/.*?\[(.*)\]/g, '$1'), 10) - 1;
-    var foundNodes = traversingDown.querySelectorAll(selector);
+    var foundNodes = Array.prototype.filter.call(traversingDown.children, function (el1) {
+      return el1.matches(selector);
+    });
     foundNodes = [].slice.call(foundNodes).filter(function (node) {
       return node.className.indexOf(ignoreSelector) == -1;
     }); // //console.log(foundNodes, counter);
