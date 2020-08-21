@@ -1,3 +1,4 @@
+import logging
 from .base import *
 
 # for harvardx tests
@@ -14,11 +15,46 @@ DATABASES = {
     },
 }
 
+logging = LOGGING['loggers'].update({
+    'oauthlib.oauth1.rfc5849': {
+        'level': 'DEBUG',
+        'handlers': ['default', 'console'],
+        'propagate': False,
+    },
+
+    'oauthlib.oauth1.rfc5849.request_validator': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.utils': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints.base': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+   'oauthlib.oauth1.rfc5849.endpoints.signature_only': {
+       'level': 'DEBUG',
+       'handlers': ['default', 'console'],
+       'propagate': False,
+   },
+
+})
+
 # test lti consumer keys
 CONSUMER_KEY = 'consumer_key_for_test'
 LTI_SECRET = 'lti_secret_for_test'
-TEST_COURSE = 'test_course'
-TEST_COURSE_LTI_SECRET = 'lti_secret_for_test_course'
+TEST_COURSE = 'test_course_from_LTI_SECRET_DICT'
+TEST_COURSE_LTI_SECRET = 'lti_secret_from_LTI_SECRET_DICT'
 LTI_SECRET_DICT = {
         TEST_COURSE: TEST_COURSE_LTI_SECRET,
         }
@@ -26,6 +62,12 @@ LTI_SECRET_DICT = {
 ANNOTATION_DB_URL = 'http://default.annotation.db.url.org'
 ANNOTATION_DB_API_KEY = 'default_annotation_db_api_key'
 ANNOTATION_DB_SECRET_TOKEN = 'default_annotation_db_secret_token'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
 
 # redefine logging configs to NOT log in files, just console thank you
 LOGGING = {
@@ -49,7 +91,7 @@ LOGGING = {
         },
     },
     'root': {
-        'level': logging.INFO,
+        'level': 'INFO',
         'handlers': ['console'],
     },
     'loggers': {

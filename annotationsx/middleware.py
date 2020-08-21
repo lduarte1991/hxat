@@ -241,6 +241,8 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                         resource_link_id=request.POST.get('resource_link_id'))
             except LTILaunchError as e:
                 self.logger.debug("LTILaunchError: {}".format(e))
+                for k,v in vars(request.session).items():
+                    self.logger.debug("*-*-*-*- SESSION[{}]: {}".format(k,v))
                 return HttpResponseBadRequest()
             except Exception as e:
                 self.logger.debug("Exception: {}".format(e))
@@ -257,30 +259,8 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         '''
         Validates an LTI launch request.
         '''
-        consumer_key = getattr(settings, 'CONSUMER_KEY', None)
-        try:
-            secret = settings.LTI_SECRET_DICT[request.POST.get('context_id')]
-        except KeyError:
-            secret = settings.LTI_SECRET
-
-        # 21feb20 naomi: note that we allow secret to be empty string!
-        if consumer_key is None or secret is None:
-            self.logger.error("missing consumer key/secret: %s/%s" % (consumer_key, secret))
-            raise PermissionDenied
-
-        request_key = request.POST.get('oauth_consumer_key', None)
-        if request_key is None:
-            self.logger.error("request doesn't contain an oauth_consumer_key; can't continue.")
-            raise PermissionDenied
-
-        if request_key != consumer_key:
-            self.logger.error("could not get a secret for requested key: %s" % request_key)
-            raise PermissionDenied
-
-        self.logger.debug('using key/secret %s/%s' % (request_key, secret))
-        tool_provider = DjangoToolProvider.from_django_request(
-            secret, request=request)
         validator = LTIRequestValidator()
+        tool_provider = DjangoToolProvider.from_django_request(request=request)
 
         postparams = request.POST.dict()
         self.logger.debug('request is secure: %s' % request.is_secure())

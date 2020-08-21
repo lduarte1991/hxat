@@ -1,0 +1,4 @@
+-r ../annotationsx/requirements/test.txt
+
+locustio==0.14.6
+websocket-client

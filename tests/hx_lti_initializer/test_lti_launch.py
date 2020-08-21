@@ -234,15 +234,15 @@ def test_launchLti_unknown_consumer(
 
 
 @pytest.mark.django_db
-def test_launchLti_missing_consumer(
+def test_launchLti_missing_context_id(
         lti_path,
         lti_launch_url,
         course_user_lti_launch_params
         ):
     course, user, launch_params = course_user_lti_launch_params
 
-    # delete consumer
-    del(launch_params['oauth_consumer_key'])
+    # delete context_id
+    del(launch_params['context_id'])
     client = Client(enforce_csrf_checks=False)
     response = client.post(
             lti_path,
@@ -283,6 +283,103 @@ def test_launchLti_missing_required_param(
             )
     assert(response.status_code == 400)
 
+
+@pytest.mark.django_db
+def test_launchLti_from_LTIdict_ok(
+        lti_path,
+        lti_launch_url,
+        course_instructor_factory,
+        ):
+    course, user = course_instructor_factory()
+    course.course_id = settings.TEST_COURSE  # force context_id
+    consumer = ToolConsumer(
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.TEST_COURSE_LTI_SECRET,
+            launch_url=lti_launch_url,
+            params={
+                'lti_message_type': 'basic-lti-launch-request',
+                'lti_version': 'LTI-1p0',
+                'resource_link_id': 'FakeResourceLinkID',
+                'lis_person_sourcedid': user.name,
+                'lis_outcome_service_url': 'fake_url',
+                'user_id': user.anon_id,
+                'roles': ['Instructor'],
+                'context_id': course.course_id,
+                },
+            )
+    params = consumer.generate_launch_data()
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=params,
+            )
+    assert(response.status_code == 200)
+
+
+@pytest.mark.django_db
+def test_launchLti_from_LTIdict_unknown_consumer(
+        lti_path,
+        lti_launch_url,
+        course_instructor_factory,
+        ):
+    course, user = course_instructor_factory()
+    course.course_id = settings.TEST_COURSE  # force context_id
+    consumer = ToolConsumer(
+            consumer_key='unknown_consumer',
+            consumer_secret=settings.TEST_COURSE_LTI_SECRET,
+            launch_url=lti_launch_url,
+            params={
+                'lti_message_type': 'basic-lti-launch-request',
+                'lti_version': 'LTI-1p0',
+                'resource_link_id': 'FakeResourceLinkID',
+                'lis_person_sourcedid': user.name,
+                'lis_outcome_service_url': 'fake_url',
+                'user_id': user.anon_id,
+                'roles': ['Instructor'],
+                'context_id': course.course_id,
+                },
+            )
+    params = consumer.generate_launch_data()
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=params,
+            )
+    assert(response.status_code == 403)
+
+
+@pytest.mark.django_db
+def test_launchLti_from_LTIdict_wrong_secret(
+        lti_path,
+        lti_launch_url,
+        course_instructor_factory,
+        ):
+    course, user = course_instructor_factory()
+    consumer = ToolConsumer(
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.TEST_COURSE_LTI_SECRET,
+            launch_url=lti_launch_url,
+            params={
+                'lti_message_type': 'basic-lti-launch-request',
+                'lti_version': 'LTI-1p0',
+                'resource_link_id': 'FakeResourceLinkID',
+                'lis_person_sourcedid': user.name,
+                'lis_outcome_service_url': 'fake_url',
+                'user_id': user.anon_id,
+                'roles': ['Instructor'],
+                'context_id': course.course_id,
+                },
+            )
+    params = consumer.generate_launch_data()
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=params,
+            )
+    assert(response.status_code == 403)
 
 #
 # TODO: not able to force a query string using django.test.Client

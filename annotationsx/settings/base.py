@@ -47,6 +47,8 @@ if allowed_hosts_other:
 
 # Application definition
 INSTALLED_APPS = (
+    'channels',
+    'notification',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -228,6 +230,16 @@ LOGGING = {
             'handlers': ['default', 'console'],
             'propagate': False,
         },
+        'annotationsx.lti_validators': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
+        'notification': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
     },
 }
 
@@ -301,3 +313,22 @@ if ORGANIZATION == "ATG":
     pass
 elif ORGANIZATION == "HARVARDX":
     pass
+
+# channels for notification
+ASGI_APPLICATION = 'annotationsx.routing.application'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(REDIS_HOST, REDIS_PORT)],
+        },
+    }
+}
+HXAT_NOTIFY_ERRORLOG = os.environ.get('HXAT_NOTIFY_ERRORLOG', 'false').lower() == 'true'
+
+# time-to-live for ws auth
+WS_JWT_TTL = os.environ.get('WS_JWT_TTL', 300)
+
+

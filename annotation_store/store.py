@@ -6,10 +6,14 @@ from lti.contrib.django import DjangoToolProvider
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
 
+import channels.layers
+from asgiref.sync import async_to_sync
+
 import json
 import requests
 import logging
 import urllib
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +23,7 @@ ANNOTATION_DB_API_KEY = settings.ANNOTATION_DB_API_KEY
 ANNOTATION_DB_SECRET_TOKEN = settings.ANNOTATION_DB_SECRET_TOKEN
 ANNOTATION_STORE_SETTINGS = getattr(settings, 'ANNOTATION_STORE', {})
 ORGANIZATION = getattr(settings, 'ORGANIZATION', None)
+
 
 class AnnotationStore(object):
     '''
@@ -479,6 +484,7 @@ class WebAnnotationStoreBackend(StoreBackend):
 
     def root(self, annotation_id):
         self.logger.info(u"MethodType: %s" % self.request.method)
+        self.channel_layer = channels.layers.get_channel_layer()
         if self.request.method == "GET":
             self.before_search()
             response = self.search()
@@ -582,6 +588,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('create response status_code=%s' % response.status_code)
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_created', cleaned_annotation)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def update(self, annotation_id):
@@ -595,6 +604,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('update response status_code=%s' % response.status_code)
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_updated', cleaned_annotation)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
     def delete(self, annotation_id):
@@ -606,7 +618,11 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('delete response status_code=%s' % response.status_code)
+        if response.status_code == 200:
+            cleaned_annotation = json.loads(response.content)
+            self.send_annotation_notification('annotation_deleted', cleaned_annotation)
         return HttpResponse(response)
+
 
     def _get_tool_provider(self):
         try:
@@ -630,6 +646,7 @@ class WebAnnotationStoreBackend(StoreBackend):
         return DjangoToolProvider.from_django_request(
             lti_secret, request=self.request)
 
+
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
@@ -649,6 +666,33 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.outcome = outcome
         except Exception as e:
             self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+
+
+    def send_annotation_notification(self, message_type, annotation):
+        # target_source_id from session guarantees it's a sequential integer id from
+        # hxat db; image annotations have the uri as target_source_id in `platform`
+        pat = re.compile('[^a-zA-Z0-9-.]')
+        context_id = pat.sub('-', self.request.LTI["hx_context_id"])
+        collection_id = pat.sub('-', self.request.LTI["hx_collection_id"])
+        target_source_id = self.request.LTI["hx_object_id"]
+
+        group = '{}--{}--{}'.format(re.sub('[^a-zA-Z0-9-.]', '-', context_id), collection_id, target_source_id)
+        self.logger.info("###### action({}) group({}) id({})".format(
+            message_type, group, annotation.get('id', 'unknown_id')))
+        try:
+            async_to_sync(self.channel_layer.group_send)(group, {
+                'type': 'annotation_notification',
+                'message': annotation,
+                'action': message_type,
+            })
+        except Exception as e:
+            # while transitioning to websockets, it might be that a redis backend is not
+            # available and notifications are not really being used; to avoid clogging
+            # logs, just printing error; to print the error stack set env var
+            # "HXAT_NOTIFY_ERRORLOG=true"
+            msg = "##### unable to notify: action({}) group({}) id({}): {}".format(
+                    message_type, group, annotation.get('id', 'unknown_id'), e)
+            self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
 
 """
 05mar20 naomi: (item1) right now the assumption is that, at least at course
