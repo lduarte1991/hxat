@@ -32,8 +32,8 @@ class LTICourseAdmin(admin.ModelAdmin):
         return str(self.course_id)
 
 class LTIResourceLinkConfigAdmin(admin.ModelAdmin):
-    list_display = ('id', 'collection_id', 'object_id', 'resource_link_id')
-    search_fields = ('collection_id', )
+    list_display = ('id', 'assignment_target', 'resource_link_id')
+    search_fields = ('resource_link_id',)
 
 
 class SessionAdmin(admin.ModelAdmin):

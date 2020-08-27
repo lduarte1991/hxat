@@ -3,6 +3,7 @@ import pytest
 
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.models import LTIProfile
+from hx_lti_initializer.models import LTIResourceLinkConfig
 
 
 @pytest.mark.django_db
@@ -64,4 +65,69 @@ def test_LTICourse_get_all_courses(user_profile_factory):
     assert(isinstance(list_of_courses3, list))
     assert(len(list_of_courses3) == 2)
 
+@pytest.mark.django_db
+def test_LTIResourceLinkConfig_create(random_assignment_target):
+    assignment = random_assignment_target['assignment']
+    target_object = random_assignment_target['target_object']
+    assignment_target = random_assignment_target['assignment_target']
+    resource_link_id = 'FakeResourceLinkID'
 
+    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target, 
+    )
+    assert(isinstance(lti_resource_link_config, LTIResourceLinkConfig))
+    assert(lti_resource_link_config.resource_link_id == resource_link_id)
+    assert(assignment_target.assignment.pk == assignment.pk)
+    assert(assignment_target.target_object.pk == target_object.pk)
+
+    lti_resource_link_config.delete()
+
+@pytest.mark.django_db
+def test_LTIResourceLinkConfig_target_object_removed_from_assignment(random_assignment_target):
+    assignment = random_assignment_target['assignment']
+    target_object = random_assignment_target['target_object']
+    assignment_target = random_assignment_target['assignment_target']
+    resource_link_id = 'FakeResourceLinkID'
+
+    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
+
+    assert(LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
+    assignment.assignment_objects.remove(target_object)
+    assert(not LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
+
+@pytest.mark.django_db
+def test_LTIResourceLinkConfig_target_object_deleted(random_assignment_target):
+    assignment = random_assignment_target['assignment']
+    target_object = random_assignment_target['target_object']
+    assignment_target = random_assignment_target['assignment_target']
+    resource_link_id = 'FakeResourceLinkID'
+
+    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
+
+    assert(LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
+    deleted_target_object = target_object.delete()
+    assert(deleted_target_object)
+    assert(not LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
+
+@pytest.mark.django_db
+def test_LTIResourceLinkConfig_assignment_deleted(random_assignment_target):
+    assignment = random_assignment_target['assignment']
+    assignment_target = random_assignment_target['assignment_target']
+    resource_link_id = 'FakeResourceLinkID'
+
+    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
+
+    assert(LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
+    deleted_assignment = assignment.delete()
+    assert(deleted_assignment)
+    assert(not LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).exists())
