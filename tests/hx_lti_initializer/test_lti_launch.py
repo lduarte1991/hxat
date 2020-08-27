@@ -49,8 +49,6 @@ def test_launchLti_session_ok(
     )
     assert(response.status_code == 200)
     assert(response.cookies.get('sessionid'))
-    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
 
     # check some info in session
     assert(client.session is not None)
@@ -110,10 +108,8 @@ def test_launchLti_user_course_created_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 302)
+    assert(response.status_code == 200)
     assert(response.cookies.get('sessionid'))
-    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -160,10 +156,8 @@ def test_launchLti_user_course_ok_no_context_title(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 302)
+    assert(response.status_code == 200)
     assert(response.cookies.get('sessionid'))
-    expected_url = reverse('hx_lti_initializer:course_admin_hub') + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -506,8 +500,6 @@ def test_launchLti_starting_resource(random_assignment_target):
             target_path,
             data=params,
             )
-    assert(response.status_code == 302)
+    assert(response.status_code == 200)
 
-    expected_url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,assignment.assignment_id,target_object.pk]) + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
 
