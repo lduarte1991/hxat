@@ -36,12 +36,10 @@ def test_api_root_default_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params['resource_link_id']
-    resource_config = LTIResourceLinkConfig(
-            resource_link_id=resource_link_id,
-            collection_id=assignment.assignment_id,
-            object_id=target_object.id,
-            )
-    resource_config.save()
+    resource_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
@@ -155,14 +153,12 @@ def test_api_root_default_no_starting_resource(
     assignment = assignment_target.assignment
     assignment.save()
 
-    # 2. no starting resource
+    # 2. set starting resource
     #resource_link_id = launch_params['resource_link_id']
-    #resource_config = LTIResourceLinkConfig(
-    #        resource_link_id=resource_link_id,
-    #        collection_id=assignment.assignment_id,
-    #        object_id=target_object.id,
-    #        )
-    #resource_config.save()
+    #resource_config = LTIResourceLinkConfig.objects.create(
+    #    resource_link_id=resource_link_id,
+    #    assignment_target=assignment_target,
+    #)
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
@@ -201,12 +197,10 @@ def test_api_root_backend_from_request_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params['resource_link_id']
-    resource_config = LTIResourceLinkConfig(
-            resource_link_id=resource_link_id,
-            collection_id=assignment.assignment_id,
-            object_id=target_object.id,
-            )
-    resource_config.save()
+    resource_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
@@ -280,7 +274,8 @@ def test_api_root_backend_from_request_ok(
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy'.format(path, annojs_id)
+    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
+            path, annojs_id, resource_link_id)
     response = client.put(
             path_with_id,
             data=annojs,
@@ -288,10 +283,10 @@ def test_api_root_backend_from_request_ok(
             HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
             )
     assert response.status_code == 200
+
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 3
     assert content == annojs
-
 
     # delete request
     response = client.delete(
@@ -328,12 +323,10 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params['resource_link_id']
-    resource_config = LTIResourceLinkConfig(
-            resource_link_id=resource_link_id,
-            collection_id=assignment.assignment_id,
-            object_id=target_object.id,
-            )
-    resource_config.save()
+    resource_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
@@ -361,7 +354,8 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
 
     annotation_store_urls = {}
     for op in ['search']:  # search preserve params request to hxat
-        annotation_store_urls[op] = '{}/?version=catchpy&collectionId={}&resource_link_id={}'.format(
+        annotation_store_urls[op] = \
+            '{}/?version=catchpy&collectionId={}&resource_link_id={}'.format(
                 assignment.annotation_database_url,
                 assignment.assignment_id,
                 resource_link_id,
@@ -401,7 +395,8 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy'.format(path, annojs_id)
+    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
+            path, annojs_id, resource_link_id)
     response = client.put(
             path_with_id,
             data=annojs,
@@ -414,8 +409,8 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     assert content == annojs
 
     # delete request
-    path_delete = '{}/{}?version=catchpy&collectionId={}'.format(
-            path, annojs_id, assignment.assignment_id)
+    path_delete = '{}/{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
+            path, annojs_id, assignment.assignment_id, resource_link_id)
 
     response = client.delete(
             path_delete,
@@ -471,12 +466,10 @@ def test_api_root_webanno_grade_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params['resource_link_id']
-    resource_config = LTIResourceLinkConfig(
-            resource_link_id=resource_link_id,
-            collection_id=assignment.assignment_id,
-            object_id=target_object.id,
-            )
-    resource_config.save()
+    resource_config = LTIResourceLinkConfig.objects.create(
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
+    )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
@@ -554,7 +547,8 @@ def test_api_root_webanno_grade_ok(
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy'.format(path, annojs_id)
+    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
+            path, annojs_id, resource_link_id)
     response = client.put(
             path_with_id,
             data=annojs,
@@ -567,8 +561,8 @@ def test_api_root_webanno_grade_ok(
     assert content == annojs
 
     # delete request
-    path_delete = '{}/{}?version=catchpy&collectionId={}'.format(
-            path, annojs_id, assignment.assignment_id)
+    path_delete = '{}/{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
+            path, annojs_id, assignment.assignment_id, resource_link_id)
 
     response = client.delete(
             path_delete,

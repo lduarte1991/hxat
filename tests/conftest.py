@@ -52,12 +52,11 @@ def course_instructor_factory(user_profile_factory):
 @pytest.fixture
 def assignment_target_factory():
     def _assignment_target_factory(course):
-        target_object = TargetObject(
+        target_object = TargetObject.objects.create(
                 target_title='{} Title'.format(uuid.uuid4().hex),
                 target_author='John {}'.format(uuid.uuid4().int),
                 )
-        target_object.save()
-        assignment = Assignment(
+        assignment = Assignment.objects.create(
                 course=course,
                 assignment_name='Assignment {}'.format(uuid.uuid4().hex),
                 pagination_limit=settings.ANNOTATION_PAGINATION_LIMIT_DEFAULT,
@@ -66,13 +65,11 @@ def assignment_target_factory():
                 annotation_database_apikey = settings.ANNOTATION_DB_API_KEY,
                 annotation_database_secret_token = settings.ANNOTATION_DB_SECRET_TOKEN,
         )
-        assignment.save()
-        assignment_target = AssignmentTargets(
+        assignment_target = AssignmentTargets.objects.create(
                 assignment=assignment,
                 target_object=target_object,
                 order=1,
                 )
-        assignment_target.save()
         return assignment_target
 
     return _assignment_target_factory
