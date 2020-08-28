@@ -64,13 +64,18 @@ def launch_lti(request):
     #
     # The idea is that the combination of the LTI user_id (anon_id) and scope should be
     # globally unique.
-    user_scope = None
-    if settings.ORGANIZATION == "HARVARDX":
-        user_scope = "course:%s" % course
-    else:
-        tool_consumer_instance_guid = request.LTI['launch_params']['tool_consumer_instance_guid']
+    # 28aug20 naomi: see [1] at the bottom of file
+    if settings.ORGANIZATION == 'HARVARDX':  # meaning, edx
+        user_scope = 'course:{}'.format(course)
+    else:  # assumes canvas
+        tool_consumer_instance_guid = request.LTI['launch_params'].get(
+                'tool_consumer_instance_guid', None)
         if tool_consumer_instance_guid:
-            user_scope = "consumer:%s" % tool_consumer_instance_guid
+            user_scope = 'consumer:{}'.format(tool_consumer_instance_guid)
+        else:
+            logger.debug('organization({}) using user_scope:course({})'.format(
+                settings.ORGANIZATION, course))
+            user_scope = 'course:{}'.format(course)
     logger.debug("DEBUG - user scope is: %s" % user_scope)
 
     # default to student
@@ -81,7 +86,6 @@ def launch_lti(request):
     # or 'Learner'
     roles = request.LTI['launch_params'][settings.LTI_ROLES]
     logger.debug("DEBUG - user logging in with roles: " + str(roles))
-
 
     # This is the name that we will show on the UI if provided...
     # EDX-NOTE: edx does not return the person's name!
@@ -217,8 +221,7 @@ def launch_lti(request):
                 userfound.delete()
             except Exception as e:
                 logger.info("Not waiting to be added as Admin: {}".format(e))
-        logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
-        return access_annotation_target(request, course_id, assignment_id, object_id)
+        return access_annotation_target(request, course_id, collection_id, object_id)
     except AnnotationTargetDoesNotExist as e:
         logger.warning('Could not access annotation target using resource config.')
         logger.info('Deleting resource config because it is invalid.')
@@ -227,6 +230,7 @@ def launch_lti(request):
     except PermissionDenied as e:
         raise e  # make sure to re-raise this exception since we shouldn't proceed
     except Exception as e:
+        logger.debug('****** exception: {}'.format(e))
         # For the use case where the course head wants to display an assignment object instead
         # of the admin_hub upon launch (i.e. for embedded use), this allows the user
         # to be routed directly to an assignment given the correct POST parameters,
@@ -625,3 +629,32 @@ def change_starting_resource(request, assignment_id, object_id):
         data['response'] = 'Success: Deleted'
     
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+"""
+[1] tool_consumer_instance_id and user-scope
+
+* tool_consumer_instance_id is an OPTIONAL lti-param that identifies an instance of the
+  consumer/platform (because lti specs covers multi-tenancy, say, a hxat connected to 2
+  instances of edx: one from HUGSE and other from HX
+* hxat creates user/profile with lti-role in settings.ADMIN_ROLES (e.g. "Administrator",
+  "Instructor", "urn:lti:instrole:ims/lis/Administrator"). This is for authorization for
+  editing course, assignments, target objects, etc.
+* in edx, each course has a set of user-ids, meaning the same person can register for
+  different courses and in each course this person will have a different user-id; it's
+  called anonymous-id and has to do with privacy.
+* in canvas, the user-id is the same across the platform; so a canvas user-id identifies
+  the person.
+* So, hxat needs a user-id and user-scope to identify a person, for edx the user-scope
+  is the course, for canvas is the platform or the tool_consumer_instance_id.
+* as stated, tool_consumer_instance_id is OPTIONAL and the fact that the platform does
+  not include it in its lti-params means the platform expects the tool to be
+  single-tenancy and doesn't refer at all of to the user-scope.
+* this all means that settings.ORGANIZATION implies that, regarding user-scope:
+  . HARVARDX == user_scope is course as in edx
+  . !HARVARDX and consumer_instance == user_scope is platform_instance as in canvas
+  . !HARVARDX and !consumer_instance == user_scope assumes course as in edx
+* TODO: review user of ORGANIZATION; maybe lti 1.3 solves it? still depends on the
+  platform implementation of lti 1.3 though...
+
+"""

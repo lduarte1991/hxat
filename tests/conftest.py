@@ -140,6 +140,7 @@ def lti_launch_params_factory():
             with_grade=False,
             consumer_key=None,
             consumer_secret=None,
+            tool_consumer_instance_guid=None,
             ):
         params={
             'lti_message_type': 'basic-lti-launch-request',
@@ -155,6 +156,8 @@ def lti_launch_params_factory():
         if with_grade:
             params['lis_outcome_service_url'] = 'http://fake_url.com/'
             params['lis_result_sourcedid'] = '{}:{}:123'.format(course_id, resource_link_id)
+        if tool_consumer_instance_guid:
+            params['tool_consumer_instance_guid'] = tool_consumer_instance_guid
 
         consumer = ToolConsumer(
                 consumer_key=consumer_key if consumer_key else settings.CONSUMER_KEY,

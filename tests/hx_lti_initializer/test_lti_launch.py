@@ -117,6 +117,105 @@ def test_launchLti_user_course_created_ok(
     lti_profile = LTIProfile.objects.get(anon_id=instructor_edxid)
     assert(lti_profile is not None)
     assert(lti_profile.user.username == user.username)
+    # scope is course
+    assert(lti_profile.scope == 'course:{}'.format(course_id))
+
+    # check course was created
+    course = LTICourse.get_course_by_id(course_id)
+    assert(course is not None)
+    assert(len(LTICourse.get_all_courses()) == 1)
+    assert(course.course_admins.all()[0].anon_id == instructor_edxid)
+    assert(course.course_name == '{}+title'.format(course_id))
+
+
+@pytest.mark.django_db
+def test_launchLti_user_scope_canvas_created_ok(
+        lti_path,
+        lti_launch_url,
+        lti_launch_params_factory,
+        ):
+    # have to set ORGANIZATION to something else than HARVARDX
+    settings.ORGANIZATION = 'ATG'
+
+    # user and course don't exist yet
+    instructor_name = 'audre_lorde'
+    instructor_edxid = '{}{}'.format(randint(1000, 65534), randint(1000, 65534))
+    user_roles = ['Administrator']
+    course_id = 'hx+FancyCourse+TermCode+Year'
+    resource_link_id = 'some_string_to_be_the_FAKE_resource_link_id'
+    tool_consumer_instance_guid = 'canvas'
+
+    params = lti_launch_params_factory(
+            course_id=course_id,
+            user_name=instructor_name,
+            user_id=instructor_edxid,
+            user_roles=user_roles,
+            resource_link_id=resource_link_id,
+            launch_url=lti_launch_url,
+            course_name='{}+title'.format(course_id),
+            tool_consumer_instance_guid=tool_consumer_instance_guid,
+    )
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=params,
+            )
+    assert(response.status_code == 200)
+    assert(response.cookies.get('sessionid'))
+
+    # check user was created
+    user = User.objects.get(username=instructor_name)
+    assert(user is not None)
+    lti_profile = LTIProfile.objects.get(anon_id=instructor_edxid)
+    assert(lti_profile is not None)
+    assert(lti_profile.user.username == user.username)
+    # scope is consumer
+    assert(lti_profile.scope == 'consumer:{}'.format(tool_consumer_instance_guid))
+
+
+@pytest.mark.django_db
+def test_launchLti_user_scope_canvas_no_platform_created_ok(
+        lti_path,
+        lti_launch_url,
+        lti_launch_params_factory,
+        ):
+    # have to set ORGANIZATION to something else than HARVARDX
+    settings.ORGANIZATION = 'ATG'
+
+    # user and course don't exist yet
+    instructor_name = 'audre_lorde'
+    instructor_edxid = '{}{}'.format(randint(1000, 65534), randint(1000, 65534))
+    user_roles = ['Administrator']
+    course_id = 'hx+FancyCourse+TermCode+Year'
+    resource_link_id = 'some_string_to_be_the_FAKE_resource_link_id'
+
+    params = lti_launch_params_factory(
+            course_id=course_id,
+            user_name=instructor_name,
+            user_id=instructor_edxid,
+            user_roles=user_roles,
+            resource_link_id=resource_link_id,
+            launch_url=lti_launch_url,
+            course_name='{}+title'.format(course_id),
+    )
+
+    client = Client(enforce_csrf_checks=False)
+    response = client.post(
+            lti_path,
+            data=params,
+            )
+    assert(response.status_code == 200)
+    assert(response.cookies.get('sessionid'))
+
+    # check user was created
+    user = User.objects.get(username=instructor_name)
+    assert(user is not None)
+    lti_profile = LTIProfile.objects.get(anon_id=instructor_edxid)
+    assert(lti_profile is not None)
+    assert(lti_profile.user.username == user.username)
+    # scope is course
+    assert(lti_profile.scope == 'course:{}'.format(course_id))
 
     # check course was created
     course = LTICourse.get_course_by_id(course_id)
@@ -474,7 +573,7 @@ def test_launchLti_starting_resource(random_assignment_target):
 
     lti_resource_link_config = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id,
-        assignment_target=assignment_target, 
+        assignment_target=assignment_target,
     )
 
     consumer = ToolConsumer(
