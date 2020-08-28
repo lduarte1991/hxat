@@ -604,8 +604,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info('update response status_code=%s' % response.status_code)
+
         if response.status_code == 200:
-            cleaned_annotation = json.loads(response.content)
+            cleaned_annotation = json.loads(response.content.decode())
             self.send_annotation_notification('annotation_updated', cleaned_annotation)
         return HttpResponse(response.content, status=response.status_code, content_type='application/json')
 
@@ -619,7 +620,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             return self._response_timeout()
         self.logger.info('delete response status_code=%s' % response.status_code)
         if response.status_code == 200:
-            cleaned_annotation = json.loads(response.content)
+            cleaned_annotation = json.loads(response.content.decode())
             self.send_annotation_notification('annotation_deleted', cleaned_annotation)
         return HttpResponse(response)
 
