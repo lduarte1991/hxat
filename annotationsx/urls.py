@@ -15,6 +15,7 @@ urlpatterns = [
     path('500/', TemplateView.as_view(template_name="main/500.html")),
     path('troubleshooting/', TemplateView.as_view(template_name="main/troubleshooting.html")),
     path('notification/', include('notification.urls')),
+    path('csp/', include('csp_report.urls')),
     # TODO: Check to see if this works without enabling django_app_lti
     # Include the lti app's urls
     #url(r'^lti/', include((django_app_lti.urls, 'lti'), namespace="lti")),

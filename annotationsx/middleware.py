@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
 from lti.contrib.django import DjangoToolProvider
 import logging
 import json
@@ -244,6 +245,8 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                 for k,v in vars(request.session).items():
                     self.logger.debug("*-*-*-*- SESSION[{}]: {}".format(k,v))
                 return HttpResponseBadRequest()
+            except PermissionDenied as e:
+                return HttpResponseForbidden()
             except Exception as e:
                 self.logger.debug("Exception: {}".format(e))
                 # this potentially returns a 500:
@@ -293,7 +296,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
         self.logger.debug('restored query string: %s' % request.META['QUERY_STRING'])
 
         if not request_is_valid:
-            self.logger.error("signature check failed")
+            self.logger.error("signature check FAILED")
             raise PermissionDenied
 
         self.logger.info("signature verified")

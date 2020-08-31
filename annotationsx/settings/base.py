@@ -64,8 +64,10 @@ INSTALLED_APPS = (
     'annotation_store',
     'hx_lti_assignment',
     'target_object_database',
+    'csp_report',
 )
 
+# check for optional csp.middleware.CSPMiddleware at bottom of file
 MIDDLEWARE = (
     'django_cookies_samesite.middleware.CookiesSameSite',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -74,9 +76,7 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'annotationsx.middleware.ContentSecurityPolicyMiddleware',
     'annotationsx.middleware.MultiLTILaunchMiddleware',
-    #'annotationsx.middleware.SessionMiddleware',
     'annotationsx.middleware.ExceptionLoggingMiddleware',
 )
 
@@ -241,6 +241,16 @@ LOGGING = {
             'handlers': ['default', 'console'],
             'propagate': False,
         },
+        'csp.middleware': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
+        'csp_report': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default'],  # no reports on console(syslog)
+            'propagate': False,
+        },
     },
 }
 
@@ -251,7 +261,46 @@ LTI_ROLES = "roles"
 LTI_DEBUG = os.environ.get('DEBUG', SECURE_SETTINGS.get('debug', False))
 ADMIN_ROLES = literal_eval(os.environ.get('ADMIN_ROLES', str(SECURE_SETTINGS.get('ADMIN_ROLES', {'Administrator'}))))
 LTI_UNIQUE_RESOURCE_ID = 'resource_link_id'
-CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get('CONTENT_SECURITY_POLICY_DOMAIN', SECURE_SETTINGS.get('content_security_policy_domain', None))
+
+#CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get('CONTENT_SECURITY_POLICY_DOMAIN', SECURE_SETTINGS.get('content_security_policy_domain', None))
+# django-csp configs
+USE_CSP = os.environ.get('HXAT_USE_CSP', 'false').lower() == 'true'
+if USE_CSP:
+    import json
+    # generates reports without blocking resources, default is TRUE
+    CSP_REPORT_ONLY = os.environ.get('CSP_REPORT_ONLY', 'true').lower() == 'true'
+
+    csp_report_uri_env = os.environ.get('CSP_REPORT_URI', [])
+    try:
+        CSP_REPORT_URI = json.loads(csp_report_uri_env)
+    except Exception as e:
+        logging.getLogger(__name__).error(
+                'unable to parse CSP_REPORT_URI({}): {}'.format(
+                    csp_report_uri_env, e))
+        if CSP_REPORT_ONLY:
+            logging.getLogger(__name__).error(
+                    'error in CSP config: CSP_REPORT_ONLY with no CSP_REPORT_URI!')
+        raise RuntimeError(
+                'error in CSP config: CSP_REPORT_ONLY with no CSP_REPORT_URI')
+
+    csp_frame_ancestors_env = os.environ.get('CSP_FRAME_ANCESTORS', '[]')
+    try:
+        CSP_FRAME_ANCESTORS = json.loads(csp_frame_ancestors_env)
+    except Exception as e:
+        logging.getLogger(__name__).error(
+                'unable to parse CSP_FRAME_ANCESTORS({}): {}'.format(
+                    csp_frame_ancestors_env, e))
+        CSP_FRAME_ANCESTORS = ["'self'"]
+
+    CSP_DEFAULT_SRC = ["'self'"]
+    CSP_FONT_SRC = ["'self'", 'data:']
+    CSP_IMG_SRC = ["'self'", 'data:']
+    CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+    CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]
+
+    # add csp middleware
+    MIDDLEWARE = MIDDLEWARE + ('csp.middleware.CSPMiddleware',)
+# end of USE_CSP
 
 SERVER_NAME = os.environ.get('SERVER_NAME', SECURE_SETTINGS.get('SERVER_NAME', ''))
 ORGANIZATION = os.environ.get('ORGANIZATION', SECURE_SETTINGS.get('ORGANIZATION', ''))

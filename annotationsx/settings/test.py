@@ -137,6 +137,11 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
         },
+        'csp_report': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
     },
 }
 

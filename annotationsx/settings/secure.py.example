@@ -12,7 +12,6 @@ SECURE_SETTINGS = {
     'LTI_SECRET_DICT': {},
     'ORGANIZATION': '',
     'SERVER_NAME': 'localhost',
-    'X_FRAME_ALLOWED_SITES': {'canvas.localhost', 'edx.localhost'},
     'db_default_name': 'annotationsx',
     'db_default_user': 'annotationsx',
     'db_default_password': 'password',
