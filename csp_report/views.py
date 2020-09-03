@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["POST"])
 @csrf_exempt
 def csp_report(request):
-    if settings.USE_CSP and request.body:
+    if request.body:
         try:
             # make sure it's json
             data = json.loads(request.body.decode('utf-8'))
