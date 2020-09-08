@@ -101,8 +101,8 @@
         '<h3 class="popover-title"></h3>' +
         '<div class="popover-content text-center">'+
           '<div class="btn-group">'+
-            '<a class="btn" data-apply="confirmation"></a>'+
-            '<a class="btn" data-dismiss="confirmation"></a>'+
+            '<a class="btn bs-confirmation-apply"></a>'+
+            '<a class="btn bs-confirmation-dismiss"></a>'+
           '</div>'+
         '</div>'+
       '</div>'
@@ -141,7 +141,7 @@
     $tip.find('.popover-title')[o.html ? 'html' : 'text'](this.getTitle());
 
     // configure 'ok' button
-    $tip.find('[data-apply="confirmation"]')
+    $tip.find('.bs-confirmation-apply')
       .addClass(o.btnOkClass)
       .html(o.btnOkLabel)
       .prepend($('<i></i>').addClass(o.btnOkIcon), ' ')
@@ -154,14 +154,14 @@
 
     // add href to confirm button if needed
     if (o.href && o.href != "#") {
-      $tip.find('[data-apply="confirmation"]').attr({
+      $tip.find('.bs-confirmation-apply').attr({
         href: o.href,
         target: o.target
       });
     }
 
     // configure 'cancel' button
-    $tip.find('[data-dismiss="confirmation"]')
+    $tip.find('.bs-confirmation-dismiss')
       .addClass(o.btnCancelClass)
       .html(o.btnCancelLabel)
       .prepend($('<i></i>').addClass(o.btnCancelIcon), ' ')
