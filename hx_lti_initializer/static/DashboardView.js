@@ -793,7 +793,7 @@
             };
         });
         jQuery('.parentAnnotation [data-toggle="confirmation"]').confirmation({
-            sanitize: false,
+            sanitize: false,  // disabling sanitizer so that the ok/cancel buttons are rendered
             title: "Would you like to delete your annotation?",
             container: 'body',
             placement: 'left',
