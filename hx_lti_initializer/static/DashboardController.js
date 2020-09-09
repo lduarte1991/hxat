@@ -301,6 +301,7 @@
     	var parentId = annotation.parent;
 
     	button.confirmation({
+			sanitize: false,  // disabling sanitizer so that the ok/cancel buttons are rendered
 			title: "Would you like to delete your reply?",
 			container: "body",
 			onConfirm: function (){
