@@ -67,6 +67,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    'django_cookies_samesite.middleware.CookiesSameSite',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'annotationsx.middleware.CookielessSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -293,8 +294,10 @@ ANNOTATION_LOGGER_URL = os.environ.get('ANNOTATION_LOGGER_URL', SECURE_SETTINGS.
 ANNOTATION_STORE = os.environ.get('ANNOTATION_STORE', SECURE_SETTINGS.get("annotation_store", {}))
 ACCESSIBILITY = literal_eval(os.environ.get('ACCESSIBILITY', str(SECURE_SETTINGS.get('accessibility', True))))
 
-SESSION_COOKIE_SAMESITE = None
-CSRF_COOKIE_SAMESITE = None
+# replace when django 3.1, see https://github.com/jotes/django-cookies-samesite
+# due to chrome 80.X, see https://www.chromium.org/updates/same-site
+DCS_SESSION_COOKIE_SAMESITE = 'None'
+DCS_CSRF_COOKIE_SAMESITE = 'None'
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
