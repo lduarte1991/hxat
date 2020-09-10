@@ -47,13 +47,7 @@ def test_api_root_default_ok(
             lti_path,
             data=launch_params,
             )
-    assert response.status_code == 200
-
-    # pluck the jwt token from lti-launch response
-    content = response.content.decode()
-    assert 'token:' in content
-    parts = content.split('token:')
-    jwt_token = parts[1].split('"')[1]
+    assert response.status_code == 302
 
     # set responses to assert
     annojs = annotatorjs_annotation_factory(user)
@@ -92,7 +86,7 @@ def test_api_root_default_ok(
     # search request
     response = client.get(
             '{}?resource_link_id={}'.format(path, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -105,7 +99,7 @@ def test_api_root_default_ok(
                 path, annojs_id, resource_link_id),
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -118,7 +112,7 @@ def test_api_root_default_ok(
             path_with_id,
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -129,48 +123,12 @@ def test_api_root_default_ok(
     # delete request
     response = client.delete(
             path_with_id,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
     assert content == annojs
-
-
-@pytest.mark.django_db
-def test_api_root_default_no_starting_resource(
-        lti_path,
-        lti_launch_url,
-        course_user_lti_launch_params,
-        assignment_target_factory,
-        annotatorjs_annotation_factory,
-        catchpy_search_result_shell,
-        ):
-    # 1. create course, assignment, target_object, user
-    course, user, launch_params = course_user_lti_launch_params
-    assignment_target = assignment_target_factory(course)
-    target_object = assignment_target.target_object
-    assignment = assignment_target.assignment
-    assignment.save()
-
-    # 2. set starting resource
-    #resource_link_id = launch_params['resource_link_id']
-    #resource_config = LTIResourceLinkConfig.objects.create(
-    #    resource_link_id=resource_link_id,
-    #    assignment_target=assignment_target,
-    #)
-
-    # 3. lti launch
-    client = Client(enforce_csrf_checks=False)
-    response = client.post(
-            lti_path,
-            data=launch_params,
-            )
-    assert response.status_code == 200
-
-    # jwt token NOT present lti-launch response
-    content = response.content.decode()
-    assert 'token:' not in content
 
 
 @responses.activate
@@ -208,13 +166,18 @@ def test_api_root_backend_from_request_ok(
             lti_path,
             data=launch_params,
             )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert(response.cookies.get('sessionid'))
+    expected_url = reverse(
+            'hx_lti_initializer:access_annotation_target',
+            args=[course.course_id,assignment.assignment_id,target_object.pk]
+            ) + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
-    # pluck the jwt token from lti-launch response
-    content = response.content.decode()
-    assert 'token:' in content
-    parts = content.split('token:')
-    jwt_token = parts[1].split('"')[1]
+    # 4. access target object to be able to create annotations on it
+    #    this is required after live-updates implementation!
+    response = client.get(expected_url)
+    assert(response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
@@ -253,7 +216,7 @@ def test_api_root_backend_from_request_ok(
     # search request
     response = client.get(
             '{}?version=catchpy&resource_link_id={}'.format(path, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -266,7 +229,7 @@ def test_api_root_backend_from_request_ok(
                 path, annojs_id, resource_link_id),
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -280,7 +243,7 @@ def test_api_root_backend_from_request_ok(
             path_with_id,
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
             )
     assert response.status_code == 200
 
@@ -291,7 +254,7 @@ def test_api_root_backend_from_request_ok(
     # delete request
     response = client.delete(
             path_with_id,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -334,13 +297,18 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
             lti_path,
             data=launch_params,
             )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert(response.cookies.get('sessionid'))
+    expected_url = reverse(
+            'hx_lti_initializer:access_annotation_target',
+            args=[course.course_id,assignment.assignment_id,target_object.pk]
+            ) + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
-    # pluck the jwt token from lti-launch response
-    content = response.content.decode()
-    assert 'token:' in content
-    parts = content.split('token:')
-    jwt_token = parts[1].split('"')[1]
+    # 4. access target object to be able to create annotations on it
+    #    this is required after live-updates implementation!
+    response = client.get(expected_url)
+    assert(response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
@@ -387,7 +355,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
                 path, annojs_id, resource_link_id),
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -401,7 +369,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
             path_with_id,
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -414,7 +382,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
 
     response = client.delete(
             path_delete,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -426,7 +394,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     response = client.get(
             '{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
                 path, assignment.assignment_id, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -477,13 +445,18 @@ def test_api_root_webanno_grade_ok(
             lti_path,
             data=launch_params,
             )
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert(response.cookies.get('sessionid'))
+    expected_url = reverse(
+            'hx_lti_initializer:access_annotation_target',
+            args=[course.course_id,assignment.assignment_id,target_object.pk]
+            ) + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
-    # pluck the jwt token from lti-launch response
-    content = response.content.decode()
-    assert 'token:' in content
-    parts = content.split('token:')
-    jwt_token = parts[1].split('"')[1]
+    # 4. access target object to be able to create annotations on it
+    #    this is required after live-updates implementation!
+    response = client.get(expected_url)
+    assert(response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
@@ -539,7 +512,7 @@ def test_api_root_webanno_grade_ok(
                 path, annojs_id, resource_link_id),
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -553,7 +526,7 @@ def test_api_root_webanno_grade_ok(
             path_with_id,
             data=annojs,
             content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -566,7 +539,7 @@ def test_api_root_webanno_grade_ok(
 
     response = client.delete(
             path_delete,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -578,7 +551,7 @@ def test_api_root_webanno_grade_ok(
     response = client.get(
             '{}?version=catchpy&collectionId={}&resource_link_id={}&userid={}'.format(
                 path, assignment.assignment_id, resource_link_id, user.anon_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN=jwt_token,
+            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
             )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
@@ -599,7 +572,7 @@ annotations_store operation:
     - the instructor must have set that target_object as starting resource
       i.e. associate the resource_link_id, provided by lti-consumer, to a
       (course, assign, target_object)
-    - jwt token in html response from successful lti-launch: when the
+    - jwt token in html response[*] from successful lti-launch: when the
       resource-link-id can be traced to a starting resource, hxat generates a
       jwt for the client to auth with the annotation-store (if annotation_store
       is external). This jwt is generated based on annotation-store creds that
@@ -609,7 +582,7 @@ annotations_store operation:
       federation (where different institutions could share annotations among
       themselvel) and to have test/demo/devo examples in production pointing to
       test/demo/devo annotation-store instances.
-
+[*] see changes in 10sep20 below
 
 The annotations can have 2 formats:
           - annotatorjs
@@ -673,6 +646,26 @@ The annotation_store can be of 2 types:
     but since it is copying launch-params from the session (see
     annotation_store.store.WebAnnotationStoreBackend._get_tool_provider()),
     then we are ok.
+
+
+---------------------
+10sep20 naomi:
+    when incorporating ATG changes for starting-resource-missing [1], we ended up skipping
+    the hx_lti_initializer.views.launch_lti() redirection to access_annotation_target()
+    and course_admin_hub() and rendering these pages as response. ATG in canvas
+    lti-launches hxat in a new window (instead of inline like HX in edx) and when the
+    user reloads the hxat new window, it asks for resubmission of lti-launch post
+    params. This reasoning is sensible and we are reverting the redirects implemented by
+    ATG. Now, the redirects change the tests as we have to specifically check return
+    from course_admin_hub() and access_annotation_target() for the jwt token in the html
+    response.
+
+[1] https://github.com/Harvard-ATG/annotationsx/pull/109
+
+
+
+
+
 """
 
 

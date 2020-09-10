@@ -221,7 +221,10 @@ def launch_lti(request):
                 userfound.delete()
             except Exception as e:
                 logger.info("Not waiting to be added as Admin: {}".format(e))
-        return access_annotation_target(request, course_id, collection_id, object_id)
+        logger.debug("DEBUG - User wants to go directly to annotations for a specific target object using UI")
+        url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,collection_id,object_id])
+        url += '?resource_link_id={}'.format(resource_link_id)
+        return redirect(url)
     except AnnotationTargetDoesNotExist as e:
         logger.warning('Could not access annotation target using resource config.')
         logger.info('Deleting resource config because it is invalid.')
@@ -255,10 +258,13 @@ def launch_lti(request):
                     userfound.delete()
                 except Exception as e:
                     logger.info("Not waiting to be added as admin: {}".format(e), exc_info=False)
-                return course_admin_hub(request)
+                url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id={}'.format(resource_link_id)
+                return redirect(url)
             else:
                 logger.debug("DEBUG - User wants to go directly to annotations for a specific target object({}--{}--{}".format(course_id, assignment_id,object_id))
-                return access_annotation_target(request, course_id, assignment_id, object_id)
+                url = reverse('hx_lti_initializer:access_annotation_target', args=[course_id,assignment_id,object_id])
+                url += '?resource_link_id={}'.format(resource_link_id)
+                return redirect(url)
         except Exception as e:
             logger.debug("DEBUG - User wants the index: {} --- {}".format(type(e), e), exc_info=False)
 
@@ -274,7 +280,8 @@ def launch_lti(request):
         logger.debug("DEBUG - Not waiting to be added as admin: {}".format(e),
                 exc_info=False)
 
-    return course_admin_hub(request)
+    url = reverse('hx_lti_initializer:course_admin_hub') + '?resource_link_id={}'.format(resource_link_id)
+    return redirect(url)
 
 
 @login_required
@@ -390,7 +397,6 @@ def access_annotation_target(
     """
     Renders an assignment page
     """
-    logger.debug('xxxxxxxxxxxxxxxxxxxxxxxxxx in access_annotation_target')
     if user_id is None:
         user_name = request.LTI['hx_user_name']
         user_id = request.LTI['hx_user_id']
