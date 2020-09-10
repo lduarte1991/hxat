@@ -90,7 +90,8 @@ class TODViewsTests(TestCase):
         lti_params = self.consumer.generate_launch_data()
         response0 = self.client.post(
                 self.target_path, lti_params)
-        self.assertTrue(response0.status_code == 200)
+
+        self.assertTrue(response0.status_code == 302)
 
         target_url = reverse(
                 'target_object_database:open_target_object',

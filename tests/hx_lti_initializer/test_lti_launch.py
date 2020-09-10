@@ -47,8 +47,11 @@ def test_launchLti_session_ok(
             lti_path,
             data=params,
     )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check some info in session
     assert(client.session is not None)
@@ -108,8 +111,11 @@ def test_launchLti_user_course_created_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -161,8 +167,11 @@ def test_launchLti_user_scope_canvas_created_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -205,8 +214,11 @@ def test_launchLti_user_scope_canvas_no_platform_created_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -255,8 +267,11 @@ def test_launchLti_user_course_ok_no_context_title(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
     assert(response.cookies.get('sessionid'))
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
     # check user was created
     user = User.objects.get(username=instructor_name)
@@ -392,6 +407,7 @@ def test_launchLti_from_LTIdict_ok(
         ):
     course, user = course_instructor_factory()
     course.course_id = settings.TEST_COURSE  # force context_id
+    resource_link_id = 'FakeResourceLinkID'
     consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.TEST_COURSE_LTI_SECRET,
@@ -399,7 +415,7 @@ def test_launchLti_from_LTIdict_ok(
             params={
                 'lti_message_type': 'basic-lti-launch-request',
                 'lti_version': 'LTI-1p0',
-                'resource_link_id': 'FakeResourceLinkID',
+                'resource_link_id': resource_link_id,
                 'lis_person_sourcedid': user.name,
                 'lis_outcome_service_url': 'fake_url',
                 'user_id': user.anon_id,
@@ -414,7 +430,10 @@ def test_launchLti_from_LTIdict_ok(
             lti_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
+    expected_url = reverse('hx_lti_initializer:course_admin_hub') \
+            + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
 
 @pytest.mark.django_db
@@ -599,6 +618,11 @@ def test_launchLti_starting_resource(random_assignment_target):
             target_path,
             data=params,
             )
-    assert(response.status_code == 200)
+    assert(response.status_code == 302)
+    expected_url = reverse(
+            'hx_lti_initializer:access_annotation_target',
+            args=[course_id,assignment.assignment_id,target_object.pk]
+            ) + f'?resource_link_id={resource_link_id}'
+    assert(response.url == expected_url)
 
 
