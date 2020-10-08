@@ -79,6 +79,9 @@ class IMMImageStoreBackend(ImageStoreBackend):
 
     def store(self, uploaded_files, title):
         ''' Returns URL to a IIIF manifest containing the images. '''
+        if not uploaded_files or len(uploaded_files) == 0:
+            return None
+
         manifest_url = None
         try:
             # authenticate and ensure course space exists
@@ -108,7 +111,7 @@ class IMMImageStoreBackend(ImageStoreBackend):
             )
 
             # get IIIF manifest URL for collection
-            collection = self.client.api.get_collection(collection['id'])
+            collection = self.client.api.get_collection(collection_id=collection['id'])
             manifest_url = collection.get('iiif_manifest', {}).get('url')
             logger.info("User %s obtained manifest for collection: %s" % (self.user_id, collection))
 
