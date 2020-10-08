@@ -3,7 +3,7 @@ import json
 import html
 from unittest.mock import Mock, patch
 
-from . import backends 
+from . import backends
 
 ImageStoreBackend = backends.ImageStoreBackend
 ImageStoreBackendException = backends.ImageStoreBackendException
@@ -18,19 +18,19 @@ class TestImageStoreBackend(unittest.TestCase):
 class TestIMMImageStoreBackend(unittest.TestCase):
     def setUp(self):
         self.config = {
-            'base_url': 'http://media-management-api.localhost/api', 
-            'client_id': 'my-client-id', 
-            'client_secret': 'my-secret', 
+            'base_url': 'http://media-management-api.localhost/api',
+            'client_id': 'my-client-id',
+            'client_secret': 'my-secret',
         }
         self.user_id = 'aaaabbbb'
         self.lti_params = {
-            'tool_consumer_instance_guid': '7db438071375c02373713c12c73869ff2f470b68.harvard.instructure.com', 
+            'tool_consumer_instance_guid': '7db438071375c02373713c12c73869ff2f470b68.harvard.instructure.com',
             'tool_consumer_instance_name': 'Harvard University',
             'context_id': '9a8b2d3fa51ef413d19e480fb6c2ab091b7866a9',
             'context_label': 'demo-foo',
             'context_title': 'Foo&#39;s Demo Course',
-            'lis_course_offering_sourcedid': 'demo-foo', 
-            'lis_person_sourcedid': self.user_id, 
+            'lis_course_offering_sourcedid': 'demo-foo',
+            'lis_person_sourcedid': self.user_id,
             'custom_canvas_course_id': '11223344',
         }
 
@@ -53,15 +53,6 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         self.assertEqual(self.lti_params['lis_course_offering_sourcedid'], backend.course_attrs['sis_course_id'])
         self.assertEqual(self.lti_params['custom_canvas_course_id'], backend.course_attrs['canvas_course_id'])
 
-        # check initial headers
-        self.assertTrue(hasattr(backend, 'headers'))
-        expected_headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
-        self.assertEqual(expected_headers, backend.headers)
-
-    
     def test_constructor_missing_required_config(self):
         with self.assertRaises(ImageStoreBackendException):
             config = {}
@@ -95,13 +86,13 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         }
         mock_post.return_value = Mock(ok=True, status_code=200)
         mock_post.return_value.json.return_value = response_data
-        
+
         backend = IMMImageStoreBackend(self.config, self.lti_params)
         actual_access_token = backend._obtain_token(course_id=None)
 
         mock_post.assert_called_with(request_url, headers=request_headers, data=json.dumps(request_data))
         self.assertEqual(response_data["access_token"], actual_access_token)
-        
+
     @patch('image_store.backends.requests.post')
     def test_create_course(self, mock_post):
         request_url = "%s/courses" % self.config['base_url']

@@ -1,14 +1,24 @@
-import requests
-import json
 import html
 import logging
 
+from media_management_sdk import Client
+from media_management_sdk.exceptions import ApiError
+
 logger = logging.getLogger(__name__)
+
+
+def get_backend_class(class_name):
+    ''' Returns backend class. '''
+    if class_name in globals():
+        return globals()[class_name]
+    return None
+
 
 class ImageStoreBackendException(Exception):
     pass
 
-class ImageStoreBackend:
+
+class ImageStoreBackend(object):
     '''
     Image storage backend.
     '''
@@ -25,32 +35,28 @@ class IMMImageStoreBackend(ImageStoreBackend):
     '''
     Collaborates with the Image Media Manager (IMM) service to store images
     and generate IIIF manifests.
-    
+
     See also: https://github.com/harvard-atg/media_management_api
 
     Notes:
-    - IMM requires client credentials (client key and secret) to authenticate and obtain a 
-      temporary access token for subsequent requests.
+    - IMM requires client credentials (client key and secret) to authenticate and obtain a
+      temporary access token for the logged-in user.
     - Requires LTI context_id and tool_consumer_instance_guid to identify the course library.
-    - Additional LTI context/course attributes are provided when creating a new course library.
-    - A collection is associated with a manifest, so as soon as a collection is created, a manifest
-      URL can be obtained and it will be generated on the fly.
+    - Additional LTI attributes are provided when creating a new course library.
+    - A manifest can be obtained for a collection with images.
     '''
     def __init__(self, config=None, lti_params=None):
         super().__init__(config, lti_params)
 
-        # configuration for API
+        # client for API
         try:
-            self.client_id = config['client_id']
-            self.client_secret = config['client_secret']
-            self.base_url = config['base_url']
-        except KeyError as e: 
+            self.client = Client(
+                client_id=config['client_id'],
+                client_secret=config['client_secret'],
+                base_url=config['base_url'],
+            )
+        except KeyError as e:
             raise ImageStoreBackendException("Misconfigured: %s" % str(e))
-
-        self.headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
 
         # course-specific parameters
         try:
@@ -59,7 +65,6 @@ class IMMImageStoreBackend(ImageStoreBackend):
             self.course_attrs = {
                 "lti_context_id": lti_params['context_id'],
                 "lti_tool_consumer_instance_guid": lti_params['tool_consumer_instance_guid'],
-                "lti_tool_consumer_instance_name": lti_params['tool_consumer_instance_name'],
                 "lti_context_title": lti_params['context_title'],
                 "lti_context_label": lti_params['context_label'],
                 "title": html.unescape(lti_params['context_title']),
@@ -68,175 +73,50 @@ class IMMImageStoreBackend(ImageStoreBackend):
             if lti_params.get('lis_course_offering_sourcedid'):
                 self.course_attrs["sis_course_id"] = lti_params['lis_course_offering_sourcedid']
             if lti_params.get('custom_canvas_course_id'):
-                self.course_attrs['canvas_course_id'] = lti_params['custom_canvas_course_id']
-        except KeyError as e:
-            raise ImageStoreBackendException("Missing required LTI course params: %s" % str(e))
+                self.course_attrs['canvas_course_id'] = int(lti_params['custom_canvas_course_id'])
+        except (KeyError, ValueError) as e:
+            raise ImageStoreBackendException("Missing or invalid LTI params: %s" % str(e))
 
     def store(self, uploaded_files, title):
         ''' Returns URL to a IIIF manifest containing the images. '''
         manifest_url = None
         try:
             # authenticate and ensure course space exists
-            self._obtain_token_find_or_create_course()
-            course = self._find_or_create_course()
-            self._obtain_token_update_course(course['id'])
+            self.client.authenticate(user_id=self.user_id)
+            course = self.client.find_or_create_course(**self.course_attrs)
+            logger.info("User %s loaded course: %s" % (self.user_id, course))
 
             # upload image to the course space
-            course_images = self._upload_images(course['id'], uploaded_files)
-            course_image_ids = [image['id'] for image in course_images]
-            
-            # create a collection and add images to it
-            collection = self._create_collection(course['id'], title)
-            self._add_to_collection(collection['id'], course_image_ids)
-            
-            # get IIIF manifest URL for collection
-            collection = self._get_collection(collection['id'])
-            manifest_url = collection.get('iiif_manifest', {}).get('url')
+            course_images = self.client.api.upload_images(
+                course_id=course['id'],
+                upload_files=[(f.name, f.file, f.content_type) for f in uploaded_files],
+                title=title,
+            )
+            logger.info("User %s uploaded images: %s" % (self.user_id, course_images))
 
-        except ImageStoreBackendException as e:
-            logger.exception("Image store backend error: %s" % str(e))
+            # create a collection and add images to it
+            collection = self.client.api.create_collection(
+                course_id=course['id'],
+                title=title,
+                description='',
+            )
+            self.client.api.update_collection(
+                collection_id=collection['id'],
+                course_id=course['id'],
+                course_image_ids=[image['id'] for image in course_images],
+                title=title,
+            )
+
+            # get IIIF manifest URL for collection
+            collection = self.client.api.get_collection(collection['id'])
+            manifest_url = collection.get('iiif_manifest', {}).get('url')
+            logger.info("User %s obtained manifest for collection: %s" % (self.user_id, collection))
+
+        except ApiError as e:
+            logger.exception("Failed to upload and store image: %s" % str(e))
+            raise ImageStoreBackendException("Failed to upload and store image")
+        except Exception as e:
+            logger.exception("Image store exception: %s" % str(e))
             raise e
-        except requests.exceptions.RequestException as e:
-            logger.exception("Image store request exception: %s" % str(e))
-            raise ImageStoreBackendException('Image store HTTP connection error: %s' % str(e))
 
         return manifest_url
-
-    def _obtain_token_find_or_create_course(self):
-        access_token = self._obtain_token(course_id=None)
-        self.headers['Authorization'] = 'Token {access_token}'.format(access_token=access_token)
-
-    def _obtain_token_update_course(self, course_id):
-        access_token = self._obtain_token(course_id=course_id)
-        self.headers['Authorization'] = 'Token {access_token}'.format(access_token=access_token)
-
-    def _obtain_token(self, course_id=None):
-        ''' 
-        Authenticates with API using client credentials (key/secret) and 
-        obtains temporary access token for requests.
-        '''
-        url = "%s/auth/obtain-token" % self.base_url
-        post_data = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "user_id": self.user_id,
-        }
-        if course_id:
-            post_data.update({
-                "course_permission": "write",
-                "course_id": course_id
-            })
-        r = requests.post(url, headers=self.headers, data=json.dumps(post_data))
-        logger.debug("API POST {url} data:{post_data} status:{status_code} text:{text}".format(url=url, post_data=post_data, status_code=r.status_code, text=r.text))
-        
-        access_token = None
-        if r.status_code == 200:
-            data = r.json()
-            access_token = data.get('access_token', None)
-            if not access_token:
-                raise ImageStoreBackendException("Authenticated successfully, but access token absent from response")
-        else: 
-            raise ImageStoreBackendException("Authentication failed: {status_code}".format(status_code=r.status_code))
-        return access_token
-    
-    def _find_or_create_course(self):
-        '''
-        Find associated course space for images using Canvas/LTI identifiers.
-        If no course space exists, create one.
-        '''
-        url = "%s/courses" % self.base_url
-        search_params = {
-            "lti_context_id": self.course_attrs["lti_context_id"],
-            "lti_tool_consumer_instance_guid": self.course_attrs["lti_tool_consumer_instance_guid"]
-        }
-        r = requests.get(url, headers=self.headers, params=search_params)
-        logger.debug("API GET {url} params:{params} status:{status_code} text:{text}".format(url=url, params=search_params, status_code=r.status_code, text=r.text))
-
-        course = None
-        if r.status_code == 200:
-            courses = r.json()
-            if len(courses) == 0:
-                course = self._create_course()
-            elif len(courses) == 1:
-                course = courses[0]
-            else:
-                raise ImageStoreBackendException("Multiple courses found {num}".format(num=len(courses)))
-        elif r.status_code == 404:
-            course = self._create_course()
-        else:
-            raise ImageStoreBackendException("Find course error: {status_code}".format(status_code=r.status_code))
-        return course
-
-    def _create_course(self):
-        '''
-        Create a new course space for images.
-        '''
-        url = "%s/courses" % self.base_url
-        post_data = self.course_attrs
-        r = requests.post(url, headers=self.headers, data=json.dumps(post_data))
-        logger.debug("API POST {url} data:{data} status:{status_code} text:{text}".format(url=url, data=post_data, status_code=r.status_code, text=r.text))
-
-        if r.status_code not in (200, 201):
-            raise ImageStoreBackendException("Create course error: {status_code}".format(status_code=r.status_code))
-        return r.json()
-
-    def _upload_images(self, course_id, uploaded_files):
-        '''
-        Upload images to course space.
-        '''
-        url = "%s/courses/%s/images" % (self.base_url, course_id)
-        post_files = []
-        for uploaded_file in uploaded_files:
-            file_tuple = (uploaded_file.name, uploaded_file.read(), uploaded_file.content_type)
-            post_files.append(('file', file_tuple)) # the field name must be "files" 
-
-        post_headers = {'Authorization': self.headers['Authorization']}
-        r = requests.post(url, headers=post_headers, data={'title':'Untitled'}, files=post_files)
-        logger.debug("API POST {url} status:{status_code} text:{text}".format(url=url, status_code=r.status_code, text=r.text))
-
-        if r.status_code not in (200, 201):
-            raise ImageStoreBackendException("Upload image error: {status_code}".format(status_code=r.status_code))
-        return r.json()
-
-    def _create_collection(self, course_id, title="Untitled Collection", description="Image Annotation"):
-        '''
-        Create a new collection.
-        '''
-        url = "%s/courses/%s/collections" % (self.base_url, course_id)
-        post_data = {"title": title, "description": description}
-        r = requests.post(url, headers=self.headers, data=json.dumps(post_data))
-        logger.debug("API POST {url} data:{data} status:{status_code} text:{text}".format(url=url, data=post_data, status_code=r.status_code, text=r.text))
-
-        if r.status_code not in (200, 201):
-            raise ImageStoreBackendException("Create collection error: {status_code}".format(status_code=r.status_code))
-        return r.json()
-
-    def _get_collection(self, collection_id):
-        '''
-        Retrieve collection details.
-        '''
-        url = "%s/collections/%s" % (self.base_url, collection_id)
-        r = requests.get(url, headers=self.headers)
-        logger.debug("API GET {url} status:{status_code} text:{text}".format(url=url, status_code=r.status_code, text=r.text))
-
-        if r.status_code == 200:
-            collection = r.json()
-        elif r.status_code == 404:
-            collection = False
-        else:
-            raise ImageStoreBackendException("Get collection error: {status_code}".format(status_code=r.status_code))
-        return collection
-
-    def _add_to_collection(self, collection_id, image_ids):
-        '''
-        Add images from course space to a specific collection so that we can obtain a IIIF manifest.
-        '''
-        url = "%s/collections/%s/images" % (self.base_url, collection_id)
-        post_data = [dict(course_image_id=image_id) for image_id in image_ids]
-        r = requests.post(url, headers=self.headers, data=json.dumps(post_data))
-        logger.debug("API POST {url} data:{data} status:{status_code} text:{text}".format(url=url, data=post_data, status_code=r.status_code, text=r.text))
-
-        if r.status_code not in (200, 201):
-            raise ImageStoreBackendException("Add images to collection error: {status_code}".format(status_code=r.status_code))
-        return r.json()
-    
