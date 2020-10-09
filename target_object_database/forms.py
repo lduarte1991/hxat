@@ -97,7 +97,7 @@ def handle_file_upload(data, files, lti_params):
     try:
         cls = image_store.backends.get_backend_class(settings.IMAGE_STORE_BACKEND)
         image_backend = cls(config=settings.IMAGE_STORE_BACKEND_CONFIG, lti_params=lti_params)
-        manifest_url = image_backend.store(list_of_files, title)
+        manifest_url = image_backend.store([file for file in list_of_files], title) # Intentionally passed as a list() instead of MultiValueDict
     except image_store.backends.ImageStoreBackendException as e:
         raise ValidationError("Error uploading image. Details: %s" % e)
 
