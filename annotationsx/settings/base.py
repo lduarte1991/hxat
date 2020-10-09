@@ -58,6 +58,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrap3',
     'crispy_forms',
+    'sslserver',
     'hx_lti_initializer',
     'annotation_store',
     'hx_lti_assignment',

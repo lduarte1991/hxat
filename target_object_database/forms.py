@@ -43,7 +43,7 @@ class SourceForm(forms.ModelForm):
             validate_https_url(target_content)
         except ValidationError as e:
             self.add_error('target_content', 'Not a valid manifest URL. Make sure it\'s only one URL and that it begins with "https".')
-    
+
     def validate_manifest_unique(self, target_content):
         found = None
         try:
@@ -83,10 +83,10 @@ def handle_file_upload(data, files, lti_params):
         data(dict): the request.POST dict-like object
         files(dict): the request.FILES dict-like object
         lti_params(dict): should be the initial LTI launch params stored in th session
-    
+
     Returns:
         str: the manifest URL
-    
+
     Raises:
         ValidationError
     '''
@@ -95,9 +95,9 @@ def handle_file_upload(data, files, lti_params):
     list_of_files = files.getlist('target_file')
 
     try:
-        image_backend_class = getattr(image_store.backends, settings.IMAGE_STORE_BACKEND)
-        image_backend = image_backend_class(settings.IMAGE_STORE_BACKEND_CONFIG, lti_params)
-        manifest_url = image_backend.store([file for file in list_of_files], title)
+        cls = image_store.backends.get_backend_class(settings.IMAGE_STORE_BACKEND)
+        image_backend = cls(config=settings.IMAGE_STORE_BACKEND_CONFIG, lti_params=lti_params)
+        manifest_url = image_backend.store([file for file in list_of_files], title) # Intentionally passed as a list() instead of MultiValueDict
     except image_store.backends.ImageStoreBackendException as e:
         raise ValidationError("Error uploading image. Details: %s" % e)
 

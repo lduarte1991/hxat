@@ -7,6 +7,7 @@ django-bootstrap3==12.0.3
 django-braces==1.13.0
 django-crispy-forms==1.9.0
 django-extensions==2.1.6
+django-sslserver==0.22
 djangorestframework==3.9.2
 httplib2==0.12.1
 idna==2.8
@@ -20,3 +21,4 @@ requests==2.21.0
 six==1.12.0
 urllib3==1.24.2
 mock==1.3.0
+git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.1.0#egg=media_management_sdk==0.1.0
