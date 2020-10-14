@@ -60,6 +60,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrap3',
     'crispy_forms',
+    'sslserver',
     'hx_lti_initializer',
     'annotation_store',
     'hx_lti_assignment',
@@ -241,6 +242,11 @@ LOGGING = {
             'handlers': ['default', 'console'],
             'propagate': False,
         },
+        'image_store.backends': {
+            'level': _DEFAULT_LOG_LEVEL,
+            'handlers': ['default', 'console'],
+            'propagate': False,
+        },
     },
 }
 
@@ -271,6 +277,7 @@ LTI_SETUP = {
                 "enabled": "true",
                 "default": "enabled",
                 "text": "AnnotationsX",
+                "windowTarget": "_blank"
             }
         }
     }
@@ -293,6 +300,8 @@ ANNOTATION_HTTPS_ONLY = literal_eval(os.environ.get("HTTPS_ONLY", str(SECURE_SET
 ANNOTATION_LOGGER_URL = os.environ.get('ANNOTATION_LOGGER_URL', SECURE_SETTINGS.get("annotation_logger_url", ""))
 ANNOTATION_STORE = os.environ.get('ANNOTATION_STORE', SECURE_SETTINGS.get("annotation_store", {}))
 ACCESSIBILITY = literal_eval(os.environ.get('ACCESSIBILITY', str(SECURE_SETTINGS.get('accessibility', True))))
+IMAGE_STORE_BACKEND = os.environ.get('IMAGE_STORE_BACKEND', str(SECURE_SETTINGS.get('image_store_backend', '')))
+IMAGE_STORE_BACKEND_CONFIG = os.environ.get('IMAGE_STORE_BACKEND_CONFIG', SECURE_SETTINGS.get('image_store_backend_config', ''))
 
 # replace when django 3.1, see https://github.com/jotes/django-cookies-samesite
 # due to chrome 80.X, see https://www.chromium.org/updates/same-site

@@ -1,24 +1,17 @@
 from django.template.defaulttags import register
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from datetime import datetime
-from dateutil import tz
-from django import template
-from django.template.defaultfilters import stringfilter
 from django.templatetags.static import static
-from re import sub
+import dateutil.parser
+import dateutil.tz
 
-from hx_lti_assignment.models import Assignment
-from abstract_base_classes.target_object_database_api import TOD_Implementation
-from target_object_database.models import TargetObject
-import re
 
 def convert_tz(datetimeobj):
 	'''
 		Converts a datetimeobj from UTC to the local timezone
 	'''
-	from_zone = tz.tzutc()
-	to_zone = tz.gettz('America/New_York')
+	from_zone = dateutil.tz.tzutc()
+	to_zone = dateutil.tz.gettz('America/New_York')
 	# Tell datetime object it's in UTC
 	utc = datetimeobj.replace(tzinfo=from_zone)
 	# Convert to local time
@@ -28,26 +21,15 @@ def convert_tz(datetimeobj):
 
 @register.filter
 def format_date(str):
-	'''
-		Converts a date string into a more readable format
-	'''
+    if str is None:
+        return ""
+    try:
+        date_parsed = convert_tz(dateutil.parser.parse(str))
+        date_formatted = date_parsed.strftime('%b %d, %Y')
+    except ValueError:
+        date_formatted = str
 
-	# Check for None case
-	if str is None:
-		return ""
-
-	# Clean string by stripping all non numeric characters
-	cleaned = sub("[^0-9]", "", str)
-
-	try:
-		# Store formatted date as datetimeobject and convert timezone
-		dformatted = convert_tz(datetime.strptime(cleaned, "%Y%m%d%H%M%S"))
-		# Date string in format for display on webpage
-		date = dformatted.strftime('%b %d')
-	except ValueError:
-		date = str
-
-	return date
+    return date_formatted
 
 @register.filter
 def format_tags(tagslist):

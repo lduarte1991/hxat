@@ -1,9 +1,8 @@
 from django.urls import include, path
 from django.contrib import admin
 from django.views.generic import TemplateView
+from hx_lti_initializer.views import tool_config
 admin.autodiscover()
-
-# import django_app_lti.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,8 +13,6 @@ urlpatterns = [
     path('accounts/profile/', TemplateView.as_view(template_name='index.html')),
     path('500/', TemplateView.as_view(template_name="main/500.html")),
     path('troubleshooting/', TemplateView.as_view(template_name="main/troubleshooting.html")),
+    path('lti/config', tool_config, name="tool_config" ),
     path('notification/', include('notification.urls')),
-    # TODO: Check to see if this works without enabling django_app_lti
-    # Include the lti app's urls
-    #url(r'^lti/', include((django_app_lti.urls, 'lti'), namespace="lti")),
 ]

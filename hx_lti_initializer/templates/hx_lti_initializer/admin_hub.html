@@ -26,16 +26,16 @@
 
         <h3 class='assignment-header'>Assignments</h3>
         <div id="assignment-items">
-            {% if course.assignments.all|only_published:is_instructor|length == 0 %}
+            {% if assignment in course.get_assignments|only_published:is_instructor|length == 0 %}
                 <div class='assignment-item empty-assignment'>You have no annotation assignments in this course.</div>
             {% endif %}
 
-            {% for assignment in course.assignments.all|only_published:is_instructor %}
-                <div class='assignment-item item-{{forloop.counter0}}'>
+            {% for assignment in course.get_assignments|only_published:is_instructor %}
+                <div class='assignment-item assignment-item-{% if assignment.is_published %}published{% else %}unpublished{% endif %} item-{{forloop.counter0}}'>
                     <div class='first-row'>
                         <div style="float: left; min-width: 300px; width: 66%; margin-bottom: 10px;">
                         <i class='assignment-toggle fa fa-caret-right fa-lg' style='color:rgb(55, 124, 182);'></i>&nbsp;<span class='assignment-title'>{{assignment.assignment_name}}</span>
-                        {% if not assignment.is_published %}<span class="assignment-unpublished">Unpublished</span>{% endif %}
+                        {% if not assignment.is_published %}<span class="assignment-unpublished" title="This assignment is not available to students. To publish go to Edit assignment">Not Published</span>{% endif %}
                         </div>
                         <div style="float: left; min-width: 170px; width: 34%;">
                         {% if is_instructor %}

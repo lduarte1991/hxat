@@ -16,6 +16,8 @@ from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib import messages
 
+from lti import ToolConfig
+
 from annotationsx.exceptions import AnnotationTargetDoesNotExist
 from target_object_database.models import TargetObject
 from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
@@ -126,7 +128,9 @@ def launch_lti(request):
             user, lti_profile = create_new_user(anon_id=user_id, username=external_user_id, display_name=display_name, roles=roles, scope=user_scope)
             # log the user into the Django backend
         lti_profile.user.backend = 'django.contrib.auth.backends.ModelBackend'
+        saved_lti_launches = request.session['LTI_LAUNCH']
         login(request, lti_profile.user)
+        request.session.setdefault('LTI_LAUNCH', saved_lti_launches)
         save_session(
             request,
             user_id=user_id,
@@ -553,6 +557,7 @@ def instructor_dashboard_student_list_view(request):
 
     context_id = request.LTI['hx_context_id']
     user_id = request.LTI['hx_user_id']
+    resource_link_id = request.LTI['resource_link_id']
 
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
@@ -561,13 +566,14 @@ def instructor_dashboard_student_list_view(request):
     fetch_elapsed_time = fetch_end_time - fetch_start_time
 
     # Transform the raw annotation results into something useful for the dashboard
-    user_annotations = DashboardAnnotations(course_annotations).get_annotations_by_user()
+    user_annotations = DashboardAnnotations(request, course_annotations).get_annotations_by_user()
     context = {
         'username': request.LTI['hx_user_name'],
         'is_instructor': request.LTI['is_staff'],
         'user_annotations': user_annotations,
         'fetch_annotations_time': fetch_elapsed_time,
         'org': settings.ORGANIZATION,
+        'resource_link_id': resource_link_id
     }
     return render(request, 'hx_lti_initializer/dashboard_student_list_view.html', context)
 
@@ -633,8 +639,22 @@ def change_starting_resource(request, assignment_id, object_id):
     elif request.method == 'DELETE':
         LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
         data['response'] = 'Success: Deleted'
-    
+
     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def tool_config(request):
+    url = request.build_absolute_uri('/')[:-1] + reverse(settings.LTI_SETUP['LAUNCH_URL'])
+    lti_tool_config = ToolConfig(
+        title=settings.LTI_SETUP['TOOL_TITLE'],
+        launch_url=url,
+        secure_launch_url=url,
+        extensions=settings.LTI_SETUP.get('EXTENSION_PARAMETERS', ''),
+        description = settings.LTI_SETUP['TOOL_DESCRIPTION']
+    )
+    lti_tool_config.initialize_models = settings.LTI_SETUP['INITIALIZE_MODELS']
+
+    return HttpResponse(lti_tool_config.to_xml(), content_type='text/xml')
 
 
 """

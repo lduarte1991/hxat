@@ -20,6 +20,7 @@ from .forms import SourceForm
 logger = logging.getLogger(__name__)
 
 
+
 def get_course_id(request):
     return request.LTI['hx_lti_course_id']
 
@@ -108,7 +109,7 @@ def edit_source(request, id):
 
 def handlePopAdd(request, addForm, field):
     if request.method == "POST":
-        form = addForm(request.POST)
+        form = addForm(request.POST, request.FILES, request=request)
         if form.is_valid():
             try:
                 newObject = form.save()
@@ -127,6 +128,7 @@ def handlePopAdd(request, addForm, field):
         'course': get_course_id(request),
         'org': settings.ORGANIZATION,
         'is_instructor': request.LTI['is_staff'],
+        'image_store_enabled': bool(settings.IMAGE_STORE_BACKEND),
     }
     return render(
         request,
@@ -147,3 +149,4 @@ class SourceView(generics.ListAPIView):
     def get_queryset(self):
         object_id = self.kwargs['object_id']
         return TargetObject.objects.filter(pk=object_id)
+

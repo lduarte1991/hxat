@@ -10,8 +10,10 @@ from random import randint
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import Client
+from django.test import TestCase
 from django.urls import reverse
 
+from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.models import LTIProfile
 from hx_lti_initializer.models import LTIResourceLinkConfig
@@ -625,4 +627,43 @@ def test_launchLti_starting_resource(random_assignment_target):
             ) + f'?resource_link_id={resource_link_id}'
     assert(response.url == expected_url)
 
+
+class LTIInitializerCourseFormTests(TestCase):
+    def setUp(self):
+        # Create users
+        users = []
+        profiles = []
+        names = ('Sally Singer', 'Bob Brown', 'Jimmy Kim', 'Jimmy Jam') # intentionally unordered
+        for name in names:
+            first, last = name.split(' ')
+            username = name.replace(' ', '').lower()
+            user = User(username=username, first_name=first, last_name=last, email="%s@localhost" % username)
+            user.save()
+            users.append(user)
+            profiles.append(LTIProfile.objects.create(user=user))
+
+        # Create course with admins
+        course = LTICourse(course_id=1)
+        course.save()
+        for profile in profiles:
+            course.add_admin(profile)
+
+        # Add instance reference to course and form
+        self.course_admins = profiles
+        self.course = course
+        self.course_form = CourseForm(instance=course)
+
+    def tearDown(self):
+        LTIProfile.objects.filter(pk__in=[p.pk for p in self.course_admins]).delete()
+        self.course.delete()
+
+    def test_course_form_admins(self):
+        queryset = self.course_form.get_course_admins().all()
+
+        expected_names = sorted([(profile.user.first_name, profile.user.last_name) for profile in self.course_admins], key=lambda user: user[0] + user[1])
+        #actual_names = sorted([(profile.user.first_name, profile.user.last_name) for profile in queryset], key=lambda user: user[0] + user[1])
+        actual_names = [(profile.user.first_name, profile.user.last_name) for profile in queryset]
+
+        self.assertEqual(len(expected_names), len(actual_names))
+        self.assertEqual(expected_names, actual_names)
 

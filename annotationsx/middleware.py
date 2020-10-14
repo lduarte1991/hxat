@@ -212,6 +212,8 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         if isinstance(exception, LTILaunchError):
+            metadata = {k:request.META.get(k, '') for k in ('HTTP_REFERER', 'HTTP_USER_AGENT', 'REQUEST_METHOD')}
+            self.logger.error(metadata)
             self.logger.error(exception)
             return HttpResponse("LTI launch error. Please try re-launching the tool.")
         return None

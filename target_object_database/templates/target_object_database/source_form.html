@@ -2,6 +2,20 @@
 {% load extra_options %}
 {% load staticfiles %}
 
+{% block css_file %}
+<style type="text/css">
+#id_image_upload_preview ol {
+	list-style-type: none;
+	margin-left: 0;
+	padding-left: 0;
+	padding-top: 10px;
+}
+#id_image_upload_preview img {
+	max-width: 75%;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 {% load bootstrap3 %}
 {# bootstrap_css #}
@@ -69,10 +83,28 @@
 		  });
 		  {% endif %}
 		  jQuery('form').on('click', '#source-save-button', function(event) {
-		  	jQuery(this).closest('form').submit();
+				var allow_submit = true;
+				var required_for_all_types = ['id_target_type', 'id_target_title'];
+				required_for_all_types.forEach(function(id) {
+					var el = document.getElementById(id);
+					if(!el.value) {
+						allow_submit = false;
+					}
+					markRequiredIfEmpty(el);
+				});
+				if(allow_submit) {
+					jQuery(this).closest('form').submit();
+				}
 		  });
 	});
-		
+
+	var markRequiredIfEmpty = function(el) {
+		if(el.value) {
+			$(el).css({'outline': 'none', 'outline-offset': 'none'})
+		} else {
+			$(el).css({'outline': 'red 2px solid', 'outline-offset': '5px'});
+		}
+	}
 
 	var createVideoFields = function() {
 		jQuery('.vdchange').before("<div class='form-group vd'>\
@@ -131,27 +163,18 @@
 					jQuery('.ig').show();
 					jQuery('#id_target_content').destroy();
 					jQuery('form').off('submit'); // fixes issue with summernote still having a "submit" event handler attached after destroy...
-                    jQuery('#id_target_content').blur( function() {
-                        var content = jQuery('#id_target_content').val();
-                        var expression = /https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-                        var regex = new RegExp(expression);
-                        jQuery('#content-error').remove();
-                        if (content.match(regex) && content.match(regex).length === 1) {
-                            jQuery('#id_target_content').css('outline', 'none');
-                            jQuery('#id_target_content').css('outline-offset', 'none');
-                        } else {
-                            jQuery('#id_target_content').css('outline', 'red 2px solid');
-                            jQuery('#id_target_content').css('outline-offset', '5px');
-                            jQuery('#id_target_content').before('<p id="content-error" style="color:red; font-size:10pt;">Not a valid manifest URL. Make sure it\'s only one URL and that it begins with "https".</p>');
-                        }
-                    });
-					jQuery('label[for="id_target_content"]').text('Mirador Manifests');
+					jQuery('label[for="id_target_content"]').text('Source Manifest');
+					jQuery('#id_image_store').show();
 				}
 			});
+
+			jQuery('#id_target_title').on('blur', function(e) {
+				this.value = this.value.trim();
+				markRequiredIfEmpty(this);
+			});
+
 			jQuery('#id_target_type').trigger('change');
-            jQuery('#id_target_content').focus(function(){console.log("targetabouttochange");}).blur( function(){
-                console.log("Targetchanged");
-            });
+			
 			setTimeout(function(){
 				if (window.navigator.platform === "Win32") {
 					jQuery('.bootstrap-select.form-control').addClass('win');
@@ -161,13 +184,80 @@
 				}
 			}, 500);
 		});
+
+		// For handling image uploads to the image store backend (only if enabled)
+		$(document).ready(function() {
+			const fileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+			const input = document.getElementById('id_image_upload');
+			const preview = document.getElementById('id_image_upload_preview');
+			//input.style.opacity = 0;
+
+			function validFileType(file) {
+				for(let i = 0; i < fileTypes.length; i++) {
+					if(file.type === fileTypes[i]) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			function returnFileSize(number) {
+				if(number < 1024) {
+					return number + 'bytes';
+				} else if(number >= 1024 && number < 1048576) {
+					return (number/1024).toFixed(1) + 'KB';
+				} else if(number >= 1048576) {
+					return (number/1048576).toFixed(1) + 'MB';
+				}
+			}
+
+			function updateImageDisplay() {
+				while(preview.firstChild) {
+					preview.removeChild(preview.firstChild);
+				}
+
+				const curFiles = input.files;
+				if(curFiles.length === 0) {
+					let para = document.createElement('p');
+					para.textContent = 'No files currently selected for upload';
+					preview.appendChild(para);
+				} else {
+					let list = document.createElement('ol');
+					preview.appendChild(list);
+					for(let i = 0; i < curFiles.length; i++) {
+						let listItem = document.createElement('li');
+						let para = document.createElement('p');
+						if(validFileType(curFiles[i])) {
+							para.textContent = 'File name ' + curFiles[i].name + ', file size ' + returnFileSize(curFiles[i].size) + '.';
+							let image = document.createElement('img');
+							image.src = window.URL.createObjectURL(curFiles[i]);
+							listItem.appendChild(image);
+							listItem.appendChild(para);
+						} else {
+							para.textContent = 'File name ' + curFiles[i].name + ': Not a valid file type. Update your selection.';
+							listItem.appendChild(para);
+						}
+						list.appendChild(listItem);
+					}
+				}
+			}
+
+			// Update image preview when file input changes
+			if(input) {
+				input.addEventListener('change', updateImageDisplay);
+			}
+		});
 	</script>
 
 	<h2>Edit Source Material</h2>
 
 	<div id='example-holder'><img id='example-image' class='ig'> <p>Be aware that any changes made below will affect all courses that use this source.</p></div>
 
-	<form method="POST" class="post-form">{% csrf_token %}
+	{% if form.non_field_errors %}
+		{{ form.non_field_errors }}
+	{% endif %}
+
+	<form method="POST" id="id_target_form" class="post-form" enctype="multipart/form-data">{% csrf_token %}
 		<div class="form-group">
 			<label for="id_target_type">Annotation Type</label> 
 			<select class="form-control selectpicker" data-live-search="false" id="id_target_type" name="target_type">
@@ -178,21 +268,38 @@
 		</div>
 
 		<div class="form-group">
-			<label for="id_target_title">Source Title:</label> 
-			<input id="id_target_title" maxlength="255" name="target_title" class="form-control hx-textfield" type="text" value="{{ form.target_title.value }}">
+			<label for="id_target_title">Source Title:</label>
+			{{form.target_title.errors}}  
+			<input id="id_target_title" maxlength="255" name="target_title" class="form-control hx-textfield" type="text" value="{{ form.target_title.value | default_if_none:"" }}" required>
 		</div>
 		<div class="form-group tx">
 			<label for="id_target_author">Source Author:</label> 
+			{{form.target_author.errors}} 
 			<input id="id_target_author" maxlength="255" name="target_author" class="form-control hx-textfield" type="text" value="{{ form.target_author.value | default_if_none:'--'}}">
 		</div>
+
+		{% if image_store_enabled %}
+		<div id="id_image_store" style="display:none;">
+			<div id="id_form_group_image_upload" class="form-group" style="padding: 10px 40px 10px 0px;">
+				<label for="id_image_upload">Source Image (PNG, JPG)</label>
+				<input type="file" id="id_image_upload" name="target_file" accept=".jpg, .jpeg, .png" multiple>
+				<div id="id_image_upload_preview">
+					<p>No files currently selected for upload. </p>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
 		<div class="form-group vdchange ig tx" style='width:84%;'>
 			<label for="id_target_content">Source Content:</label> 
             {{form.target_content.errors}}
-			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | escape  }}</textarea>
+			<textarea id="id_target_content" name="target_content" class="form-control hx-textfield">{{ form.target_content.value | default_if_none:"" | escape  }}</textarea>
 		</div>
+
 		<div class="form-group">
-			<label for="id_target_citation">Source Citation:</label> 
-			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | escape }}</textarea>
+			<label for="id_target_citation">Source Citation:</label>
+			{{form.target_citation.errors}} 
+			<textarea id="id_target_citation" name="target_citation" class="form-control hx-textfield">{{ form.target_citation.value | default_if_none:"" | escape }}</textarea>
 		</div>
 
 		<div class="form-group" style='display:none;'>

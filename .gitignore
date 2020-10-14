@@ -22,3 +22,5 @@ reports
 !/vagrant/*.sh
 /.idea
 /pycharm-debug.egg
+.coverage
+.vscode
