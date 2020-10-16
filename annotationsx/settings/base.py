@@ -328,8 +328,8 @@ elif ORGANIZATION == "HARVARDX":
 
 # channels for notification
 ASGI_APPLICATION = 'annotationsx.routing.application'
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+REDIS_HOST = os.environ.get('REDIS_HOST', SECURE_SETTINGS.get('redis_host', 'localhost'))
+REDIS_PORT = os.environ.get('REDIS_PORT', SECURE_SETTINGS.get('redis_port', '6379'))
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
