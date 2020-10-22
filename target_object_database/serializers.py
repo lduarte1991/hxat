@@ -6,9 +6,9 @@ class TargetObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TargetObject
         fields = (
-            'target_title',
-            'target_author',
-            'target_content',
-            'target_citation',
-            'target_type'
+            "target_title",
+            "target_author",
+            "target_content",
+            "target_citation",
+            "target_type",
         )

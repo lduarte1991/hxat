@@ -5,8 +5,9 @@ from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 
 logger = logging.getLogger(__name__)
 
+
 class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
-    '''
+    """
     This subclasses ManifestStaticFilesStorage to make it possible for the static asset manifest
     to have a "mix" of files that have been hashed, and files that have not.
 
@@ -23,7 +24,8 @@ class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
     not included in the build/distribution, and causes the post processor to fail. An example is mirador-combined.css,
     which includes jqueryui as part of the distribution, but refers to image assets that were not included with mirador.
     This issue causes the ManifestStaticFilesStorage post processor to fail.
-    '''
+    """
+
     def post_process(self, paths, dry_run=False, **options):
         hashed_files = OrderedDict()
 
@@ -31,7 +33,7 @@ class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         # change references inside the files themselves. We can also be confident in our own custom CSS (but not vendors).
         paths_to_process, paths_to_skip = dict(), dict()
         for path in paths:
-            if path.endswith(".js") or path.startswith('css/'):
+            if path.endswith(".js") or path.startswith("css/"):
                 paths_to_process[path] = paths[path]
             else:
                 paths_to_skip[path] = paths[path]
@@ -45,7 +47,9 @@ class MixedManifestStaticFilesStorage(ManifestStaticFilesStorage):
             result.append((path, path, processed))
 
         # Run the hashing process on the paths we want to process
-        all_post_processed = super(ManifestStaticFilesStorage, self).post_process(paths_to_process, dry_run, **options)
+        all_post_processed = super(ManifestStaticFilesStorage, self).post_process(
+            paths_to_process, dry_run, **options
+        )
         for post_processed in all_post_processed:
             result.append(post_processed)
 

@@ -11,61 +11,178 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('target_object_database', '0001_initial'),
-        ('hx_lti_initializer', '0001_initial'),
+        ("target_object_database", "0001_initial"),
+        ("hx_lti_initializer", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Assignment',
+            name="Assignment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('assignment_id', models.CharField(blank=True, default=uuid.uuid4, max_length=100, unique=True)),
-                ('assignment_name', models.CharField(default='No Assignment Name Given', max_length=255)),
-                ('annotation_database_url', models.CharField(max_length=255)),
-                ('annotation_database_apikey', models.CharField(max_length=255)),
-                ('annotation_database_secret_token', models.CharField(max_length=255)),
-                ('include_instructor_tab', models.BooleanField(default=False, help_text='Include a tab for instructor annotations.')),
-                ('include_mynotes_tab', models.BooleanField(default=True, help_text="Include a tab for user's annotations. Warning: Turning this off will not allow students to make annotations.")),
-                ('include_public_tab', models.BooleanField(default=True, help_text="Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations.")),
-                ('allow_highlights', models.BooleanField(default=False, help_text='Allow predetermined tags with colors.')),
-                ('highlights_options', models.CharField(blank=True, max_length=255)),
-                ('allow_touch', models.BooleanField(default=False, help_text='Allow touch devices to use tool (warning, experimental).')),
-                ('pagination_limit', models.IntegerField(help_text="How many annotations should show up when you hit the 'More' button?")),
-                ('allow_flags', models.BooleanField(default=False, help_text='Allow users to flag items as inappropriate/offensive.')),
-                ('is_published', models.BooleanField(default=True, help_text='Published assignments are available to students while unpublished are not.')),
-                ('default_tab', models.CharField(choices=[('Instructor', 'Instructor'), ('MyNotes', 'My Notes'), ('Public', 'Public')], default='Public', max_length=20)),
-                ('hidden', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "assignment_id",
+                    models.CharField(
+                        blank=True, default=uuid.uuid4, max_length=100, unique=True
+                    ),
+                ),
+                (
+                    "assignment_name",
+                    models.CharField(
+                        default="No Assignment Name Given", max_length=255
+                    ),
+                ),
+                ("annotation_database_url", models.CharField(max_length=255)),
+                ("annotation_database_apikey", models.CharField(max_length=255)),
+                ("annotation_database_secret_token", models.CharField(max_length=255)),
+                (
+                    "include_instructor_tab",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Include a tab for instructor annotations.",
+                    ),
+                ),
+                (
+                    "include_mynotes_tab",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Include a tab for user's annotations. Warning: Turning this off will not allow students to make annotations.",
+                    ),
+                ),
+                (
+                    "include_public_tab",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Include a tab for public annotations. Used for private annotations. If you want users to view each other's annotations.",
+                    ),
+                ),
+                (
+                    "allow_highlights",
+                    models.BooleanField(
+                        default=False, help_text="Allow predetermined tags with colors."
+                    ),
+                ),
+                ("highlights_options", models.CharField(blank=True, max_length=255)),
+                (
+                    "allow_touch",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Allow touch devices to use tool (warning, experimental).",
+                    ),
+                ),
+                (
+                    "pagination_limit",
+                    models.IntegerField(
+                        help_text="How many annotations should show up when you hit the 'More' button?"
+                    ),
+                ),
+                (
+                    "allow_flags",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Allow users to flag items as inappropriate/offensive.",
+                    ),
+                ),
+                (
+                    "is_published",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Published assignments are available to students while unpublished are not.",
+                    ),
+                ),
+                (
+                    "default_tab",
+                    models.CharField(
+                        choices=[
+                            ("Instructor", "Instructor"),
+                            ("MyNotes", "My Notes"),
+                            ("Public", "Public"),
+                        ],
+                        default="Public",
+                        max_length=20,
+                    ),
+                ),
+                ("hidden", models.BooleanField(default=False)),
             ],
-            options={
-                'ordering': ['id'],
-            },
+            options={"ordering": ["id"],},
         ),
         migrations.CreateModel(
-            name='AssignmentTargets',
+            name="AssignmentTargets",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order', models.IntegerField(verbose_name='Order')),
-                ('target_external_css', models.CharField(blank=True, help_text='Only input a URL to an externally hosted CSS file.', max_length=255)),
-                ('target_instructions', models.TextField(blank=True, help_text='Add instructions for this object in this assignment.', null=True)),
-                ('target_external_options', models.TextField(blank=True, null=True)),
-                ('assignment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='hx_lti_assignment.Assignment', verbose_name='Assignment')),
-                ('target_object', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='target_object_database.TargetObject', verbose_name='Source Material')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("order", models.IntegerField(verbose_name="Order")),
+                (
+                    "target_external_css",
+                    models.CharField(
+                        blank=True,
+                        help_text="Only input a URL to an externally hosted CSS file.",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "target_instructions",
+                    models.TextField(
+                        blank=True,
+                        help_text="Add instructions for this object in this assignment.",
+                        null=True,
+                    ),
+                ),
+                ("target_external_options", models.TextField(blank=True, null=True)),
+                (
+                    "assignment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="hx_lti_assignment.Assignment",
+                        verbose_name="Assignment",
+                    ),
+                ),
+                (
+                    "target_object",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="target_object_database.TargetObject",
+                        verbose_name="Source Material",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order'],
-                'verbose_name_plural': 'Assignment Targets',
-                'verbose_name': 'Assignment Target',
+                "ordering": ["order"],
+                "verbose_name_plural": "Assignment Targets",
+                "verbose_name": "Assignment Target",
             },
         ),
         migrations.AddField(
-            model_name='assignment',
-            name='assignment_objects',
-            field=models.ManyToManyField(through='hx_lti_assignment.AssignmentTargets', to='target_object_database.TargetObject'),
+            model_name="assignment",
+            name="assignment_objects",
+            field=models.ManyToManyField(
+                through="hx_lti_assignment.AssignmentTargets",
+                to="target_object_database.TargetObject",
+            ),
         ),
         migrations.AddField(
-            model_name='assignment',
-            name='course',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assignments', to='hx_lti_initializer.LTICourse'),
+            model_name="assignment",
+            name="course",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="assignments",
+                to="hx_lti_initializer.LTICourse",
+            ),
         ),
     ]

@@ -47,13 +47,10 @@ class LTITODAPITests(TestCase):
         # trivial parameter because class methods also pass in "self" as a
         # parameter first
         self.assertRaises(
-            NotImplementedError,
-            self.sampleTODAPI.get_own_targets_from_course,
-            ''
+            NotImplementedError, self.sampleTODAPI.get_own_targets_from_course, ""
         )
         self.assertRaises(
-            NotImplementedError,
-            self.sampleTODAPI.get_own_targets_as_user
+            NotImplementedError, self.sampleTODAPI.get_own_targets_as_user
         )
 
 
@@ -74,13 +71,14 @@ class TOD_ImplementationTests(TestCase):
         """
         """
         self.sampleImplementation = TOD_Implementation()
-        self.user1, self.ltiprofile1 = self.createFakeUser("fakeusername1", "fakeuserid1")
-        self.user2, self.ltiprofile2 = self.createFakeUser("fakeusername2", "fakeuserid2")
-
-        self.samplecourse = LTICourse.create_course(
-            "fake_course",
-            self.ltiprofile1
+        self.user1, self.ltiprofile1 = self.createFakeUser(
+            "fakeusername1", "fakeuserid1"
         )
+        self.user2, self.ltiprofile2 = self.createFakeUser(
+            "fakeusername2", "fakeuserid2"
+        )
+
+        self.samplecourse = LTICourse.create_course("fake_course", self.ltiprofile1)
         self.samplecourse.course_name = "Fake Course"
         self.samplecourse.save()
         self.target1 = TargetObject(
@@ -88,7 +86,7 @@ class TOD_ImplementationTests(TestCase):
             target_author="Test Author",
             target_content="Fake Content",
             target_citation="Fake Citation",
-            target_type="tx"
+            target_type="tx",
         )
         self.target1.save()
         self.target1.target_courses.add(self.samplecourse)
@@ -97,7 +95,7 @@ class TOD_ImplementationTests(TestCase):
             target_author="Test Author",
             target_content="Fake Content2",
             target_citation="Fake Citation2",
-            target_type="tx"
+            target_type="tx",
         )
         self.target2.save()
         self.target2.target_courses.add(self.samplecourse)
@@ -121,10 +119,18 @@ class TOD_ImplementationTests(TestCase):
     def test_get_own_targets_from_course(self):
         """
         """
-        self.assertTrue(len(TOD_Implementation.get_own_targets_from_course("fake_course")) == 2)  # noqa
-        self.assertRaises(ObjectDoesNotExist, TOD_Implementation.get_own_targets_from_course, 'fake_course2')  # noqa
-        course2 = LTICourse.create_course('fake_course2', self.ltiprofile1)
-        self.assertTrue(len(TOD_Implementation.get_own_targets_from_course("fake_course2")) == 0)  # noqa
+        self.assertTrue(
+            len(TOD_Implementation.get_own_targets_from_course("fake_course")) == 2
+        )  # noqa
+        self.assertRaises(
+            ObjectDoesNotExist,
+            TOD_Implementation.get_own_targets_from_course,
+            "fake_course2",
+        )  # noqa
+        course2 = LTICourse.create_course("fake_course2", self.ltiprofile1)
+        self.assertTrue(
+            len(TOD_Implementation.get_own_targets_from_course("fake_course2")) == 0
+        )  # noqa
 
     def test_get_dict_of_files_from_courses(self):
         """
@@ -133,12 +139,16 @@ class TOD_ImplementationTests(TestCase):
             LTICourse.get_all_courses()
         )
         self.assertIsInstance(dict_of_targets, dict)
-        self.assertTrue(len(dict_of_targets['Fake Course']) == 2)
-        self.assertTrue(self.target1 in dict_of_targets['Fake Course'])
-        self.assertTrue(self.target2 in dict_of_targets['Fake Course'])
+        self.assertTrue(len(dict_of_targets["Fake Course"]) == 2)
+        self.assertTrue(self.target1 in dict_of_targets["Fake Course"])
+        self.assertTrue(self.target2 in dict_of_targets["Fake Course"])
 
     def test_get_own_targets_as_user(self):
         """
         """
-        self.assertTrue(len(TOD_Implementation.get_own_targets_as_user(self.ltiprofile1)) == 2)  # noqa
-        self.assertTrue(len(TOD_Implementation.get_own_targets_as_user(self.ltiprofile2)) == 0)  # noqa
+        self.assertTrue(
+            len(TOD_Implementation.get_own_targets_as_user(self.ltiprofile1)) == 2
+        )  # noqa
+        self.assertTrue(
+            len(TOD_Implementation.get_own_targets_as_user(self.ltiprofile2)) == 0
+        )  # noqa

@@ -7,17 +7,17 @@ from hx_lti_initializer.models import LTICourse, LTIProfile
 
 def get_extension(srcurl):
     """get the extension of a given url """
-    if 'youtu' in srcurl:
-        return 'video/youtube'
+    if "youtu" in srcurl:
+        return "video/youtube"
     else:
         disassembled = urlparse(srcurl)
         file_ext = splitext(basename(disassembled.path))[1]
-        return 'video/' + file_ext.replace('.', '')
+        return "video/" + file_ext.replace(".", "")
 
 
 class LTI_TodApi(models.Model):
     class Meta:
-        app_label = 'Source Text/Image/Video Database'
+        app_label = "Source Text/Image/Video Database"
         abstract = True
 
 
@@ -35,51 +35,45 @@ class TargetObject(LTI_TodApi):
     target_creator = models.ForeignKey(LTIProfile, null=True, on_delete=models.SET_NULL)
     target_courses = models.ManyToManyField(LTICourse)
     ANNOTATION_TYPES = (
-        ('tx', 'Text Annotation'),
-        ('vd', 'Video Annotation'),
-        ('ig', 'Image Annotation'),
+        ("tx", "Text Annotation"),
+        ("vd", "Video Annotation"),
+        ("ig", "Image Annotation"),
     )
 
-    target_type = models.CharField(
-        max_length=2,
-        choices=ANNOTATION_TYPES,
-        default='tx'
-    )
+    target_type = models.CharField(max_length=2, choices=ANNOTATION_TYPES, default="tx")
 
     def __str__(self):
-        return "\"" + self.target_title + "\" by " + self.target_author
+        return '"' + self.target_title + '" by ' + self.target_author
 
     def __unicode__(self):
-        return u"\"%s\" by %s" % (self.target_title, self.target_author)
+        return '"%s" by %s' % (self.target_title, self.target_author)
 
     class Meta:
         verbose_name = "Source"
-        ordering = ['target_title']
+        ordering = ["target_title"]
 
     def get_targets_from_creator(user_requesting, user_requested):
-        if (user_requesting.user.is_staff is True):
+        if user_requesting.user.is_staff is True:
             return TargetObject.objects.filter(target_creator=user_requested)
         return None
 
     def get_own_targets(user_requesting):
-        if (user_requesting.user.is_staff is True):
+        if user_requesting.user.is_staff is True:
             return TargetObject.objects.filter(target_creator=user_requesting)
         return None
 
     def get_all_targets(user_requesting):
-        if(user_requesting.user.is_staff is True):
+        if user_requesting.user.is_staff is True:
             return TargetObject.objects.all()
         return None
 
     def get_target_content_by_title(user_requesting, title_given):
-        if(user_requesting.user.is_staff is True):
-            return TargetObject.objects.filter(
-                target_title__icontains=title_given
-            )
+        if user_requesting.user.is_staff is True:
+            return TargetObject.objects.filter(target_title__icontains=title_given)
         return None
 
     def get_target_content_uri(self):
-        if self.target_type in ('ig', 'vd'):
+        if self.target_type in ("ig", "vd"):
             return self.target_content.strip()
         return None
 
@@ -87,19 +81,45 @@ class TargetObject(LTI_TodApi):
         return TargetObject.objects.get(pk=id_requested)
 
     def get_target_content_as_list(self):
-        return self.target_content.split(';')
+        return self.target_content.split(";")
 
     def get_target_content_for_video(self):
         target_content = self.target_content
         if target_content is None:
             return ""
-        result = target_content.split(';')
+        result = target_content.split(";")
         if len(result) == 1:
-            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />"
+            return (
+                '<source src="'
+                + result[0]
+                + "\" type='"
+                + get_extension(result[0])
+                + "' />"
+            )
         if len(result) == 2:
-            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />" + \
-                   "<track kind='captions' src='" + result[1] + "' srclang='en' label='English' default />"
+            return (
+                '<source src="'
+                + result[0]
+                + "\" type='"
+                + get_extension(result[0])
+                + "' />"
+                + "<track kind='captions' src='"
+                + result[1]
+                + "' srclang='en' label='English' default />"
+            )
         if len(result) == 3:
-            return "<source src=\"" + result[0] + "\" type='" + get_extension(result[0]) + "' />" + \
-                   "<source src=\"" + result[1] + "\" type='" + get_extension(result[1]) + "' />" + \
-                   "<track kind='captions' src='" + result[2] + "' srclang='en' label='English' default />"
+            return (
+                '<source src="'
+                + result[0]
+                + "\" type='"
+                + get_extension(result[0])
+                + "' />"
+                + '<source src="'
+                + result[1]
+                + "\" type='"
+                + get_extension(result[1])
+                + "' />"
+                + "<track kind='captions' src='"
+                + result[2]
+                + "' srclang='en' label='English' default />"
+            )

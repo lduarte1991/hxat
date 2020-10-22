@@ -15,63 +15,119 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='LTICourse',
+            name="LTICourse",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('course_id', models.CharField(default='No Course ID', max_length=255)),
-                ('course_name', models.CharField(default='No Default Name', max_length=255)),
-                ('course_external_css_default', models.CharField(blank=True, help_text='Please only add a URL to an externally hosted file.', max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("course_id", models.CharField(default="No Course ID", max_length=255)),
+                (
+                    "course_name",
+                    models.CharField(default="No Default Name", max_length=255),
+                ),
+                (
+                    "course_external_css_default",
+                    models.CharField(
+                        blank=True,
+                        help_text="Please only add a URL to an externally hosted file.",
+                        max_length=255,
+                    ),
+                ),
             ],
-            options={
-                'verbose_name': 'Course',
-            },
+            options={"verbose_name": "Course",},
         ),
         migrations.CreateModel(
-            name='LTICourseAdmin',
+            name="LTICourseAdmin",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('admin_unique_identifier', models.CharField(max_length=255)),
-                ('new_admin_course_id', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("admin_unique_identifier", models.CharField(max_length=255)),
+                ("new_admin_course_id", models.CharField(max_length=255)),
             ],
-            options={
-                'verbose_name': 'Pending Admin',
-            },
+            options={"verbose_name": "Pending Admin",},
         ),
         migrations.CreateModel(
-            name='LTIProfile',
+            name="LTIProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('roles', models.CharField(blank=True, max_length=255, null=True, verbose_name='Roles')),
-                ('anon_id', models.CharField(blank=True, max_length=255, null=True)),
-                ('name', models.CharField(blank=True, max_length=255, null=True)),
-                ('scope', models.CharField(blank=True, max_length=1024, null=True)),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='annotations_user_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "roles",
+                    models.CharField(
+                        blank=True, max_length=255, null=True, verbose_name="Roles"
+                    ),
+                ),
+                ("anon_id", models.CharField(blank=True, max_length=255, null=True)),
+                ("name", models.CharField(blank=True, max_length=255, null=True)),
+                ("scope", models.CharField(blank=True, max_length=1024, null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="annotations_user_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'verbose_name': 'Instructor/Administrator',
-            },
+            options={"verbose_name": "Instructor/Administrator",},
         ),
         migrations.CreateModel(
-            name='LTIResourceLinkConfig',
+            name="LTIResourceLinkConfig",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('resource_link_id', models.CharField(max_length=255)),
-                ('object_id', models.CharField(max_length=255)),
-                ('collection_id', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("resource_link_id", models.CharField(max_length=255)),
+                ("object_id", models.CharField(max_length=255)),
+                ("collection_id", models.CharField(max_length=255)),
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='lticourseadmin',
-            unique_together={('admin_unique_identifier', 'new_admin_course_id')},
+            name="lticourseadmin",
+            unique_together={("admin_unique_identifier", "new_admin_course_id")},
         ),
         migrations.AddField(
-            model_name='lticourse',
-            name='course_admins',
-            field=models.ManyToManyField(related_name='course_admin_user_profiles', to='hx_lti_initializer.LTIProfile'),
+            model_name="lticourse",
+            name="course_admins",
+            field=models.ManyToManyField(
+                related_name="course_admin_user_profiles",
+                to="hx_lti_initializer.LTIProfile",
+            ),
         ),
         migrations.AddField(
-            model_name='lticourse',
-            name='course_users',
-            field=models.ManyToManyField(blank=True, related_name='course_user_profiles', to='hx_lti_initializer.LTIProfile'),
+            model_name="lticourse",
+            name="course_users",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="course_user_profiles",
+                to="hx_lti_initializer.LTIProfile",
+            ),
         ),
     ]

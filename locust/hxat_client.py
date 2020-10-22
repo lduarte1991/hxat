@@ -10,13 +10,13 @@ from utils import Console
 
 def make_jwt(apikey, secret, user, iat=None, ttl=36000, override=[], backcompat=False):
     payload = {
-        'consumerKey': apikey if apikey else str(uuid4()),
-        'userId': user if user else str(uuid4()),
-        'issuedAt': iat if iat else datetime.now(tz.tzutc()).isoformat(),
-        'ttl': ttl,
+        "consumerKey": apikey if apikey else str(uuid4()),
+        "userId": user if user else str(uuid4()),
+        "issuedAt": iat if iat else datetime.now(tz.tzutc()).isoformat(),
+        "ttl": ttl,
     }
     if not backcompat:
-        payload['override'] = override
+        payload["override"] = override
 
     return jwt.encode(payload, secret)
 
@@ -59,52 +59,52 @@ class HxatClient(object):
         )
 
 
-FAKE_USER_ID = 'fake_user'
-FAKE_USER_NAME = 'fake_username'
-FAKE_USER_ROLES = 'Learner'
-FAKE_COLLECTION_ID = 'fake-collection-id'
-FAKE_CONTEXT_ID = 'fake-context-id'
-FAKE_CONTEXT_TITLE = 'fake-context-id-title'
-FAKE_TARGET_SOURCE_ID = '0'
-FAKE_RESOURCE_LINK_ID = 'fake-resource-link-id'
-FAKE_HXAT_CONSUMER = 'fake-consumer-key'
-FAKE_HXAT_SECRET = 'fake-secret-key'
-FAKE_STORE_CONSUMER = 'fake-store-consumer'
-FAKE_STORE_SECRET = 'fake-store-secret'
+FAKE_USER_ID = "fake_user"
+FAKE_USER_NAME = "fake_username"
+FAKE_USER_ROLES = "Learner"
+FAKE_COLLECTION_ID = "fake-collection-id"
+FAKE_CONTEXT_ID = "fake-context-id"
+FAKE_CONTEXT_TITLE = "fake-context-id-title"
+FAKE_TARGET_SOURCE_ID = "0"
+FAKE_RESOURCE_LINK_ID = "fake-resource-link-id"
+FAKE_HXAT_CONSUMER = "fake-consumer-key"
+FAKE_HXAT_SECRET = "fake-secret-key"
+FAKE_STORE_CONSUMER = "fake-store-consumer"
+FAKE_STORE_SECRET = "fake-store-secret"
 
 
-def get_hxat_client(cat='fake', random_user=True):
-    if cat == 'from_env':
+def get_hxat_client(cat="fake", random_user=True):
+    if cat == "from_env":
         if random_user:
             user_id = uuid4().hex
-            user_name = 'naomi-{}'.format(user_id)
+            user_name = "naomi-{}".format(user_id)
         else:
-            user_id = os.environ.get('USER_ID')
-            user_name = os.environ.get('USER_NAME')
+            user_id = os.environ.get("USER_ID")
+            user_name = os.environ.get("USER_NAME")
         return HxatClient(
             user_id=user_id,
             user_name=user_name,
             user_roles=[
                 r.strip()
-                for r in os.environ.get('USER_ROLES', FAKE_USER_ROLES).split(',')
+                for r in os.environ.get("USER_ROLES", FAKE_USER_ROLES).split(",")
             ],
-            collection_id=os.environ.get('COLLECTION_ID', FAKE_COLLECTION_ID),
-            context_id=os.environ.get('CONTEXT_ID', FAKE_CONTEXT_ID),
-            context_title=os.environ.get('CONTEXT_TITLE', FAKE_CONTEXT_TITLE),
-            target_source_id=os.environ.get('TARGET_SOURCE_ID', FAKE_TARGET_SOURCE_ID),
-            resource_link_id=os.environ.get('RESOURCE_LINK_ID', FAKE_RESOURCE_LINK_ID),
-            consumer_key=os.environ.get('HXAT_CONSUMER', FAKE_HXAT_CONSUMER),
-            secret_key=os.environ.get('HXAT_SECRET', FAKE_HXAT_SECRET),
-            store_consumer=os.environ.get('STORE_CONSUMER', FAKE_STORE_CONSUMER),
-            store_secret=os.environ.get('STORE_SECRET', FAKE_STORE_SECRET),
+            collection_id=os.environ.get("COLLECTION_ID", FAKE_COLLECTION_ID),
+            context_id=os.environ.get("CONTEXT_ID", FAKE_CONTEXT_ID),
+            context_title=os.environ.get("CONTEXT_TITLE", FAKE_CONTEXT_TITLE),
+            target_source_id=os.environ.get("TARGET_SOURCE_ID", FAKE_TARGET_SOURCE_ID),
+            resource_link_id=os.environ.get("RESOURCE_LINK_ID", FAKE_RESOURCE_LINK_ID),
+            consumer_key=os.environ.get("HXAT_CONSUMER", FAKE_HXAT_CONSUMER),
+            secret_key=os.environ.get("HXAT_SECRET", FAKE_HXAT_SECRET),
+            store_consumer=os.environ.get("STORE_CONSUMER", FAKE_STORE_CONSUMER),
+            store_secret=os.environ.get("STORE_SECRET", FAKE_STORE_SECRET),
         )
     else:
         user_id = uuid4().hex
-        user_name = 'naomi-{}'.format(user_id)
+        user_name = "naomi-{}".format(user_id)
         return HxatClient(
             user_id=user_id,
             user_name=user_name,
-            user_roles=[r.strip() for r in FAKE_USER_ROLES.split(',')],
+            user_roles=[r.strip() for r in FAKE_USER_ROLES.split(",")],
             collection_id=FAKE_COLLECTION_ID,
             context_id=FAKE_CONTEXT_ID,
             context_title=FAKE_CONTEXT_TITLE,
@@ -126,25 +126,27 @@ class HxatLocust(HttpLocust):
         self.console = Console()
 
         # default is verbose=True
-        self.verbose = os.environ.get('HXAT_LOCUST_VERBOSE', 'true').lower() == 'true'
+        self.verbose = os.environ.get("HXAT_LOCUST_VERBOSE", "true").lower() == "true"
 
         # settings for this hxat user instance
-        random_user = os.environ.get('FORCE_SINGLE_USER', 'false').lower() == 'false'
-        self.hxat_client = get_hxat_client(cat='from_env', random_user=random_user)
+        random_user = os.environ.get("FORCE_SINGLE_USER", "false").lower() == "false"
+        self.hxat_client = get_hxat_client(cat="from_env", random_user=random_user)
 
         # TODO: this dumps lots of message for each http request
-        self.ssl_verify = os.environ.get('HXAT_LOCUST_SSL_VERIFY', 'false').lower() == 'true'
+        self.ssl_verify = (
+            os.environ.get("HXAT_LOCUST_SSL_VERIFY", "false").lower() == "true"
+        )
 
         # check if should use ssl (for ws)
-        self.use_ssl = self.host.startswith('https')
+        self.use_ssl = self.host.startswith("https")
 
         # do not create ws-client until a successful lti-launch
         self.ws_client = None
 
         for attr, value in vars(self.hxat_client).items():
-            self.console.write('----- {} = {} '.format(attr, value))
+            self.console.write("----- {} = {} ".format(attr, value))
         for attr, value in vars(self).items():
-            self.console.write('***** {} = {}'.format(attr, value))
+            self.console.write("***** {} = {}".format(attr, value))
 
     def log(self, msg):
         # TODO: locust has a instance id?

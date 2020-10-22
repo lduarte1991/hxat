@@ -1,4 +1,3 @@
-
 import json
 import uuid
 
@@ -16,14 +15,14 @@ from hx_lti_initializer.utils import retrieve_token
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_default_ok(
-        lti_path,
-        lti_launch_url,
-        course_user_lti_launch_params,
-        assignment_target_factory,
-        annotatorjs_annotation_factory,
-        catchpy_search_result_shell,
-        ):
-    '''webannotation api, redirected to the default annotatorjs api.'''
+    lti_path,
+    lti_launch_url,
+    course_user_lti_launch_params,
+    assignment_target_factory,
+    annotatorjs_annotation_factory,
+    catchpy_search_result_shell,
+):
+    """webannotation api, redirected to the default annotatorjs api."""
 
     # 1. create course, assignment, target_object, user
     course, user, launch_params = course_user_lti_launch_params
@@ -33,59 +32,54 @@ def test_api_root_default_ok(
     assignment.save()
 
     # 2. set starting resource
-    resource_link_id = launch_params['resource_link_id']
+    resource_link_id = launch_params["resource_link_id"]
     resource_config = LTIResourceLinkConfig.objects.create(
-        resource_link_id=resource_link_id,
-        assignment_target=assignment_target,
+        resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
-    response = client.post(
-            lti_path,
-            data=launch_params,
-            )
+    response = client.post(lti_path, data=launch_params,)
     assert response.status_code == 302
 
     # set responses to assert
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
     search_result = catchpy_search_result_shell
-    search_result['total'] = 1
-    search_result['size'] = 1
-    search_result['rows'].append(annojs)
+    search_result["total"] = 1
+    search_result["size"] = 1
+    search_result["rows"].append(annojs)
 
     annotation_store_urls = {}
-    for op in ['create', 'search']:
-        annotation_store_urls[op] = '{}/{}'.format(
-                assignment.annotation_database_url,
-                op)
-    for op in ['update', 'delete']:
-        annotation_store_urls[op] = '{}/{}/{}'.format(
-                assignment.annotation_database_url,
-                op,
-                annojs_id)
+    for op in ["create", "search"]:
+        annotation_store_urls[op] = "{}/{}".format(
+            assignment.annotation_database_url, op
+        )
+    for op in ["update", "delete"]:
+        annotation_store_urls[op] = "{}/{}/{}".format(
+            assignment.annotation_database_url, op, annojs_id
+        )
 
     responses.add(
-            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
-            )
+        responses.POST, annotation_store_urls["create"], json=annojs, status=200,
+    )
     responses.add(
-            responses.POST, annotation_store_urls['update'], json=annojs, status=200,
-            )
+        responses.POST, annotation_store_urls["update"], json=annojs, status=200,
+    )
     responses.add(
-            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
-            )
+        responses.DELETE, annotation_store_urls["delete"], json=annojs, status=200,
+    )
     responses.add(
-            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
-            )
+        responses.GET, annotation_store_urls["search"], json=search_result, status=200,
+    )
 
-    path = reverse('annotation_store:api_root_prefix')
+    path = reverse("annotation_store:api_root_prefix")
 
     # search request
     response = client.get(
-            '{}?resource_link_id={}'.format(path, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
-            )
+        "{}?resource_link_id={}".format(path, resource_link_id),
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hahaha",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 1
@@ -93,36 +87,31 @@ def test_api_root_default_ok(
 
     # create request
     response = client.post(
-            '{}/{}?resource_link_id={}'.format(
-                path, annojs_id, resource_link_id),
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
-            )
+        "{}/{}?resource_link_id={}".format(path, annojs_id, resource_link_id),
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hohoho",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 2
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}'.format(path, annojs_id)
+    path_with_id = "{}/{}".format(path, annojs_id)
     response = client.put(
-            path_with_id,
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
-            )
+        path_with_id,
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hihihi",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 3
     assert content == annojs
 
-
     # delete request
-    response = client.delete(
-            path_with_id,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
-            )
+    response = client.delete(path_with_id, HTTP_X_ANNOTATOR_AUTH_TOKEN="hehehe",)
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
@@ -132,90 +121,87 @@ def test_api_root_default_ok(
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_backend_from_request_ok(
-        lti_path,
-        lti_launch_url,
-        course_user_lti_launch_params,
-        assignment_target_factory,
-        annotatorjs_annotation_factory,
-        catchpy_search_result_shell,
-        ):
-    '''webannotation api, configured from client search request.'''
+    lti_path,
+    lti_launch_url,
+    course_user_lti_launch_params,
+    assignment_target_factory,
+    annotatorjs_annotation_factory,
+    catchpy_search_result_shell,
+):
+    """webannotation api, configured from client search request."""
 
     # 1. create course, assignment, target_object, user
     course, user, launch_params = course_user_lti_launch_params
     assignment_target = assignment_target_factory(course)
     target_object = assignment_target.target_object
     assignment = assignment_target.assignment
-    #assignment.annotation_database_url = 'http://funky.com'
-    #assignment.annotation_database_apikey = 'funky_key'
-    #assignment.annotation_database_secret_token = 'funky_secret'
+    # assignment.annotation_database_url = 'http://funky.com'
+    # assignment.annotation_database_apikey = 'funky_key'
+    # assignment.annotation_database_secret_token = 'funky_secret'
     assignment.save()
 
     # 2. set starting resource
-    resource_link_id = launch_params['resource_link_id']
+    resource_link_id = launch_params["resource_link_id"]
     resource_config = LTIResourceLinkConfig.objects.create(
-        resource_link_id=resource_link_id,
-        assignment_target=assignment_target,
+        resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
-    response = client.post(
-            lti_path,
-            data=launch_params,
-            )
+    response = client.post(lti_path, data=launch_params,)
     assert response.status_code == 302
-    assert(response.cookies.get('sessionid'))
-    expected_url = reverse(
-            'hx_lti_initializer:access_annotation_target',
-            args=[course.course_id,assignment.assignment_id,target_object.pk]
-            ) + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
+    assert response.cookies.get("sessionid")
+    expected_url = (
+        reverse(
+            "hx_lti_initializer:access_annotation_target",
+            args=[course.course_id, assignment.assignment_id, target_object.pk],
+        )
+        + f"?resource_link_id={resource_link_id}"
+    )
+    assert response.url == expected_url
 
     # 4. access target object to be able to create annotations on it
     #    this is required after live-updates implementation!
     response = client.get(expected_url)
-    assert(response.status_code) == 200
+    assert (response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
     search_result = catchpy_search_result_shell
-    search_result['total'] = 1
-    search_result['size'] = 1
-    search_result['rows'].append(annojs)
+    search_result["total"] = 1
+    search_result["size"] = 1
+    search_result["rows"].append(annojs)
 
     annotation_store_urls = {}
-    for op in ['search']:
-        annotation_store_urls[op] = '{}'.format(
-                assignment.annotation_database_url,
-                )
-    for op in ['create', 'update', 'delete']:
-        annotation_store_urls[op] = '{}/{}'.format(
-                assignment.annotation_database_url,
-                annojs_id)
+    for op in ["search"]:
+        annotation_store_urls[op] = "{}".format(assignment.annotation_database_url,)
+    for op in ["create", "update", "delete"]:
+        annotation_store_urls[op] = "{}/{}".format(
+            assignment.annotation_database_url, annojs_id
+        )
 
     responses.add(
-            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
-            )
+        responses.POST, annotation_store_urls["create"], json=annojs, status=200,
+    )
     responses.add(
-            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
-            )
+        responses.PUT, annotation_store_urls["update"], json=annojs, status=200,
+    )
     responses.add(
-            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
-            )
+        responses.DELETE, annotation_store_urls["delete"], json=annojs, status=200,
+    )
     responses.add(
-            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
-            )
+        responses.GET, annotation_store_urls["search"], json=search_result, status=200,
+    )
 
-    path = reverse('annotation_store:api_root_prefix')
+    path = reverse("annotation_store:api_root_prefix")
 
     # search request
     response = client.get(
-            '{}?version=catchpy&resource_link_id={}'.format(path, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
-            )
+        "{}?version=catchpy&resource_link_id={}".format(path, resource_link_id),
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hahaha",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 1
@@ -223,26 +209,28 @@ def test_api_root_backend_from_request_ok(
 
     # create request
     response = client.post(
-            '{}/{}?version=catchpy&resource_link_id={}'.format(
-                path, annojs_id, resource_link_id),
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
-            )
+        "{}/{}?version=catchpy&resource_link_id={}".format(
+            path, annojs_id, resource_link_id
+        ),
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hehehe",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 2
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
-            path, annojs_id, resource_link_id)
+    path_with_id = "{}/{}?version=catchpy&resource_link_id={}".format(
+        path, annojs_id, resource_link_id
+    )
     response = client.put(
-            path_with_id,
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
-            )
+        path_with_id,
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hihihi",
+    )
     assert response.status_code == 200
 
     content = json.loads(response.content.decode())
@@ -250,10 +238,7 @@ def test_api_root_backend_from_request_ok(
     assert content == annojs
 
     # delete request
-    response = client.delete(
-            path_with_id,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
-            )
+    response = client.delete(path_with_id, HTTP_X_ANNOTATOR_AUTH_TOKEN="hohoho",)
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
@@ -263,125 +248,126 @@ def test_api_root_backend_from_request_ok(
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_backend_from_request_store_cfg_from_db_ok(
-        lti_path,
-        lti_launch_url,
-        course_user_lti_launch_params,
-        assignment_target_factory,
-        annotatorjs_annotation_factory,
-        catchpy_search_result_shell,
-        ):
-    '''webannotation api, configured from client search request.'''
+    lti_path,
+    lti_launch_url,
+    course_user_lti_launch_params,
+    assignment_target_factory,
+    annotatorjs_annotation_factory,
+    catchpy_search_result_shell,
+):
+    """webannotation api, configured from client search request."""
 
     # 1. create course, assignment, target_object, user
     course, user, launch_params = course_user_lti_launch_params
     assignment_target = assignment_target_factory(course)
     target_object = assignment_target.target_object
     assignment = assignment_target.assignment
-    assignment.annotation_database_url = 'http://funky.com'
-    assignment.annotation_database_apikey = 'funky_key'
-    assignment.annotation_database_secret_token = 'funky_secret'
+    assignment.annotation_database_url = "http://funky.com"
+    assignment.annotation_database_apikey = "funky_key"
+    assignment.annotation_database_secret_token = "funky_secret"
     assignment.save()
 
     # 2. set starting resource
-    resource_link_id = launch_params['resource_link_id']
+    resource_link_id = launch_params["resource_link_id"]
     resource_config = LTIResourceLinkConfig.objects.create(
-        resource_link_id=resource_link_id,
-        assignment_target=assignment_target,
+        resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
-    response = client.post(
-            lti_path,
-            data=launch_params,
-            )
+    response = client.post(lti_path, data=launch_params,)
     assert response.status_code == 302
-    assert(response.cookies.get('sessionid'))
-    expected_url = reverse(
-            'hx_lti_initializer:access_annotation_target',
-            args=[course.course_id,assignment.assignment_id,target_object.pk]
-            ) + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
+    assert response.cookies.get("sessionid")
+    expected_url = (
+        reverse(
+            "hx_lti_initializer:access_annotation_target",
+            args=[course.course_id, assignment.assignment_id, target_object.pk],
+        )
+        + f"?resource_link_id={resource_link_id}"
+    )
+    assert response.url == expected_url
 
     # 4. access target object to be able to create annotations on it
     #    this is required after live-updates implementation!
     response = client.get(expected_url)
-    assert(response.status_code) == 200
+    assert (response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
-    annojs['collectionId'] = '{}'.format(assignment.assignment_id)  # convert uuid to str
+    annojs["collectionId"] = "{}".format(
+        assignment.assignment_id
+    )  # convert uuid to str
     search_result = catchpy_search_result_shell
-    search_result['total'] = 1
-    search_result['size'] = 1
-    search_result['rows'].append(annojs)
+    search_result["total"] = 1
+    search_result["size"] = 1
+    search_result["rows"].append(annojs)
 
     annotation_store_urls = {}
-    for op in ['search']:  # search preserve params request to hxat
-        annotation_store_urls[op] = \
-            '{}/?version=catchpy&collectionId={}&resource_link_id={}'.format(
-                assignment.annotation_database_url,
-                assignment.assignment_id,
-                resource_link_id,
-                )
-    for op in ['create', 'update', 'delete']:
-        annotation_store_urls[op] = '{}/{}'.format(
-                assignment.annotation_database_url,
-                annojs_id,
-                )
+    for op in ["search"]:  # search preserve params request to hxat
+        annotation_store_urls[
+            op
+        ] = "{}/?version=catchpy&collectionId={}&resource_link_id={}".format(
+            assignment.annotation_database_url,
+            assignment.assignment_id,
+            resource_link_id,
+        )
+    for op in ["create", "update", "delete"]:
+        annotation_store_urls[op] = "{}/{}".format(
+            assignment.annotation_database_url, annojs_id,
+        )
 
     responses.add(
-            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
-            )
+        responses.POST, annotation_store_urls["create"], json=annojs, status=200,
+    )
     responses.add(
-            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
-            )
+        responses.PUT, annotation_store_urls["update"], json=annojs, status=200,
+    )
     responses.add(
-            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
-            )
+        responses.DELETE, annotation_store_urls["delete"], json=annojs, status=200,
+    )
     responses.add(
-            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
-            )
+        responses.GET, annotation_store_urls["search"], json=search_result, status=200,
+    )
 
-    path = reverse('annotation_store:api_root_prefix')
+    path = reverse("annotation_store:api_root_prefix")
 
     # create request
     response = client.post(
-            '{}/{}?version=catchpy&resource_link_id={}'.format(
-                path, annojs_id, resource_link_id),
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
-            )
+        "{}/{}?version=catchpy&resource_link_id={}".format(
+            path, annojs_id, resource_link_id
+        ),
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hahaha",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 1
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
-            path, annojs_id, resource_link_id)
+    path_with_id = "{}/{}?version=catchpy&resource_link_id={}".format(
+        path, annojs_id, resource_link_id
+    )
     response = client.put(
-            path_with_id,
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
-            )
+        path_with_id,
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hehehe",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 2
     assert content == annojs
 
     # delete request
-    path_delete = '{}/{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
-            path, annojs_id, assignment.assignment_id, resource_link_id)
+    path_delete = "{}/{}?version=catchpy&collectionId={}&resource_link_id={}".format(
+        path, annojs_id, assignment.assignment_id, resource_link_id
+    )
 
-    response = client.delete(
-            path_delete,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
-            )
+    response = client.delete(path_delete, HTTP_X_ANNOTATOR_AUTH_TOKEN="hihihi",)
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 3
@@ -390,10 +376,11 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     # search request
     # needs resource_link_id to access LTI params for pass_grade
     response = client.get(
-            '{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
-                path, assignment.assignment_id, resource_link_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
-            )
+        "{}?version=catchpy&collectionId={}&resource_link_id={}".format(
+            path, assignment.assignment_id, resource_link_id
+        ),
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hohoho",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
@@ -403,142 +390,144 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_webanno_grade_ok(
-        lti_path,
-        lti_launch_url,
-        course_user_lti_launch_params_with_grade,
-        assignment_target_factory,
-        annotatorjs_annotation_factory,
-        catchpy_search_result_shell,
-        make_lti_replaceResultResponse,
-        ):
-    '''webannotation api, configured from client search request.
+    lti_path,
+    lti_launch_url,
+    course_user_lti_launch_params_with_grade,
+    assignment_target_factory,
+    annotatorjs_annotation_factory,
+    catchpy_search_result_shell,
+    make_lti_replaceResultResponse,
+):
+    """webannotation api, configured from client search request.
 
     sends lis_outcome_service_url, lis_result_sourcedid to signal that lti
     consumer expects a grade
-    '''
+    """
 
     # 1. create course, assignment, target_object, user
     course, user, launch_params = course_user_lti_launch_params_with_grade
     assignment_target = assignment_target_factory(course)
     target_object = assignment_target.target_object
     assignment = assignment_target.assignment
-    assignment.annotation_database_url = 'http://funky.com'
-    assignment.annotation_database_apikey = 'funky_key'
-    assignment.annotation_database_secret_token = 'funky_secret'
+    assignment.annotation_database_url = "http://funky.com"
+    assignment.annotation_database_apikey = "funky_key"
+    assignment.annotation_database_secret_token = "funky_secret"
     assignment.save()
 
     # get outcome_resource_url
-    lis_outcome_service_url = launch_params['lis_outcome_service_url']
+    lis_outcome_service_url = launch_params["lis_outcome_service_url"]
 
     # 2. set starting resource
-    resource_link_id = launch_params['resource_link_id']
+    resource_link_id = launch_params["resource_link_id"]
     resource_config = LTIResourceLinkConfig.objects.create(
-        resource_link_id=resource_link_id,
-        assignment_target=assignment_target,
+        resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
     # 3. lti launch
     client = Client(enforce_csrf_checks=False)
-    response = client.post(
-            lti_path,
-            data=launch_params,
-            )
+    response = client.post(lti_path, data=launch_params,)
     assert response.status_code == 302
-    assert(response.cookies.get('sessionid'))
-    expected_url = reverse(
-            'hx_lti_initializer:access_annotation_target',
-            args=[course.course_id,assignment.assignment_id,target_object.pk]
-            ) + f'?resource_link_id={resource_link_id}'
-    assert(response.url == expected_url)
+    assert response.cookies.get("sessionid")
+    expected_url = (
+        reverse(
+            "hx_lti_initializer:access_annotation_target",
+            args=[course.course_id, assignment.assignment_id, target_object.pk],
+        )
+        + f"?resource_link_id={resource_link_id}"
+    )
+    assert response.url == expected_url
 
     # 4. access target object to be able to create annotations on it
     #    this is required after live-updates implementation!
     response = client.get(expected_url)
-    assert(response.status_code) == 200
+    assert (response.status_code) == 200
 
     # set responses to assert
     # TODO: if using webannotation api, should send webannotation format
     annojs = annotatorjs_annotation_factory(user)
     annojs_id = uuid.uuid4().int
-    annojs['collectionId'] = '{}'.format(assignment.assignment_id)  # convert uuid to str
+    annojs["collectionId"] = "{}".format(
+        assignment.assignment_id
+    )  # convert uuid to str
     search_result = catchpy_search_result_shell
-    search_result['total'] = 1
-    search_result['size'] = 1
-    search_result['rows'].append(annojs)
+    search_result["total"] = 1
+    search_result["size"] = 1
+    search_result["rows"].append(annojs)
 
     annotation_store_urls = {}
-    for op in ['search']:  # search preserve params request to hxat
-        annotation_store_urls[op] = \
-                '{}/?version=catchpy&collectionId={}&resource_link_id={}&userid={}' \
-                .format(
-                        assignment.annotation_database_url,
-                        assignment.assignment_id,
-                        resource_link_id,
-                        user.anon_id,
-                )
-    for op in ['create', 'update', 'delete']:
-        annotation_store_urls[op] = '{}/{}'.format(
-                assignment.annotation_database_url,
-                annojs_id,
-                )
+    for op in ["search"]:  # search preserve params request to hxat
+        annotation_store_urls[
+            op
+        ] = "{}/?version=catchpy&collectionId={}&resource_link_id={}&userid={}".format(
+            assignment.annotation_database_url,
+            assignment.assignment_id,
+            resource_link_id,
+            user.anon_id,
+        )
+    for op in ["create", "update", "delete"]:
+        annotation_store_urls[op] = "{}/{}".format(
+            assignment.annotation_database_url, annojs_id,
+        )
 
     responses.add(
-            responses.POST, annotation_store_urls['create'], json=annojs, status=200,
-            )
+        responses.POST, annotation_store_urls["create"], json=annojs, status=200,
+    )
     responses.add(
-            responses.PUT, annotation_store_urls['update'], json=annojs, status=200,
-            )
+        responses.PUT, annotation_store_urls["update"], json=annojs, status=200,
+    )
     responses.add(
-            responses.DELETE, annotation_store_urls['delete'], json=annojs, status=200,
-            )
+        responses.DELETE, annotation_store_urls["delete"], json=annojs, status=200,
+    )
     responses.add(
-            responses.GET, annotation_store_urls['search'], json=search_result, status=200,
-            )
+        responses.GET, annotation_store_urls["search"], json=search_result, status=200,
+    )
 
     replace_result_response = make_lti_replaceResultResponse
     responses.add(
-            responses.POST, lis_outcome_service_url,
-            body=replace_result_response, content_type='application/xml',
-            status=200,
-            )
+        responses.POST,
+        lis_outcome_service_url,
+        body=replace_result_response,
+        content_type="application/xml",
+        status=200,
+    )
 
-    path = reverse('annotation_store:api_root_prefix')
+    path = reverse("annotation_store:api_root_prefix")
 
     # create request
     response = client.post(
-            '{}/{}?version=catchpy&resource_link_id={}'.format(
-                path, annojs_id, resource_link_id),
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hahaha',
-            )
+        "{}/{}?version=catchpy&resource_link_id={}".format(
+            path, annojs_id, resource_link_id
+        ),
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hahaha",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 2
     assert content == annojs
 
     # update request
-    path_with_id = '{}/{}?version=catchpy&resource_link_id={}'.format(
-            path, annojs_id, resource_link_id)
+    path_with_id = "{}/{}?version=catchpy&resource_link_id={}".format(
+        path, annojs_id, resource_link_id
+    )
     response = client.put(
-            path_with_id,
-            data=annojs,
-            content_type='application/json',
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hehehe',
-            )
+        path_with_id,
+        data=annojs,
+        content_type="application/json",
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hehehe",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 3
     assert content == annojs
 
     # delete request
-    path_delete = '{}/{}?version=catchpy&collectionId={}&resource_link_id={}'.format(
-            path, annojs_id, assignment.assignment_id, resource_link_id)
+    path_delete = "{}/{}?version=catchpy&collectionId={}&resource_link_id={}".format(
+        path, annojs_id, assignment.assignment_id, resource_link_id
+    )
 
-    response = client.delete(
-            path_delete,
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hihihi',
-            )
+    response = client.delete(path_delete, HTTP_X_ANNOTATOR_AUTH_TOKEN="hihihi",)
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
@@ -547,18 +536,15 @@ def test_api_root_webanno_grade_ok(
     # search request
     # needs resource_link_id to access LTI params for pass_grade
     response = client.get(
-            '{}?version=catchpy&collectionId={}&resource_link_id={}&userid={}'.format(
-                path, assignment.assignment_id, resource_link_id, user.anon_id),
-            HTTP_X_ANNOTATOR_AUTH_TOKEN='hohoho',
-            )
+        "{}?version=catchpy&collectionId={}&resource_link_id={}&userid={}".format(
+            path, assignment.assignment_id, resource_link_id, user.anon_id
+        ),
+        HTTP_X_ANNOTATOR_AUTH_TOKEN="hohoho",
+    )
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 6
     assert content == search_result
-
-
-
-
 
 
 """
@@ -665,6 +651,3 @@ The annotation_store can be of 2 types:
 
 
 """
-
-
-

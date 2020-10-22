@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hx_lti_assignment', '0002_assignment_use_hxighlighter'),
+        ("hx_lti_assignment", "0002_assignment_use_hxighlighter"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assignment',
-            name='common_inst_name',
+            model_name="assignment",
+            name="common_inst_name",
             field=models.CharField(blank=True, max_length=255),
         ),
     ]

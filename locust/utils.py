@@ -23,9 +23,9 @@ class Console(code.InteractiveConsole):
 # catchpy webannotation funcs
 #
 def fetch_fortune():
-    process = Popen('fortune', shell=True, stdout=PIPE, stderr=None)
+    process = Popen("fortune", shell=True, stdout=PIPE, stderr=None)
     output, _ = process.communicate()
-    return output.decode('utf-8')
+    return output.decode("utf-8")
 
 
 def fresh_ann(hxat_client):

@@ -27,7 +27,7 @@ from tasks import (
 #    task_set = WSJustLTI
 
 
-#class WSUserConnectAndChangeObject(HxatLocust):
+# class WSUserConnectAndChangeObject(HxatLocust):
 #    weight = 3
 #    task_set = WSConnectAndChangeObject
 

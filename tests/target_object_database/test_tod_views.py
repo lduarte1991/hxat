@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -21,22 +20,16 @@ class TODViewsTests(TestCase):
         user = User(username="Luis", email="dfslkjfijeflkj")
         user.save()
         lti_profile = LTIProfile.objects.create(
-                user=user,
-                name=user.username,
-                anon_id='luis123')
+            user=user, name=user.username, anon_id="luis123"
+        )
         lti_profile.save()
 
-        course = LTICourse(
-            course_name="Fake Course",
-            course_id="BlueMonkeyFake"
-        )
+        course = LTICourse(course_name="Fake Course", course_id="BlueMonkeyFake")
         course.save()
         course.course_admins.add(lti_profile)
 
         self.assignment = Assignment(
-            assignment_name="Test",
-            pagination_limit=10,
-            course=course
+            assignment_name="Test", pagination_limit=10, course=course
         )
         self.assignment.save()
 
@@ -45,7 +38,7 @@ class TODViewsTests(TestCase):
             target_author="Test Author",
             target_content="Fake Content2",
             target_citation="Fake Citation2",
-            target_type="tx"
+            target_type="tx",
         )
         self.tod.save()
 
@@ -55,58 +48,49 @@ class TODViewsTests(TestCase):
             order=1,
             target_external_css="",
             target_instructions="Fake Instructions",
-            target_external_options=""
+            target_external_options="",
         )
 
-        self.target_path = reverse('hx_lti_initializer:launch_lti')
-        self.launch_url = 'http://testserver{}'.format(self.target_path)
-        self.resource_link_id = 'some_string_to_be_the_fake_resource_link_id'
+        self.target_path = reverse("hx_lti_initializer:launch_lti")
+        self.launch_url = "http://testserver{}".format(self.target_path)
+        self.resource_link_id = "some_string_to_be_the_fake_resource_link_id"
         self.consumer = ToolConsumer(
-                consumer_key=settings.CONSUMER_KEY,
-                consumer_secret=settings.LTI_SECRET,
-                launch_url=self.launch_url,
-                params={
-                    'lti_message_type': 'basic-lti-launch-request',
-                    'lti_version': 'LTI-1p0',
-                    'resource_link_id': self.resource_link_id,
-                    'lis_person_sourcedid': lti_profile.name,
-                    'lis_outcome_service_url': 'fake_url',
-                    'user_id': lti_profile.anon_id,
-                    'roles': ['Learner'],
-                    'context_id': course.course_id,
-                    },
-                )
+            consumer_key=settings.CONSUMER_KEY,
+            consumer_secret=settings.LTI_SECRET,
+            launch_url=self.launch_url,
+            params={
+                "lti_message_type": "basic-lti-launch-request",
+                "lti_version": "LTI-1p0",
+                "resource_link_id": self.resource_link_id,
+                "lis_person_sourcedid": lti_profile.name,
+                "lis_outcome_service_url": "fake_url",
+                "user_id": lti_profile.anon_id,
+                "roles": ["Learner"],
+                "context_id": course.course_id,
+            },
+        )
         self.lti_params = self.consumer.generate_launch_data()
-
 
     def tearDown(self):
         del self.assignment
         del self.tod
 
-
     def test_call_view_loads(self):
         lti_params = self.consumer.generate_launch_data()
-        response0 = self.client.post(
-                self.target_path, lti_params)
+        response0 = self.client.post(self.target_path, lti_params)
 
         self.assertTrue(response0.status_code == 302)
 
         target_url = reverse(
-                'target_object_database:open_target_object',
-                kwargs={
-                    'collection_id': self.assignment.id,
-                    'target_obj_id': self.tod.id,
-                    },
+            "target_object_database:open_target_object",
+            kwargs={"collection_id": self.assignment.id, "target_obj_id": self.tod.id,},
         )
         response = self.client.get(target_url)
         self.assertTrue(response.status_code == 200)
 
         target_url = reverse(
-                'target_object_database:open_target_object',
-                kwargs={
-                    'collection_id': self.assignment.id,
-                    'target_obj_id': '987654321',
-                    },
+            "target_object_database:open_target_object",
+            kwargs={"collection_id": self.assignment.id, "target_obj_id": "987654321",},
         )
         response = self.client.get(target_url)
         self.assertTrue(response.status_code == 404)

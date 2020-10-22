@@ -24,33 +24,24 @@ class LTIProfile(models.Model):
     # Many profiles can be associated with a single user object.
     user = models.ForeignKey(
         User,
-        related_name='annotations_user_profile',
+        related_name="annotations_user_profile",
         null=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     # saves the list of roles attached to that user
     roles = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name=_("Roles"),
+        max_length=255, blank=True, null=True, verbose_name=_("Roles"),
     )
 
     # saves the anonymous id for research purposes
-    anon_id = models.CharField(
-        max_length=255, blank=True, null=True
-    )
+    anon_id = models.CharField(max_length=255, blank=True, null=True)
 
     # saves the name for display purposes
-    name = models.CharField(
-        max_length=255, blank=True, null=True
-    )
-    
+    name = models.CharField(max_length=255, blank=True, null=True)
+
     # saves the scope where this profile is valid (i.e. domain instance for canvas, course instance for edx)
-    scope = models.CharField(
-        max_length=1024, blank=True, null=True
-    )
+    scope = models.CharField(max_length=1024, blank=True, null=True)
 
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
@@ -58,13 +49,13 @@ class LTIProfile(models.Model):
 
     class Meta:
         """ The name of this section within the admin site """
+
         verbose_name = _("Instructor/Administrator")
 
     def get_id(self):
         """Returns Canvas user_id of LTIProfile"""
         anon_id = self.anon_id
         return anon_id
-
 
 
 class LTICourse(models.Model):
@@ -75,33 +66,24 @@ class LTICourse(models.Model):
     """
 
     # this id will come from the context_id value in the LTI
-    course_id = models.CharField(
-        max_length=255,
-        default=_('No Course ID'),
-    )
+    course_id = models.CharField(max_length=255, default=_("No Course ID"),)
 
     # this is used for usability purposes only, course_id is the unique value
-    course_name = models.CharField(
-        max_length=255,
-        default=_('No Default Name'),
-    )
+    course_name = models.CharField(max_length=255, default=_("No Default Name"),)
 
     # admins are able to add other users with LTIProfiles already in the system
     course_admins = models.ManyToManyField(
-        LTIProfile,
-        related_name='course_admin_user_profiles',
+        LTIProfile, related_name="course_admin_user_profiles",
     )
 
     course_users = models.ManyToManyField(
-        LTIProfile,
-        related_name='course_user_profiles',
-        blank=True,
+        LTIProfile, related_name="course_user_profiles", blank=True,
     )
 
     course_external_css_default = models.CharField(
         max_length=255,
         blank=True,
-        help_text='Please only add a URL to an externally hosted file.',
+        help_text="Please only add a URL to an externally hosted file.",
     )
 
     class Meta:
@@ -112,7 +94,7 @@ class LTICourse(models.Model):
         When asked to print itself, this object will print the name
         of the course.
         """
-        return u"%s" % self.course_name
+        return "%s" % self.course_name
 
     def __str__(self):
         return self.course_name
@@ -130,9 +112,9 @@ class LTICourse(models.Model):
         Given an administrator, it will return all LTICourse objects
         in which that user appears within the course_admins attribute.
         """
-        courses_for_user = list(LTICourse.objects.filter(
-            course_admins=user_requested.id
-        ))
+        courses_for_user = list(
+            LTICourse.objects.filter(course_admins=user_requested.id)
+        )
         return courses_for_user
 
     @staticmethod
@@ -149,13 +131,13 @@ class LTICourse(models.Model):
         and adds the LTIProfile as a course_admin.
         """
         course_object = LTICourse(course_id=course_id)
-        course_name = kwargs.get('name', None)
+        course_name = kwargs.get("name", None)
         if course_name:
             course_object.course_name = course_name
         course_object.save()
         course_object.add_admin(lti_profile)
         return course_object
-    
+
     def add_admin(self, lti_profile):
         """
         Given an lti_profile, adds a user to the course_admins of an LTICourse if not already there
@@ -165,7 +147,7 @@ class LTICourse(models.Model):
             self.course_admins.add(lti_profile)
             self.save()
         return self
-    
+
     def add_user(self, lti_profile):
         """
         Given an lti_profile, adds a user to the course_users of an LTICourse if not already there
@@ -180,18 +162,14 @@ class LTICourse(models.Model):
         """
         Returns a QuerySet of assignments for this course, ordered by name.
         """
-        return self.assignments.order_by(Lower('assignment_name'))
+        return self.assignments.order_by(Lower("assignment_name"))
 
 
 class LTICourseAdmin(models.Model):
 
-    admin_unique_identifier = models.CharField(
-        max_length=255
-    )
+    admin_unique_identifier = models.CharField(max_length=255)
 
-    new_admin_course_id = models.CharField(
-        max_length=255
-    )
+    new_admin_course_id = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = _("Pending Admin")
@@ -200,14 +178,24 @@ class LTICourseAdmin(models.Model):
     def __unicode__(self):
         """
         """
-        return u"%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)
+        return "%s for course %s" % (
+            self.admin_unique_identifier,
+            self.new_admin_course_id,
+        )
 
     def __str__(self):
         """
         """
-        return "%s for course %s" % (self.admin_unique_identifier, self.new_admin_course_id)
+        return "%s for course %s" % (
+            self.admin_unique_identifier,
+            self.new_admin_course_id,
+        )
 
 
 class LTIResourceLinkConfig(models.Model):
-    resource_link_id = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    assignment_target = models.ForeignKey('hx_lti_assignment.AssignmentTargets', null=False, on_delete=models.CASCADE)
+    resource_link_id = models.CharField(
+        max_length=255, unique=True, blank=False, null=False
+    )
+    assignment_target = models.ForeignKey(
+        "hx_lti_assignment.AssignmentTargets", null=False, on_delete=models.CASCADE
+    )

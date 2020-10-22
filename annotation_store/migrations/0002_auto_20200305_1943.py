@@ -6,14 +6,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('annotation_store', '0001_initial'),
+        ("annotation_store", "0001_initial"),
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='Annotation',
-        ),
-        migrations.DeleteModel(
-            name='AnnotationTags',
-        ),
+        migrations.DeleteModel(name="Annotation",),
+        migrations.DeleteModel(name="AnnotationTags",),
     ]

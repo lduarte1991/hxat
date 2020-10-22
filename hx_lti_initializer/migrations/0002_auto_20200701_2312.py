@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hx_lti_initializer', '0001_initial'),
+        ("hx_lti_initializer", "0001_initial"),
     ]
 
     operations = [
@@ -18,37 +18,34 @@ class Migration(migrations.Migration):
             AS SELECT * FROM hx_lti_initializer_ltiresourcelinkconfig;
             """
         ),
-        migrations.RunSQL(
-            sql="DELETE FROM hx_lti_initializer_ltiresourcelinkconfig;",
-        ),
+        migrations.RunSQL(sql="DELETE FROM hx_lti_initializer_ltiresourcelinkconfig;",),
         # Replace collection_id and object_id fields with assignment_target.
         # The assignment_target represents a particular target object and assignment within a course.
         # This should ensure that deleting an assignment or the combination of assignment and target
         # will cascade as expected.
         migrations.RemoveField(
-            model_name='ltiresourcelinkconfig',
-            name='collection_id',
+            model_name="ltiresourcelinkconfig", name="collection_id",
         ),
-        migrations.RemoveField(
-            model_name='ltiresourcelinkconfig',
-            name='object_id',
-        ),
+        migrations.RemoveField(model_name="ltiresourcelinkconfig", name="object_id",),
         migrations.AddField(
-            model_name='ltiresourcelinkconfig',
-            name='assignment_target',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='hx_lti_assignment.AssignmentTargets'),
+            model_name="ltiresourcelinkconfig",
+            name="assignment_target",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="hx_lti_assignment.AssignmentTargets",
+            ),
         ),
         # Set uniqueness constraint on resource_link_id
         migrations.AlterField(
-            model_name='ltiresourcelinkconfig',
-            name='resource_link_id',
+            model_name="ltiresourcelinkconfig",
+            name="resource_link_id",
             field=models.CharField(max_length=255, unique=True),
         ),
         # Re-populate the LTIResourceLinkConfig table, but this time with the Assignment PKs
         # Note that this query is more complicated than it should be because it has to handle the case
         # where a target object is duplicated within an assignment/collection (e.g. Lorem Ipsum repeated twice).
         # Since that's an edge case for this migration, we're just going to pick one, otherwise we'll get
-        # a primary key violation. 
+        # a primary key violation.
         migrations.RunSQL(
             sql="""
             INSERT INTO hx_lti_initializer_ltiresourcelinkconfig (id, resource_link_id, assignment_target_id)

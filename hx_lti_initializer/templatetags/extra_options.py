@@ -10,7 +10,7 @@ register = Library()
 def just_the_view_type(extra_options):
     if extra_options is None:
         return "ImageView"
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 2:
         return "ImageView"
     else:
@@ -21,7 +21,7 @@ def just_the_view_type(extra_options):
 def just_the_canvas_id(extra_options):
     if extra_options is None:
         return ""
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 2:
         return ""
     else:
@@ -32,7 +32,7 @@ def just_the_canvas_id(extra_options):
 def just_dashboard_hidden(extra_options):
     if extra_options is None:
         return False
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 3:
         return False
     else:
@@ -46,7 +46,7 @@ def just_dashboard_hidden(extra_options):
 def just_transcript_hidden(extra_options):
     if extra_options is None:
         return False
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 4:
         return False
     else:
@@ -60,7 +60,7 @@ def just_transcript_hidden(extra_options):
 def just_transcript_download(extra_options):
     if extra_options is None:
         return False
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 5:
         return False
     else:
@@ -74,7 +74,7 @@ def just_transcript_download(extra_options):
 def just_video_download(extra_options):
     if extra_options is None:
         return False
-    result = extra_options.split(',')
+    result = extra_options.split(",")
     if len(result) < 6:
         return False
     else:
@@ -84,22 +84,22 @@ def just_video_download(extra_options):
             return False
 
 
-@register.tag(name='captureas')
+@register.tag(name="captureas")
 def do_captureas(parser, token):
     try:
         tag_name, args = token.contents.split(None, 1)
     except ValueError:
         raise template.TemplateSyntaxError("'captureas' requires a variable.")
-    nodelist = parser.parse(('endcaptureas',))
+    nodelist = parser.parse(("endcaptureas",))
     parser.delete_first_token()
     return CaptureasNode(nodelist, args)
 
 
 @register.filter_function
-def just_the_youtube_vid_link(content, target_type='vd'):
-    if content is None or target_type != 'vd':
+def just_the_youtube_vid_link(content, target_type="vd"):
+    if content is None or target_type != "vd":
         return ""
-    result = content.split(';')
+    result = content.split(";")
     if len(result) < 3:
         if get_extension(result[0]) == "video/youtube":
             return result[0]
@@ -108,11 +108,12 @@ def just_the_youtube_vid_link(content, target_type='vd'):
     if len(result) == 3:
         return result[0]
 
+
 @register.filter_function
-def just_the_html5_vid_link(content, target_type='vd'):
-    if content is None or target_type != 'vd':
+def just_the_html5_vid_link(content, target_type="vd"):
+    if content is None or target_type != "vd":
         return ""
-    result = content.split(';')
+    result = content.split(";")
     if len(result) < 3:
         if get_extension(result[0]) != "video/youtube":
             return result[0]
@@ -123,13 +124,13 @@ def just_the_html5_vid_link(content, target_type='vd'):
 
 
 @register.filter_function
-def just_the_transcript_link(content, target_type='vd'):
-    if content is None or target_type != 'vd':
+def just_the_transcript_link(content, target_type="vd"):
+    if content is None or target_type != "vd":
         if settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT:
             return settings.ANNOTATION_TRANSCRIPT_LINK_DEFAULT
         else:
             return ""
-    result = content.split(';')
+    result = content.split(";")
     return result[len(result) - 1]
 
 
@@ -141,4 +142,4 @@ class CaptureasNode(template.Node):
     def render(self, context):
         output = self.nodelist.render(context)
         context[self.varname] = output
-        return ''
+        return ""

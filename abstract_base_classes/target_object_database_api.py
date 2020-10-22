@@ -27,21 +27,24 @@ class TODAPI_LTI(ABC):
 
 
 class TOD_Implementation(TODAPI_LTI):
-
     @staticmethod
     def get_own_targets_from_course(course_id):
         """
         This function should return a list of objects with the attributes set up above. 
         """
         course_for_user = LTICourse.get_course_by_id(course_id)
-        response = TargetObject.objects.filter(target_courses=course_for_user).order_by('assignmenttargets')
+        response = TargetObject.objects.filter(target_courses=course_for_user).order_by(
+            "assignmenttargets"
+        )
         return response
 
     @staticmethod
     def get_dict_of_files_from_courses(courses):
         files_in_courses = dict()
         for course_item in courses:
-            files_found = TOD_Implementation.get_own_targets_from_course(course_item.course_id)
+            files_found = TOD_Implementation.get_own_targets_from_course(
+                course_item.course_id
+            )
             files_in_courses[course_item.course_name] = list(files_found)
         return files_in_courses
 
@@ -56,5 +59,6 @@ class TOD_Implementation(TODAPI_LTI):
             files_found = TargetObject.objects.filter(target_courses=course_item)
             files_in_courses += list(files_found)
         return files_in_courses
+
 
 TODAPI_LTI.register(TOD_Implementation)
