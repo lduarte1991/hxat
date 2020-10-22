@@ -1,11 +1,10 @@
 import re
-from http import cookies
+from http import cookies  # noqa
 from random import randint
 
 import pytest
-from channels.exceptions import DenyConnection
 from channels.routing import URLRouter
-from channels.testing import HttpCommunicator, WebsocketCommunicator
+from channels.testing import WebsocketCommunicator
 from django.conf import settings
 from django.test import Client
 from django.urls import re_path, reverse
@@ -19,7 +18,7 @@ from notification.middleware import SessionAuthMiddleware
 async def test_wsauth_missing_querystring():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -30,7 +29,7 @@ async def test_wsauth_missing_querystring():
         "headers": [],
         "subprotocols": [],
     }
-    inner_consumer = mut.__call__(scope=mock_scope)
+    _ = mut.__call__(scope=mock_scope)
 
     assert "hxat_auth" in mock_scope
     assert mock_scope["hxat_auth"] == "403: missing querystring"
@@ -41,7 +40,7 @@ async def test_wsauth_missing_querystring():
 async def test_wsauth_missing_session():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -52,7 +51,7 @@ async def test_wsauth_missing_session():
         "headers": [],
         "subprotocols": [],
     }
-    inner_consumer = mut.__call__(scope=mock_scope)
+    _ = mut.__call__(scope=mock_scope)
 
     assert "hxat_auth" in mock_scope
     assert mock_scope["hxat_auth"] == "403: missing session-id or resource-link-id"
@@ -63,7 +62,7 @@ async def test_wsauth_missing_session():
 async def test_wsauth_unknown_session():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
     )
     mut = SessionAuthMiddleware(application)
     utm_source = "333333"
@@ -78,7 +77,7 @@ async def test_wsauth_unknown_session():
         "headers": [],
         "subprotocols": [],
     }
-    inner_consumer = mut.__call__(scope=mock_scope)
+    _ = mut.__call__(scope=mock_scope)
 
     assert "hxat_auth" in mock_scope
     assert mock_scope["hxat_auth"] == "403: unknown session-id({})".format(utm_source)
@@ -92,7 +91,6 @@ def test_wsauth_unknown_contextid():
     instructor_name = "audre_lorde"
     instructor_edxid = "{}{}".format(randint(1000, 65534), randint(1000, 65534))
     course_id = "hx+FancyCourse+TermCode+Year"
-    clean_course_id = re.sub(r"[\W_]", "-", course_id)
     target_path = reverse("hx_lti_initializer:launch_lti")
     launch_url = "http://testserver{}".format(target_path)
     resource_link_id = "some_string_to_be_the_fake_resource_link_id"
@@ -122,7 +120,7 @@ def test_wsauth_unknown_contextid():
     ###
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -136,7 +134,7 @@ def test_wsauth_unknown_contextid():
         "headers": [],
         "subprotocols": [],
     }
-    inner_consumer = mut.__call__(scope=mock_scope)
+    _ = mut.__call__(scope=mock_scope)
 
     assert "hxat_auth" in mock_scope
     assert mock_scope["hxat_auth"] == "403: unknown context-id({})".format(
@@ -181,7 +179,7 @@ def test_wsauth_ok():
     ###
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -194,7 +192,7 @@ def test_wsauth_ok():
         "headers": [],
         "subprotocols": [],
     }
-    inner_consumer = mut.__call__(scope=mock_scope)
+    _ = mut.__call__(scope=mock_scope)
 
     assert "hxat_auth" in mock_scope
     assert mock_scope["hxat_auth"] == "authenticated"
@@ -238,7 +236,7 @@ async def test_wsconn_ok():
 
     application = SessionAuthMiddleware(
         URLRouter(
-            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
         )
     )
     path = "/ws/notification/{}--dvorak--1/?utm_source={}&resource_link_id={}".format(
@@ -263,7 +261,6 @@ async def test_wsconn_denied():
     instructor_name = "sylvia_plath"
     instructor_edxid = "{}{}".format(randint(1000, 65534), randint(1000, 65534))
     course_id = "hx+FancierCourse+TermCode+Year"
-    clean_course_id = re.sub(r"[\W_]", "-", course_id)
     target_path = reverse("hx_lti_initializer:launch_lti")
     launch_url = "http://testserver{}".format(target_path)
     resource_link_id = "some_string_to_be_THE_fake_resource_link_id"
@@ -293,7 +290,7 @@ async def test_wsconn_denied():
 
     application = SessionAuthMiddleware(
         URLRouter(
-            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer)]
         )
     )
     path = "/ws/notification/qwerty--dvorak--1/?utm_source={}&resource_link_id={}".format(

@@ -4,7 +4,6 @@ from importlib import import_module
 from urllib.parse import parse_qs
 
 from django.conf import settings
-from django.contrib.sessions.models import Session
 from django.db import close_old_connections
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
@@ -56,7 +55,6 @@ class SessionAuthMiddleware(object):
             # get lti params from session
             multi_launch = session.get("LTI_LAUNCH", {})
             lti_launch = multi_launch.get(resource_link_id, {})
-            lti_params = lti_launch.get("launch_params", {})
 
             for key in lti_launch:
                 self.log.debug("NOTIFY LTI_LAUNCH[{}]: {}".format(key, lti_launch[key]))

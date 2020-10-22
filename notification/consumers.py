@@ -57,7 +57,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     # receive message from websocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
+        # message = text_data_json["message"]
 
         logging.getLogger(__name__).debug(
             "{}|WSRECEIVE[{}]".format(self.wsid, text_data_json.keys())
@@ -79,5 +79,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # send message to websocket
         await self.send(
-            text_data=json.dumps({"type": action, "message": "{}".format(message),})
+            text_data=json.dumps({"type": action, "message": "{}".format(message)})
         )
