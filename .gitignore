@@ -1,26 +1,71 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
 .Python
-/pyenv
-env
-env3
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
 bin
-lib
 node_modules
 include
-*.DS_Store
-*.pyc
-*.sh
-*.log
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.cache
+.coverage
 htmlcov
-secure.py
-http_static
-production.py
 reports
+
+# Django stuff:
+*.log
+local_settings.py
+logs
+
+# dotenv
+.env
+
+# db
+db.sqlite3
+
+# static root
+public/
+http_static
+
+# virtualenvs
+/pyenv
+.venv
+env
+env3
+
+# other
+*.DS_Store
+secure.py
+production.py
 *-annotation-list.json
 *-old.json
 *.srt
-/.vagrant
-!/vagrant/*.sh
 /.idea
 /pycharm-debug.egg
-.coverage
 .vscode
