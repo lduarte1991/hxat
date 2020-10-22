@@ -1,0 +1,17 @@
+
+[tool.isort]
+profile = 'black'
+src_paths = ['isort', 'test']
+
+[tool.black]
+target-version = ['py36']
+exclude = '''
+/(
+        \.eggs
+      | \.git
+      | \.tox
+      | \.venv
+      | build
+      | dist
+)/
+'''
