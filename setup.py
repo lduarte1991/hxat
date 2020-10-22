@@ -39,7 +39,7 @@ setup(
     url="https://github.com/lduarte1991/" + project_name,
     packages=find_packages(exclude=["test*"]),
     entry_points={
-        "console_scripts": ["{} = {}.manage:cli".format(project_name, project_name),]
+        "console_scripts": ["{} = {}.manage:cli".format(project_name, project_name)]
     },
     include_package_data=True,
     install_requires=requirements,
