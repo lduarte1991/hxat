@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
                 ),
                 ("hidden", models.BooleanField(default=False)),
             ],
-            options={"ordering": ["id"],},
+            options={"ordering": ["id"]},
         ),
         migrations.CreateModel(
             name="AssignmentTargets",

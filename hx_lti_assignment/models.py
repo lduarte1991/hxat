@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 import uuid
 
 import requests
@@ -45,7 +44,7 @@ class AssignmentTargets(models.Model):
         """
         Returns a list of options that are saved to the target_external_options model attribute
         in CSV format.
-        
+
         Notes:
         - since the model attribute could be null in the database, we have to
           check if it's None before trying parse it.
@@ -230,7 +229,7 @@ class Assignment(models.Model):
                     return AssignmentTargets.objects.get(
                         assignment=self, order=new_order
                     )
-            except:
+            except Exception:  # TODO: specify exception
                 return None
         return None
 
@@ -250,7 +249,7 @@ class Assignment(models.Model):
                     return AssignmentTargets.objects.get(
                         assignment=self, order=new_order
                     )
-            except:
+            except Exception:  # TODO: specify exception
                 return None
         return None
 
@@ -320,6 +319,6 @@ class Assignment(models.Model):
                 try:
                     result.append((concat_tag_name + res[0], getColorValues(res[1])))
                     concat_tag_name = ""
-                except:
+                except Exception:  # TODO: specify exception
                     concat_tag_name += res[0] + " "
             return result

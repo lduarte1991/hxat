@@ -9,11 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, QueryDict
-from django.shortcuts import get_object_or_404, redirect, render, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from hx_lti_assignment.forms import (
     AssignmentForm,
-    AssignmentTargetsForm,
     AssignmentTargetsFormSet,
     DeleteAssignmentForm,
 )
@@ -105,7 +104,7 @@ def create_new_assignment(request):
             target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
-            logger.debug("Form Errors: {}".format(target_form.errors))
+            logger.debug("Form Errors: {}".format(targets_form.errors))
             return error_view(
                 request,
                 "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.",
@@ -221,11 +220,6 @@ def edit_assignment(request, id):
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
 
-    try:
-        course_name = request.LTI["course_name"]
-    except:
-        course_name = None
-
     template_used = "hx_lti_assignment/create_new_assignment2.html"
     if assignment.use_hxighlighter:
         template_used = "hx_lti_assignment/create_new_assignment_hxighlighter.html"
@@ -320,7 +314,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         result.update({"object_ids": pks, "result": 200})
         data = json.dumps(result)
         return HttpResponse(data, content_type="application/json")
-    except:
+    except Exception:  # TODO: specify exception
         data = json.dumps(
             {
                 "result": 500,
