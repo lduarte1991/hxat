@@ -1,19 +1,18 @@
-from django.conf import settings
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import PermissionDenied
-from lti.contrib.django import DjangoToolProvider
-from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.utils import retrieve_token
+import json
+import logging
+import re
+import urllib
 
 import channels.layers
-from asgiref.sync import async_to_sync
-
-import json
 import requests
-import logging
-import urllib
-import re
+from asgiref.sync import async_to_sync
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from hx_lti_assignment.models import Assignment
+from hx_lti_initializer.utils import retrieve_token
+from lti.contrib.django import DjangoToolProvider
 
 logger = logging.getLogger(__name__)
 

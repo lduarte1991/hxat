@@ -1,5 +1,6 @@
-from collections import OrderedDict
 import json
+from collections import OrderedDict
+
 
 class JsonOrderedDictSerializer(object):
     """

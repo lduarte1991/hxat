@@ -1,12 +1,10 @@
-import jwt
 import os
-
 from datetime import datetime
-from dateutil import tz
 from uuid import uuid4
 
+import jwt
+from dateutil import tz
 from locust import HttpLocust
-
 from utils import Console
 
 

@@ -6,8 +6,16 @@ Later on we should be able to differentiate each LTI tool by unrolling the URL
 used, e.g. /launch_lti/textannotation, /launch_lti/shared_annotation.
 """
 from django.urls import path
-from hx_lti_initializer.views import edit_course, launch_lti, course_admin_hub, access_annotation_target, instructor_dashboard_view, instructor_dashboard_student_list_view, delete_assignment, change_starting_resource
-
+from hx_lti_initializer.views import (
+    access_annotation_target,
+    change_starting_resource,
+    course_admin_hub,
+    delete_assignment,
+    edit_course,
+    instructor_dashboard_student_list_view,
+    instructor_dashboard_view,
+    launch_lti,
+)
 
 urlpatterns = [
     path(

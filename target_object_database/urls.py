@@ -1,6 +1,11 @@
 from django.conf.urls import url
 from target_object_database import views
-from target_object_database.views import open_target_object, create_new_source, edit_source, newSource
+from target_object_database.views import (
+    create_new_source,
+    edit_source,
+    newSource,
+    open_target_object,
+)
 
 urlpatterns = [
     url(

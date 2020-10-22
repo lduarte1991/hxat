@@ -1,21 +1,21 @@
+import json
+import logging
+import urllib
+import urllib.parse
+
+import requests
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-
-from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTICourse 
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.utils import retrieve_token
 from hx_lti_initializer import annotation_database
-from .store import AnnotationStore
+from hx_lti_initializer.models import LTICourse
+from hx_lti_initializer.utils import retrieve_token
+from target_object_database.models import TargetObject
 
-import json
-import requests
-import urllib
-import urllib.parse
-import logging
+from .store import AnnotationStore
 
 logger = logging.getLogger(__name__)
 

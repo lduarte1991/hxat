@@ -1,9 +1,5 @@
 import pytest
-
-
-from hx_lti_initializer.models import LTICourse
-from hx_lti_initializer.models import LTIProfile
-from hx_lti_initializer.models import LTIResourceLinkConfig
+from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
 
 
 @pytest.mark.django_db

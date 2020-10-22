@@ -3,27 +3,23 @@ import logging
 import sys
 import uuid
 
-from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, HttpResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render_to_response
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django.contrib import messages
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.urls import reverse
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core import serializers
-
-from hx_lti_assignment.forms import AssignmentForm
-from hx_lti_assignment.forms import AssignmentTargetsForm
-from hx_lti_assignment.forms import AssignmentTargetsFormSet
-from hx_lti_assignment.forms import DeleteAssignmentForm
-from hx_lti_assignment.models import Assignment
-from hx_lti_assignment.models import AssignmentTargets
-from hx_lti_initializer.views import error_view  # should we centralize an error view?
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse, QueryDict
+from django.shortcuts import get_object_or_404, redirect, render, render_to_response
+from django.urls import reverse
+from hx_lti_assignment.forms import (
+    AssignmentForm,
+    AssignmentTargetsForm,
+    AssignmentTargetsFormSet,
+    DeleteAssignmentForm,
+)
+from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse
-
+from hx_lti_initializer.views import error_view  # should we centralize an error view?
 
 logger = logging.getLogger(__name__)
 

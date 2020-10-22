@@ -1,11 +1,13 @@
-from django import forms
-from hx_lti_assignment.models import Assignment, AssignmentTargets
-from crispy_forms.helper import FormHelper
-from django.forms.models import modelformset_factory, inlineformset_factory
-from crispy_forms.layout import Layout, Fieldset, Div, Field, HTML, Hidden
-from crispy_forms.bootstrap import TabHolder, Tab
-from django.utils.html import strip_tags
 import re
+
+from crispy_forms.bootstrap import Tab, TabHolder
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import HTML, Div, Field, Fieldset, Hidden, Layout
+from django import forms
+from django.forms.models import inlineformset_factory, modelformset_factory
+from django.utils.html import strip_tags
+from hx_lti_assignment.models import Assignment, AssignmentTargets
+
 
 class AssignmentForm(forms.ModelForm):
 

@@ -1,6 +1,6 @@
-from django.template import Library
-from django.conf import settings
 from django import template
+from django.conf import settings
+from django.template import Library
 from target_object_database.models import get_extension
 
 register = Library()

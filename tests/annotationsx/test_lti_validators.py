@@ -1,15 +1,13 @@
-import pytest
-
-from lti import ToolConsumer
-from lti.contrib.django import DjangoToolProvider
 from random import randint
 
+import pytest
+from annotationsx.lti_validators import LTIRequestValidator
+from annotationsx.middleware import MultiLTILaunchMiddleware
 from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
-
-from annotationsx.middleware import MultiLTILaunchMiddleware
-from annotationsx.lti_validators import LTIRequestValidator
+from lti import ToolConsumer
+from lti.contrib.django import DjangoToolProvider
 
 
 def test_lti_validation_from_ltidict_ok():

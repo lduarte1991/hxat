@@ -1,6 +1,7 @@
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
+
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 from django import forms
 from django.db.models import Q
-from hx_lti_initializer.models import LTICourse, LTIProfile
 from hx_lti_assignment.models import Assignment
+from hx_lti_initializer.models import LTICourse, LTIProfile
 
 
 class CourseForm(forms.ModelForm):

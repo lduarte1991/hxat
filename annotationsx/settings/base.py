@@ -8,11 +8,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+import logging
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import logging
-from django.contrib import messages
 from ast import literal_eval
+
+from django.contrib import messages
+
 try:
     from .secure import SECURE_SETTINGS
 except Exception as e:

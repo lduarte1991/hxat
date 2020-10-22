@@ -1,10 +1,9 @@
-import unittest
-import logging
 import html
+import logging
+import unittest
 from unittest.mock import Mock, patch
 
 import media_management_sdk
-
 from image_store import backends
 
 ImageStoreBackend = backends.ImageStoreBackend

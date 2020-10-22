@@ -6,37 +6,47 @@ It will set up the tool provider, create/retrive the user and pass along any
 other information that will be rendered to the access/init screen to the user.
 """
 
-from django.http import HttpResponse
-from django.core.exceptions import (MultipleObjectsReturned, PermissionDenied)
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from abstract_base_classes.target_object_database_api import TOD_Implementation
+from annotationsx.exceptions import AnnotationTargetDoesNotExist
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.contrib.auth import login
-from django.contrib import messages
-
-from lti import ToolConfig
-
-from annotationsx.exceptions import AnnotationTargetDoesNotExist
-from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse, LTICourseAdmin, LTIResourceLinkConfig
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.utils import (retrieve_token, save_session, create_new_user, fetch_annotations_by_course, DashboardAnnotations)
 from hx_lti_initializer import annotation_database
-from django.conf import settings
-from abstract_base_classes.target_object_database_api import TOD_Implementation
+from hx_lti_initializer.forms import CourseForm
+from hx_lti_initializer.models import (
+    LTICourse,
+    LTICourseAdmin,
+    LTIProfile,
+    LTIResourceLinkConfig,
+)
+from hx_lti_initializer.utils import (
+    DashboardAnnotations,
+    create_new_user,
+    fetch_annotations_by_course,
+    retrieve_token,
+    save_session,
+)
+from lti import ToolConfig
+from target_object_database.models import TargetObject
+
 try:
     from django.contrib.sites.models import get_current_site
 except ImportError:
     from django.contrib.sites.shortcuts import get_current_site
 
-from urllib.parse import urlparse
 import json
-import time
-import os.path
 import logging
+import os.path
+import time
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 

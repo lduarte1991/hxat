@@ -3,24 +3,20 @@
 # https://github.com/websocket-client/websocket-client/blob/master/bin/wsdump.py
 #
 import ast
-import iso8601
 import json
 import os
 import re
 import ssl
 import threading
-import websocket
-
-from datetime import datetime
-from datetime import timedelta
-from dateutil import tz
+from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from uuid import uuid4
 
+import iso8601
+import websocket
+from dateutil import tz
 from locust import events
-
 from utils import Console
-
 
 # valid codes for ws read
 OPCODE_DATA = (websocket.ABNF.OPCODE_TEXT, websocket.ABNF.OPCODE_BINARY)

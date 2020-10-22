@@ -2,16 +2,11 @@ import json
 import os
 import random
 import re
-import requests
 import time
 
+import requests
+from locust import TaskSet, between, events, task
 from lti import ToolConsumer
-
-from locust import between
-from locust import events
-from locust import TaskSet
-from locust import task
-
 from utils import fresh_ann
 from wsclient import SocketClient
 

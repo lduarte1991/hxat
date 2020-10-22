@@ -4,12 +4,13 @@
 #
 
 from hxat_client import HxatLocust
-from tasks import WSConnectAndChangeObject
-from tasks import WSConnectAndCreate
-from tasks import WSConnectAndDie
-from tasks import WSJustConnect
-from tasks import WSJustLTI
-
+from tasks import (
+    WSConnectAndChangeObject,
+    WSConnectAndCreate,
+    WSConnectAndDie,
+    WSJustConnect,
+    WSJustLTI,
+)
 
 # class WSUserConnectAndDie(HxatLocust):
 #    weight = 3

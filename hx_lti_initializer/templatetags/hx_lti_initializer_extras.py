@@ -1,9 +1,9 @@
-from django.template.defaulttags import register
-from django.utils.safestring import mark_safe
-from django.conf import settings
-from django.templatetags.static import static
 import dateutil.parser
 import dateutil.tz
+from django.conf import settings
+from django.template.defaulttags import register
+from django.templatetags.static import static
+from django.utils.safestring import mark_safe
 
 
 def convert_tz(datetimeobj):

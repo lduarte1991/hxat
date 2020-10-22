@@ -1,20 +1,15 @@
-import pytest
 import re
-
 from http import cookies
-from lti import ToolConsumer
 from random import randint
 
+import pytest
 from channels.exceptions import DenyConnection
 from channels.routing import URLRouter
-from channels.testing import HttpCommunicator
-from channels.testing import WebsocketCommunicator
-
+from channels.testing import HttpCommunicator, WebsocketCommunicator
 from django.conf import settings
 from django.test import Client
-from django.urls import re_path
-from django.urls import reverse
-
+from django.urls import re_path, reverse
+from lti import ToolConsumer
 from notification.consumers import NotificationConsumer
 from notification.middleware import SessionAuthMiddleware
 

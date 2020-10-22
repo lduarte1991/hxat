@@ -1,9 +1,6 @@
-from channels.routing import ProtocolTypeRouter
-from channels.routing import URLRouter
-
 import notification.routing
+from channels.routing import ProtocolTypeRouter, URLRouter
 from notification.middleware import SessionAuthMiddleware
-
 
 ASGI_APPLICATION = 'annotationsx.routing.application'
 

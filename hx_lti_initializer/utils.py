@@ -2,28 +2,30 @@
 These functions will be used for the initializer module, but may also be
 helpful elsewhere.
 """
-import django.shortcuts
-from urllib.parse import urlparse
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from abstract_base_classes.target_object_database_api import *
-from .models import *
-from django.conf import settings
-from django.urls import reverse
-from os.path import splitext, basename
 import base64
+import datetime
+import logging
+import re
 import sys
 import time
-import datetime
+import urllib
+from os.path import basename, splitext
+from urllib.parse import urlparse
+
+import django.shortcuts
 import jwt
 import requests
-import urllib
-import re
-import logging
+from abstract_base_classes.target_object_database_api import *
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.urls import reverse
 
 # import Sample Target Object Model
 from hx_lti_assignment.models import Assignment
 from target_object_database.models import TargetObject
+
+from .models import *
 
 logger = logging.getLogger(__name__)
 

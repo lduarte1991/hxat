@@ -1,20 +1,16 @@
 
-import pytest
 import uuid
-
-from datetime import datetime
-from datetime import timedelta
-from dateutil import tz
-from lti import ToolConsumer
+from datetime import datetime, timedelta
 from random import randint
 
+import pytest
+from dateutil import tz
 from django.conf import settings
 from django.urls import reverse
-
-from hx_lti_assignment.models import Assignment
-from hx_lti_assignment.models import AssignmentTargets
+from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import create_new_user
+from lti import ToolConsumer
 from target_object_database.models import TargetObject
 
 

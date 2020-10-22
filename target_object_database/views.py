@@ -1,21 +1,25 @@
 
 import logging
 
-from django.shortcuts import get_object_or_404, render_to_response, render, redirect  # noqa
-from django.urls import reverse
-from django.http import Http404, HttpResponse
-from django.utils.html import escape
-from django.forms import ValidationError
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
+from django.forms import ValidationError
+from django.http import Http404, HttpResponse
+from django.shortcuts import (  # noqa
+    get_object_or_404,
+    redirect,
+    render,
+    render_to_response,
+)
+from django.urls import reverse
+from django.utils.html import escape
+from hx_lti_initializer.models import LTIProfile
 from rest_framework import generics
 
-from hx_lti_initializer.models import LTIProfile
+from .forms import SourceForm
 from .models import TargetObject
 from .serializers import TargetObjectSerializer
-from .forms import SourceForm
-
 
 logger = logging.getLogger(__name__)
 

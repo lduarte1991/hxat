@@ -1,16 +1,14 @@
 
 import json
-import pytest
-import responses
 import uuid
 
+import annotation_store.views as views
+import pytest
+import responses
 from django.conf import settings
 from django.test import Client
 from django.test.client import RequestFactory
 from django.urls import reverse
-
-import annotation_store.views as views
-
 from hx_lti_initializer.models import LTIResourceLinkConfig
 from hx_lti_initializer.utils import retrieve_token
 

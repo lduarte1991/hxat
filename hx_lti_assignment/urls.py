@@ -1,5 +1,12 @@
 from django.conf.urls import url
-from hx_lti_assignment.views import create_new_assignment, edit_assignment, delete_assignment, import_assignment, assignments_from_course, moving_assignment
+from hx_lti_assignment.views import (
+    assignments_from_course,
+    create_new_assignment,
+    delete_assignment,
+    edit_assignment,
+    import_assignment,
+    moving_assignment,
+)
 
 urlpatterns = [
     url(

@@ -1,14 +1,13 @@
 import copy
 import json
 import logging
-import mock
 
+import mock
+from annotation_store.store import AnnotationStore, StoreBackend
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
-
-from annotation_store.store import StoreBackend, AnnotationStore
 
 logger = logging.getLogger(__name__)
 

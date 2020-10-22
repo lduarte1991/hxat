@@ -2,22 +2,16 @@
 # run these with pytest:
 # $> DJANGO_SETTINGS_MODULE=annotationsx.settings.test pytest hx_lti_initializer/tests/test_launch.py  -v
 #
-import pytest
-
-from lti import ToolConsumer
 from random import randint
 
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import Client
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
-
 from hx_lti_initializer.forms import CourseForm
-from hx_lti_initializer.models import LTICourse
-from hx_lti_initializer.models import LTIProfile
-from hx_lti_initializer.models import LTIResourceLinkConfig
-
+from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
+from lti import ToolConsumer
 
 old_timestamp = '1580487110'
 

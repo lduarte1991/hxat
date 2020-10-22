@@ -1,7 +1,8 @@
-from django.db import models
-from hx_lti_initializer.models import LTIProfile, LTICourse
+from os.path import basename, splitext
 from urllib.parse import urlparse
-from os.path import splitext, basename
+
+from django.db import models
+from hx_lti_initializer.models import LTICourse, LTIProfile
 
 
 def get_extension(srcurl):

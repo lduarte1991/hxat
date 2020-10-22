@@ -13,15 +13,14 @@ Note: Chrome, Safari, and IE ignore Allow-From, though they should still
 load the iframe.
 """
 import collections
+import importlib
+import json
+import logging
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from lti.contrib.django import DjangoToolProvider
-import logging
-import json
-import importlib
 
 from .lti_validators import LTIRequestValidator
 

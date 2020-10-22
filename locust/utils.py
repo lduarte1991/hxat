@@ -1,11 +1,8 @@
 import code
 import sys
-
 from random import randint
-from subprocess import Popen
-from subprocess import PIPE
+from subprocess import PIPE, Popen
 from uuid import uuid4
-
 
 # this is particular to the target_source document
 # how many text chars in a <p> element

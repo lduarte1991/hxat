@@ -1,11 +1,12 @@
-from django.db import models
-from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTICourse
-import requests
-import uuid
-import sys
 import json
 import logging
+import sys
+import uuid
+
+import requests
+from django.db import models
+from hx_lti_initializer.models import LTICourse
+from target_object_database.models import TargetObject
 
 logger = logging.getLogger(__name__)
 

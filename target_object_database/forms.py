@@ -1,3 +1,4 @@
+import image_store.backends
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -5,7 +6,6 @@ from django.core.validators import URLValidator
 from django.forms import ValidationError
 from target_object_database.models import TargetObject
 
-import image_store.backends
 
 class SourceForm(forms.ModelForm):
     target_content = forms.CharField(required=False)

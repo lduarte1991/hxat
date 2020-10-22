@@ -9,14 +9,15 @@ Original purpose of this app:
     2) Set up an implementation of the object
 """
 
-from django.test import TestCase
+from abstract_base_classes.target_object_database_api import (
+    TODAPI_LTI,
+    TOD_Implementation,
+)
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.test import TestCase
+from hx_lti_initializer.models import LTICourse, LTIProfile
 from target_object_database.models import TargetObject
-from hx_lti_initializer.models import LTIProfile, LTICourse
-from abstract_base_classes.target_object_database_api import TODAPI_LTI
-from abstract_base_classes.target_object_database_api import TOD_Implementation
-from abstract_base_classes.target_object_database_api import TODAPI_LTI, TOD_Implementation
 
 
 class LTITODAPITests(TestCase):

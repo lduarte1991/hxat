@@ -1,13 +1,11 @@
 import logging
 import re
-
 from importlib import import_module
 from urllib.parse import parse_qs
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.db import close_old_connections
-
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
