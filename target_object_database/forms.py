@@ -1,7 +1,6 @@
 import image_store.backends
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import URLValidator
 from django.forms import ValidationError
 from target_object_database.models import TargetObject
@@ -43,7 +42,7 @@ class SourceForm(forms.ModelForm):
         try:
             validate_https_url = URLValidator(schemes=["https"])
             validate_https_url(target_content)
-        except ValidationError as e:
+        except ValidationError:
             self.add_error(
                 "target_content",
                 'Not a valid manifest URL. Make sure it\'s only one URL and that it begins with "https".',
@@ -55,7 +54,7 @@ class SourceForm(forms.ModelForm):
             found = TargetObject.objects.filter(
                 target_content__icontains=target_content
             )[0]
-        except:
+        except Exception:  # TODO: specify exception
             pass
         if found and found.pk != self.instance.pk:
             msg = (

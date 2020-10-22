@@ -56,6 +56,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"ordering": ["target_title"], "verbose_name": "Source",},
+            options={"ordering": ["target_title"], "verbose_name": "Source"},
         ),
     ]
