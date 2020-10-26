@@ -4,8 +4,6 @@
 #
 import ast
 import json
-import os
-import re
 import ssl
 import threading
 from datetime import datetime, timedelta

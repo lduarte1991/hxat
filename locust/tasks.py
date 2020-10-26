@@ -41,7 +41,7 @@ def hxat_create(locust):
         response.failure("no data")
     else:
         try:
-            a_id = response.json()["id"]
+            _ = response.json()["id"]
         except KeyError:
             resp = response.json()
             if "payload" in resp:
@@ -85,7 +85,7 @@ def hxat_search(locust, limit=50, offset=0):
         response.failure("no data")
     else:
         try:
-            rows = response.json()["rows"]
+            _ = response.json()["rows"]
         except KeyError:
             resp = response.json()
             if "payload" in resp:
@@ -231,8 +231,8 @@ def hxat_change_object(locust):
 
 def make_ws_app_url_path(locust):
     return "/ws/notification/{}--{}--{}".format(
-        re.sub("[\W_]", "-", locust.hxat_client.context_id),
-        re.sub("[\W_]", "-", locust.hxat_client.collection_id),
+        re.sub(r"[\W_]", "-", locust.hxat_client.context_id),
+        re.sub(r"[\W_]", "-", locust.hxat_client.collection_id),
         locust.hxat_client.target_source_id,
     )
 

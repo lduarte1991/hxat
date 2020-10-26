@@ -46,7 +46,7 @@ def fresh_ann(hxat_client):
                 }
             ],
         },
-        "creator": {"id": hxat_client.user_id, "name": hxat_client.user_name,},
+        "creator": {"id": hxat_client.user_id, "name": hxat_client.user_name},
         "id": str(uuid4()),
         "permissions": {
             "can_admin": [hxat_client.user_id],
