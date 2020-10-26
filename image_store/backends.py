@@ -97,7 +97,8 @@ class IMMImageStoreBackend(ImageStoreBackend):
             # authenticate and ensure course space exists
             self.client.authenticate(user_id=self.user_id)
             course = self.client.find_or_create_course(**self.course_attrs)
-            logger.info("User %s loaded course: %s" % (self.user_id, course))
+            self.client.authenticate(user_id=self.user_id, course_id=course['id'], course_permission='write')
+            logger.info("User %s authenticated to course: %s" % (self.user_id, course))
 
             # upload image to the course space
             course_images = self.client.api.upload_images(
