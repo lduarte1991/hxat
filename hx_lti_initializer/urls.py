@@ -6,6 +6,7 @@ Later on we should be able to differentiate each LTI tool by unrolling the URL
 used, e.g. /launch_lti/textannotation, /launch_lti/shared_annotation.
 """
 from django.urls import path
+
 from hx_lti_initializer.views import (
     access_annotation_target,
     change_starting_resource,

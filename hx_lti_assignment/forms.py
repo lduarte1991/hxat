@@ -6,6 +6,7 @@ from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.utils.html import strip_tags
+
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 
 

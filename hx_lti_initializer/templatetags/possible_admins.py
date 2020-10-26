@@ -1,4 +1,5 @@
 from django.template import Library
+
 from hx_lti_initializer.models import LTIProfile
 
 register = Library()

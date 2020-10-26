@@ -9,9 +9,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.urls import reverse
+from lti import ToolConsumer
+
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
-from lti import ToolConsumer
 
 old_timestamp = "1580487110"
 

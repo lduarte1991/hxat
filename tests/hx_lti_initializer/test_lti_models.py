@@ -1,4 +1,5 @@
 import pytest
+
 from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
 
 

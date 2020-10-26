@@ -2,9 +2,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from lti import ToolConsumer
+
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIProfile
-from lti import ToolConsumer
 from target_object_database.models import TargetObject
 
 

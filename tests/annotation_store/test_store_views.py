@@ -5,6 +5,7 @@ import pytest
 import responses
 from django.test import Client
 from django.urls import reverse
+
 from hx_lti_initializer.models import LTIResourceLinkConfig
 
 

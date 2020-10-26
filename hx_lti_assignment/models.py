@@ -4,6 +4,7 @@ import uuid
 
 import requests
 from django.db import models
+
 from hx_lti_initializer.models import LTICourse
 from target_object_database.models import TargetObject
 

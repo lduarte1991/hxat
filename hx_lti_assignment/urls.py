@@ -1,4 +1,5 @@
 from django.conf.urls import url
+
 from hx_lti_assignment.views import (
     assignments_from_course,
     create_new_assignment,

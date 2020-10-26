@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+
 from hx_lti_initializer.views import tool_config
 
 admin.autodiscover()

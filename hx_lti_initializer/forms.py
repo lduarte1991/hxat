@@ -1,5 +1,6 @@
 from django import forms
 from django.db.models import Q
+
 from hx_lti_initializer.models import LTICourse, LTIProfile
 
 

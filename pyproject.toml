@@ -1,7 +1,6 @@
 
 [tool.isort]
 profile = 'black'
-src_paths = ['isort', 'test']
 
 [tool.black]
 target-version = ['py36']

@@ -18,8 +18,7 @@ from django.urls import reverse
 from hx_lti_assignment.models import Assignment
 from target_object_database.models import TargetObject
 
-from .models import LTICourse
-from .models import LTIProfile
+from .models import LTICourse, LTIProfile
 
 logger = logging.getLogger(__name__)
 

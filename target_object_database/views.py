@@ -13,8 +13,9 @@ from django.shortcuts import (  # noqa
 )
 from django.urls import reverse
 from django.utils.html import escape
-from hx_lti_initializer.models import LTIProfile
 from rest_framework import generics
+
+from hx_lti_initializer.models import LTIProfile
 
 from .forms import SourceForm
 from .models import TargetObject

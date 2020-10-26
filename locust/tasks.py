@@ -5,10 +5,11 @@ import re
 import time
 
 import requests
-from locust import TaskSet, between, events, task
 from lti import ToolConsumer
 from utils import fresh_ann
 from wsclient import SocketClient
+
+from locust import TaskSet, between, events, task
 
 # key: collection_id; value: list of target_object_ids as str
 COLLECTION_TARGET_DICT = json.loads(os.environ.get("COLLECTION_TARGET_DICT", "{}"))

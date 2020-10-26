@@ -10,9 +10,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from lti.contrib.django import DjangoToolProvider
+
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.utils import retrieve_token
-from lti.contrib.django import DjangoToolProvider
 
 logger = logging.getLogger(__name__)
 

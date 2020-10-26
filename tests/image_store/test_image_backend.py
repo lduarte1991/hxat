@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import Mock
 
 import media_management_sdk
+
 from image_store import backends
 
 ImageStoreBackend = backends.ImageStoreBackend

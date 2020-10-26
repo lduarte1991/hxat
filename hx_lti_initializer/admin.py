@@ -7,6 +7,7 @@ throughout the LTI. Even courses is only related via the target objects.
 
 from django.contrib import admin
 from django.contrib.sessions.models import Session
+
 from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
 
 

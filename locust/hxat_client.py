@@ -4,8 +4,9 @@ from uuid import uuid4
 
 import jwt
 from dateutil import tz
-from locust import HttpLocust
 from utils import Console
+
+from locust import HttpLocust
 
 
 def make_jwt(apikey, secret, user, iat=None, ttl=36000, override=[], backcompat=False):

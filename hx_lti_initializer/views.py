@@ -6,8 +6,6 @@ It will set up the tool provider, create/retrive the user and pass along any
 other information that will be rendered to the access/init screen to the user.
 """
 
-from abstract_base_classes.target_object_database_api import TOD_Implementation
-from annotationsx.exceptions import AnnotationTargetDoesNotExist
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -18,6 +16,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from lti import ToolConfig
+
+from abstract_base_classes.target_object_database_api import TOD_Implementation
+from annotationsx.exceptions import AnnotationTargetDoesNotExist
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer import annotation_database
 from hx_lti_initializer.forms import CourseForm
@@ -34,7 +36,6 @@ from hx_lti_initializer.utils import (
     retrieve_token,
     save_session,
 )
-from lti import ToolConfig
 from target_object_database.models import TargetObject
 
 try:

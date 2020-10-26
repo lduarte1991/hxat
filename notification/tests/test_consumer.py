@@ -9,6 +9,7 @@ from django.conf import settings
 from django.test import Client
 from django.urls import re_path, reverse
 from lti import ToolConsumer
+
 from notification.consumers import NotificationConsumer
 from notification.middleware import SessionAuthMiddleware
 

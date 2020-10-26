@@ -1,9 +1,10 @@
-from annotationsx.lti_validators import LTIRequestValidator
 from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from lti import ToolConsumer
 from lti.contrib.django import DjangoToolProvider
+
+from annotationsx.lti_validators import LTIRequestValidator
 
 
 def test_lti_validation_from_ltidict_ok():

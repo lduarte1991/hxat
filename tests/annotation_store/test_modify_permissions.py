@@ -2,9 +2,10 @@ import copy
 import json
 import logging
 
-from annotation_store.store import StoreBackend
 from django.test import TestCase
 from django.test.client import RequestFactory
+
+from annotation_store.store import StoreBackend
 
 logger = logging.getLogger(__name__)
 

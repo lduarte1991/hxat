@@ -1,8 +1,9 @@
-import image_store.backends
 from django import forms
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.forms import ValidationError
+
+import image_store.backends
 from target_object_database.models import TargetObject
 
 

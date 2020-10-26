@@ -13,8 +13,9 @@ from uuid import uuid4
 import iso8601
 import websocket
 from dateutil import tz
-from locust import events
 from utils import Console
+
+from locust import events
 
 # valid codes for ws read
 OPCODE_DATA = (websocket.ABNF.OPCODE_TEXT, websocket.ABNF.OPCODE_BINARY)

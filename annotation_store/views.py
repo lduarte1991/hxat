@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import retrieve_token
