@@ -10,17 +10,16 @@ def update_read_permissions(data):
     """
     Given an annotation data object, update the "read" permissions so that
     course admins can view private annotations.
-    
+
     Instead of adding the specific user IDs of course admins, a group identifier is used
     so that the IDs aren't hard-coded, which would require updating if the list of admins
     changes in the tool. It's expected that when the tool searchs the annotation database on
     behalf of a course admin, it will use the admin group identifier.
-    
+
     Possible read permissions:
        - permissions.read = []                        # world-readable (public)
        - permissions.read = [user_id]                 # private (user only)
        - permissions.read = [user_id, ADMIN_GROUP_ID] # semi-private (user + admins only)
-    
     """
     logger.debug(
         "update_read_permissions(): data: %s"

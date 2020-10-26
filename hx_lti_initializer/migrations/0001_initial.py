@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Course",},
+            options={"verbose_name": "Course"},
         ),
         migrations.CreateModel(
             name="LTICourseAdmin",
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ("admin_unique_identifier", models.CharField(max_length=255)),
                 ("new_admin_course_id", models.CharField(max_length=255)),
             ],
-            options={"verbose_name": "Pending Admin",},
+            options={"verbose_name": "Pending Admin"},
         ),
         migrations.CreateModel(
             name="LTIProfile",
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Instructor/Administrator",},
+            options={"verbose_name": "Instructor/Administrator"},
         ),
         migrations.CreateModel(
             name="LTIResourceLinkConfig",

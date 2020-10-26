@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         # Create temp copy of the LTIResourceLinkConfig table and then truncate
         migrations.RunSQL(
             sql="""
-            CREATE TABLE IF NOT EXISTS hx_lti_initializer_ltiresourcelinkconfig_20200701 
+            CREATE TABLE IF NOT EXISTS hx_lti_initializer_ltiresourcelinkconfig_20200701
             AS SELECT * FROM hx_lti_initializer_ltiresourcelinkconfig;
             """
         ),

@@ -265,7 +265,7 @@ def launch_lti(request):
         )
         url += "?resource_link_id={}".format(resource_link_id)
         return redirect(url)
-    except AnnotationTargetDoesNotExist as e:
+    except AnnotationTargetDoesNotExist:
         logger.warning("Could not access annotation target using resource config.")
         logger.info("Deleting resource config because it is invalid.")
         LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
@@ -374,7 +374,7 @@ def edit_course(request, id):
                                 new_admin_course_id=course.course_id,
                             )
                             new_course_admin.save()
-                        except:
+                        except Exception:
                             # admin already pending
                             logger.info("Admin already pending.")
 
@@ -396,7 +396,7 @@ def edit_course(request, id):
         pending_admins = LTICourseAdmin.objects.filter(
             new_admin_course_id=course.course_id
         )
-    except:
+    except LTICourseAdmin.DoesNotExist:
         pending_admins = None
 
     return render(
@@ -433,7 +433,7 @@ def course_admin_hub(request):
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
 
-    except:
+    except LTIResourceLinkConfig.DoesNotExist:
         object_id = None
         collection_id = None
         to = None
@@ -450,7 +450,7 @@ def course_admin_hub(request):
         "hx_lti_initializer/admin_hub.html",
         {
             "username": request.LTI["hx_user_name"],
-            "is_instructor": request.LTI["is_staff"],
+            "is_instructor": is_instructor,
             "courses": courses_for_user,
             "files": files_in_courses,
             "org": settings.ORGANIZATION,
@@ -504,7 +504,7 @@ def access_annotation_target(
         hide_sidebar = request.LTI["launch_params"][
             "custom_hide_sidebar_instance"
         ].split(",")
-    except:
+    except Exception:
         hide_sidebar = []
 
     save_session(
@@ -616,8 +616,6 @@ def instructor_dashboard_view(request):
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
     resource_link_id = request.LTI["resource_link_id"]
-    context_id = request.LTI["hx_context_id"]
-    user_id = request.LTI["hx_user_id"]
     context = {
         "username": request.LTI["hx_user_name"],
         "is_instructor": request.LTI["is_staff"],
@@ -646,7 +644,6 @@ def instructor_dashboard_student_list_view(request):
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
     context_id = request.LTI["hx_context_id"]
-    user_id = request.LTI["hx_user_id"]
     resource_link_id = request.LTI["resource_link_id"]
 
     # Fetch the annotations and time how long the request takes
@@ -737,7 +734,7 @@ def change_starting_resource(request, assignment_id, object_id):
             )
             config.assignment_target = assignment_target
             created = False
-        except:
+        except Exception:
             config = LTIResourceLinkConfig(
                 resource_link_id=resource_link_id, assignment_target=assignment_target
             )

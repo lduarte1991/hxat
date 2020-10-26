@@ -2,22 +2,15 @@
 These functions will be used for the initializer module, but may also be
 helpful elsewhere.
 """
-import base64
 import datetime
 import logging
-import re
-import sys
 import time
 import urllib
-from os.path import basename, splitext
-from urllib.parse import urlparse
 
-import django.shortcuts
 import jwt
 import requests
-from abstract_base_classes.target_object_database_api import *
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.urls import reverse
 
@@ -25,7 +18,8 @@ from django.urls import reverse
 from hx_lti_assignment.models import Assignment
 from target_object_database.models import TargetObject
 
-from .models import *
+from .models import LTICourse
+from .models import LTIProfile
 
 logger = logging.getLogger(__name__)
 
@@ -289,7 +283,7 @@ def _fetch_annotations_by_course(
         # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
 
-    except:
+    except Exception:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
@@ -298,7 +292,15 @@ def _fetch_annotations_by_course(
     return annotations
 
 
-def get_distinct_users_from_annotations(annotations, sort_key=None):
+def _get_user_id(user):
+    return user["id"]
+
+
+def _get_user_name(user):
+    return user.get("name", "").strip().lower()
+
+
+def get_distinct_users_from_annotations(annotations, sort_key=_get_user_id):
     """
     Given a set of annotation objects returned by the CATCH database,
     this function returns a list of distinct user objects.
@@ -309,8 +311,6 @@ def get_distinct_users_from_annotations(annotations, sort_key=None):
         user_id = r["user"]["id"]
         if user_id not in annotations_by_user:
             annotations_by_user[user_id] = r["user"]
-    if sort_key is None:
-        sort_key = lambda user: user["id"]
     users = list(sorted(annotations_by_user.values(), key=sort_key))
     return users
 
@@ -411,8 +411,9 @@ class DashboardAnnotations(object):
         return get_annotations_keyed_by_annotation_id(self.annotations)
 
     def get_distinct_users(self):
-        sort_key = lambda user: user.get("name", "").strip().lower()
-        return get_distinct_users_from_annotations(self.annotations, sort_key)
+        return get_distinct_users_from_annotations(
+            self.annotations, sort_key=_get_user_name
+        )
 
     def get_assignments_dict(self,):
         return dict(Assignment.objects.values_list("assignment_id", "assignment_name"))
