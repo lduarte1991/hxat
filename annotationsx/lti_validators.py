@@ -4,9 +4,8 @@ import logging
 from uuid import uuid4
 
 from django.conf import settings
-from django.http import HttpRequest
 from oauthlib.common import to_unicode
-from oauthlib.oauth1 import SIGNATURE_HMAC, RequestValidator
+from oauthlib.oauth1 import RequestValidator
 
 log = logging.getLogger(__name__)
 

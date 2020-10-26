@@ -6,14 +6,10 @@ It exposes the WSGI callable as a module-level variable named ``application``.
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 """
-try:
-    from dotenv import load_dotenv
-except:
-    pass
-
 import os
 
 from django.core.wsgi import get_wsgi_application
+from dotenv import load_dotenv
 
 # if dotenv file, load it
 dotenv_path = None

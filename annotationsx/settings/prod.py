@@ -1,4 +1,5 @@
-from .aws import *
+from .aws import *  # noqa
+from .aws import LOGGING
 
 #
 # for production, we log to stdout, and then redirect to syslog

@@ -18,7 +18,7 @@ from django.contrib import messages
 
 try:
     from .secure import SECURE_SETTINGS
-except Exception as e:
+except Exception:
     SECURE_SETTINGS = dict()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -82,7 +82,7 @@ MIDDLEWARE = (
     "django.contrib.messages.middleware.MessageMiddleware",
     "annotationsx.middleware.ContentSecurityPolicyMiddleware",
     "annotationsx.middleware.MultiLTILaunchMiddleware",
-    #'annotationsx.middleware.SessionMiddleware',
+    # 'annotationsx.middleware.SessionMiddleware',
     "annotationsx.middleware.ExceptionLoggingMiddleware",
 )
 
@@ -180,7 +180,7 @@ LOGGING = {
             "format": "%(levelname)s\t%(asctime)s.%(msecs)03dZ\t%(name)s:%(lineno)s\t%(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S",
         },
-        "simple": {"format": "%(levelname)s\t%(name)s:%(lineno)s\t%(message)s",},
+        "simple": {"format": "%(levelname)s\t%(name)s:%(lineno)s\t%(message)s"},
     },
     "handlers": {
         "console": {
@@ -202,7 +202,7 @@ LOGGING = {
     # setting an empty string logger in the loggers dict below, but the separation
     # here is a bit more explicit.  See link for more details:
     # https://docs.python.org/2.7/library/logging.config.html#dictionary-schema-details
-    "root": {"level": logging.INFO, "handlers": ["default", "console"],},
+    "root": {"level": logging.INFO, "handlers": ["default", "console"]},
     "loggers": {
         # Add app-specific loggers below.
         # Make sure that propagate is False so that the root logger doesn't get involved
@@ -387,7 +387,7 @@ REDIS_PORT = os.environ.get("REDIS_PORT", SECURE_SETTINGS.get("redis_port", "637
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(REDIS_HOST, REDIS_PORT)],},
+        "CONFIG": {"hosts": [(REDIS_HOST, REDIS_PORT)]},
     }
 }
 HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() == "true"

@@ -1,4 +1,7 @@
-from .base import *
+import os
+
+from .base import *  # noqa
+from .base import BASE_DIR
 
 ORGANIZATION = "HARVARDX"
 
