@@ -83,14 +83,14 @@ class TODViewsTests(TestCase):
 
         target_url = reverse(
             "target_object_database:open_target_object",
-            kwargs={"collection_id": self.assignment.id, "target_obj_id": self.tod.id,},
+            kwargs={"collection_id": self.assignment.id, "target_obj_id": self.tod.id},
         )
         response = self.client.get(target_url)
         self.assertTrue(response.status_code == 200)
 
         target_url = reverse(
             "target_object_database:open_target_object",
-            kwargs={"collection_id": self.assignment.id, "target_obj_id": "987654321",},
+            kwargs={"collection_id": self.assignment.id, "target_obj_id": "987654321"},
         )
         response = self.client.get(target_url)
         self.assertTrue(response.status_code == 404)

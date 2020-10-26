@@ -1,7 +1,7 @@
 import html
 import logging
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import media_management_sdk
 from image_store import backends
@@ -77,13 +77,13 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         with self.assertRaises(ImageStoreBackendException):
             config = {}
             lti_params = self.lti_params
-            backend = IMMImageStoreBackend(config, lti_params)
+            _ = IMMImageStoreBackend(config, lti_params)
 
     def test_constructor_missing_required_lti_params(self):
         with self.assertRaises(ImageStoreBackendException):
             config = self.config
             lti_params = {"context_id": "foocontext123"}
-            backend = IMMImageStoreBackend(config, lti_params)
+            _ = IMMImageStoreBackend(config, lti_params)
 
     def test_store_called_with_no_uploaded_files(self):
         backend = IMMImageStoreBackend(self.config, self.lti_params)

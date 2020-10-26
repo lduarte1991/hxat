@@ -13,6 +13,16 @@ from lti import ToolConsumer
 from target_object_database.models import TargetObject
 
 
+# copied from catchpy/anno/utils.py
+def generate_uid(must_be_int=False):
+    """ for back-compat, generate id as integer."""
+    # originally shifted by 64 to keep number within max integer value
+    # but javascript in the frontend support integers with 52bits.
+    # https://stackoverflow.com/a/3530326
+    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+    return str(uuid.uuid4().int >> 76 - 1) if must_be_int else str(uuid.uuid4())
+
+
 @pytest.fixture
 def user_profile_factory():
     def _user_profile_factory(roles=["Learner"]):
@@ -290,7 +300,7 @@ def make_annotatorjs_object(age_in_hours=0, media="Text", user=None):
             "id": uuid.uuid4().int,
             "created": created_at,
             "updated": created_at,
-            "user": {"id": creator_id, "name": "user_{}".format(creator_id),},
+            "user": {"id": creator_id, "name": "user_{}".format(creator_id)},
         }
     else:
         created = {}
@@ -325,7 +335,7 @@ def make_wa_object(age_in_hours=0, media="Text", user=None):
             "id": generate_uid(),
             "created": created_at,
             "modified": created_at,
-            "creator": {"id": creator_id, "name": "user_{}".format(creator_id),},
+            "creator": {"id": creator_id, "name": "user_{}".format(creator_id)},
             "platform": {
                 "platform_name": "CATCH_DEFAULT_PLATFORM_NAME",
                 "context_id": "fake_context",

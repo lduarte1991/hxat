@@ -2,10 +2,7 @@ import copy
 import json
 import logging
 
-import mock
-from annotation_store.store import AnnotationStore, StoreBackend
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from annotation_store.store import StoreBackend
 from django.test import TestCase
 from django.test.client import RequestFactory
 
@@ -119,7 +116,7 @@ class StoreBackendTest(TestCase):
         for test in tests:
             anno_test = copy.deepcopy(anno)
             anno_test.update(
-                {"permissions": test["permissions"], "parent": test["parent"],}
+                {"permissions": test["permissions"], "parent": test["parent"]}
             )
             before_perms = copy.deepcopy(anno_test["permissions"])
             result = backend._modify_permissions(anno_test)

@@ -127,7 +127,7 @@ class TOD_ImplementationTests(TestCase):
             TOD_Implementation.get_own_targets_from_course,
             "fake_course2",
         )  # noqa
-        course2 = LTICourse.create_course("fake_course2", self.ltiprofile1)
+        _ = LTICourse.create_course("fake_course2", self.ltiprofile1)
         self.assertTrue(
             len(TOD_Implementation.get_own_targets_from_course("fake_course2")) == 0
         )  # noqa

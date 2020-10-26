@@ -301,12 +301,12 @@ def test_launchLti_expired_timestamp(
 
     # check user was NOT created
     with pytest.raises(User.DoesNotExist) as e:
-        user = User.objects.get(username=instructor_name)
+        _ = User.objects.get(username=instructor_name)
     assert "does not exist" in str(e.value)
 
     # check course was created
     with pytest.raises(LTICourse.DoesNotExist) as e:
-        course = LTICourse.get_course_by_id(course_id)
+        _ = LTICourse.get_course_by_id(course_id)
     assert "does not exist" in str(e.value)
 
 
@@ -350,7 +350,7 @@ def test_launchLti_missing_required_param(
             "lti_version": "LTI-1p0",
             "resource_link_id": "FakeResourceLinkID",
             # for hxat lis_person_sourcedid is required!
-            #'lis_person_sourcedid': user.name,
+            # 'lis_person_sourcedid': user.name,
             "lis_outcome_service_url": "fake_url",
             "user_id": user.anon_id,
             "roles": ["Instructor"],
@@ -543,7 +543,7 @@ def test_launchLti_starting_resource(random_assignment_target):
     target_path = "/lti_init/launch_lti/"
     launch_url = "http://testserver{}".format(target_path)
 
-    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 

@@ -1,15 +1,11 @@
 import json
 import uuid
 
-import annotation_store.views as views
 import pytest
 import responses
-from django.conf import settings
 from django.test import Client
-from django.test.client import RequestFactory
 from django.urls import reverse
 from hx_lti_initializer.models import LTIResourceLinkConfig
-from hx_lti_initializer.utils import retrieve_token
 
 
 @responses.activate
@@ -27,13 +23,13 @@ def test_api_root_default_ok(
     # 1. create course, assignment, target_object, user
     course, user, launch_params = course_user_lti_launch_params
     assignment_target = assignment_target_factory(course)
-    target_object = assignment_target.target_object
+    # target_object = assignment_target.target_object
     assignment = assignment_target.assignment
     assignment.save()
 
     # 2. set starting resource
     resource_link_id = launch_params["resource_link_id"]
-    resource_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
@@ -142,7 +138,7 @@ def test_api_root_backend_from_request_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params["resource_link_id"]
-    resource_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
@@ -269,7 +265,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params["resource_link_id"]
-    resource_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
@@ -419,7 +415,7 @@ def test_api_root_webanno_grade_ok(
 
     # 2. set starting resource
     resource_link_id = launch_params["resource_link_id"]
-    resource_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 

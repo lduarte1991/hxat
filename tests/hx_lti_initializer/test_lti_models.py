@@ -89,7 +89,7 @@ def test_LTIResourceLinkConfig_target_object_removed_from_assignment(
     assignment_target = random_assignment_target["assignment_target"]
     resource_link_id = "FakeResourceLinkID"
 
-    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
@@ -104,12 +104,11 @@ def test_LTIResourceLinkConfig_target_object_removed_from_assignment(
 
 @pytest.mark.django_db
 def test_LTIResourceLinkConfig_target_object_deleted(random_assignment_target):
-    assignment = random_assignment_target["assignment"]
     target_object = random_assignment_target["target_object"]
     assignment_target = random_assignment_target["assignment_target"]
     resource_link_id = "FakeResourceLinkID"
 
-    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
@@ -129,7 +128,7 @@ def test_LTIResourceLinkConfig_assignment_deleted(random_assignment_target):
     assignment_target = random_assignment_target["assignment_target"]
     resource_link_id = "FakeResourceLinkID"
 
-    lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+    _ = LTIResourceLinkConfig.objects.create(
         resource_link_id=resource_link_id, assignment_target=assignment_target,
     )
 
