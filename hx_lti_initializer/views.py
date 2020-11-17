@@ -195,7 +195,9 @@ def launch_lti(request):
 
         # save the course name to the session so it auto-populate later.
         save_session(
-            request, course_name=course_object.course_name, course_id=course_object.id,
+            request,
+            course_name=course_object.course_name,
+            course_id=course_object.id,
         )
 
     except LTICourse.DoesNotExist:
@@ -263,7 +265,9 @@ def launch_lti(request):
             "hx_lti_initializer:access_annotation_target",
             args=[course_id, collection_id, object_id],
         )
-        url += "?resource_link_id={}".format(resource_link_id)
+        url += "?resource_link_id={}&utm_source={}".format(
+            resource_link_id, request.session.session_key
+        )
         return redirect(url)
     except AnnotationTargetDoesNotExist as e:
         logger.warning("Could not access annotation target using resource config.")
@@ -302,7 +306,9 @@ def launch_lti(request):
                     )
                 url = reverse(
                     "hx_lti_initializer:course_admin_hub"
-                ) + "?resource_link_id={}".format(resource_link_id)
+                ) + "?resource_link_id={}&utm_source={}".format(
+                    resource_link_id, request.session.session_key
+                )
                 return redirect(url)
             else:
                 logger.debug(
@@ -314,7 +320,9 @@ def launch_lti(request):
                     "hx_lti_initializer:access_annotation_target",
                     args=[course_id, assignment_id, object_id],
                 )
-                url += "?resource_link_id={}".format(resource_link_id)
+                url += "?resource_link_id={}&utm_source={}".format(
+                    resource_link_id, request.session.session_key
+                )
                 return redirect(url)
         except Exception as e:
             logger.debug(
@@ -337,7 +345,9 @@ def launch_lti(request):
 
     url = reverse(
         "hx_lti_initializer:course_admin_hub"
-    ) + "?resource_link_id={}".format(resource_link_id)
+    ) + "?resource_link_id={}&utm_source={}".format(
+        resource_link_id, request.session.session_key
+    )
     return redirect(url)
 
 
@@ -382,9 +392,10 @@ def edit_course(request, id):
             save_session(request, course_name=course.course_name)
 
             messages.success(request, "Course was successfully edited!")
-            url = (
-                reverse("hx_lti_initializer:course_admin_hub")
-                + "?resource_link_id=%s" % request.LTI["resource_link_id"]
+            url = reverse(
+                "hx_lti_initializer:course_admin_hub"
+            ) + "?resource_link_id={}&utm_source={}".format(
+                request.LTI["resource_link_id"], request.session.session_key
             )
             return redirect(url)
         else:
@@ -610,7 +621,7 @@ def access_annotation_target(
 
 def instructor_dashboard_view(request):
     """
-        Renders the instructor dashboard (without annotations).
+    Renders the instructor dashboard (without annotations).
     """
     if not request.LTI["is_staff"]:
         raise PermissionDenied("You must be a staff member to view the dashboard.")
@@ -630,7 +641,9 @@ def instructor_dashboard_view(request):
                 "student_list_view_url": reverse(
                     "hx_lti_initializer:instructor_dashboard_student_list_view"
                 )
-                + "?resource_link_id=%s" % resource_link_id,
+                + "?resource_link_id={}&utm_source={}".format(
+                    resource_link_id, request.session.session_key
+                ),
             }
         ),
     }
@@ -689,7 +702,7 @@ def error_view(request, message):
 
 def delete_assignment(request):
     """
-        Assignment deletion from Postgres databases
+    Assignment deletion from Postgres databases
     """
     try:
         collection_id = request.POST["assignment_id"]
@@ -700,9 +713,10 @@ def delete_assignment(request):
         logger.error("error in delete assignment({}): {}".format(assignment, e))
         return error_view(request, "The assignment deletion may have failed")
 
-    url = (
-        reverse("hx_lti_initializer:course_admin_hub")
-        + "?resource_link_id=%s" % request.LTI["resource_link_id"]
+    url = reverse(
+        "hx_lti_initializer:course_admin_hub"
+    ) + "?resource_link_id={}&utm_source={}".format(
+        request.LTI["resource_link_id"], request.session.session_key
     )
     return redirect(url)
 
