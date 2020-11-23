@@ -157,6 +157,7 @@ def test_api_root_backend_from_request_ok(
             args=[course.course_id, assignment.assignment_id, target_object.pk],
         )
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -284,6 +285,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
             args=[course.course_id, assignment.assignment_id, target_object.pk],
         )
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -434,6 +436,7 @@ def test_api_root_webanno_grade_ok(
             args=[course.course_id, assignment.assignment_id, target_object.pk],
         )
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
