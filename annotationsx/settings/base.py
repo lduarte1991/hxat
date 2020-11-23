@@ -65,7 +65,6 @@ INSTALLED_APPS = (
     "django_extensions",
     "bootstrap3",
     "crispy_forms",
-    "sslserver",
     "hx_lti_initializer",
     "annotation_store",
     "hx_lti_assignment",
@@ -80,6 +79,7 @@ MIDDLEWARE = (
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "annotationsx.middleware.ContentSecurityPolicyMiddleware",
     "annotationsx.middleware.MultiLTILaunchMiddleware",
     #'annotationsx.middleware.SessionMiddleware',
@@ -394,3 +394,4 @@ HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() =
 
 # time-to-live for ws auth
 WS_JWT_TTL = os.environ.get("WS_JWT_TTL", 300)
+

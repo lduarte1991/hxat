@@ -44,7 +44,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     </details>
                     <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
 
-                    
+
                     <div id="hx-sr-notifications" class='sr-only' aria-live="polite">
                         <div class='sr-real-alert'></div>
                         <div class="sr-alert"></div>
@@ -162,7 +162,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                     Badges: {
                     },
                     Websockets: {
-                        wsUrl: window.location.hostname,
+                        wsUrl: window.location.hostname + (window.location.port ? ":"+window.location.port : ""),
                         utm: "{{ utm_source }}",
                         resource: "{{ resource_link_id }}"
                     },
@@ -171,7 +171,7 @@ Text Annotation Tool | {{ target_object.target_title }}
                         homeURL: "{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&utm_source={{utm_source}}",
                         has_staff_permissions: ("{{ is_instructor }}" === "True")
                         {% endif %}
-                    },  
+                    },
                     PrevNextButton: {
                         prevUrl: {% if prev_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=prev_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
                         nextUrl: {% if next_object %}"{% url 'hx_lti_initializer:access_annotation_target' course_id=course assignment_id=collection object_id=next_object.target_object.id %}?utm_source={{utm_source}}&resource_link_id={{resource_link_id}}" {% else %} "" {% endif %},
