@@ -18,7 +18,7 @@ from hx_lti_initializer.views import (
 )
 
 urlpatterns = [
-    path("course/(<int:id>)/edit/", edit_course, name="edit_course",),
+    path("course/<int:id>/edit/", edit_course, name="edit_course",),
     path("launch_lti/", launch_lti, name="launch_lti",),
     path("admin_hub/", course_admin_hub, name="course_admin_hub",),
     path(

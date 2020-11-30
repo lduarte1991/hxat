@@ -398,8 +398,6 @@ def edit_course(request, id):
                 request.LTI["resource_link_id"], request.session.session_key
             )
             return redirect(url)
-        else:
-            raise PermissionDenied("Invalid course form submitted")
     else:
         form = CourseForm(instance=course, user_scope=user_scope)
 
