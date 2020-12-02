@@ -1,7 +1,7 @@
 import html
 import logging
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, call
 
 import media_management_sdk
 from image_store import backends
@@ -126,7 +126,10 @@ class TestIMMImageStoreBackend(unittest.TestCase):
 
         self.assertEqual(manifest_url, collection_response["iiif_manifest"]["url"])
 
-        mock_client.authenticate.assert_called_with(user_id=self.user_id)
+        mock_client.authenticate.assert_has_calls([
+            call(user_id=self.user_id),
+            call(user_id=self.user_id, course_id=course_response["id"], course_permission="write")
+        ])
         mock_client.find_or_create_course.assert_called_with(
             lti_context_id=self.lti_params["context_id"],
             lti_tool_consumer_instance_guid=self.lti_params[

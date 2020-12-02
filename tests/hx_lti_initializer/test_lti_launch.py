@@ -45,6 +45,7 @@ def test_launchLti_session_ok(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -108,6 +109,7 @@ def test_launchLti_user_course_created_ok(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -161,6 +163,7 @@ def test_launchLti_user_scope_canvas_created_ok(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -205,6 +208,7 @@ def test_launchLti_user_scope_canvas_no_platform_created_ok(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -255,6 +259,7 @@ def test_launchLti_user_course_ok_no_context_title(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -394,6 +399,7 @@ def test_launchLti_from_LTIdict_ok(
     expected_url = (
         reverse("hx_lti_initializer:course_admin_hub")
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 
@@ -574,6 +580,7 @@ def test_launchLti_starting_resource(random_assignment_target):
             args=[course_id, assignment.assignment_id, target_object.pk],
         )
         + f"?resource_link_id={resource_link_id}"
+        + f"&utm_source={client.session.session_key}"
     )
     assert response.url == expected_url
 

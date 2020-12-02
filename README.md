@@ -64,13 +64,13 @@ When the tool launches (i.e. authenticates a user for a particular course contex
 **To run tests:**
 
 ```
-$ ./manage.py test
+$ pytest tests/
 ```
 
 **To update the test coverage badge:**
 
 ```
-$ coverage run --source='.' manage.py test
+$ coverage run -m pytest
 $ coverage-badge -f -o coverage.svg
 ```
 
