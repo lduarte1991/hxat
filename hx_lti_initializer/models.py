@@ -73,7 +73,7 @@ class LTICourse(models.Model):
 
     # admins are able to add other users with LTIProfiles already in the system
     course_admins = models.ManyToManyField(
-        LTIProfile, related_name="course_admin_user_profiles",
+        LTIProfile, related_name="course_admin_user_profiles", blank=True,
     )
 
     course_users = models.ManyToManyField(

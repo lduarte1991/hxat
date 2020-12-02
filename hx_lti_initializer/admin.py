@@ -7,7 +7,7 @@ throughout the LTI. Even courses is only related via the target objects.
 
 from django.contrib import admin
 from django.contrib.sessions.models import Session
-from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
+from hx_lti_initializer.models import LTICourse, LTICourseAdmin, LTIProfile, LTIResourceLinkConfig
 
 
 class LTIProfileAdmin(admin.ModelAdmin):
@@ -16,7 +16,7 @@ class LTIProfileAdmin(admin.ModelAdmin):
     ordering = ("user", "scope", "anon_id", "name", "roles")
 
 
-class LTICourseAdmin(admin.ModelAdmin):
+class LTICourseListAdmin(admin.ModelAdmin):
     list_display = (
         "course_name",
         "course_id",
@@ -47,7 +47,12 @@ class SessionAdmin(admin.ModelAdmin):
     list_display = ["session_key", "_session_data", "expire_date"]
 
 
+class LTIPendingAdmin(admin.ModelAdmin):
+    list_display = ("admin_unique_identifier", "new_admin_course_id")
+
+
 admin.site.register(Session, SessionAdmin)
 admin.site.register(LTIProfile, LTIProfileAdmin)
-admin.site.register(LTICourse, LTICourseAdmin)
+admin.site.register(LTICourse, LTICourseListAdmin)
 admin.site.register(LTIResourceLinkConfig, LTIResourceLinkConfigAdmin)
+admin.site.register(LTICourseAdmin, LTIPendingAdmin)
