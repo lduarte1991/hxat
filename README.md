@@ -1,4 +1,3 @@
-![Build Status](https://travis-ci.org/Harvard-ATG/annotationsx.svg?branch=master)
 ![Coverage Status](./coverage.svg)
 
 # The HarvardX Annotation Tool (HxAT)
@@ -14,6 +13,7 @@ Requirements:
 
 - Python 3.6+ 
 - Postgresql 9.6+
+- [ASGI](https://asgi.readthedocs.io/en/latest/) application server such as [Daphne](http://github.com/django/daphne).
 
 ### Quickstart
 
@@ -28,6 +28,17 @@ $ ./manage.py runserver
 Notes:
 - You will need to create a postgres database first (e.g. `createdb hxat`).
 - You will need to edit `secure.py` to configure the database connection details.
+- The `runserver` command will automatically start daphne (ASGI server), which will handle HTTP and websocket requests. 
+
+### Running Django with SSL
+
+Generate a certificate for local development using a tool such as [mkcert](https://github.com/FiloSottile/mkcert) and then start the server:
+
+```
+$ daphne -e ssl:8000:privateKey=key.pem:certKey=cert.pem annotationsx.asgi:application
+```
+
+Note: The reason we need to run daphne directly is that at the time of writing, the django `runserver` command doesn't support SSL and `runsslserver` (via [django-sslserver](https://github.com/teddziuba/django-sslserver)) doesn't support ASGI/Daphne. 
 
 ## LMS Integration
 
