@@ -160,9 +160,15 @@ class LTICourse(models.Model):
 
     def get_assignments(self):
         """
-        Returns a QuerySet of assignments for this course, ordered by name.
+        Returns a QuerySet of all assignments (published and unpublished) for this course, ordered by name.
         """
         return self.assignments.order_by(Lower("assignment_name"))
+
+    def get_published_assignments(self):
+        """
+        Returns a QuerySet of published assignments for this course.
+        """
+        return self.get_assignments().filter(is_published=True)
 
 
 class LTICourseAdmin(models.Model):

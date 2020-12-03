@@ -1,0 +1,25 @@
+{% load staticfiles %}
+{% load bootstrap3 %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}HarvardX Annotation Tool{% endblock %}</title>
+        {% bootstrap_css %}
+        <style type="text/css">
+            ul.content_item, ul.content_item ul { list-style-type: none; }
+        </style>
+    </head>
+    <body>
+        <main class="container" style="margin: 20px;">
+            {% if selection_form.fields.content_item.choices|length > 0 %}
+                <form id="lti_selection" action="{% url 'hx_lti_initializer:embed_lti_response' %}" method="post">
+                    {% csrf_token %}
+                    {{ selection_form }}
+                    <input type="submit" class="btn btn-primary" value="Insert this annotation content">
+                </form>
+            {% else %}
+                <p>No annotation content items available to add.</p>
+            {% endif %}
+        </main>
+    </body>
+</html>

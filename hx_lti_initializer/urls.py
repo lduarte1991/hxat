@@ -15,11 +15,15 @@ from hx_lti_initializer.views import (
     instructor_dashboard_student_list_view,
     instructor_dashboard_view,
     launch_lti,
+    embed_lti,
+    embed_lti_response,
 )
 
 urlpatterns = [
     path("course/<int:id>/edit/", edit_course, name="edit_course",),
     path("launch_lti/", launch_lti, name="launch_lti",),
+    path("embed_lti/", embed_lti, name="embed_lti",),
+    path("embed_lti/response/", embed_lti_response, name="embed_lti_response",),
     path("admin_hub/", course_admin_hub, name="course_admin_hub",),
     path(
         "admin_hub/<path:course_id>/<slug:assignment_id>/<int:object_id>/preview/",

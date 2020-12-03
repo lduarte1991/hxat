@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,7 +20,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.forms import CourseForm
+from hx_lti_initializer import annotation_database
+from hx_lti_initializer.forms import CourseForm, EmbedLtiSelectionForm, EmbedLtiResponseForm
 from hx_lti_initializer.models import (
     LTICourse,
     LTICourseAdmin,
@@ -287,8 +289,14 @@ def launch_lti(request):
             # This is motivated by the Poetry in America Course
 
             # If there are variables passed into the launch indicating a desired target object, render that object
-            assignment_id = request.LTI["launch_params"][settings.LTI_COLLECTION_ID]
-            object_id = request.LTI["launch_params"][settings.LTI_OBJECT_ID]
+            assignment_id = request.LTI["launch_params"].get(settings.LTI_COLLECTION_ID)
+            object_id = request.LTI["launch_params"].get(settings.LTI_OBJECT_ID)
+            if not assignment_id and not object_id:
+                assignment_id = request.GET.get(settings.LTI_COLLECTION_ID)
+                object_id = request.GET.get(settings.LTI_OBJECT_ID)
+                if not assignment_id and not object_id:
+                    logger.debug("no assignment object")
+                    raise Exception("Assignment object not specified")
             course_id = str(course)
             if set(roles) & set(settings.ADMIN_ROLES):
                 try:
@@ -303,26 +311,19 @@ def launch_lti(request):
                     logger.info(
                         "Not waiting to be added as admin: {}".format(e), exc_info=False
                     )
-                url = reverse(
-                    "hx_lti_initializer:course_admin_hub"
-                ) + "?resource_link_id={}&utm_source={}".format(
-                    resource_link_id, request.session.session_key
+            logger.debug(
+                "DEBUG - User wants to go directly to annotations for a specific target object({}--{}--{}".format(
+                    course_id, assignment_id, object_id
                 )
-                return redirect(url)
-            else:
-                logger.debug(
-                    "DEBUG - User wants to go directly to annotations for a specific target object({}--{}--{}".format(
-                        course_id, assignment_id, object_id
-                    )
-                )
-                url = reverse(
-                    "hx_lti_initializer:access_annotation_target",
-                    args=[course_id, assignment_id, object_id],
-                )
-                url += "?resource_link_id={}&utm_source={}".format(
-                    resource_link_id, request.session.session_key
-                )
-                return redirect(url)
+            )
+            url = reverse(
+                "hx_lti_initializer:access_annotation_target",
+                args=[course_id, assignment_id, object_id],
+            )
+            url += "?resource_link_id={}&utm_source={}".format(
+                resource_link_id, request.session.session_key
+            )
+            return redirect(url)
         except Exception as e:
             logger.debug(
                 "DEBUG - User wants the index: {} --- {}".format(type(e), e),
@@ -348,6 +349,117 @@ def launch_lti(request):
         resource_link_id, request.session.session_key
     )
     return redirect(url)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def embed_lti(request):
+    '''
+    Generates a content selection view to insert the LTI tool into a page in the LMS.
+    Assumes that the LTI ContentItemSelectionRequest has been validated (e.g. oauth signature).
+
+    This is part of the "Deep Linking" specification.
+    See also:
+    - https://www.imsglobal.org/specs/lticiv1p0-intro
+    - https://www.imsglobal.org/specs/lticiv1p0/specification
+    '''
+    user_id = request.POST.get('user_id')
+    roles = request.POST.get('roles', '').split(",")
+    context_id = request.POST.get('context_id')
+    content_item_return_url = request.POST.get('content_item_return_url')
+
+    # we can't proceed unless we know where to return a content item response
+    if not content_item_return_url:
+        return HttpResponse("Error: content_item_return_url is missing")
+
+    # ensure user is an admin
+    if set(roles) & set(settings.ADMIN_ROLES):
+        try:
+            lti_profile = LTIProfile.objects.get(anon_id=user_id)
+            login(request, lti_profile.user)
+        except LTIProfile.DoesNotExist:
+            return HttpResponse("Profile not found. Please launch the tool through the course navigation so that your profile is created.")
+    else:
+        raise PermissionDenied("You must be an admin to insert content items")
+
+    # ensure the course exists
+    try:
+        course_instance = LTICourse.objects.get(course_id=context_id)
+    except LTICourse.DoesNotExist:
+        return HttpResponse("Course not found. Please launch the tool through the course navigation so that the course context is created.")
+
+    selection_form = EmbedLtiSelectionForm(
+        course_instance=course_instance,
+        content_item_return_url=content_item_return_url,
+    )
+    context = {
+        "selection_form": selection_form,
+    }
+    return render(request, "hx_lti_initializer/embed_lti_selection.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def embed_lti_response(request):
+    '''
+    This view returns a POSTed response back to the tool consumer that is oauth
+    signed to verify its authenticity.
+
+    Assumes that the admin user has already been logged in via ContentItemSelectionRequest
+    and has made a selection.
+
+    A specific annotation assignment target must be returned to the tool consumer rather
+    than just a reference to the launch URL and setting a starting resource after the fact.
+    The reason is that an embedded LTI link item will NOT have a distinct resource link ID
+    compared to a module item, assignment item or course navigation item. So if the tool is
+    embedded on multiple pages, they will all share the same resource_link_id.
+    '''
+    content_item_return_url = request.POST.get('content_item_return_url')
+    content_item = request.POST.get("content_item", "")
+    (collection_id, object_id) = content_item.split("/", 2)
+
+    # Build LTI response to tool consumer
+    base_url = request.build_absolute_uri("/")[:-1]
+    launch_url = base_url + reverse("hx_lti_initializer:launch_lti")
+    launch_url_with_custom_params = f"{launch_url}?custom_collection_id={collection_id}&custom_object_id={object_id}"
+    content_items = {
+        "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+        "@graph": [
+            {
+                "@type": "LtiLinkItem",
+                "@id": launch_url_with_custom_params,
+                "url": launch_url_with_custom_params,
+                "title": "HarvardX Annotation Tool",
+                "text": "HarvardX Annotation Tool",
+                "mediaType": "application/vnd.ims.lti.v1.ltilink",
+                "placementAdvice": {
+                    "presentationDocumentTarget": "iframe",
+                    "displayWidth": "100%",
+                    "displayHeight": "600",
+                },
+                # NOTE: canvas does not actually copy these params into launch request body.
+                # One workaround for this is to use GET params with the launch URL.
+                # See also: https://github.com/instructure/canvas-lms/issues/1025
+                "custom": {
+                    "collection_id": collection_id,
+                    "object_id": object_id,
+                },
+            }
+        ]
+    }
+    data = {
+        "lti_message_type": "ContentItemSelection",
+        "lti_version": "LTI-1p0",
+        "content_items": json.dumps(content_items),
+    }
+    form = EmbedLtiResponseForm(data)
+    form.set_oauth_signature(url=content_item_return_url)
+
+    context = {
+        "content_item_return_url": content_item_return_url,
+        "embed_lti_response_form": form,
+    }
+    return render(request, "hx_lti_initializer/embed_lti_response.html", context)
 
 
 @login_required
@@ -763,17 +875,60 @@ def change_starting_resource(request, assignment_id, object_id):
 
 
 def tool_config(request):
-    url = request.build_absolute_uri("/")[:-1] + reverse(
-        settings.LTI_SETUP["LAUNCH_URL"]
-    )
+    '''
+    Generates XML tool config.
+    See also: https://canvas.instructure.com/doc/api/file.tools_xml.html
+    '''
+    base_url = request.build_absolute_uri("/")[:-1]
+
+    title = settings.LTI_TOOL_CONFIGURATION["title"]
+    description = settings.LTI_TOOL_CONFIGURATION["description"]
+    course_navigation_enabled = settings.LTI_TOOL_CONFIGURATION.get("course_navigation_enabled", False)
+    new_tab = settings.LTI_TOOL_CONFIGURATION.get("new_tab", False)
+    embed_enabled = settings.LTI_TOOL_CONFIGURATION.get("embed_enabled", False)
+    embed_url = base_url + reverse(settings.LTI_TOOL_CONFIGURATION["embed_url"])
+    embed_icon_url = base_url + static(settings.LTI_TOOL_CONFIGURATION["embed_icon_url"])
+    launch_url = base_url + reverse(settings.LTI_TOOL_CONFIGURATION["launch_url"])
+
     lti_tool_config = ToolConfig(
-        title=settings.LTI_SETUP["TOOL_TITLE"],
-        launch_url=url,
-        secure_launch_url=url,
-        extensions=settings.LTI_SETUP.get("EXTENSION_PARAMETERS", ""),
-        description=settings.LTI_SETUP["TOOL_DESCRIPTION"],
+        title=title,
+        description=description,
+        launch_url=launch_url,
+        secure_launch_url=launch_url,
+        extensions={
+            "canvas.instructure.com": {
+                # The oauth_compliant parameter allows an external tool provider to specify how it wants Canvas
+                # to handle launch URLs with query parameters: if set to true LTI query parameters will not be
+                # copied to the POST body. Note that this is required if the launch URL includes GET parameters,
+                # such as passing a custom assignment ID and object ID.
+                "oauth_compliant": "true",
+
+                # The privacy_level parameter determines what personal information to provide to the tool.
+                # Valid values include: "anonymous", "name_only", "public"
+                "privacy_level": "public",
+
+                # Configuration for course navigation link
+                "course_navigation": {
+                    "enabled": "true" if course_navigation_enabled else "false",
+                    "default": "disabled",
+                    "text": title,
+                    "windowTarget": "_blank" if new_tab else "_self",
+                },
+
+                # Configuration for WYSIWYG editor button
+                "editor_button": {
+                    "enabled": "true" if embed_enabled else "false",
+                    "visibility": "admins",
+                    "message_type": "ContentItemSelectionRequest",
+                    "text": f"Add from {title}",
+                    "url": embed_url,
+                    "icon_url": embed_icon_url,
+                    "selection_height": "400",
+                    "selection_width": "500",
+                },
+            },
+        },
     )
-    lti_tool_config.initialize_models = settings.LTI_SETUP["INITIALIZE_MODELS"]
 
     return HttpResponse(lti_tool_config.to_xml(), content_type="text/xml")
 
