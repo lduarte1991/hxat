@@ -2,7 +2,7 @@ sudo: false
 language: python
 python: ["3.6"]
 env:
-    - DJANGO_SETTINGS_MODULE=annotationsx.settings.test
+    - DJANGO_SETTINGS_MODULE=hxat.settings.test
 services:
   - postgresql
 install:
