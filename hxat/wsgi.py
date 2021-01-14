@@ -1,5 +1,5 @@
 """
-WSGI config for annotationsx project.
+WSGI config for hxat project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

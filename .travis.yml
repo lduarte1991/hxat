@@ -6,13 +6,13 @@ env:
 services:
   - postgresql
 install:
-    - pip install -r annotationsx/requirements/test.txt
+    - pip install -r hxat/requirements/test.txt
     - psql -c 'DROP DATABASE IF EXISTS annotationsx;' -U postgres
     - psql -c "CREATE USER annotationsx WITH PASSWORD 'password';" -U postgres
     - psql -c 'ALTER USER annotationsx CREATEDB;' -U postgres
     - psql -c 'CREATE DATABASE annotationsx;' -U postgres
     - psql -c 'GRANT ALL PRIVILEGES ON DATABASE annotationsx TO annotationsx;' -U postgres
-    - cp -vf annotationsx/settings/secure.py.example annotationsx/settings/secure.py
+    - cp -vf hxat/settings/secure.py.example hxat/settings/secure.py
 script:
     - python manage.py migrate --noinput
     - python manage.py test
