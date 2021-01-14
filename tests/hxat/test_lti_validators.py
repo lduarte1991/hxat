@@ -1,8 +1,8 @@
 from random import randint
 
 import pytest
-from annotationsx.lti_validators import LTIRequestValidator
-from annotationsx.middleware import MultiLTILaunchMiddleware
+from hxat.lti_validators import LTIRequestValidator
+from hxat.middleware import MultiLTILaunchMiddleware
 from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse

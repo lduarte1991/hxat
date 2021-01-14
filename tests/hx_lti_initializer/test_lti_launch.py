@@ -1,6 +1,6 @@
 #
 # run these with pytest:
-# $> DJANGO_SETTINGS_MODULE=annotationsx.settings.test pytest hx_lti_initializer/tests/test_launch.py  -v
+# $> DJANGO_SETTINGS_MODULE=hxat.settings.test pytest hx_lti_initializer/tests/test_launch.py  -v
 #
 from random import randint
 

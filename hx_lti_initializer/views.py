@@ -7,7 +7,7 @@ other information that will be rendered to the access/init screen to the user.
 """
 
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-from annotationsx.exceptions import AnnotationTargetDoesNotExist
+from hxat.exceptions import AnnotationTargetDoesNotExist
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
