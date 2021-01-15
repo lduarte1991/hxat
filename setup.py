@@ -16,7 +16,7 @@ def get_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-version = get_version("annotationsx", "__init__.py")
+version = get_version("hxat", "__init__.py")
 
 
 with open("README.md") as readme_file:

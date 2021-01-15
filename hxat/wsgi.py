@@ -1,5 +1,5 @@
 """
-WSGI config for annotationsx project.
+WSGI config for hxat project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -19,10 +19,10 @@ from django.core.wsgi import get_wsgi_application
 dotenv_path = None
 if "HXAT_DOTENV_PATH" in os.environ:
     dotenv_path = os.environ["HXAT_DOTENV_PATH"]
-elif os.path.exists(os.path.join("annotationsx", "settings", ".env")):
-    dotenv_path = os.path.join("annotationsx", "settings", ".env")
+elif os.path.exists(os.path.join("hxat", "settings", ".env")):
+    dotenv_path = os.path.join("hxat", "settings", ".env")
 if dotenv_path:
     load_dotenv(dotenv_path)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "annotationsx.settings.aws")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hxat.settings.aws")
 application = get_wsgi_application()

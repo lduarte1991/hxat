@@ -120,7 +120,7 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "annotationsx.middleware": {
+        "hxat.middleware": {
             "level": "DEBUG",
             "handlers": ["console"],
             "propagate": False,

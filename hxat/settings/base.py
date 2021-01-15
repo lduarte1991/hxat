@@ -74,21 +74,21 @@ INSTALLED_APPS = (
 MIDDLEWARE = (
     "django_cookies_samesite.middleware.CookiesSameSite",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "annotationsx.middleware.CookielessSessionMiddleware",
+    "hxat.middleware.CookielessSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "annotationsx.middleware.ContentSecurityPolicyMiddleware",
-    "annotationsx.middleware.MultiLTILaunchMiddleware",
-    #'annotationsx.middleware.SessionMiddleware',
-    "annotationsx.middleware.ExceptionLoggingMiddleware",
+    "hxat.middleware.ContentSecurityPolicyMiddleware",
+    "hxat.middleware.MultiLTILaunchMiddleware",
+    #'hxat.middleware.SessionMiddleware',
+    "hxat.middleware.ExceptionLoggingMiddleware",
 )
 
-ROOT_URLCONF = "annotationsx.urls"
+ROOT_URLCONF = "hxat.urls"
 
-WSGI_APPLICATION = "annotationsx.wsgi.application"
+WSGI_APPLICATION = "hxat.wsgi.application"
 
 DATABASES = {
     "default": {
@@ -135,8 +135,8 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "annotationsx.context_processors.resource_link_id_processor",
-                "annotationsx.context_processors.utm_source_processor",
+                "hxat.context_processors.resource_link_id_processor",
+                "hxat.context_processors.utm_source_processor",
             ],
             "debug": True,
         },
@@ -242,12 +242,12 @@ LOGGING = {
             "handlers": ["default", "console"],
             "propagate": False,
         },
-        "annotationsx.middleware": {
+        "hxat.middleware": {
             "level": _DEFAULT_LOG_LEVEL,
             "handlers": ["default", "console"],
             "propagate": False,
         },
-        "annotationsx.lti_validators": {
+        "hxat.lti_validators": {
             "level": _DEFAULT_LOG_LEVEL,
             "handlers": ["default", "console"],
             "propagate": False,
@@ -369,7 +369,7 @@ if ANNOTATION_HTTPS_ONLY:
 # Instead of using the default JSON serializer, we need to modify it slightly so that
 # session dicts stored in JSON are de-serialized with their order preserved. This functionality
 # is used in particular by the MultiLTILaunchMiddleware.
-SESSION_SERIALIZER = "annotationsx.serializers.JsonOrderedDictSerializer"
+SESSION_SERIALIZER = "hxat.serializers.JsonOrderedDictSerializer"
 
 # Organization-specific configuration
 # Try to minimize this as much as possible in favor of configuration
@@ -379,7 +379,7 @@ elif ORGANIZATION == "HARVARDX":
     pass
 
 # channels for notification
-ASGI_APPLICATION = "annotationsx.routing.application"
+ASGI_APPLICATION = "hxat.routing.application"
 REDIS_HOST = os.environ.get(
     "REDIS_HOST", SECURE_SETTINGS.get("redis_host", "localhost")
 )
