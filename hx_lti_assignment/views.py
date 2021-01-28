@@ -36,9 +36,11 @@ def create_new_assignment(request):
         targets_form = AssignmentTargetsFormSet(request.POST)
         if targets_form.is_valid():
             assignment_targets = targets_form.save(commit=False)
-            targets = "assignment_objects=" + str(
-                assignment_targets[0].target_object.id
-            )
+            targets = []
+            if len(assignment_targets) > 0:
+                targets = "assignment_objects=" + str(
+                    assignment_targets[0].target_object.id
+                )
             for x in range(len(assignment_targets) - 1):
                 targets += (
                     "&"
