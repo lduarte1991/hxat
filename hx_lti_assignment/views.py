@@ -105,7 +105,7 @@ def create_new_assignment(request):
             target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
-            logger.debug("Form Errors: {}".format(target_form.errors))
+            logger.debug("Form Errors: {}".format(targets_form.errors))
             return error_view(
                 request,
                 "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.",
