@@ -50,6 +50,7 @@ def create_new_assignment(request):
             post_values = QueryDict(targets, mutable=True)
             post_values.update(request.POST)
             form = AssignmentForm(post_values)
+            assignment = None
             if form.is_valid():
                 assignment = form.save(commit=False)
                 random_id = uuid.uuid4()
