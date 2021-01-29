@@ -66,7 +66,7 @@ class LTIRequestValidator(RequestValidator):
             secret = to_unicode(settings.LTI_SECRET_DICT[context_id])
         except KeyError:  # context_id not in LTI_SECRET_DICT
             if client_key == settings.CONSUMER_KEY:
-                log.error("----------------- lti consumer key FALLBACK")
+                log.debug("----------------- lti consumer key FALLBACK")
                 return to_unicode(settings.LTI_SECRET)
             else:  # oauth_consumer_key not a known value
                 log.error(
