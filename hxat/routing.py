@@ -2,7 +2,7 @@ import notification.routing
 from channels.routing import ProtocolTypeRouter, URLRouter
 from notification.middleware import SessionAuthMiddleware
 
-ASGI_APPLICATION = "annotationsx.routing.application"
+ASGI_APPLICATION = "hxat.routing.application"
 
 application = ProtocolTypeRouter(
     {

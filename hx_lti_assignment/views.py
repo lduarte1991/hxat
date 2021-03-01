@@ -36,9 +36,11 @@ def create_new_assignment(request):
         targets_form = AssignmentTargetsFormSet(request.POST)
         if targets_form.is_valid():
             assignment_targets = targets_form.save(commit=False)
-            targets = "assignment_objects=" + str(
-                assignment_targets[0].target_object.id
-            )
+            targets = []
+            if len(assignment_targets) > 0:
+                targets = "assignment_objects=" + str(
+                    assignment_targets[0].target_object.id
+                )
             for x in range(len(assignment_targets) - 1):
                 targets += (
                     "&"
@@ -48,6 +50,7 @@ def create_new_assignment(request):
             post_values = QueryDict(targets, mutable=True)
             post_values.update(request.POST)
             form = AssignmentForm(post_values)
+            assignment = None
             if form.is_valid():
                 assignment = form.save(commit=False)
                 random_id = uuid.uuid4()
@@ -105,7 +108,7 @@ def create_new_assignment(request):
             target_num = 0
             form = AssignmentForm(request.POST)
             debug = "Targets Form is NOT valid: " + str(request.POST)
-            logger.debug("Form Errors: {}".format(target_form.errors))
+            logger.debug("Form Errors: {}".format(targets_form.errors))
             return error_view(
                 request,
                 "Something went wrong with the source material. It's likely you have selected a source that is already in use elsewhere.",

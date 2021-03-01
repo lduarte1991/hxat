@@ -10,14 +10,14 @@ if __name__ == "__main__":
     dotenv_path = None
     if "HXAT_DOTENV_PATH" in os.environ:
         dotenv_path = os.environ["HXAT_DOTENV_PATH"]
-    elif os.path.exists(os.path.join("annotationsx", "settings", ".env")):
-        dotenv_path = os.path.join("annotationsx", "settings", ".env")
+    elif os.path.exists(os.path.join("hxat", "settings", ".env")):
+        dotenv_path = os.path.join("hxat", "settings", ".env")
     if dotenv_path:
         load_dotenv(dotenv_path)
 
     # define settings if not in environment
     if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "annotationsx.settings.aws")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hxat.settings.aws")
     try:
         from django.core.management import execute_from_command_line
     except ImportError:

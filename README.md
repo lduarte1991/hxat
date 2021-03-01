@@ -19,7 +19,7 @@ Requirements:
 
 ```
 $ pip install -r requirements.txt
-$ cp annotationsx/settings/secure.py.example annotationsx/settings/secure.py 
+$ cp hxat/settings/secure.py.example hxat/settings/secure.py 
 $ ./manage.py migrate
 $ ./manage.py createsuperuser
 $ ./manage.py runserver
@@ -35,7 +35,7 @@ Notes:
 Generate a certificate for local development using a tool such as [mkcert](https://github.com/FiloSottile/mkcert) and then start the server:
 
 ```
-$ daphne -e ssl:8000:privateKey=key.pem:certKey=cert.pem annotationsx.asgi:application
+$ daphne -e ssl:8000:privateKey=key.pem:certKey=cert.pem hxat.asgi:application
 ```
 
 Note: The reason we need to run daphne directly is that at the time of writing, the django `runserver` command doesn't support SSL and `runsslserver` (via [django-sslserver](https://github.com/teddziuba/django-sslserver)) doesn't support ASGI/Daphne. 
@@ -51,8 +51,8 @@ This tool is compatible with [Edx](https://www.edx.org/) and [Canvas](https://ww
 1. In your Canvas course, click `Settings -> Apps -> View App Configurations -> Add App` and then:
 2. Select "By URL" for Configuration Type.
 3. Then enter the following:
-    - Name: AnnotationsX
-    - Consumer Key: annotationsx
+    - Name: hxat
+    - Consumer Key: hxat
     - Shared Secret: secret
     - Config URL: https://localhost:8000/lti/config
 4. If the installation worked, the tool should appear in your left navigation.
