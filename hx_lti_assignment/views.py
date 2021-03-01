@@ -70,7 +70,7 @@ def create_new_assignment(request):
                 target_num = (
                     0 if assignment_targets is None else len(assignment_targets)
                 )
-                debug = "Assignment Form is NOT valid" + str(request.POST) + "What?"
+                messages.error(request, form.errors)
                 logger.debug("form errors: {}".format(form.errors))
                 template_used = "hx_lti_assignment/create_new_assignment2.html"
                 if assignment and assignment.use_hxighlighter:
@@ -155,8 +155,6 @@ def create_new_assignment(request):
 
 @login_required
 def edit_assignment(request, id):
-    """
-    """
     assignment = get_object_or_404(Assignment, pk=id)
     target_num = len(AssignmentTargets.objects.filter(assignment=assignment))
     debug = "TEST"

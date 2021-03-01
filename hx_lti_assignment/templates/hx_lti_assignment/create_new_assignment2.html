@@ -5,6 +5,10 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 {% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote.css" %}">
 <link rel="stylesheet" href="{% static "vendors/development/css/summernote-bs3.css" %}">
 <link rel="stylesheet" href="{% static "vendors/Annotator/plugins/summernote-richtext-annotator.css" %}">
