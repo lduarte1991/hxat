@@ -322,7 +322,7 @@ def make_wa_object(age_in_hours=0, media="Text", user=None):
     if age_in_hours > 0:
         created_at = get_past_datetime(age_in_hours)
         created = {
-            "id": generate_uid(),
+            "id": uuid.uuid4().hex,
             "created": created_at,
             "modified": created_at,
             "creator": {"id": creator_id, "name": "user_{}".format(creator_id),},

@@ -619,17 +619,20 @@ class WebAnnotationStoreBackend(StoreBackend):
                 except (KeyError, IndexError) as e:
                     assignment_id = None
 
-            else:
+            else:  # PUT or POST
                 body = self._get_request_body()
                 # 02mar20 naomi: pulling collection_id from wrong place,
                 # this is a webannotation so body['platform']['collection_id']
                 # related to https://github.com/lduarte1991/hxat/issues/116
                 # 03mar20 naomi: if client tries to update the collection_id?
                 # what is the supposed behavior for hxat?
-                assignment_id = body.get(
-                    "collectionId", body.get("collection_id", None)
-                )
-                # assignment_id = body['platform']['collection_id']
+                platform = body.get("platform", None)
+                if platform:
+                    assignment_id = platform.get("collection_id", None)
+                else:  # see (item2)
+                    assignment_id = body.get(
+                            "collectionId", body.get("collection_id", None)
+                    )
             if assignment_id:
                 assignment = self._get_assignment(assignment_id)
                 base_url = assignment.annotation_database_url
@@ -876,4 +879,6 @@ goodness of users hearts. This requirement allows developers to create
 assignemnts with lti components pointing to other lti providers than prod and
 do debugging and tests.
 
+09mar21 naomi: (item2) not sure if the WebannotationStoreBackend is being used for
+annotatorjs AND webannotation... keeping both functioning for now.
 """

@@ -58,6 +58,7 @@ http_static
 .venv
 env
 env3
+.python-version
 
 # other
 *.DS_Store
