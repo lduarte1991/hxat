@@ -74,7 +74,7 @@ class AnnotationStore(object):
             qs = urllib.parse.parse_qs(request.META["QUERY_STRING"])
             try:
                 version_requested = qs.get("version")[0]
-            except (KeyError, IndexError, TypeError) as e:
+            except (KeyError, IndexError, TypeError):
                 version_requested = None
         else:
             body = json.loads(str(request.body, "utf-8"))
@@ -391,7 +391,7 @@ class CatchStoreBackend(StoreBackend):
                 base_url = assignment.annotation_database_url
             else:
                 base_url = str(ANNOTATION_DB_URL).strip()
-        except:
+        except Exception:
             self.logger.info(
                 "Default annotation_database_url used as assignment could not be found."
             )
@@ -433,7 +433,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.get(
                 database_url, headers=self.headers, params=params, timeout=timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info(
@@ -474,7 +474,7 @@ class CatchStoreBackend(StoreBackend):
                     self.logger.info(
                         "Grade sent back for user %s" % self.request.LTI["hx_user_id"]
                     )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("create response status_code=%s" % response.status_code)
@@ -496,7 +496,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.post(
                 database_url, data=data, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("update response status_code=%s" % response.status_code)
@@ -515,7 +515,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.delete(
                 database_url, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("delete response status_code=%s" % response.status_code)
@@ -616,7 +616,7 @@ class WebAnnotationStoreBackend(StoreBackend):
                 qs = urllib.parse.parse_qs(self.request.META["QUERY_STRING"])
                 try:
                     assignment_id = qs.get("collectionId")[0]
-                except (KeyError, IndexError) as e:
+                except (KeyError, IndexError):
                     assignment_id = None
 
             else:  # PUT or POST
@@ -687,7 +687,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.get(
                 database_url, headers=self.headers, params=params, timeout=timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info(
@@ -729,7 +729,7 @@ class WebAnnotationStoreBackend(StoreBackend):
                 )
                 if is_graded:
                     self.lti_grade_passback(score=1)
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("create response status_code=%s" % response.status_code)
@@ -754,7 +754,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.put(
                 database_url, data=data, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("update response status_code=%s" % response.status_code)
@@ -777,7 +777,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.delete(
                 database_url, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("delete response status_code=%s" % response.status_code)

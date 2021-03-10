@@ -19,7 +19,6 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer import annotation_database
 from hx_lti_initializer.forms import CourseForm
 from hx_lti_initializer.models import (
     LTICourse,
