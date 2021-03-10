@@ -631,7 +631,7 @@ class WebAnnotationStoreBackend(StoreBackend):
                     assignment_id = platform.get("collection_id", None)
                 else:  # see (item2)
                     assignment_id = body.get(
-                            "collectionId", body.get("collection_id", None)
+                        "collectionId", body.get("collection_id", None)
                     )
             if assignment_id:
                 assignment = self._get_assignment(assignment_id)
