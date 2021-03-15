@@ -4,13 +4,11 @@ import urllib
 import urllib.parse
 
 import requests
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer import annotation_database
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import retrieve_token
 from target_object_database.models import TargetObject
@@ -116,15 +114,15 @@ def transfer(request, instructor_only="1"):
         if response.status_code == 200:
             annotations = json.loads(response.text)
             for ann in annotations["rows"]:
-                ann["contextId"] = unicode(new_course_id)
-                ann["collectionId"] = unicode(new_assignment_id)
+                ann["contextId"] = str(new_course_id)
+                ann["collectionId"] = str(new_assignment_id)
                 ann["id"] = None
                 logger.info("annotation user_id: %s" % ann["user"]["id"])
                 if ann["user"]["id"] in old_admins:
                     try:
                         if new_admins[ann["user"]["name"]]:
                             ann["user"]["id"] = new_admins[ann["user"]["name"]]
-                    except:
+                    except Exception:
                         ann["user"]["id"] = user_id
                 response2 = requests.post(
                     create_database_url, headers=headers, data=json.dumps(ann)

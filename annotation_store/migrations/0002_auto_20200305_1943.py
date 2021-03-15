@@ -10,6 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(name="Annotation",),
-        migrations.DeleteModel(name="AnnotationTags",),
+        migrations.DeleteModel(
+            name="Annotation",
+        ),
+        migrations.DeleteModel(
+            name="AnnotationTags",
+        ),
     ]

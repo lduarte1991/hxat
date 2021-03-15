@@ -74,7 +74,7 @@ class AnnotationStore(object):
             qs = urllib.parse.parse_qs(request.META["QUERY_STRING"])
             try:
                 version_requested = qs.get("version")[0]
-            except (KeyError, IndexError, TypeError) as e:
+            except (KeyError, IndexError, TypeError):
                 version_requested = None
         else:
             body = json.loads(str(request.body, "utf-8"))
@@ -391,7 +391,7 @@ class CatchStoreBackend(StoreBackend):
                 base_url = assignment.annotation_database_url
             else:
                 base_url = str(ANNOTATION_DB_URL).strip()
-        except:
+        except Exception:
             self.logger.info(
                 "Default annotation_database_url used as assignment could not be found."
             )
@@ -433,7 +433,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.get(
                 database_url, headers=self.headers, params=params, timeout=timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info(
@@ -474,7 +474,7 @@ class CatchStoreBackend(StoreBackend):
                     self.logger.info(
                         "Grade sent back for user %s" % self.request.LTI["hx_user_id"]
                     )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("create response status_code=%s" % response.status_code)
@@ -496,7 +496,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.post(
                 database_url, data=data, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("update response status_code=%s" % response.status_code)
@@ -515,7 +515,7 @@ class CatchStoreBackend(StoreBackend):
             response = requests.delete(
                 database_url, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("delete response status_code=%s" % response.status_code)
@@ -616,20 +616,23 @@ class WebAnnotationStoreBackend(StoreBackend):
                 qs = urllib.parse.parse_qs(self.request.META["QUERY_STRING"])
                 try:
                     assignment_id = qs.get("collectionId")[0]
-                except (KeyError, IndexError) as e:
+                except (KeyError, IndexError):
                     assignment_id = None
 
-            else:
+            else:  # PUT or POST
                 body = self._get_request_body()
                 # 02mar20 naomi: pulling collection_id from wrong place,
                 # this is a webannotation so body['platform']['collection_id']
                 # related to https://github.com/lduarte1991/hxat/issues/116
                 # 03mar20 naomi: if client tries to update the collection_id?
                 # what is the supposed behavior for hxat?
-                assignment_id = body.get(
-                    "collectionId", body.get("collection_id", None)
-                )
-                # assignment_id = body['platform']['collection_id']
+                platform = body.get("platform", None)
+                if platform:
+                    assignment_id = platform.get("collection_id", None)
+                else:  # see (item2)
+                    assignment_id = body.get(
+                        "collectionId", body.get("collection_id", None)
+                    )
             if assignment_id:
                 assignment = self._get_assignment(assignment_id)
                 base_url = assignment.annotation_database_url
@@ -684,7 +687,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.get(
                 database_url, headers=self.headers, params=params, timeout=timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info(
@@ -726,7 +729,7 @@ class WebAnnotationStoreBackend(StoreBackend):
                 )
                 if is_graded:
                     self.lti_grade_passback(score=1)
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("create response status_code=%s" % response.status_code)
@@ -751,7 +754,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.put(
                 database_url, data=data, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("update response status_code=%s" % response.status_code)
@@ -774,7 +777,7 @@ class WebAnnotationStoreBackend(StoreBackend):
             response = requests.delete(
                 database_url, headers=self.headers, timeout=self.timeout
             )
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout:
             self.logger.error("requested timed out!")
             return self._response_timeout()
         self.logger.info("delete response status_code=%s" % response.status_code)
@@ -876,4 +879,6 @@ goodness of users hearts. This requirement allows developers to create
 assignemnts with lti components pointing to other lti providers than prod and
 do debugging and tests.
 
+09mar21 naomi: (item2) not sure if the WebannotationStoreBackend is being used for
+annotatorjs AND webannotation... keeping both functioning for now.
 """
