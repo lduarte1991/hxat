@@ -1,1 +1,1 @@
-__version__ = "5.0.0"  # package name is "hxat", dropping annotationsx
+__version__ = "5.0.1"  # multi-store for debug
