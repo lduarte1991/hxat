@@ -1,1 +1,1 @@
-__version__ = "5.0.1"  # multi-store for debug
+__version__ = "5.0.2"  # fix admin_group_id
