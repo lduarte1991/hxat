@@ -662,7 +662,7 @@ def instructor_dashboard_student_list_view(request):
     # Fetch the annotations and time how long the request takes
     fetch_start_time = time.time()
     course_annotations = fetch_annotations_by_course(
-        context_id, annotation_database.ADMIN_GROUP_ID
+        context_id, settings.ADMIN_GROUP_ID
     )
     fetch_end_time = time.time()
     fetch_elapsed_time = fetch_end_time - fetch_start_time

@@ -245,7 +245,7 @@ class AnnotationStore(object):
 
 class StoreBackend(object):
     BACKEND_NAME = None
-    ADMIN_GROUP_ID = "__admin__"
+    ADMIN_GROUP_ID = settings.ADMIN_GROUP_ID
     ADMIN_GROUP_ENABLED = True if ORGANIZATION == "ATG" else False
 
     def __init__(self, request):

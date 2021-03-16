@@ -265,6 +265,7 @@ LOGGING = {
     },
 }
 
+ADMIN_GROUP_ID = "__admin__"
 LTI_COURSE_ID = "context_id"
 LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
