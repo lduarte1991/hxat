@@ -118,7 +118,7 @@ Video Annotation Tool | {{ target_object.target_title }}
                 "mediaType": "image",
                 "context_id": "{{ course }}",
                 "collection_id": "{{ collection }}",
-                "object_id": "{{ target_object.get_target_content_for_video | safe }}",
+                "object_id": "{{ target_object.get_video_url | safe }}",
                 "ws_object_id": "{{ object }}",
                 "username": "{{ username }}",
                 "user_id": "{{ user_id }}",
@@ -128,7 +128,7 @@ Video Annotation Tool | {{ target_object.target_title }}
             "targets": [{
                 'mediaType': "video",
                 'method': 'manifest',
-                'transcript_url': "{{ target_object.get_target_content_for_video | safe }}",
+                'transcript_url': "{{ target_object.get_transcript_url | safe }}",
                 'object_source': '.container1',
                 "template_urls":  "{% static 'templates/dashboard/' %}",
                 "source_type": 'video/mp4',
