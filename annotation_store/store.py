@@ -390,6 +390,11 @@ class CatchStoreBackend(StoreBackend):
                 assignment = self._get_assignment(assignment_id)
                 base_url = assignment.annotation_database_url
             else:
+                self.logger.debug(
+                    "---- FALLBACK to default data-store in {}".format(
+                        self.request.method
+                    )
+                )
                 base_url = str(ANNOTATION_DB_URL).strip()
         except Exception:
             self.logger.info(
@@ -615,7 +620,9 @@ class WebAnnotationStoreBackend(StoreBackend):
             elif self.request.method == "DELETE":
                 qs = urllib.parse.parse_qs(self.request.META["QUERY_STRING"])
                 try:
-                    assignment_id = qs.get("collectionId")[0]
+                    assignment_id = qs.get(
+                        "collection_id", qs.get("collectionId", None)
+                    )[0]
                 except (KeyError, IndexError):
                     assignment_id = None
 
@@ -644,6 +651,11 @@ class WebAnnotationStoreBackend(StoreBackend):
                 # different credentials. _get_database_url() maybe returns a
                 # map of (collection_id, database_url) pairs and its clients
                 # have to deal with that. (see bottom of file item1)
+                self.logger.debug(
+                    "******* FALLBACK to default data-store in {}".format(
+                        self.request.method
+                    )
+                )
                 base_url = str(ANNOTATION_DB_URL).strip()
         except Exception as e:
             base_url = str(ANNOTATION_DB_URL).strip()
