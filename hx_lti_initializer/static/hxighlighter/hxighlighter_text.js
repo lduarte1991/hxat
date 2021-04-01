@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.2.0 - Thursday, March 25th, 2021, 1:35:56 PM  
+// [AIV_SHORT]  Version: 1.2.0 - Thursday, April 1st, 2021, 2:25:26 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -40754,53 +40754,59 @@ __webpack_require__(15);
       jQuery('.side.item-' + ann.id).find('.edit').click(function (event) {
         self.ViewerEditorOpen(event, ann, true);
       });
-      jQuery('.side.item-' + ann.id).click(function (e) {
-        console.log(ann, self.options);
 
-        if (self.options.mediaType.toLowerCase() === "text" && ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
-          var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
-          jQuery(self.element).parent().animate({
-            scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 140
-          }); //jQuery(ann._local.highlights).animate({'outline': '2px solid black'}, 1000)
+      if (self.options.mediaType.toLowerCase() !== "video" && self.options.mediaType.toLowerCase() !== "audio") {
+        jQuery('.side.item-' + ann.id).click(function (e) {
+          if (self.options.mediaType.toLowerCase() === "text" && ann._local && ann._local.highlights && ann._local.highlights.length > 0) {
+            var nav_offset = getComputedStyle(document.body).getPropertyValue('--nav-bar-offset');
+            jQuery(self.element).parent().animate({
+              scrollTop: jQuery(ann._local.highlights[0]).offset().top + jQuery(self.element).parent().scrollTop() - parseInt(nav_offset, 10) - 140
+            }); //jQuery(ann._local.highlights).animate({'outline': '2px solid black'}, 1000)
 
-          setTimeout(function () {
-            ann._local.highlights.forEach(function (hl) {
-              if (jQuery(hl).text().trim().length > 0) {
-                jQuery(hl).css({
-                  border: '0 solid black'
-                }).animate({
-                  borderWidth: 2
-                }, 200).animate({
-                  borderWidth: 0
-                }, 200);
-              }
-            });
+            setTimeout(function () {
+              ann._local.highlights.forEach(function (hl) {
+                if (jQuery(hl).text().trim().length > 0) {
+                  jQuery(hl).css({
+                    border: '0 solid black'
+                  }).animate({
+                    borderWidth: 2
+                  }, 200).animate({
+                    borderWidth: 0
+                  }, 200);
+                }
+              });
 
-            jQuery('#first-node-' + ann.id)[0].focus();
-            $.publishEvent('focusOnContext', self.instance_id, [ann]);
-          }, 350);
-        } else if (self.options.mediaType.toLowerCase() === "image") {
-          var elementClass = e.target.getAttribute('class');
+              jQuery('#first-node-' + ann.id)[0].focus();
+              $.publishEvent('focusOnContext', self.instance_id, [ann]);
+            }, 350);
+          } else if (self.options.mediaType.toLowerCase() === "image") {
+            var elementClass = e.target.getAttribute('class');
 
-          if (elementClass && elementClass.indexOf('zoom-to-error-button') > -1 || e.target.tagName.toLowerCase() === "image" || e.target.tagName.toLowerCase() === "svg" || e.target.tagName.toLowerCase() === "path") {
-            var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
-            var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
-              return parseInt(val, 10);
-            });
-            var bounds = {
-              x: boundSplit[0] - boundSplit[2] * .167,
-              y: boundSplit[1] - boundSplit[3] * .167,
-              width: boundSplit[2] + boundSplit[2] / 3.0,
-              height: boundSplit[3] + boundSplit[3] / 3.0
-            };
-            $.publishEvent('zoomTo', self.inst_id, [bounds, ann]);
-          } // console.log("Yup!");
-          // $.pauseEvent(e);
+            if (elementClass && elementClass.indexOf('zoom-to-error-button') > -1 || e.target.tagName.toLowerCase() === "image" || e.target.tagName.toLowerCase() === "svg" || e.target.tagName.toLowerCase() === "path") {
+              var regexp = /\/([0-9]+,[0-9]+,[0-9]+,[0-9]+)\//;
+              var boundSplit = regexp.exec(ann.thumbnail)[1].split(',').map(function (val) {
+                return parseInt(val, 10);
+              });
+              var bounds = {
+                x: boundSplit[0] - boundSplit[2] * .167,
+                y: boundSplit[1] - boundSplit[3] * .167,
+                width: boundSplit[2] + boundSplit[2] / 3.0,
+                height: boundSplit[3] + boundSplit[3] / 3.0
+              };
+              $.publishEvent('zoomTo', self.inst_id, [bounds, ann]);
+            } // console.log("Yup!");
+            // $.pauseEvent(e);
 
-        } else if (self.options.mediaType.toLowerCase() === "video" || self.options.mediaType.toLowerCase() === "audio") {
+          } else if (self.options.mediaType.toLowerCase() === "video" || self.options.mediaType.toLowerCase() === "audio") {
+            $.publishEvent('playAnnotation', self.inst_id, [ann]);
+          }
+        });
+      } else {
+        jQuery('.side.item-' + ann.id).find('.playMediaButton').click(function (e) {
           $.publishEvent('playAnnotation', self.inst_id, [ann]);
-        }
-      });
+        });
+      }
+
       jQuery('.side.item-' + ann.id).find('.annotatedBy.side').click(function (e) {
         self.autosearch(jQuery(this).text().trim(), 'User');
         $.pauseEvent(e);
@@ -41561,7 +41567,7 @@ __p += '\n            <span class="idAnnotation" style="display:none">' +
 ((__t = ( source_url )) == null ? '' : __t) +
 '</span>\n        </div>\n    ';
  } else if (media.toLowerCase() === "video") {;
-__p += '\n        <div class="playMediaButton" style="text-align:center;">\n            <div class="btn btn-default" style="text-align:center;margin-top:20px;">\n                Segment ' +
+__p += '\n        <div class="playMediaButton" style="text-align:center;">\n            <div class="btn btn-default" style="text-align:center;margin-top:20px;">\n                <i class="fas fa-play"></i> ' +
 ((__t = ( ranges[0].startLabel )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( ranges[0].endLabel )) == null ? '' : __t) +
@@ -41652,7 +41658,7 @@ __webpack_require__(38);
     var toolbar = [['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr']]];
 
     if (self.options.instructors.indexOf(self.options.user_id) > -1) {
-      toolbar = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['fontsize', ['fontsize']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
+      toolbar = [['style', ['style']], ['font', ['bold', 'italic', 'underline', 'clear']], ['para', ['ul', 'ol', 'paragraph']], ['insert', ['table', 'link', 'hr', 'picture', 'video']], ['view', ['codeview']]];
     }
 
     this.summernoteOpts = jQuery.extend({
@@ -41786,7 +41792,10 @@ __webpack_require__(38);
     delete jQuery.summernote.options.keyMap.mac['SHIFT+TAB'];
     element.find('.note-editable').trigger('focus');
     jQuery('.note-editor button').attr('tabindex', '0');
-    jQuery('.note-statusbar').hide();
+    setTimeout(function () {
+      jQuery('.note-statusbar').hide();
+      console.log("HELP");
+    }, 500);
     jQuery(document).on('mouseleave', function () {
       jQuery('.note-statusbar').trigger('mouseup');
 
@@ -43571,6 +43580,39 @@ __webpack_require__(55);
 
     delete jQuery.summernote.options.keyMap.pc.TAB;
     delete jQuery.summernote.options.keyMap.mac.TAB;
+    jQuery('.note-editor button').attr('tabindex', '0');
+    jQuery('.note-statusbar').hide();
+    jQuery(document).on('mouseleave', function () {
+      jQuery('.note-statusbar').trigger('mouseup');
+
+      if (self.elementObj) {
+        var editorObj = self.elementObj.closest('.annotation-editor');
+        var newTop = parseInt(editorObj.css('top'), 10);
+        ;
+        var newLeft = parseInt(editorObj.css('left'), 10); // console.log(editorObj, newTop, newLeft);
+
+        if (newTop + editorObj.outerHeight() > window.innerHeight) {
+          newTop = window.innerHeight - editorObj.outerHeight();
+        }
+
+        if (newLeft + editorObj.outerWidth() > window.innerWidth) {
+          newLeft = window.innerWidth - editorObj.outerWidth();
+        }
+
+        if (newTop < 0) {
+          newTop = 0;
+        }
+
+        if (newLeft < 0) {
+          newLeft = 0;
+        }
+
+        editorObj.css({
+          top: newTop,
+          left: newLeft
+        });
+      }
+    });
   };
   /**
    * Returns the HTML value of the WYSIWYG. 
@@ -44146,8 +44188,11 @@ var annotator = annotator ? annotator : __webpack_require__(13);
       self.ViewerDisplayClose();
     });
     Hxighlighter.subscribeEvent('DrawnSelectionClicked', self.instance_id, function (_, event1, annotations) {
+      if (self.annotation_tool.isStatic) {
+        return;
+      }
+
       jQuery(event1.target).addClass('annotation-selected');
-      console.log(event1.target.className);
       clearTimeout(self.hideTimer);
 
       try {
