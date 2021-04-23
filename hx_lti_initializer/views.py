@@ -607,7 +607,7 @@ def access_annotation_target(
 
     original.update(get_paras)
     if (
-        targ_obj.target_type == "tx" or targ_obj.target_type == "ig"
+        targ_obj.target_type == "tx" or targ_obj.target_type == "ig" or targ_obj.target_type == "vd"
     ) and assignment.use_hxighlighter:
         return render(
             request, "%s/detail_hxighlighter.html" % targ_obj.target_type, original

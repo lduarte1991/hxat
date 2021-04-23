@@ -83,6 +83,22 @@ class TargetObject(LTI_TodApi):
     def get_target_content_as_list(self):
         return self.target_content.split(";")
 
+    def get_video_url(self):
+        target_content = self.target_content
+        if target_content is None:
+            return ""
+        result = target_content.split(";")
+        return result[0]
+
+    def get_transcript_url(self):
+        target_content = self.target_content
+        if target_content is None:
+            return ""
+        result = target_content.split(";")
+        if len(result) >= 2:
+            return result[1]
+        return ""
+
     def get_target_content_for_video(self):
         target_content = self.target_content
         if target_content is None:
