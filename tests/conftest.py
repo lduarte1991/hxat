@@ -133,10 +133,12 @@ def lti_launch_params_factory():
         consumer_key=None,
         consumer_secret=None,
         tool_consumer_instance_guid=None,
+        lti_message_type="basic-lti-launch-request",
+        lti_version="LTI-1p0",
     ):
         params = {
-            "lti_message_type": "basic-lti-launch-request",
-            "lti_version": "LTI-1p0",
+            "lti_message_type": lti_message_type,
+            "lti_version": lti_version,
             "resource_link_id": resource_link_id,
             "lis_person_sourcedid": user_name,
             "user_id": user_id,

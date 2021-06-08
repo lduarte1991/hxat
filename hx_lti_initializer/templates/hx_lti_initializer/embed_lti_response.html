@@ -7,6 +7,10 @@
         <form id="content_item_return" action="{{ content_item_return_url }}" method="post" encType="application/x-www-form-urlencoded">
             {{ embed_lti_response_form }}
         </form>
-        <script>document.forms[0].submit();</script>
+        <script>
+            var content_item_return_form = document.forms["content_item_return"];
+            console.log("HxAT submitting ContentItemSelection response...");
+            content_item_return_form.submit();
+        </script>
     </body>
 </html>

@@ -20,7 +20,6 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer import annotation_database
 from hx_lti_initializer.forms import CourseForm, EmbedLtiSelectionForm, EmbedLtiResponseForm
 from hx_lti_initializer.models import (
     LTICourse,
@@ -435,7 +434,7 @@ def embed_lti_response(request):
                 "placementAdvice": {
                     "presentationDocumentTarget": "iframe",
                     "displayWidth": "100%",
-                    "displayHeight": "600",
+                    "displayHeight": "700",
                 },
                 # NOTE: canvas does not actually copy these params into launch request body.
                 # One workaround for this is to use GET params with the launch URL.
@@ -453,7 +452,11 @@ def embed_lti_response(request):
         "content_items": json.dumps(content_items),
     }
     form = EmbedLtiResponseForm(data)
-    form.set_oauth_signature(url=content_item_return_url)
+    form.set_oauth_signature(
+        url=content_item_return_url,
+        consumer_key=settings.CONSUMER_KEY,
+        consumer_secret=settings.LTI_SECRET,
+    )
 
     context = {
         "content_item_return_url": content_item_return_url,

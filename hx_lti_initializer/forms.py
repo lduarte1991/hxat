@@ -1,8 +1,8 @@
-import oauthlib.common
-import oauthlib.oauth1
 from django import forms
-from django.conf import settings
 from django.db.models import Q
+from oauthlib.common import Request as OAuthRequest
+from oauthlib.oauth1 import Client as OAuthClient
+
 from hx_lti_initializer.models import LTICourse, LTIProfile
 
 
@@ -78,9 +78,9 @@ class EmbedLtiResponseForm(forms.Form):
     signing process.
     '''
 
-    lti_message_type = forms.CharField(widget=forms.HiddenInput())
-    lti_version = forms.CharField(widget=forms.HiddenInput())
-    content_items = forms.CharField(widget=forms.HiddenInput())  # Note: this should probably be a JSONField, but requires Django 3.1
+    lti_message_type = forms.CharField(widget=forms.HiddenInput(), initial="ContentItemSelection")
+    lti_version = forms.CharField(widget=forms.HiddenInput(), initial="LTI-1p0")
+    content_items = forms.CharField(widget=forms.HiddenInput())
     oauth_version = forms.CharField(widget=forms.HiddenInput())
     oauth_nonce = forms.CharField(widget=forms.HiddenInput())
     oauth_timestamp = forms.CharField(widget=forms.HiddenInput())
@@ -91,16 +91,17 @@ class EmbedLtiResponseForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data['lti_message_type'] = self.fields['lti_message_type'].initial
+        self.data['lti_version'] = self.fields['lti_version'].initial
 
-    def set_oauth_signature(self, http_method="POST", url=None):
+    def set_oauth_signature(self, url=None, consumer_key=None, consumer_secret=None):
         body = dict(self.data)  # shallow copy
         headers = {}
-        request = oauthlib.common.Request(url, http_method, body, headers)
+        request = OAuthRequest(url, "POST", body, headers)
 
         # generate the oauth params and update the form data
-        client = oauthlib.oauth1.Client(settings.CONSUMER_KEY, client_secret=settings.LTI_SECRET)
-        oauth_params = client.get_oauth_params(request)
-        oauth_signature =  client.get_oauth_signature(request)
-        oauth_params.append(('oauth_signature', oauth_signature))
-        oauth_params.append(('oauth_callback', 'about:blank'))
-        self.data.update(oauth_params)
+        client = OAuthClient(consumer_key, client_secret=consumer_secret, callback_uri='about:blank')
+        request.oauth_params = client.get_oauth_params(request)
+        oauth_signature = client.get_oauth_signature(request)
+        request.oauth_params.append(('oauth_signature', oauth_signature))
+        self.data.update(request.oauth_params)
