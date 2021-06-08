@@ -33,6 +33,8 @@ class AssignmentTargets(models.Model):
         help_text="Add instructions for this object in this assignment.",
     )
     target_external_options = models.TextField(blank=True, null=True,)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Assignment Target"
@@ -192,6 +194,8 @@ class Assignment(models.Model):
         help_text="Published assignments are available to students while unpublished are not.",
         default=True,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     TABS = (
         ("Instructor", "Instructor"),
