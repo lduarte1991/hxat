@@ -369,7 +369,7 @@ def embed_lti(request):
 
     # we can't proceed unless we know where to return a content item response
     if not content_item_return_url:
-        return HttpResponse("Error: content_item_return_url is missing")
+        return HttpResponse(status=400, content="Error: ContentItemSelectionRequest is missing content_item_return_url")
 
     # ensure user is an admin
     if set(roles) & set(settings.ADMIN_ROLES):
@@ -377,15 +377,15 @@ def embed_lti(request):
             lti_profile = LTIProfile.objects.get(anon_id=user_id)
             login(request, lti_profile.user)
         except LTIProfile.DoesNotExist:
-            return HttpResponse("Profile not found. Please launch the tool through the course navigation so that your profile is created.")
+            return HttpResponse(status=404, content="User profile not found. Please launch the tool through the course navigation so that your profile is created.")
     else:
-        raise PermissionDenied("You must be an admin to insert content items")
+        return HttpResponse(status=403, content="You must be an admin to insert content items")
 
     # ensure the course exists
     try:
         course_instance = LTICourse.objects.get(course_id=context_id)
     except LTICourse.DoesNotExist:
-        return HttpResponse("Course not found. Please launch the tool through the course navigation so that the course context is created.")
+        return HttpResponse(status=404, content="Course not found. Please launch the tool through the course navigation so that the course context is created.")
 
     selection_form = EmbedLtiSelectionForm(
         course_instance=course_instance,
