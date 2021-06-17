@@ -367,26 +367,29 @@ def embed_lti(request):
     context_id = request.POST.get('context_id')
     content_item_return_url = request.POST.get('content_item_return_url')
 
-    # we can't proceed unless we know where to return a content item response
+    # initial checks to ensure we have a return URL for the content selection
+    # and that the user has permission
     if not content_item_return_url:
         return HttpResponse(status=400, content="Error: ContentItemSelectionRequest is missing content_item_return_url")
 
-    # ensure user is an admin
-    if set(roles) & set(settings.ADMIN_ROLES):
-        try:
-            lti_profile = LTIProfile.objects.get(anon_id=user_id)
-            login(request, lti_profile.user)
-        except LTIProfile.DoesNotExist:
-            return HttpResponse(status=404, content="User profile not found. Please launch the tool through the course navigation so that your profile is created.")
-    else:
-        return HttpResponse(status=403, content="You must be an admin to insert content items")
+    is_admin = set(roles) & set(settings.ADMIN_ROLES)
+    if not is_admin:
+        return HttpResponse(status=403, content="You must be a course admin to insert content items")
 
-    # ensure the course exists
+    # ensure that the course and user profile exist, otherwise we can't proceed
+    # TODO: refactor the course/user profile creation logic in launch_lti() so that we can automatically do that here too.
     try:
         course_instance = LTICourse.objects.get(course_id=context_id)
     except LTICourse.DoesNotExist:
-        return HttpResponse(status=404, content="Course not found. Please launch the tool through the course navigation so that the course context is created.")
+        return HttpResponse(status=404, content="Content not found for course. Please launch the tool through the course navigation and create some content.")
 
+    try:
+        lti_profile = LTIProfile.objects.get(anon_id=user_id)
+        login(request, lti_profile.user)  # required since the form is POSTed to embed_lti_response
+    except LTIProfile.DoesNotExist:
+        return HttpResponse(status=404, content="User profile not found. Please launch the tool through the course navigation so that your profile is created automatically.")
+
+    # render a form with the content items (annotation objects) that can be selected
     selection_form = EmbedLtiSelectionForm(
         course_instance=course_instance,
         content_item_return_url=content_item_return_url,

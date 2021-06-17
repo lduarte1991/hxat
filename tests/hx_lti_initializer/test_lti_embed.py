@@ -24,7 +24,7 @@ def test_embed_lti_permissions_learner_denied(
     client = Client(enforce_csrf_checks=False)
     response = client.post(embed_lti_path, data=params)
     assert response.status_code == 403
-    assert "You must be an admin to insert content items" in response.content.decode()
+    assert "You must be a course admin to insert content items" in response.content.decode()
 
 
 @pytest.mark.django_db
