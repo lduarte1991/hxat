@@ -11,10 +11,9 @@ from hx_lti_initializer.forms import EmbedLtiSelectionForm, EmbedLtiResponseForm
 
 class LtiContentItemReturnValidator(RequestValidator):
     '''
-    Used to test that oauth 1.0-signed requests from Tool Provider --> Tool Consumer
-    for the TI 1.1 Content-Item Process are valid.
-
-    Note that this is in contrast to LTI launches from Tool Consumer --> Tool Provider.
+    Used for testing that the response from the tool back to the LMS is valid:
+    
+        Tool Provider (HxAT) --(oauth-signed)--> Tool Consumer (Canvas/EdX)
 
     With the LTI 1.1 Content-Item Process, the tool provider receives a *ContentItemSelectionRequest*
     LTI message, and then needs to send back a *ContentItemSelection* message that includes
