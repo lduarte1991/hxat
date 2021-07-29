@@ -285,23 +285,15 @@ CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get(
 SERVER_NAME = os.environ.get("SERVER_NAME", SECURE_SETTINGS.get("SERVER_NAME", ""))
 ORGANIZATION = os.environ.get("ORGANIZATION", SECURE_SETTINGS.get("ORGANIZATION", ""))
 
-LTI_SETUP = {
-    "TOOL_TITLE": "AnnotationsX",
-    "TOOL_DESCRIPTION": "Tool for annotating texts ported from HarvardX",
-    "LAUNCH_URL": "hx_lti_initializer:launch_lti",  # "lti_init/launch_lti"
-    "LAUNCH_REDIRECT_URL": "hx_lti_initializer:launch_lti",
-    "INITIALIZE_MODELS": False,  # Options: False|resource_only|resource_and_course|resource_and_course_users
-    "EXTENSION_PARAMETERS": {
-        "canvas.instructure.com": {
-            "privacy_level": "public",
-            "course_navigation": {
-                "enabled": "true",
-                "default": "enabled",
-                "text": "AnnotationsX",
-                "windowTarget": "_blank",
-            },
-        }
-    },
+LTI_TOOL_CONFIGURATION = {
+    "title": "AnnotationsX",
+    "description": "Tool for annotating text, image, and video",
+    "launch_url": "hx_lti_initializer:launch_lti",
+    "course_navigation_enabled": True,
+    "new_tab": True,
+    "embed_enabled": True,
+    "embed_url": "hx_lti_initializer:embed_lti",
+    "embed_icon_url": "img/HxAT-16x16.png",
 }
 
 CONSUMER_KEY = os.environ.get("CONSUMER_KEY", SECURE_SETTINGS.get("CONSUMER_KEY", ""))

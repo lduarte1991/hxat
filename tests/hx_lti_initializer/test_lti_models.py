@@ -63,6 +63,30 @@ def test_LTICourse_get_all_courses(user_profile_factory):
 
 
 @pytest.mark.django_db
+def test_LTICourse_get_published_assignments(user_profile_factory, assignment_target_factory):
+    """
+    Checks that it returns a list of all the courses for that admin.
+    """
+    instructor = user_profile_factory(roles=["Instructor"])
+    course_object = LTICourse.create_course("test_course_id", instructor)
+
+    num_assignments = 5
+    for i in range(num_assignments):
+        assignment_target_factory(course_object)
+
+    published_assignments = course_object.get_published_assignments()
+    assert len(published_assignments) == num_assignments
+    assert all([a.is_published for a in published_assignments])
+
+    published_assignments[0].is_published = False
+    published_assignments[0].save()
+
+    published_assignments2 = course_object.get_published_assignments()
+    assert len(published_assignments2) == num_assignments - 1
+    assert all([a.is_published for a in published_assignments2])
+
+
+@pytest.mark.django_db
 def test_LTIResourceLinkConfig_create(random_assignment_target):
     assignment = random_assignment_target["assignment"]
     target_object = random_assignment_target["target_object"]

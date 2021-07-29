@@ -6,10 +6,12 @@ import pytest
 from dateutil import tz
 from django.conf import settings
 from django.urls import reverse
+from lti import ToolConsumer
+from lti.tool_outbound import ToolOutbound
+
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import create_new_user
-from lti import ToolConsumer
 from target_object_database.models import TargetObject
 
 
@@ -119,6 +121,17 @@ def lti_launch_url(lti_path):
     return launch_url
 
 
+@pytest.fixture(scope="module")
+def embed_lti_path():
+    return reverse("hx_lti_initializer:embed_lti")
+
+
+@pytest.fixture(scope="module")
+def embed_lti_launch_url(embed_lti_path):
+    launch_url = "http://testserver{}".format(embed_lti_path)
+    return launch_url
+
+
 @pytest.fixture
 def lti_launch_params_factory():
     def _params_factory(
@@ -154,6 +167,56 @@ def lti_launch_params_factory():
             params["tool_consumer_instance_guid"] = tool_consumer_instance_guid
 
         consumer = ToolConsumer(
+            consumer_key=consumer_key if consumer_key else settings.CONSUMER_KEY,
+            consumer_secret=consumer_secret if consumer_secret else settings.LTI_SECRET,
+            launch_url=launch_url,
+            params=params,
+        )
+        lti_params = consumer.generate_launch_data()
+        return lti_params
+
+    return _params_factory
+
+
+@pytest.fixture
+def lti_content_item_request_factory():
+    def _params_factory(
+            course_id,
+            user_name,
+            user_id,
+            user_roles,
+            launch_url,
+            course_name=None,
+            consumer_key=None,
+            consumer_secret=None,
+            tool_consumer_instance_guid=None,
+    ):
+        # See also:
+        #   https://www.imsglobal.org/specs/lticiv1p0/specification
+        # Note: The resource_link_id should NOT be passed.
+        params = {
+            'lti_message_type': 'ContentItemSelectionRequest',
+            'lti_version': 'LTI-1p0',
+            'accept_media_types': 'image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*',
+            'accept_presentation_document_targets': 'embed,frame,iframe,window',
+            'accept_unsigned': 'true',
+            'accept_multiple': 'true',
+            'auto_create': 'false',
+            'content_item_return_url': 'https://lms.fake/courses/123456/external_content/success/external_tool_dialog',
+            'context_id': uuid.uuid4().hex,
+            "lis_person_sourcedid": user_name,
+            "user_id": user_id,
+            "roles": user_roles,
+            "context_id": course_id,
+        }
+        if course_name:
+            params["context_title"] = course_name
+        if tool_consumer_instance_guid:
+            params["tool_consumer_instance_guid"] = tool_consumer_instance_guid
+
+        # Using ToolOutbound instead of ToolConsumer because resource_link_id
+        # will raise an required param exception otherwise.
+        consumer = ToolOutbound(
             consumer_key=consumer_key if consumer_key else settings.CONSUMER_KEY,
             consumer_secret=consumer_secret if consumer_secret else settings.LTI_SECRET,
             launch_url=launch_url,

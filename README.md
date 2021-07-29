@@ -99,3 +99,4 @@ In edX, the opaque `user_id` is unique within the scope of a course. In Canvas, 
 **The meaning of the ORG variable:**
 
 Older versions of the tool used a global `ORG` variable to encode some differences, but this has been deprecated and should not be used.
+
