@@ -43,6 +43,9 @@ class LTIProfile(models.Model):
     # saves the scope where this profile is valid (i.e. domain instance for canvas, course instance for edx)
     scope = models.CharField(max_length=1024, blank=True, null=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
         return self.name or self.user.username
@@ -85,6 +88,9 @@ class LTICourse(models.Model):
         blank=True,
         help_text="Please only add a URL to an externally hosted file.",
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Course")
@@ -171,6 +177,9 @@ class LTICourseAdmin(models.Model):
 
     new_admin_course_id = models.CharField(max_length=255)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = _("Pending Admin")
         unique_together = ("admin_unique_identifier", "new_admin_course_id")
@@ -199,3 +208,5 @@ class LTIResourceLinkConfig(models.Model):
     assignment_target = models.ForeignKey(
         "hx_lti_assignment.AssignmentTargets", null=False, on_delete=models.CASCADE
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
