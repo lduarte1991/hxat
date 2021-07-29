@@ -76,6 +76,7 @@ Video Annotation Tool | {{ target_object.target_title }}
     </style>
     <script type="text/javascript" src="{% static 'hxighlighter/hxighlighter_video_vjs.js' %}"></script>
     <script>
+        var video_url = "{{ target_object.get_video_url | safe }}";
         var tags = "{{ assignment.highlights_options }}".split(',');
         var hide_sidebar = {{ hide_sidebar_instance | safe }};
         var tagDict = {};
@@ -113,12 +114,20 @@ Video Annotation Tool | {{ target_object.target_title }}
         } else if (defTab == "Public") {
             defTab = "peer"
         }
+
+        // determine video source type
+        var youtube_regex = /^https:\/\/(youtu\.be)|(www\.youtube\.com)\//;
+        var video_source_type = "video/mp4";
+        if (youtube_regex.test(video_url)) {
+            video_source_type = "video/youtube";
+        }
+
         var hxighlighter_object1 = {
             "commonInfo": {
                 "mediaType": "video",
                 "context_id": "{{ course }}",
                 "collection_id": "{{ collection }}",
-                "object_id": "{{ target_object.get_video_url | safe }}",
+                "object_id": video_url,
                 "ws_object_id": "{{ object }}",
                 "username": "{{ username }}",
                 "user_id": "{{ user_id }}",
@@ -131,7 +140,7 @@ Video Annotation Tool | {{ target_object.target_title }}
                 'transcript_url': "{{ target_object.get_transcript_url | safe }}",
                 'object_source': '.container1',
                 "template_urls":  "{% static 'templates/dashboard/' %}",
-                "source_type": 'video/mp4',
+                "source_type": video_source_type,
                 "readonly": false,
                 "DropdownTags": {
                     'tags': Object.keys(tagDict),
