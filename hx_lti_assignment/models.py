@@ -47,7 +47,7 @@ class AssignmentTargets(models.Model):
         """
         Returns a list of options that are saved to the target_external_options model attribute
         in CSV format.
-        
+
         Notes:
         - since the model attribute could be null in the database, we have to
           check if it's None before trying parse it.
@@ -327,3 +327,6 @@ class Assignment(models.Model):
                 except:
                     concat_tag_name += res[0] + " "
             return result
+
+    def get_target_objects(self):
+        return self.assignment_objects.all()

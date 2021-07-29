@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}HarvardX Annotation Tool{% endblock %}</title>
+    </head>
+    <body>
+        <form id="content_item_return" action="{{ content_item_return_url }}" method="post" encType="application/x-www-form-urlencoded">
+            {{ embed_lti_response_form }}
+        </form>
+        <script>
+            var content_item_return_form = document.forms["content_item_return"];
+            console.log("HxAT submitting ContentItemSelection response...");
+            content_item_return_form.submit();
+        </script>
+    </body>
+</html>

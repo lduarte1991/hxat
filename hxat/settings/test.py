@@ -59,6 +59,7 @@ TEST_COURSE_LTI_SECRET = "lti_secret_from_LTI_SECRET_DICT"
 LTI_SECRET_DICT = {
     TEST_COURSE: TEST_COURSE_LTI_SECRET,
 }
+ADMIN_ROLES = {"Administrator", "Instructor"}
 
 ANNOTATION_DB_URL = "http://default.annotation.db.url.org"
 ANNOTATION_DB_API_KEY = "default_annotation_db_api_key"

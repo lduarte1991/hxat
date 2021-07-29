@@ -265,8 +265,12 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             request.method == "POST"
             and request.POST.get("lti_message_type") == "basic-lti-launch-request"
         )
-        self.logger.info("basic-lti-launch-request? %s" % is_basic_lti_launch)
+        is_lti_content_item_message = (
+            request.method == "POST"
+            and request.POST.get("lti_message_type") == "ContentItemSelectionRequest"
+        )
         if is_basic_lti_launch:
+            self.logger.info("handling lti_message_type=basic-lti-launch-request")
             try:
                 self._validate_request(request)
                 self._update_session(request)
@@ -283,6 +287,10 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                 self.logger.debug("Exception: {}".format(e))
                 # this potentially returns a 500:
                 raise
+        elif is_lti_content_item_message:
+            self.logger.info("handling lti_message_type=ContentItemSelectionRequest")
+            self._validate_request(request)
+            self._log_ip_address(request)
         else:
             self._set_current_session(
                 request, resource_link_id=request.GET.get("resource_link_id")
@@ -332,14 +340,6 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             raise PermissionDenied
 
         self.logger.info("signature verified")
-
-        for required_param in ("resource_link_id", "context_id", "user_id"):
-            if required_param not in request.POST:
-                self.logger.error(
-                    "Required LTI param '%s' was not present in request"
-                    % required_param
-                )
-                raise LTILaunchError("missing LTI param {}".format(required_param))
 
         if (
             "lis_person_sourcedid" not in request.POST
