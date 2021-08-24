@@ -4,6 +4,7 @@ import sys
 import uuid
 
 import requests
+from requests.exceptions import HTTPError
 from django.db import models
 from hx_lti_initializer.models import LTICourse
 from target_object_database.models import TargetObject
@@ -53,6 +54,14 @@ class AssignmentTargets(models.Model):
           check if it's None before trying parse it.
         - this field does not contain user-supplied values, so we don't need industrial-strength
           CSV parsing.
+
+        Order of options:
+          1. ViewType for mirador: string
+          2. CanvasID for mirador: string|integer
+          3. DashboardHidden: boolean
+          4. TranscriptHidden: boolean
+          5. TranscriptDownload: boolean
+          6. VideoDownload: boolean
         """
         if self.target_external_options is None:
             return []
@@ -72,20 +81,27 @@ class AssignmentTargets(models.Model):
         """
         options = self.get_target_external_options_list()
         logger.debug("OPTIONS: %s " % options)
-        if options is None or len(options) <= 1:
-            logger.debug("Trying to get canvas id but none in list")
-            req = requests.get(self.target_object.target_content)
-            manifest = json.loads(req.text)
-            canv_id = manifest["sequences"][0]["canvases"][0]["@id"]
-            return canv_id
-        else:
-            if options[1] == "":
-                req = requests.get(self.target_object.target_content)
+
+        # Retrieve first canvas ID in the IIIF manifest if none
+        # is specified in the options list.
+        if options is None or len(options) <= 1 or options[1] == "":
+            try:
+                req = requests.get(self.target_object.target_content, timeout=5)
+                req.raise_for_status()
+            except HTTPError as e:
+                logger.error(f"Failed to request manifest: AssignmentTarget {self.pk} status {e.response.status_code}")
+                return None
+            try:
                 manifest = json.loads(req.text)
-                canv_id = manifest["sequences"][0]["canvases"][0]["@id"]
-                return canv_id
-            else:
-                return options[1]
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse manifest: AssignmentTarget {self.pk}")
+                return None
+            try:
+                return manifest["sequences"][0]["canvases"][0]["@id"]
+            except (KeyError, IndexError) as e:
+                logger.error(f"Failed to extract canvas ID from manifest: AssignmentTarget {self.pk}")
+                return None
+        return options[1]
 
     def get_dashboard_hidden(self):
         """

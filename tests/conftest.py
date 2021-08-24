@@ -48,14 +48,16 @@ def course_instructor_factory(user_profile_factory):
 
 @pytest.fixture
 def assignment_target_factory():
-    def _assignment_target_factory(course):
+    def _assignment_target_factory(course, **kwargs):
         target_object = TargetObject.objects.create(
-            target_title="{} Title".format(uuid.uuid4().hex),
-            target_author="John {}".format(uuid.uuid4().int),
+            target_title=kwargs.get("target_title", "{} Title".format(uuid.uuid4().hex)),
+            target_author=kwargs.get("target_author", "John {}".format(uuid.uuid4().int)),
+            target_type=kwargs.get("target_type", "tx"),
+            target_content=kwargs.get("target_content", ""),
         )
         assignment = Assignment.objects.create(
             course=course,
-            assignment_name="Assignment {}".format(uuid.uuid4().hex),
+            assignment_name=kwargs.get("assignment_name", "Assignment {}".format(uuid.uuid4().hex)),
             pagination_limit=settings.ANNOTATION_PAGINATION_LIMIT_DEFAULT,
             # default from settings, this is set by UI
             annotation_database_url=settings.ANNOTATION_DB_URL,
@@ -63,7 +65,10 @@ def assignment_target_factory():
             annotation_database_secret_token=settings.ANNOTATION_DB_SECRET_TOKEN,
         )
         assignment_target = AssignmentTargets.objects.create(
-            assignment=assignment, target_object=target_object, order=1,
+            assignment=assignment,
+            target_object=target_object,
+            order=1,
+            target_external_options=kwargs.get("target_external_options"),
         )
         return assignment_target
 
