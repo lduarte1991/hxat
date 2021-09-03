@@ -4,7 +4,7 @@ import sys
 import uuid
 
 import requests
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, Timeout
 from django.db import models
 from hx_lti_initializer.models import LTICourse
 from target_object_database.models import TargetObject
@@ -85,17 +85,23 @@ class AssignmentTargets(models.Model):
         # Retrieve first canvas ID in the IIIF manifest if none
         # is specified in the options list.
         if options is None or len(options) <= 1 or options[1] == "":
+            manifest_url = self.target_object.target_content
             try:
-                req = requests.get(self.target_object.target_content, timeout=5)
+                req = requests.get(manifest_url, timeout=10)
                 req.raise_for_status()
-            except HTTPError as e:
-                logger.error(f"Failed to request manifest: AssignmentTarget {self.pk} status {e.response.status_code}")
+            except Timeout as e:
+                logger.warning(f"Request for manifest timed out: AssignmentTarget {self.pk} manifest: {manifest_url}")
                 return None
+            except HTTPError as e:
+                logger.error(f"Failed to request manifest: AssignmentTarget {self.pk} status {e.response.status_code} manifest: {manifest_url}")
+                return None
+
             try:
                 manifest = json.loads(req.text)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse manifest: AssignmentTarget {self.pk}")
                 return None
+
             try:
                 return manifest["sequences"][0]["canvases"][0]["@id"]
             except (KeyError, IndexError) as e:
