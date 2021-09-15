@@ -37,14 +37,18 @@ class IMMImageStoreBackend(ImageStoreBackend):
     Collaborates with the Image Media Manager (IMM) service to store images
     and generate IIIF manifests.
 
-    See also: https://github.com/harvard-atg/media_management_api
-
     Notes:
-    - IMM requires client credentials (client key and secret) to authenticate and obtain a
-      temporary access token for the logged-in user.
-    - Requires LTI context_id and tool_consumer_instance_guid to identify the course library.
-    - Additional LTI attributes are provided when creating a new course library.
-    - A manifest can be obtained for a collection with images.
+    - API client credentials (`client_id` and `client_secret`) are required to authenticate.
+    - LTI attributes (`context_id` and `tool_consumer_instance_guid`) are required to
+      identify the image library for the course. If the image library does not exist,
+      it will be created.
+    - Images must be uploaded to a "collection" associated with the image library, which can 
+      then be represented as a IIIF manifest.
+    - The user uploading the image must be identified by their SIS ID.
+
+    See also: 
+        - https://github.com/harvard-atg/media_management_api
+        - https://github.com/harvard-atg/media_management_sdk
     """
 
     def __init__(self, config=None, lti_params=None):
