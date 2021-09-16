@@ -475,10 +475,10 @@ footer {
 }
 
 body {
-	margin: 0!important;
-	font-family: Verdana, Arial, sans-serif!important;
-	padding-bottom: 50px!important;
-	position:relative!important;
+	margin: 0;
+	font-family: Verdana, Arial, sans-serif;
+	padding-bottom: 50px;
+	position:relative;
 }
 
 @-moz-keyframes spin {
