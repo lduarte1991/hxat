@@ -64,6 +64,7 @@
     display: flex;
     -webkit-justify-content: space-between; 
     justify-content: space-between;
+	max-height: 50px;
 }
 
 .header .site-title {
@@ -474,10 +475,10 @@ footer {
 }
 
 body {
-	margin: 0;
-	font-family: Verdana, Arial, sans-serif;
-	padding-bottom: 50px;
-	position:relative;
+	margin: 0!important;
+	font-family: Verdana, Arial, sans-serif!important;
+	padding-bottom: 50px!important;
+	position:relative!important;
 }
 
 @-moz-keyframes spin {
@@ -1297,7 +1298,7 @@ progress[value]::-webkit-progress-value {
    100% { background-position: -100px 0px; }
 }
 
-.current-progress: {
+.current-progress {
 	margin: 15px 20px;
 }
 

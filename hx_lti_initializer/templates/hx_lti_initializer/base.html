@@ -30,12 +30,12 @@
             </div>
             <!-- Broken off into two sections, information on the left and content on the right -->
             <nav class="navigation" role="navigation" aria-label="Main Menu">
-                <a href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}" class='selected'><i class="fa fa-home"></i>  Home</a>
+                <a id="home" href="{% url 'hx_lti_initializer:course_admin_hub' %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}" class='selected'><i class="fa fa-home"></i>  Home</a>
                 {% if is_instructor %}
                     {% get_annotation_manual  default_url="pages/instructor_manual/hxat-instructor-manual.html" default_target="_self" as annotation_manual %}
                     <a target="{{ annotation_manual.target }}" href="{{ annotation_manual.url }}">Manual</a>
                     {% if org == "ATG" %}
-                    <a role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}">Dashboard</a>
+                    <a id="dashboard" role="button" href="{% url 'hx_lti_initializer:instructor_dashboard_view' %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}">Dashboard</a>
                     {% endif %}
                 {% endif %}
             </nav>
