@@ -54,7 +54,6 @@
 
 .header {
     width: 100%;
-    min-width: 514px;
     background-color: black;
     vertical-align: middle;
     display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
@@ -64,13 +63,29 @@
     display: flex;
     -webkit-justify-content: space-between; 
     justify-content: space-between;
-	max-height: 50px;
+	height: 50px;
+	padding-left: 11%;
+	padding-right: 11%;
+}
+
+@media screen and (min-width: 1920px) {
+	.header {
+		padding-left: 7.5%;
+		padding-right: 7.5%;
+	}
+}
+
+@media screen and (min-width: 1140px) {
+	.header {
+		padding-left: 7.7%;
+		padding-right: 7.7%;
+	}
 }
 
 .header .site-title {
 	display: inline-block;
 	position: relative;
-    font-size: 1em;
+    font-size: 1.2em;
     color: white;
     font-family: Verdana, sans-serif;
 }
@@ -100,7 +115,6 @@
 
 .header #banner-logo-left {
 	position: relative;
-	left: 10%;
 	display: inline-block;
 	padding: 5px 0px;
 }
@@ -122,12 +136,16 @@
 .course-name {
     font-family: Verdana, Arial, sans-serif;
     margin: 10px 0 0 0;
+	font-size: 1.8em;
+	font-weight: bold;
 }
 
 .assignment-header {
 	color: rgb(86, 86, 86);
 	font-family: Verdana, Arial, sans-serif;
     margin: 15px 0;
+	font-size: 1.4em;
+	font-weight: bold;
 }
 
 td {
@@ -146,6 +164,7 @@ th {
 .settingslink {
     font-size: 12px;
     display: block;
+	text-decoration: underline;
 }
 
 .leftfloat{
@@ -215,15 +234,14 @@ li {
 	color: #aaaaaa;
 }
 .navigation {
-    font-size: 0.8em;
+    font-size: 0.9em;
     position: relative;
     display: inline-block;
-    margin-right: 10%;
     margin-top: auto;
     margin-bottom: auto;
     font-family: Verdana;
     padding-top: 15px;
-    height: 35px;
+    height: 54px;
 }
 
 .navigation a {
@@ -256,7 +274,15 @@ li {
 
 .container {
 	display: block;
-	margin: 20px 10%;
+	padding-left: 86px;
+    padding-right: 86px;
+    padding-top: 16px;
+}
+
+@media (min-width: 768px){
+	.container {
+		width: 94%;
+	}
 }
 
 .container table#assignments {
@@ -332,14 +358,16 @@ footer {
 	font-weight: bold;
 	word-wrap: break-word;
 	vertical-align: middle;
+	font-size: 1.1em;
 }
 
 .assignment-item .edit-assignment-button {
 	padding: 5px 20px;
 	border: 2px solid rgb(55, 124, 182);
 	border-radius: 5px;
-  text-decoration: none;
-  float: right;
+	text-decoration: none;
+	float: right;
+	font-size: 1.1em;
 }
 .assignment-item .edit-assignment-button:hover {
 	border: 2px solid black;
@@ -362,6 +390,7 @@ footer {
 	color: rgb(86, 86, 86);
 	font-weight: bold;
 	margin-bottom: 10px;
+	font-size: 1.1em;
 }
 
 .table-row:nth-child(odd) {
@@ -385,6 +414,7 @@ footer {
 
 .table-row a {
 	color: #0871b0;
+	font-size: 1.1em;
 }
 
 .table-row a:nth-child(2) {
@@ -402,6 +432,7 @@ footer {
 .table-footer {
 	margin-top: 10px;
 	color: #b60000;
+	font-size: 1.1em;
 }
 
 #new-assignment-button {
@@ -415,6 +446,7 @@ footer {
 	font-family: Verdana, arial, sans-serif;
 	display: inline-block;
 	margin-right: 10px;
+	font-size: 1.2em;
 }
 
 #new-assignment-section {
@@ -1327,4 +1359,12 @@ progress[value]::-webkit-progress-value {
     float: left;
     margin-top: -999999px;
     margin-left: -999999px;
+}
+
+#dashboard {
+	margin-right: 0;
+}
+
+a {
+	text-decoration: underline;
 }

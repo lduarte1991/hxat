@@ -2,69 +2,15 @@
 {% load hx_lti_initializer_extras %}
 {% load static from staticfiles %} 
 {# Load the tag library #} 
-{% load bootstrap3 %} 
-{# Load CSS and JavaScript #} 
-{% bootstrap_css %} 
-{% bootstrap_javascript %} 
+
 {# Display django.contrib.messages as Bootstrap alerts #} 
 {% bootstrap_messages %}
 
 
 {% block content %}
-{% bootstrap_css %}
 {% bootstrap_javascript %}
 {% bootstrap_messages %}
-<style type="text/css">
-/* adding css back due to bootstrap overriding base.css */
-	.header {
-		width: 100%;
-		min-width: 514px;
-		background-color: black;
-		vertical-align: middle;
-		display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-		display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-		display: -ms-flexbox;      /* TWEENER - IE 10 */
-		display: -webkit-flex;
-		display: flex;
-		-webkit-justify-content: space-between; 
-		justify-content: space-between;
-		min-height: 50px;
-	}
 
-	.header .site-title {
-		display: inline-block;
-		position: relative;
-		font-size: 16px;
-		color: white;
-		font-family: Verdana, sans-serif;
-		
-	}
-
-	.header #banner-logo-left {
-		padding: 4px 0px;
-	}
-
-	.navigation {
-		font-size: .91em;
-		margin-right: 10%;
-		margin-top: auto;
-		margin-bottom: 16px;
-		padding-top: 14px;
-		height: 35px;
-	}
-
-	.navigation a {
-		color: #88ddff;
-		margin-left: 5.3px;
-		padding-bottom: 32px;
-	}
-
-	.navigation a:focus {
-		color: #999999;
-		border-bottom: 4px solid rgb(154, 154, 154);
-	}
-
-</style>
 <div style="margin: 1em 0; padding: 1em 0;">
 	<div class="input-group">
 		<div class="input-group-btn search-panel">
