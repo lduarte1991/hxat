@@ -27,7 +27,6 @@ SECURE_SETTINGS = {
         'TeachingAssistant',
         'urn:lti:role:ims/lis/Administrator',
         'urn:lti:role:ims/lis/Instructor',
-        'urn:lti:instrole:ims/lis/Instructor',
         'urn:lti:instrole:ims/lis/Administrator',
         'urn:lti:role:ims/lis/TeachingAssistant',
     },
