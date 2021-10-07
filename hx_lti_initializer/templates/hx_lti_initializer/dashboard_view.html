@@ -2,18 +2,15 @@
 {% load hx_lti_initializer_extras %}
 {% load static from staticfiles %} 
 {# Load the tag library #} 
-{% load bootstrap3 %} 
-{# Load CSS and JavaScript #} 
-{% bootstrap_css %} 
-{% bootstrap_javascript %} 
+{% load bootstrap3 %}
 {# Display django.contrib.messages as Bootstrap alerts #} 
 {% bootstrap_messages %}
 
 
 {% block content %}
-{% bootstrap_css %}
 {% bootstrap_javascript %}
 {% bootstrap_messages %}
+
 <div style="margin: 1em 0; padding: 1em 0;">
 	<div class="input-group">
 		<div class="input-group-btn search-panel">
@@ -36,6 +33,7 @@
 			{% include "hx_lti_initializer/dashboard_student_list_view.html" with user_annotations=user_annotations %}
 		{% endif %}
 	</div>
+</div>	
 {% endblock %}
 
 
@@ -124,6 +122,10 @@ $(document).ready(function() {
 			}
 		});		
 	}
+	// Toggle between selected in navbar
+	$('#dashboard').toggleClass('selected');
+	$('#home').toggleClass('selected');
+
 });
 </script>
 {% endblock %}
