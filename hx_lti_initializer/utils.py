@@ -259,7 +259,7 @@ def _fetch_annotations_by_course(
     }
     limit = kwargs.get("limit", 1000)  # Note: -1 means get everything there is
     encoded_context_id = urllib.parse.quote_plus(context_id)
-    request_url = "%s/search?contextId=%s&limit=%s" % (
+    request_url = "%s/?contextId=%s&limit=%s" % (
         annotation_db_url,
         encoded_context_id,
         limit,
@@ -295,7 +295,34 @@ def _fetch_annotations_by_course(
         # gracefully by manually passing in that empty response
         annotations = {"rows": [], "totalCount": 0}
 
-    return annotations
+    formatted_annotations = []
+    #Note: there are other fields i left out since it did not seem to be required for what we need 
+    for annote in annotations["rows"]:
+        formatted = {
+            "id": annote["id"],
+            "created": annote["created"],
+            "updated": annote["modified"],
+            "text": annote["body"]["items"][0]["value"],
+            "permissions": annote["permissions"],
+            "user": annote["creator"],
+            "totalComments": annote["totalReplies"],
+            "tags": [],
+            #TODO need to implement, original api did not have this working either
+            # previous parent values were uuid
+            "parent": "0",
+            "ranges": [],
+            "contextId": annote["platform"]["context_id"],
+            "collectionId": annote["platform"]["collection_id"],
+            "uri": annote["platform"]["target_source_id"],
+            "media":  annote["target"]["items"][0]["type"].lower(),
+            "quote":""
+        }
+        if "selector" in annote["target"]["items"][0]:
+            for item in annote["target"]["items"][0]["selector"]["items"]:
+                if "type" in item and item["type"] == "TextQuoteSelector":
+                    formatted["quote"] = item["exact"]
+        formatted_annotations.append(formatted)
+    return {"rows": formatted_annotations }
 
 
 def get_distinct_users_from_annotations(annotations, sort_key=None):
