@@ -288,41 +288,55 @@ def _fetch_annotations_by_course(
         # where each row represents an annotation object.
         # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
+        # Transform data body because we are hitting a v2 catchpy endpoint
+        formatted_annotations = []
+        parents_text_dict = {}
+        #Note: there are other fields i left out since it did not seem to be required for what we need 
+        for annote in annotations["rows"]:
+            # add text to parent_text_dict text dict for quick lookup
+            id = annote['id']
+            text = annote["body"]["items"][0]["value"]
+            parents_text_dict[id] = text
 
+            formatted = {
+                "id": id,
+                "created": annote["created"],
+                "updated": annote["modified"],
+                "text": text,
+                "permissions": annote["permissions"],
+                "user": annote["creator"],
+                "totalComments": annote["totalReplies"],
+                "tags": [],
+                "parent": "0",
+                "ranges": [],
+                "contextId": annote["platform"]["context_id"],
+                "collectionId": annote["platform"]["collection_id"],
+                "uri": annote["platform"]["target_source_id"],
+                "media":  annote["target"]["items"][0]["type"].lower(),
+                "quote":""
+            }
+            if "selector" in annote["target"]["items"][0]:
+                for item in annote["target"]["items"][0]["selector"]["items"]:
+                    if "type" in item and item["type"] == "TextQuoteSelector":
+                        formatted["quote"] = item["exact"]
+            # check if the annotation has a parent text
+            # parent id is written to "parent" key
+            if annote["target"]["items"][0]["type"] == "Annotation":
+                formatted["parent"] = annote["target"]["items"][0]["source"]
+            formatted_annotations.append(formatted)
+        
+        # Loop through the formatted_annotations and add parent_text if parent !=0
+        for formatted_annote in formatted_annotations:
+            if formatted_annote["parent"] is not "0":
+                id = formatted_annote["parent"]
+                formatted_annote["parent_text"] = parents_text_dict[id]
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
         annotations = {"rows": [], "totalCount": 0}
 
-    formatted_annotations = []
-    #Note: there are other fields i left out since it did not seem to be required for what we need 
-    for annote in annotations["rows"]:
-        formatted = {
-            "id": annote["id"],
-            "created": annote["created"],
-            "updated": annote["modified"],
-            "text": annote["body"]["items"][0]["value"],
-            "permissions": annote["permissions"],
-            "user": annote["creator"],
-            "totalComments": annote["totalReplies"],
-            "tags": [],
-            #TODO need to implement, original api did not have this working either
-            # previous parent values were uuid
-            "parent": "0",
-            "ranges": [],
-            "contextId": annote["platform"]["context_id"],
-            "collectionId": annote["platform"]["collection_id"],
-            "uri": annote["platform"]["target_source_id"],
-            "media":  annote["target"]["items"][0]["type"].lower(),
-            "quote":""
-        }
-        if "selector" in annote["target"]["items"][0]:
-            for item in annote["target"]["items"][0]["selector"]["items"]:
-                if "type" in item and item["type"] == "TextQuoteSelector":
-                    formatted["quote"] = item["exact"]
-        formatted_annotations.append(formatted)
-    return {"rows": formatted_annotations }
+    return {"rows": formatted_annotations, "totalCount": annotations["total"] }
 
 
 def get_distinct_users_from_annotations(annotations, sort_key=None):
@@ -569,7 +583,6 @@ class DashboardAnnotations(object):
         return parent_value
 
     def get_annotation_by_id(self, annotation_id):
-        annotation_id = int(annotation_id)
         if annotation_id in self.annotation_by_id:
             return self.annotation_by_id[annotation_id]
         return None
