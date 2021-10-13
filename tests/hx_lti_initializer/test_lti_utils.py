@@ -5,11 +5,11 @@ import requests
 import requests_mock
 from uuid import uuid4
 
-context_id = f"{uuid4()}"
-annotator_auth_token = f"{uuid4()}"
-id = f"{uuid4()}"
-request_url = f"http://test.com/?contextId={context_id}&limit=1000"
-data = [
+def test_fetch_annotations_by_course_success():
+    context_id = f"{uuid4()}"
+    annotator_auth_token = f"{uuid4()}"
+    id = f"{uuid4()}"
+    data = [
     {
         "id": f"{id}",
         "body": {
@@ -50,42 +50,34 @@ data = [
         "permissions": {
         },
         "totalReplies": "0"
-    },
-]
+        },
+    ]
 
-expected_response = {
-   "rows": [
-     {
-       "id": f"{id}",
-       "created": "2021-10-04T18:37:59+00:00",
-       "updated": "2021-10-04T18:37:59+00:00",
-       "text": "<p>tdsting old image 2</p>",
-       "permissions": {},
-       "user": { "id": f"{id}", "name": "Vesna Tan" },
-       "totalComments": "0",
-       "tags": [],
-       "parent": "0",
-       "ranges": [],
-       "contextId": f"{context_id}",
-       "collectionId": "1",
-       "uri": "https://damsssl.llgc.org.uk/iiif/2.0/4389767/canvas/4389768.json",
-       "media": "thumbnail",
-       "quote": "",
-     },
-   ],
-   "totalCount": "1",
- };
-@pytest.fixture
-def mock_get():
+    expected_response = {
+    "rows": [
+        {
+        "id": f"{id}",
+        "created": "2021-10-04T18:37:59+00:00",
+        "updated": "2021-10-04T18:37:59+00:00",
+        "text": "<p>tdsting old image 2</p>",
+        "permissions": {},
+        "user": { "id": f"{id}", "name": "Vesna Tan" },
+        "totalComments": "0",
+        "tags": [],
+        "parent": "0",
+        "ranges": [],
+        "contextId": f"{context_id}",
+        "collectionId": "1",
+        "uri": "https://damsssl.llgc.org.uk/iiif/2.0/4389767/canvas/4389768.json",
+        "media": "thumbnail",
+        "quote": "",
+        },
+    ],
+    "totalCount": len(data),
+    };
+    annotation_db_url = "http://test.com"  
+    request_url = f"http://test.com/?contextId={context_id}&limit=1000"
     with requests_mock.Mocker() as requests_mocker:
-        requests_mocker.get(
-            request_url,
-            status_code=200,
-            json={"rows":data, "total": "1"},
-        )
-        yield
-
-def test_fetch_annotations_by_course_ok(mock_get):
-    annotation_db_url = "http://test.com"    
-    response = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
-    assert response == expected_response
+     requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
+     r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
+     assert r == expected_response
