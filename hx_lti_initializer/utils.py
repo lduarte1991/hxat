@@ -291,52 +291,92 @@ def _fetch_annotations_by_course(
         # Transform data body because we are hitting a v2 catchpy endpoint
         formatted_annotations = []
         parents_text_dict = {}
+        total = annotations["total"] or 0
+        result = {
+            "totalCount": total
+        }
         #Note: there are other fields i left out since it did not seem to be required for what we need 
         for annote in annotations["rows"]:
             # add text to parent_text_dict text dict for quick lookup
-            id = annote['id']
-            text = annote["body"]["items"][0]["value"]
-            parents_text_dict[id] = text
+            try:
+                id = annote['id']
+                text = annote["body"]["items"][0]["value"]
+                parents_text_dict[id] = text
+                created = annote["created"]
+                updated = annote["modified"]
+                text = text
+                permissions = annote["permissions"]
+                user = annote["creator"]
+                totalComments = annote["totalReplies"]
+                tags = []
+                parent = "0"
+                ranges = []
+                contextId = annote["platform"]["context_id"]
+                collectionId = annote["platform"]["collection_id"]
+                uri = annote["platform"]["target_source_id"]
+                media =  annote["target"]["items"][0]["type"].lower()
+                target_items = annote["target"]["items"]
+                quote = ""
+                formatted = {
+                    "id": id,
+                    "created": created,
+                    "updated": updated,
+                    "text": text,
+                    "permissions": permissions,
+                    "user": user,
+                    "totalComments": totalComments,
+                    "tags": tags,
+                    "parent": parent,
+                    "ranges": ranges,
+                    "contextId": contextId,
+                    "collectionId": collectionId,
+                    "uri": uri,
+                    "media": media,
+                    "quote": quote
+                }
+                if "selector" in target_items[0]:
+                    for item in target_items[0]["selector"]["items"]:
+                        if "type" in item and item["type"] == "TextQuoteSelector":
+                            formatted["quote"] = item["exact"]
+                # check if the annotation has a parent text
+                # parent id is written to "parent" key
+                if target_items[0]["type"] == "Annotation":
+                    formatted["parent"] = target_items[0]["source"]
+                
+                # check images annotation fields
+                if len(target_items) >= 2 and media == "image":
+                    if target_items[1]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[1]["source"]
+                    if "selector" in target_items[0]:
+                        formatted["rangePosition"] = target_items[0]["selector"]["items"]
+                        bounds = target_items[0]["scope"]["value"]
+                        formatted_bounds = bounds.split("=")[1].split(',')
+                        x, y, width, height = formatted_bounds
+                        formatted["bounds"] = {
+                            "x": x,
+                            "y": y,
+                            "width": width,
+                            "height": height,
+                        }
 
-            formatted = {
-                "id": id,
-                "created": annote["created"],
-                "updated": annote["modified"],
-                "text": text,
-                "permissions": annote["permissions"],
-                "user": annote["creator"],
-                "totalComments": annote["totalReplies"],
-                "tags": [],
-                "parent": "0",
-                "ranges": [],
-                "contextId": annote["platform"]["context_id"],
-                "collectionId": annote["platform"]["collection_id"],
-                "uri": annote["platform"]["target_source_id"],
-                "media":  annote["target"]["items"][0]["type"].lower(),
-                "quote":""
-            }
-            if "selector" in annote["target"]["items"][0]:
-                for item in annote["target"]["items"][0]["selector"]["items"]:
-                    if "type" in item and item["type"] == "TextQuoteSelector":
-                        formatted["quote"] = item["exact"]
-            # check if the annotation has a parent text
-            # parent id is written to "parent" key
-            if annote["target"]["items"][0]["type"] == "Annotation":
-                formatted["parent"] = annote["target"]["items"][0]["source"]
-            formatted_annotations.append(formatted)
-        
+                formatted_annotations.append(formatted)
+            except KeyError as e:
+                logger.warning(f"key error={e}")
         # Loop through the formatted_annotations and add parent_text if parent !=0
         for formatted_annote in formatted_annotations:
             if formatted_annote["parent"] is not "0":
                 id = formatted_annote["parent"]
                 formatted_annote["parent_text"] = parents_text_dict[id]
+        result["rows"] =  formatted_annotations
+    except KeyError as ke:
+        logger.error(f"missing {ke} field in response body")
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
         annotations = {"rows": [], "totalCount": 0}
-
-    return {"rows": formatted_annotations, "totalCount": annotations["total"] }
+    
+    return result
 
 
 def get_distinct_users_from_annotations(annotations, sort_key=None):
