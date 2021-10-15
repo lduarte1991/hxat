@@ -545,10 +545,12 @@ class DashboardAnnotations(object):
         target_id = ""
         if media_type == "image":
             trimmed_object_id = object_id[
-                0 : object_id.find("/canvas/")
+                0 : object_id.find("/Canvas/") or object_id.find("/canvas/") 
             ]  # only use regex if absolutely necessary
-            if trimmed_object_id in self.target_objects_by_content:
-                target_id = self.target_objects_by_content[trimmed_object_id]["id"]
+            # checks for anything that contains the root trimmed_object_id or root url if its an image
+            for key in self.target_objects_by_content:
+                if key.startswith(trimmed_object_id):
+                    target_id = target_id = self.target_objects_by_content[key]["id"]
         else:
             if object_id in self.target_objects_by_id:
                 target_id = object_id
@@ -564,6 +566,9 @@ class DashboardAnnotations(object):
         media_type = annotation.get("media", None)
         object_id = annotation["uri"]
         target_id = self.get_target_id(media_type, object_id)
+        # the keys in self.target_objects_by_id are strings so the lookup will fail if we pass an int
+        if type(target_id) == int:
+            target_id = str(target_id)
         if target_id in self.target_objects_by_id:
             return self.target_objects_by_id[target_id]["target_title"]
         return ""
