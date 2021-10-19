@@ -242,7 +242,6 @@ def fetch_annotations_by_course(context_id, user_id):
             results["rows"] += data["rows"]
         if "totalCount" in data:
             results["totalCount"] += int(data["totalCount"])
-
     return results
 
 
@@ -359,11 +358,17 @@ def _fetch_annotations_by_course(
                         formatted["thumb"] = target_items[0]["source"]
                     elif target_items[1]["type"] == "Thumbnail":
                         formatted["thumb"] = target_items[1]["source"]
-                    if "selector" in target_items[0]:
-                        formatted["rangePosition"] = target_items[0]["selector"]["items"]
+                    if "selector" in target_items[index_of_target_items]:
+                        formatted["rangePosition"] = target_items[index_of_target_items]["selector"]["items"]
                         # added field for image manifest for lookup in get_target_id function
-                        formatted["manifest_url"] = target_items[0]["selector"]["items"][0]["within"]["@id"]
-                        bounds = target_items[0]["scope"]["value"]
+                        bounds = ""
+                        # Data structure is different between old highlighter and new highlighter e.g. newhighlighter assignment data does not have scope field
+                        if "type" in formatted['rangePosition'][0]:
+                            formatted["manifest_url"] = target_items[index_of_target_items]["source"]
+                            bounds = formatted['rangePosition'][0]["value"]
+                        else:    
+                            formatted["manifest_url"] = formatted["rangePosition"][0]["within"]["@id"]
+                            bounds = target_items[index_of_target_items]["scope"]["value"]
                         formatted_bounds = bounds.split("=")[1].split(',')
                         x, y, width, height = formatted_bounds
                         formatted["bounds"] = {
@@ -388,7 +393,7 @@ def _fetch_annotations_by_course(
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
-        annotations = {"rows": [], "totalCount": 0}
+        annotations = {"rows": [], "totalCount": 0} 
     return result
 
 
@@ -554,15 +559,15 @@ class DashboardAnnotations(object):
     def get_target_id(self, media_type, object_id):
         object_id = str(
             object_id
-        )  # ensure we have the target id as a string, not an int
+        ).lower()  # ensure we have the target id as a string, not an int
         target_id = ""
         if media_type == "image":
             trimmed_object_id = object_id[
-                0 : object_id.find("/Canvas/") or object_id.find("/canvas/") 
+                0 : object_id.find("/canvas/")
             ]  # only use regex if absolutely necessary
             # checks for anything that contains the root trimmed_object_id or root url if its an image
             for key in self.target_objects_by_content:
-                if key.startswith(trimmed_object_id):
+                if key.lower().startswith(trimmed_object_id):
                     target_id = self.target_objects_by_content[key]["id"]
         else:
             if object_id in self.target_objects_by_id:
