@@ -304,7 +304,9 @@ def _fetch_annotations_by_course(
             # add text to parent_text_dict text dict for quick lookup
             try:
                 # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
-                index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),0)
+                index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),None)
+                if index_of_target_items is None:
+                    raise KeyError(f"media type")
                 id = annote['id']
                 text = annote["body"]["items"][0]["value"]
                 parents_text_dict[id] = text
