@@ -295,10 +295,17 @@ def _fetch_annotations_by_course(
         result = {
             "totalCount": total
         }
+
+        # note: left out "Thumbnail" and "Annotations"
+        # help with finding the correct types in the data response
+        accepted_catchpy_types = ["Image", "Audio", "Image", "Text", "Video"]
+
         #Note: there are other fields i left out since it did not seem to be required for what we need 
         for annote in annotations["rows"]:
             # add text to parent_text_dict text dict for quick lookup
             try:
+                # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
+                index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),0)
                 id = annote['id']
                 text = annote["body"]["items"][0]["value"]
                 parents_text_dict[id] = text
@@ -314,7 +321,7 @@ def _fetch_annotations_by_course(
                 contextId = annote["platform"]["context_id"]
                 collectionId = annote["platform"]["collection_id"]
                 uri = annote["platform"]["target_source_id"]
-                media =  annote["target"]["items"][0]["type"].lower()
+                media =  annote["target"]["items"][index_of_target_items]["type"].lower()
                 target_items = annote["target"]["items"]
                 quote = ""
                 formatted = {
@@ -332,23 +339,30 @@ def _fetch_annotations_by_course(
                     "collectionId": collectionId,
                     "uri": uri,
                     "media": media,
-                    "quote": quote
+                    "quote": quote,
+                    # added manifest_url for better matching in get_target_id
+                    "manifest_url": ""
                 }
-                if "selector" in target_items[0]:
-                    for item in target_items[0]["selector"]["items"]:
+                if "selector" in target_items[index_of_target_items]:
+                    for item in target_items[index_of_target_items]["selector"]["items"]:
                         if "type" in item and item["type"] == "TextQuoteSelector":
                             formatted["quote"] = item["exact"]
                 # check if the annotation has a parent text
                 # parent id is written to "parent" key
-                if target_items[0]["type"] == "Annotation":
-                    formatted["parent"] = target_items[0]["source"]
-                
+                if target_items[index_of_target_items]["type"] == "Annotation":
+                    formatted["parent"] = target_items[index_of_target_items]["source"]
+
                 # check images annotation fields
-                if len(target_items) >= 2 and media == "image":
-                    if target_items[1]["type"] == "Thumbnail":
+                if media == "image":
+                    # not guarenteed correct order
+                    if index_of_target_items == 1 and target_items[0]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[0]["source"]
+                    elif target_items[1]["type"] == "Thumbnail":
                         formatted["thumb"] = target_items[1]["source"]
                     if "selector" in target_items[0]:
                         formatted["rangePosition"] = target_items[0]["selector"]["items"]
+                        # added field for image manifest for lookup in get_target_id function
+                        formatted["manifest_url"] = target_items[0]["selector"]["items"][0]["within"]["@id"]
                         bounds = target_items[0]["scope"]["value"]
                         formatted_bounds = bounds.split("=")[1].split(',')
                         x, y, width, height = formatted_bounds
@@ -375,7 +389,6 @@ def _fetch_annotations_by_course(
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
         annotations = {"rows": [], "totalCount": 0}
-    
     return result
 
 
@@ -550,7 +563,7 @@ class DashboardAnnotations(object):
             # checks for anything that contains the root trimmed_object_id or root url if its an image
             for key in self.target_objects_by_content:
                 if key.startswith(trimmed_object_id):
-                    target_id = target_id = self.target_objects_by_content[key]["id"]
+                    target_id = self.target_objects_by_content[key]["id"]
         else:
             if object_id in self.target_objects_by_id:
                 target_id = object_id
@@ -565,6 +578,9 @@ class DashboardAnnotations(object):
     def get_target_object_name(self, annotation):
         media_type = annotation.get("media", None)
         object_id = annotation["uri"]
+        # fix to find correct id using manifest_url instead
+        if media_type == 'image':
+            object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         # the keys in self.target_objects_by_id are strings so the lookup will fail if we pass an int
         if type(target_id) == int:
@@ -582,7 +598,7 @@ class DashboardAnnotations(object):
         preview_url = ""
 
         if media_type == "image":
-            target_id = self.get_target_id(media_type, annotation["uri"])
+            target_id = self.get_target_id(media_type, annotation["manifest_url"])
         else:
             target_id = annotation["uri"]
 
@@ -615,6 +631,8 @@ class DashboardAnnotations(object):
         media_type = annotation.get("media", None)
         collection_id = annotation["collectionId"]
         object_id = annotation["uri"]
+        if media_type == 'image':
+            object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         return (collection_id in self.assignment_name_of) and target_id
 
