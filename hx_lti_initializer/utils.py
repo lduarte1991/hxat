@@ -258,7 +258,7 @@ def _fetch_annotations_by_course(
     }
     limit = kwargs.get("limit", 1000)  # Note: -1 means get everything there is
     encoded_context_id = urllib.parse.quote_plus(context_id)
-    request_url = "%s/?contextId=%s&limit=%s" % (
+    request_url = "%s/?context_id=%s&limit=%s" % (
         annotation_db_url,
         encoded_context_id,
         limit,
@@ -303,85 +303,84 @@ def _fetch_annotations_by_course(
         for annote in annotations["rows"]:
             # add text to parent_text_dict text dict for quick lookup
             try:
+                # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
+                index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),None)
+                if index_of_target_items is None:
+                    raise KeyError(f"media type")
+                id = annote['id']
+                text = annote["body"]["items"][0]["value"]
+                parents_text_dict[id] = text
+                created = annote["created"]
+                updated = annote["modified"]
+                text = text
+                permissions = annote["permissions"]
+                user = annote["creator"]
+                totalComments = annote["totalReplies"]
+                tags = []
+                parent = "0"
+                ranges = []
                 contextId = annote["platform"]["context_id"]
-                if context_id == contextId:
-                    # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
-                    index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),None)
-                    if index_of_target_items is None:
-                        raise KeyError(f"media type")
-                    id = annote['id']
-                    text = annote["body"]["items"][0]["value"]
-                    parents_text_dict[id] = text
-                    created = annote["created"]
-                    updated = annote["modified"]
-                    text = text
-                    permissions = annote["permissions"]
-                    user = annote["creator"]
-                    totalComments = annote["totalReplies"]
-                    tags = []
-                    parent = "0"
-                    ranges = []
-                    collectionId = annote["platform"]["collection_id"]
-                    uri = annote["platform"]["target_source_id"]
-                    media =  annote["target"]["items"][index_of_target_items]["type"].lower()
-                    target_items = annote["target"]["items"]
-                    quote = ""
-                    formatted = {
-                        "id": id,
-                        "created": created,
-                        "updated": updated,
-                        "text": text,
-                        "permissions": permissions,
-                        "user": user,
-                        "totalComments": totalComments,
-                        "tags": tags,
-                        "parent": parent,
-                        "ranges": ranges,
-                        "contextId": contextId,
-                        "collectionId": collectionId,
-                        "uri": uri,
-                        "media": media,
-                        "quote": quote,
-                        # added manifest_url for better matching in get_target_id
-                        "manifest_url": ""
-                    }
+                collectionId = annote["platform"]["collection_id"]
+                uri = annote["platform"]["target_source_id"]
+                media =  annote["target"]["items"][index_of_target_items]["type"].lower()
+                target_items = annote["target"]["items"]
+                quote = ""
+                formatted = {
+                    "id": id,
+                    "created": created,
+                    "updated": updated,
+                    "text": text,
+                    "permissions": permissions,
+                    "user": user,
+                    "totalComments": totalComments,
+                    "tags": tags,
+                    "parent": parent,
+                    "ranges": ranges,
+                    "contextId": contextId,
+                    "collectionId": collectionId,
+                    "uri": uri,
+                    "media": media,
+                    "quote": quote,
+                    # added manifest_url for better matching in get_target_id
+                    "manifest_url": ""
+                }
+                if "selector" in target_items[index_of_target_items]:
+                    for item in target_items[index_of_target_items]["selector"]["items"]:
+                        if "type" in item and item["type"] == "TextQuoteSelector":
+                            formatted["quote"] = item["exact"]
+                # check if the annotation has a parent text
+                # parent id is written to "parent" key
+                if target_items[index_of_target_items]["type"] == "Annotation":
+                    formatted["parent"] = target_items[index_of_target_items]["source"]
+
+                # check images annotation fields
+                if media == "image":
+                    # not guarenteed correct order
+                    if index_of_target_items == 1 and target_items[0]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[0]["source"]
+                    elif target_items[1]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[1]["source"]
                     if "selector" in target_items[index_of_target_items]:
-                        for item in target_items[index_of_target_items]["selector"]["items"]:
-                            if "type" in item and item["type"] == "TextQuoteSelector":
-                                formatted["quote"] = item["exact"]
-                    # check if the annotation has a parent text
-                    # parent id is written to "parent" key
-                    if target_items[index_of_target_items]["type"] == "Annotation":
-                        formatted["parent"] = target_items[index_of_target_items]["source"]
+                        formatted["rangePosition"] = target_items[index_of_target_items]["selector"]["items"]
+                        # added field for image manifest for lookup in get_target_id function
+                        bounds = ""
+                        # Data structure is different between old highlighter and new highlighter e.g. newhighlighter assignment data does not have scope field
+                        if "type" in formatted['rangePosition'][0]:
+                            formatted["manifest_url"] = target_items[index_of_target_items]["source"]
+                            bounds = formatted['rangePosition'][0]["value"]
+                        else:    
+                            formatted["manifest_url"] = formatted["rangePosition"][0]["within"]["@id"]
+                            bounds = target_items[index_of_target_items]["scope"]["value"]
+                        formatted_bounds = bounds.split("=")[1].split(',')
+                        x, y, width, height = formatted_bounds
+                        formatted["bounds"] = {
+                            "x": x,
+                            "y": y,
+                            "width": width,
+                            "height": height,
+                        }
 
-                    # check images annotation fields
-                    if media == "image":
-                        # not guarenteed correct order
-                        if index_of_target_items == 1 and target_items[0]["type"] == "Thumbnail":
-                            formatted["thumb"] = target_items[0]["source"]
-                        elif target_items[1]["type"] == "Thumbnail":
-                            formatted["thumb"] = target_items[1]["source"]
-                        if "selector" in target_items[index_of_target_items]:
-                            formatted["rangePosition"] = target_items[index_of_target_items]["selector"]["items"]
-                            # added field for image manifest for lookup in get_target_id function
-                            bounds = ""
-                            # Data structure is different between old highlighter and new highlighter e.g. newhighlighter assignment data does not have scope field
-                            if "type" in formatted['rangePosition'][0]:
-                                formatted["manifest_url"] = target_items[index_of_target_items]["source"]
-                                bounds = formatted['rangePosition'][0]["value"]
-                            else:    
-                                formatted["manifest_url"] = formatted["rangePosition"][0]["within"]["@id"]
-                                bounds = target_items[index_of_target_items]["scope"]["value"]
-                            formatted_bounds = bounds.split("=")[1].split(',')
-                            x, y, width, height = formatted_bounds
-                            formatted["bounds"] = {
-                                "x": x,
-                                "y": y,
-                                "width": width,
-                                "height": height,
-                            }
-
-                    formatted_annotations.append(formatted)
+                formatted_annotations.append(formatted)
             except KeyError as e:
                 logger.warning(f"key error={e}")
         # Loop through the formatted_annotations and add parent_text if parent !=0
