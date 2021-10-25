@@ -304,7 +304,7 @@ def _fetch_annotations_by_course(
             # add text to parent_text_dict text dict for quick lookup
             try:
                 # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
-                index_of_target_items = next((index for (index, d) in enumerate(annote["target"]["items"]) if d["type"] in accepted_catchpy_types),None)
+                index_of_target_items = find_target_object_index(annote["target"]["items"])
                 if index_of_target_items is None:
                     raise KeyError(f"media type")
                 id = annote['id']
@@ -590,7 +590,7 @@ class DashboardAnnotations(object):
             object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         # the keys in self.target_objects_by_id are strings so the lookup will fail if we pass an int
-        if type(target_id) == int:
+        if isinstance(target_id, int):
             target_id = str(target_id)
         if target_id in self.target_objects_by_id:
             return self.target_objects_by_id[target_id]["target_title"]
@@ -656,3 +656,13 @@ class DashboardAnnotations(object):
         if annotation_id in self.annotation_by_id:
             return self.annotation_by_id[annotation_id]
         return None
+
+def find_target_object_index(anno_target_items):
+    # note: left out "Thumbnail" and "Annotations"
+    # help with finding the correct types in the data response
+    # TODO: add to constants?
+    accepted_catchpy_types = ["Image", "Audio", "Image", "Text", "Video"]
+    for index, d in enumerate(anno_target_items):
+        if d["type"] in accepted_catchpy_types:
+            return index
+    return None
