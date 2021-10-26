@@ -563,7 +563,7 @@ class DashboardAnnotations(object):
             index = object_id.find("/canvas/")
             trimmed_object_id = object_id if index == -1 else object_id[0:index]
             
-            # checks for anything that contains the trimmed_object_id or  if its an image
+            # gets the data dict from the target_objects_by_content dictionary by trimmed_object_id else assign None
             dict_object = self.target_objects_by_content.get(trimmed_object_id, None)
             if dict_object:
                 target_id = dict_object["id"]
