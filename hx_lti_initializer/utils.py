@@ -295,10 +295,6 @@ def _fetch_annotations_by_course(
             "totalCount": total
         }
 
-        # note: left out "Thumbnail" and "Annotations"
-        # help with finding the correct types in the data response
-        accepted_catchpy_types = ["Image", "Audio", "Image", "Text", "Video"]
-
         #Note: there are other fields i left out since it did not seem to be required for what we need 
         for annote in annotations["rows"]:
             # add text to parent_text_dict text dict for quick lookup
