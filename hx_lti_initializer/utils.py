@@ -562,26 +562,15 @@ class DashboardAnnotations(object):
         if media_type == "image":
             index = object_id.find("/canvas/")
             trimmed_object_id = object_id if index == -1 else object_id[0:index]
-            # trimmed_object_id = object_id[
-            #     0 : object_id.find("/canvas/")
-            # ]  # only use regex if absolutely necessary
-            # logger.info(f"self.target_objects_by_content={self.target_objects_by_content.keys()}")
-            logger.info(f"trimmed_object_id={trimmed_object_id}")
-            # checks for anything that contains the root trimmed_object_id or root url if its an image
-            object_key = self.target_objects_by_content.get(trimmed_object_id, None)
-            if object_key:
-                target_id = object_key["id"]
-            # logger.info(f"")
-            # for key in self.target_objects_by_content:
-            #     # logger.info(f"trimmed_object_id={trimmed_object_id} key.lower()={key.lower()}")
-            #     if key.lower() == trimmed_object_id:
-            #         target_id = self.target_objects_by_content[key]["id"]
-            #         break
+            
+            # checks for anything that contains the trimmed_object_id or  if its an image
+            dict_object = self.target_objects_by_content.get(trimmed_object_id, None)
+            if dict_object:
+                target_id = dict_object["id"]
         else:
             if object_id in self.target_objects_by_id:
                 target_id = object_id
-        if not target_id:
-            logger.info(f" object_id={object_id}")
+
         return target_id
 
     def get_assignment_name(self, annotation):
