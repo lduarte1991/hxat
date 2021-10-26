@@ -16,30 +16,30 @@ def test_fetch_annotations_by_course_success_new_highlighter():
     data = [d["data"]]
     expected_response = d["expected_response"]
     annotation_db_url = "http://test.com"  
-    request_url = f"http://test.com/?contextId={context_id}&limit=1000"
+    request_url = f"http://test.com/?context_id={context_id}&limit=1000"
     with requests_mock.Mocker() as requests_mocker:
-     requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
-     r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
-     assert r == expected_response
+        requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
+        r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
+        assert r == expected_response
 
 def test_fetch_annotations_by_course_success_old_highlighter():
     d = built_json["test_fetch_annotations_by_course_success_old_highlighter"]
     data = [d["data"]]
     expected_response = d["expected_response"]
     annotation_db_url = "http://test.com"  
-    request_url = f"http://test.com/?contextId={context_id}&limit=1000"
+    request_url = f"http://test.com/?context_id={context_id}&limit=1000"
     with requests_mock.Mocker() as requests_mocker:
-     requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
-     r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
-     assert r == expected_response
+        requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
+        r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
+        assert r == expected_response
 
 def test_fetch_annotations_by_course_failing():
     d = built_json["test_fetch_annotations_by_course_failing"]
     data = [d["data"]]
     expected_response = d["expected_response"]
     annotation_db_url = "http://test.com"  
-    request_url = f"http://test.com/?contextId={context_id}&limit=1000"
+    request_url = f"http://test.com/?context_id={context_id}&limit=1000"
     with requests_mock.Mocker() as requests_mocker:
-     requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
-     r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
-    assert r == expected_response
+        requests_mocker.get(request_url, json={"rows":data,"total":len(data)})
+        r = _fetch_annotations_by_course(context_id, annotation_db_url, annotator_auth_token)
+        assert r == expected_response
