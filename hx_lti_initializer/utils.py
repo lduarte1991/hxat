@@ -242,7 +242,6 @@ def fetch_annotations_by_course(context_id, user_id):
             results["rows"] += data["rows"]
         if "totalCount" in data:
             results["totalCount"] += int(data["totalCount"])
-
     return results
 
 
@@ -259,7 +258,7 @@ def _fetch_annotations_by_course(
     }
     limit = kwargs.get("limit", 1000)  # Note: -1 means get everything there is
     encoded_context_id = urllib.parse.quote_plus(context_id)
-    request_url = "%s/search?contextId=%s&limit=%s" % (
+    request_url = "%s/?context_id=%s&limit=%s" % (
         annotation_db_url,
         encoded_context_id,
         limit,
@@ -288,14 +287,112 @@ def _fetch_annotations_by_course(
         # where each row represents an annotation object.
         # if more convenient, we could cut the top level and just return flat annotations.
         annotations = r.json()
+        # Transform data body because we are hitting a v2 catchpy endpoint
+        formatted_annotations = []
+        parents_text_dict = {}
+        total = annotations["total"] or 0
+        result = {
+            "totalCount": total
+        }
 
+        #Note: there are other fields i left out since it did not seem to be required for what we need 
+        for annote in annotations["rows"]:
+            # add text to parent_text_dict text dict for quick lookup
+            try:
+                # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
+                index_of_target_items = find_target_object_index(annote["target"]["items"])
+                if index_of_target_items is None:
+                    raise KeyError(f"media type")
+                id = annote['id']
+                text = annote["body"]["items"][0]["value"]
+                parents_text_dict[id] = text
+                created = annote["created"]
+                updated = annote["modified"]
+                text = text
+                permissions = annote["permissions"]
+                user = annote["creator"]
+                totalComments = annote["totalReplies"]
+                tags = []
+                parent = "0"
+                ranges = []
+                contextId = annote["platform"]["context_id"]
+                collectionId = annote["platform"]["collection_id"]
+                uri = annote["platform"]["target_source_id"]
+                media =  annote["target"]["items"][index_of_target_items]["type"].lower()
+                target_items = annote["target"]["items"]
+                quote = ""
+                formatted = {
+                    "id": id,
+                    "created": created,
+                    "updated": updated,
+                    "text": text,
+                    "permissions": permissions,
+                    "user": user,
+                    "totalComments": totalComments,
+                    "tags": tags,
+                    "parent": parent,
+                    "ranges": ranges,
+                    "contextId": contextId,
+                    "collectionId": collectionId,
+                    "uri": uri,
+                    "media": media,
+                    "quote": quote,
+                    # added manifest_url for better matching in get_target_id
+                    "manifest_url": ""
+                }
+                if "selector" in target_items[index_of_target_items]:
+                    for item in target_items[index_of_target_items]["selector"]["items"]:
+                        if "type" in item and item["type"] == "TextQuoteSelector":
+                            formatted["quote"] = item["exact"]
+                # check if the annotation has a parent text
+                # parent id is written to "parent" key
+                if target_items[index_of_target_items]["type"] == "Annotation":
+                    formatted["parent"] = target_items[index_of_target_items]["source"]
+
+                # check images annotation fields
+                if media == "image":
+                    # not guarenteed correct order
+                    if index_of_target_items == 1 and target_items[0]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[0]["source"]
+                    elif target_items[1]["type"] == "Thumbnail":
+                        formatted["thumb"] = target_items[1]["source"]
+                    if "selector" in target_items[index_of_target_items]:
+                        formatted["rangePosition"] = target_items[index_of_target_items]["selector"]["items"]
+                        # added field for image manifest for lookup in get_target_id function
+                        bounds = ""
+                        # Data structure is different between old highlighter and new highlighter e.g. newhighlighter assignment data does not have scope field
+                        if "type" in formatted['rangePosition'][0]:
+                            formatted["manifest_url"] = target_items[index_of_target_items]["source"]
+                            bounds = formatted['rangePosition'][0]["value"]
+                        else:    
+                            formatted["manifest_url"] = formatted["rangePosition"][0]["within"]["@id"]
+                            bounds = target_items[index_of_target_items]["scope"]["value"]
+                        formatted_bounds = bounds.split("=")[1].split(',')
+                        x, y, width, height = formatted_bounds
+                        formatted["bounds"] = {
+                            "x": x,
+                            "y": y,
+                            "width": width,
+                            "height": height,
+                        }
+
+                formatted_annotations.append(formatted)
+            except KeyError as e:
+                logger.warning(f"key error={e}")
+        # Loop through the formatted_annotations and add parent_text if parent !=0
+        for formatted_annote in formatted_annotations:
+            if formatted_annote["parent"] is not "0":
+                id = formatted_annote["parent"]
+                formatted_annote["parent_text"] = parents_text_dict[id]
+        result["rows"] =  formatted_annotations
+    except KeyError as ke:
+        logger.error(f"missing {ke} field in response body")
     except:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
-        annotations = {"rows": [], "totalCount": 0}
-
-    return annotations
+        annotations = {"rows": [], "totalCount": 0} 
+    return result
 
 
 def get_distinct_users_from_annotations(annotations, sort_key=None):
@@ -460,14 +557,16 @@ class DashboardAnnotations(object):
     def get_target_id(self, media_type, object_id):
         object_id = str(
             object_id
-        )  # ensure we have the target id as a string, not an int
+        ).lower()  # ensure we have the target id as a string, not an int
         target_id = ""
         if media_type == "image":
             trimmed_object_id = object_id[
                 0 : object_id.find("/canvas/")
             ]  # only use regex if absolutely necessary
-            if trimmed_object_id in self.target_objects_by_content:
-                target_id = self.target_objects_by_content[trimmed_object_id]["id"]
+            # checks for anything that contains the root trimmed_object_id or root url if its an image
+            for key in self.target_objects_by_content:
+                if key.lower().startswith(trimmed_object_id):
+                    target_id = self.target_objects_by_content[key]["id"]
         else:
             if object_id in self.target_objects_by_id:
                 target_id = object_id
@@ -482,7 +581,13 @@ class DashboardAnnotations(object):
     def get_target_object_name(self, annotation):
         media_type = annotation.get("media", None)
         object_id = annotation["uri"]
+        # fix to find correct id using manifest_url instead
+        if media_type == 'image':
+            object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
+        # the keys in self.target_objects_by_id are strings so the lookup will fail if we pass an int
+        if isinstance(target_id, int):
+            target_id = str(target_id)
         if target_id in self.target_objects_by_id:
             return self.target_objects_by_id[target_id]["target_title"]
         return ""
@@ -496,7 +601,7 @@ class DashboardAnnotations(object):
         preview_url = ""
 
         if media_type == "image":
-            target_id = self.get_target_id(media_type, annotation["uri"])
+            target_id = self.get_target_id(media_type, annotation["manifest_url"])
         else:
             target_id = annotation["uri"]
 
@@ -529,6 +634,8 @@ class DashboardAnnotations(object):
         media_type = annotation.get("media", None)
         collection_id = annotation["collectionId"]
         object_id = annotation["uri"]
+        if media_type == 'image':
+            object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         return (collection_id in self.assignment_name_of) and target_id
 
@@ -542,7 +649,16 @@ class DashboardAnnotations(object):
         return parent_value
 
     def get_annotation_by_id(self, annotation_id):
-        annotation_id = int(annotation_id)
         if annotation_id in self.annotation_by_id:
             return self.annotation_by_id[annotation_id]
         return None
+
+def find_target_object_index(anno_target_items):
+    # note: left out "Thumbnail" and "Annotations"
+    # help with finding the correct types in the data response
+    # TODO: add to constants?
+    accepted_catchpy_types = ["Image", "Audio", "Image", "Text", "Video"]
+    for index, d in enumerate(anno_target_items):
+        if d["type"] in accepted_catchpy_types:
+            return index
+    return None
