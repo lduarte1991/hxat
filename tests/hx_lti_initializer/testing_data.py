@@ -251,6 +251,46 @@ def build_json(id, context_id):
                     "totalReplies": "0"
                 },
                 "expected_response": {"rows": [], "totalCount": 1}
+            },
+            "test_dashboard_annotations_success": {
+                "https://iiif.bodleian.ox.ac.uk/iiif/manifest/60834383-7146-41ab-bfe1-48ee97bc04be.json":
+                    {
+                    "id": 14,
+                    "target_title": "bodleian",
+                    "target_content":
+                        "https://iiif.bodleian.ox.ac.uk/iiif/manifest/60834383-7146-41ab-bfe1-48ee97bc04be.json",
+                    "target_type": "ig",
+                    },
+                "https://d.lib.ncsu.edu/collections/catalog/nubian-message-1992-11-30/manifest/661":
+                    {
+                    "id": 15,
+                    "target_title": "nubian-message-1992",
+                    "target_content":
+                        "https://d.lib.ncsu.edu/collections/catalog/nubian-message-1992-11-30/manifest/661",
+                    "target_type": "ig",
+                    },
+                "https://d.lib.ncsu.edu/collections/catalog/nubian-message-1992-11-30/manifest/662":
+                    {
+                    "id": 16,
+                    "target_title": "nubian-message-1992",
+                    "target_content":
+                        "https://d.lib.ncsu.edu/collections/catalog/nubian-message-1992-11-30/manifest/662",
+                    "target_type": "ig",
+                    },
+                "https://digital.library.villanova.edu/Item/vudl:92879/Manifest": {
+                    "id": 9,
+                    "target_title": "test old",
+                    "target_content":
+                    "https://digital.library.villanova.edu/Item/vudl:92879/Manifest",
+                    "target_type": "ig",
+                },
+                "https://damsssl.llgc.org.uk/iiif/2.0/4389767/manifest.json": {
+                    "id": 12,
+                    "target_title": "test old2",
+                    "target_content":
+                    "https://damsssl.llgc.org.uk/iiif/2.0/4389767/manifest.json",
+                    "target_type": "ig",
+                }
             }
         }
     return testing_data_dict
