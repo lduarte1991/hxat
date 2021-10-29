@@ -555,14 +555,10 @@ class DashboardAnnotations(object):
 
     """
     Edge cases for get_target_id function that can cause bugs from external manifest uri:
-        Capital Letters in the URI can cause errors when doing lookups
-        object_id=https://digital.library.villanova.edu/item/vudl:92879/Manifest
-        target_objects_by_content key=https://digital.library.villanova.edu/Item/vudl:92879/Manifest
-        
-    Note: local testing(local hxat and catchpy database) of these URI fails, will need to revisit if bugs pop up in the future
+    Note: local testing(hxat and catchpy database) of these URI fails, will need to revisit if bugs pop up in the future
         Assignments using New highlighter images will only store the URI that has "Canvas" or "canvas" in catchpy.
         While the old highlighter will store the manifest URI in addition to the canvas URI
-        New Highlighter:
+        New Highlighter example data:
         object_id=https://digital.library.villanova.edu/Item/vudl:92879/Canvas/p0
         target_objects_by_content key=https://digital.library.villanova.edu/Item/vudl:92879/Manifest
     """
