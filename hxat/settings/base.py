@@ -92,7 +92,9 @@ WSGI_APPLICATION = "hxat.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        # django.db.backends.postgresql_psycopg2 module is deprecated in favor of django.db.backends.postgresq
+        # https://docs.djangoproject.com/en/3.0/releases/2.0/#id1
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get(
             "HXAT_DB_NAME", SECURE_SETTINGS.get("db_default_name", "annotationsx")
         ),
