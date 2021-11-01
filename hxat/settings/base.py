@@ -389,3 +389,5 @@ HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() =
 # time-to-live for ws auth
 WS_JWT_TTL = os.environ.get("WS_JWT_TTL", 300)
 
+# https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
