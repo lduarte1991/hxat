@@ -72,7 +72,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    "django_cookies_samesite.middleware.CookiesSameSite",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "hxat.middleware.CookielessSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -350,10 +349,10 @@ IMAGE_STORE_BACKEND_CONFIG = os.environ.get(
     "IMAGE_STORE_BACKEND_CONFIG", SECURE_SETTINGS.get("image_store_backend_config", "")
 )
 
-# replace when django 3.1, see https://github.com/jotes/django-cookies-samesite
+# https://docs.djangoproject.com/en/3.2/releases/3.1/#django-contrib-sessions
 # due to chrome 80.X, see https://www.chromium.org/updates/same-site
-DCS_SESSION_COOKIE_SAMESITE = "None"
-DCS_CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "None"
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
