@@ -6,9 +6,6 @@ from urllib.parse import parse_qs
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.db import close_old_connections
-import os
-
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
