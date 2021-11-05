@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 
 # default settings_module is prod
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hxat.settings.prod")
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 django.setup()
 # move below django.setup() due to django exception: django.core.exceptions.ImproperlyConfigured
 from notification.middleware import SessionAuthMiddleware
