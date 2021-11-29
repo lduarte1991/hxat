@@ -503,7 +503,6 @@ class DashboardAnnotations(object):
             if x["target_type"] == "ig"
         }
         self.preview_url_cache = {}
-
     def get_annotations_by_id(self):
         return get_annotations_keyed_by_annotation_id(self.annotations)
 
@@ -554,19 +553,28 @@ class DashboardAnnotations(object):
                 )
         return users
 
+    """
+    Edge cases for get_target_id function that can cause bugs from external manifest uri:
+    Note: local testing(hxat and catchpy database) of these URI fails, will need to revisit if bugs pop up in the future
+        Assignments using New highlighter images will only store the URI that has "Canvas" or "canvas" in catchpy.
+        While the old highlighter will store the manifest URI in addition to the canvas URI
+        New Highlighter example data:
+        object_id=https://digital.library.villanova.edu/Item/vudl:92879/Canvas/p0
+        target_objects_by_content key=https://digital.library.villanova.edu/Item/vudl:92879/Manifest
+    """
     def get_target_id(self, media_type, object_id):
         object_id = str(
             object_id
-        ).lower()  # ensure we have the target id as a string, not an int
+        ) # ensure we have the target id as a string, not an int
         target_id = ""
         if media_type == "image":
-            trimmed_object_id = object_id[
-                0 : object_id.find("/canvas/")
-            ]  # only use regex if absolutely necessary
-            # checks for anything that contains the root trimmed_object_id or root url if its an image
-            for key in self.target_objects_by_content:
-                if key.lower().startswith(trimmed_object_id):
-                    target_id = self.target_objects_by_content[key]["id"]
+            found = object_id.find("/canvas/")
+            # in case there is capital letters in the URI
+            index = found if found is not -1 else object_id.find("/Canvas/")
+            trimmed_object_id = object_id if index == -1 else object_id[0:index]
+            # gets the data dict from the target_objects_by_content dictionary by trimmed_object_id else assign None
+            if trimmed_object_id in self.target_objects_by_content:
+                target_id = self.target_objects_by_content[trimmed_object_id]["id"]
         else:
             if object_id in self.target_objects_by_id:
                 target_id = object_id
@@ -602,6 +610,7 @@ class DashboardAnnotations(object):
 
         if media_type == "image":
             target_id = self.get_target_id(media_type, annotation["manifest_url"])
+            logger.info(f"canvas in={'/canvas/' in  annotation['manifest_url']}")
         else:
             target_id = annotation["uri"]
 
