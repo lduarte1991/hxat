@@ -72,7 +72,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    "django_cookies_samesite.middleware.CookiesSameSite",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "hxat.middleware.CookielessSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -92,7 +91,9 @@ WSGI_APPLICATION = "hxat.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        # django.db.backends.postgresql_psycopg2 module is deprecated in favor of django.db.backends.postgresq
+        # https://docs.djangoproject.com/en/3.0/releases/2.0/#id1
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get(
             "HXAT_DB_NAME", SECURE_SETTINGS.get("db_default_name", "annotationsx")
         ),
@@ -348,10 +349,10 @@ IMAGE_STORE_BACKEND_CONFIG = os.environ.get(
     "IMAGE_STORE_BACKEND_CONFIG", SECURE_SETTINGS.get("image_store_backend_config", "")
 )
 
-# replace when django 3.1, see https://github.com/jotes/django-cookies-samesite
+# https://docs.djangoproject.com/en/3.2/releases/3.1/#django-contrib-sessions
 # due to chrome 80.X, see https://www.chromium.org/updates/same-site
-DCS_SESSION_COOKIE_SAMESITE = "None"
-DCS_CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "None"
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -388,3 +389,5 @@ HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() =
 # time-to-live for ws auth
 WS_JWT_TTL = os.environ.get("WS_JWT_TTL", 300)
 
+# https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

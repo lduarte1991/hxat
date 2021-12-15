@@ -9,7 +9,6 @@ from django.shortcuts import (  # noqa
     get_object_or_404,
     redirect,
     render,
-    render_to_response,
 )
 from django.urls import reverse
 from django.utils.html import escape

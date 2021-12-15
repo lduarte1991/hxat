@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, QueryDict
-from django.shortcuts import get_object_or_404, redirect, render, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from hx_lti_assignment.forms import (
     AssignmentForm,

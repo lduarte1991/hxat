@@ -2,6 +2,8 @@
 # Using the below secure settings in combination with project defaults should be 
 # sufficient to get you started.  Make sure you copy this file over as is to
 # secure.py before running `vagrant up`.
+# Note: 'https_only': True required to create/delete assignments when running locally
+    
 
 SECURE_SETTINGS = {
     'django_secret_key': 'SuPeR-SeCrEt_KeY!',
@@ -30,4 +32,6 @@ SECURE_SETTINGS = {
         'urn:lti:instrole:ims/lis/Administrator',
         'urn:lti:role:ims/lis/TeachingAssistant',
     },
+    'https_only': True
 }
+

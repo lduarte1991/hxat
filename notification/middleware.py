@@ -6,18 +6,43 @@ from urllib.parse import parse_qs
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.db import close_old_connections
+from asgiref.sync import sync_to_async
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+
+
+@sync_to_async
+def _async_session_exists(session_id):
+    '''
+    Returns an awaitable for checking if a session exists.
+
+    NOTE: `sync_to_async` is necessary because the SessionStore
+    uses the DB, and therefore is a synchronous operation. The `sync_to_async`
+    utility turns `session.exists()` into an awaitable.
+    '''
+    return SessionStore(session_id).exists(session_id)
+
+
+@sync_to_async
+def _async_session_get_ltilaunch(session_id):
+    '''
+    Returns an awaitable for loading the LTI_LAUNCH data from the session.
+
+    NOTE: `sync_to_async` is necessary because the SessionStore
+    uses the DB, and therefore is a synchronous operation. The `sync_to_async`
+    utility turns `session.get()` into an awaitable.
+    '''
+    return SessionStore(session_id).get("LTI_LAUNCH", {})
 
 
 class SessionAuthMiddleware(object):
     """auth via session_id in query string."""
 
-    def __init__(self, inner):
-        self.inner = inner
+    def __init__(self, app):
+        self.app = app
         self.log = logging.getLogger(__name__)
 
-    def __call__(self, scope):
+    async def __call__(self, scope, receive, send):
         # not authorized yet
         scope["hxat_auth"] = "403"
         scope["hx_user_id"] = "anonymous"
@@ -34,7 +59,7 @@ class SessionAuthMiddleware(object):
         if not parsed_query:
             scope["hxat_auth"] = "403: missing querystring"
             self.log.debug("NOTIFY {}".format(scope["hxat_auth"]))
-            return self.inner(scope)
+            return await self.app(scope, receive, send)
 
         session_id = parsed_query.get(b"utm_source", [b""])[0].decode()
         resource_link_id = parsed_query.get(b"resource_link_id", [b""])[0].decode()
@@ -44,17 +69,17 @@ class SessionAuthMiddleware(object):
         if not session_id or not resource_link_id:
             scope["hxat_auth"] = "403: missing session-id or resource-link-id"
             self.log.debug("NOTIFY {}".format(scope["hxat_auth"]))
-            return self.inner(scope)
+            return await self.app(scope, receive, send)
 
         # close old db conn to prevent usage of timed out conn
         # see https://channels.readthedocs.io/en/latest/topics/authentication.html#custom-authentication
         close_old_connections()
-        session = SessionStore(session_id)
-        if not session.exists(session_id):
+        session_exists = await _async_session_exists(session_id)
+        if not session_exists:
             scope["hxat_auth"] = "403: unknown session-id({})".format(session_id)
         else:
             # get lti params from session
-            multi_launch = session.get("LTI_LAUNCH", {})
+            multi_launch = await _async_session_get_ltilaunch(session_id)
             lti_launch = multi_launch.get(resource_link_id, {})
             lti_params = lti_launch.get("launch_params", {})
 
@@ -90,7 +115,7 @@ class SessionAuthMiddleware(object):
 
         self.log.debug("NOTIFY {}".format(scope["hxat_auth"]))
         self.log.debug("NOTIFY finished with middleware")
-        return self.inner(scope)
+        return await self.app(scope, receive, send)
 
 
 """
