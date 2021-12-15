@@ -78,7 +78,7 @@
         {% if is_instructor %}
         <div id="new-assignment-section" style='top:25px; position: relative;'>
             <a href="{% url 'hx_lti_assignment:create_new_assignment' %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" id="new-assignment-button" role="button">Create new assignment</a>
-            or <a href="{% url 'hx_lti_assignment:import_assignment' %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" style='margin-left: 10px;'>import from another course</a>
+            or <a href="{% url 'hx_lti_assignment:import_assignment' %}?resource_link_id={{resource_link_id}}&{{utm_source_param}}" style='margin-left: 10px; font-size: 1.1em;'>import from another course</a>
         </div>
         {% endif %}
     {% endfor %}
