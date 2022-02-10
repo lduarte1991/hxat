@@ -237,7 +237,7 @@ class AnnotationStore(object):
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
+                    "LTI grade request failed: status_code=%s response=%s description=%s lti_log_data=%s" % (outcome.response_code, outcome.post_response.content, outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
@@ -578,7 +578,7 @@ class CatchStoreBackend(StoreBackend):
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
+                    "LTI grade request failed: status_code=%s response=%s description=%s lti_log_data=%s" % (outcome.response_code, outcome.post_response.content, outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
@@ -857,7 +857,7 @@ class WebAnnotationStoreBackend(StoreBackend):
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
+                    "LTI grade request failed: status_code=%s response=%s description=%s lti_log_data=%s" % (outcome.response_code, outcome.post_response.content, outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
