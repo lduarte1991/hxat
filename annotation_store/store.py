@@ -214,29 +214,34 @@ class AnnotationStore(object):
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
+
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug(
                 "LTI consumer does not expect a grade for the current user and assignment"
             )
             return
-        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+
+        lti_log_data = {
+            k:tool_provider.launch_params.get(k)
+            for k in ('context_id', 'user_id', 'lis_outcome_service_url', 'lis_result_sourcedid', 'launch_presentation_return_url')
+        }
+
+        self.logger.info("LTI grade request initiating passback: score=%s lti_log_data=%s" % (score, lti_log_data))
         try:
             outcome = tool_provider.post_replace_result(score)
             self.logger.info(vars(outcome))
             if outcome.is_success():
                 self.logger.info(
-                    "LTI grade request was successful. Description: %s"
-                    % outcome.description
+                    "LTI grade request was successful: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed. Description: %s" % outcome.description
+                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
-            self.logger.error("LTI post_replace_result request failed: %s" % str(e))
-        return self.outcome
+            self.logger.error("LTI grade request post_replace_result failed exception=%s lti_log_data=%s" % (str(e), lti_log_data))
 
 
 ###########################################################
@@ -550,28 +555,34 @@ class CatchStoreBackend(StoreBackend):
     def lti_grade_passback(self, score=1.0):
         if score < 0 or score > 1.0 or isinstance(score, str):
             return
+
         tool_provider = self._get_tool_provider()
         if not tool_provider.is_outcome_service():
             self.logger.debug(
                 "LTI consumer does not expect a grade for the current user and assignment"
             )
             return
-        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+
+        lti_log_data = {
+            k:tool_provider.launch_params.get(k)
+            for k in ('context_id', 'user_id', 'lis_outcome_service_url', 'lis_result_sourcedid', 'launch_presentation_return_url')
+        }
+
+        self.logger.info("LTI grade request initiating passback: score=%s lti_log_data=%s" % (score, lti_log_data))
         try:
             outcome = tool_provider.post_replace_result(score)
             self.logger.info(vars(outcome))
             if outcome.is_success():
                 self.logger.info(
-                    "LTI grade request was successful. Description: %s"
-                    % outcome.description
+                    "LTI grade request was successful: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed. Description: %s" % outcome.description
+                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
-            self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+            self.logger.error("LTI grade request post_replace_result failed exception=%s lti_log_data=%s" % (str(e), lti_log_data))
 
 
 class WebAnnotationStoreBackend(StoreBackend):
@@ -830,22 +841,27 @@ class WebAnnotationStoreBackend(StoreBackend):
                 "LTI consumer does not expect a grade for the current user and assignment"
             )
             return
-        self.logger.info("Initiating LTI Grade Passback: score=%s" % score)
+
+        lti_log_data = {
+            k:tool_provider.launch_params.get(k)
+            for k in ('context_id', 'user_id', 'lis_outcome_service_url', 'lis_result_sourcedid', 'launch_presentation_return_url')
+        }
+
+        self.logger.info("LTI grade request initiating passback: score=%s lti_log_data=%s" % (score, lti_log_data))
         try:
             outcome = tool_provider.post_replace_result(score)
             self.logger.info(vars(outcome))
             if outcome.is_success():
                 self.logger.info(
-                    "LTI grade request was successful. Description: %s"
-                    % outcome.description
+                    "LTI grade request was successful: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             else:
                 self.logger.error(
-                    "LTI grade request failed. Description: %s" % outcome.description
+                    "LTI grade request failed: description=%s lti_log_data=%s" % (outcome.description, lti_log_data)
                 )
             self.outcome = outcome
         except Exception as e:
-            self.logger.error("LTI post_replace_result request failed: %s" % str(e))
+            self.logger.error("LTI grade request post_replace_result failed exception=%s lti_log_data=%s" % (str(e), lti_log_data))
 
     def send_annotation_notification(self, message_type, annotation):
         # target_source_id from session guarantees it's a sequential integer id from
