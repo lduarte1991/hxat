@@ -72,6 +72,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    "log_request_id.middleware.RequestIDMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "hxat.middleware.CookielessSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -176,16 +177,22 @@ _LOG_FILENAME = os.environ.get(
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "request_id": {
+            "()": "log_request_id.filters.RequestIDFilter",
+        },
+    },
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s\t%(asctime)s.%(msecs)03dZ\t%(name)s:%(lineno)s\t%(message)s",
+            "format": "[%(request_id)s]:%(levelname)s\t%(asctime)s.%(msecs)03dZ\t%(name)s:%(lineno)s\t%(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S",
         },
-        "simple": {"format": "%(levelname)s\t%(name)s:%(lineno)s\t%(message)s",},
+        "simple": {"format": "[%(request_id)s]:%(levelname)s\t%(name)s:%(lineno)s\t%(message)s",},
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "filters": ["request_id"],
             "formatter": "simple",
             "level": "DEBUG",
             "stream": "ext://sys.stdout",
@@ -193,8 +200,9 @@ LOGGING = {
         "default": {
             "class": "logging.handlers.WatchedFileHandler",
             "level": _DEFAULT_LOG_LEVEL,
-            "formatter": "verbose",
             "filename": os.path.join(_LOG_ROOT, _LOG_FILENAME),
+            "filters": ["request_id"],
+            "formatter": "verbose",
         },
     },
     # This is the default logger for any apps or libraries that use the logger
@@ -391,3 +399,8 @@ WS_JWT_TTL = os.environ.get("WS_JWT_TTL", 300)
 
 # https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# log request-id
+LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
+NO_REQUEST_ID = "none"
+
