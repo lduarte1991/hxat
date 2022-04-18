@@ -51,7 +51,10 @@ class SessionAuthMiddleware(object):
         path = scope.get("path")
         room_name = path.split("/")[-2]  # assumes path ends with a '/'
         (context, collection, target) = room_name.split("--")
-        tgt, _ = target.split("-")  # hxighliter appends a canvas-id
+        try:
+            tgt, _ = target.split("-")  # hxighliter appends a canvas-id
+        except ValueError:
+            tgt = target
 
         # parse query string for session-id and resource-link-id
         query_string = scope.get("query_string", "")
