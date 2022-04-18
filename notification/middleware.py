@@ -50,7 +50,8 @@ class SessionAuthMiddleware(object):
         # parse path to get context_id, collection_id, target_source_id
         path = scope.get("path")
         room_name = path.split("/")[-2]  # assumes path ends with a '/'
-        (context, collection, target) = room_name.split("--")
+        (context, collection, tgt) = room_name.split("--")
+        target, _ = tgt.split("-")  # hxighliter appends a canvas-id
 
         # parse query string for session-id and resource-link-id
         query_string = scope.get("query_string", "")
