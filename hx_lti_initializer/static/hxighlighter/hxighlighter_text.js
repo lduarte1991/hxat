@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 4:31:27 PM  
+// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 5:00:23 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -46196,9 +46196,13 @@ __webpack_require__(43);
     var self = this;
     var message = response['message'];
     var annotation = eval("(" + message + ")");
-    console.log("WS:" + message, annotation);
+
+    if (annotation.platform.target_source_id != self.currentObjectId) {
+      console.log(annotation.platform.target_source_id, self.currentObjectId);
+      return;
+    }
+
     self.convertAnnotation(annotation, function (wa) {
-      // console.log("YEH", response)
       if (response['type'] === 'annotation_deleted') {
         $.publishEvent('GetSpecificAnnotationData', self.instanceID, [wa.id, function (annotationFound) {
           if (typeof annotationFound === "undefined") {
