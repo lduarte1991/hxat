@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.4.1 - Friday, April 15th, 2022, 3:34:53 PM  
+// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 11:40:57 AM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -46132,11 +46132,11 @@ __webpack_require__(43);
   $.Websockets = function (options, instanceID) {
     this.options = jQuery.extend({}, options);
     this.instanceID = instanceID;
-    this.init();
     this.timerRetryInterval;
     this.socket = null;
     this.maxConnections = 10;
     this.currentConnections = 0;
+    this.init();
     return this;
   };
   /**
@@ -46166,10 +46166,7 @@ __webpack_require__(43);
 
       if (self.socket) {
         self.socket.close();
-        console.log(self.socket);
       }
-
-      console.log(self.options);
     });
   };
 
