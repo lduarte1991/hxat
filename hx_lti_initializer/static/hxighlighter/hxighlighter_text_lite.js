@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 12:09:05 PM  
+// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 3:08:57 PM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45670,8 +45670,8 @@ __webpack_require__(43);
 
   $.Websockets.prototype.init = function () {
     var self = this;
-    var valid_object_id = self.options.ws_object_id.length > self.options.object_id.length ? self.options.ws_object_id : self.options.object_id;
-    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + valid_object_id.replace(/[^a-zA-Z0-9-]/g, '');
+    var valid_object_id = self.options.ws_object_id || self.options.object_id;
+    self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + valid_object_id.replace(/[^a-zA-Z0-9-]/g, '') + '-0';
     self.setUpListeners();
     self.setUpConnection();
   };
@@ -45682,10 +45682,9 @@ __webpack_require__(43);
 
   $.Websockets.prototype.setUpListeners = function () {
     var self = this;
-    $.subscribeEvent('objectIdUpdated', self.instanceID, function (_, objectID) {
-      self.options.ws_object_id = objectID;
+    $.subscribeEvent('objectIdUpdated', self.instanceID, function (_, objectID, currentPage) {
       self.options.object_id = objectID;
-      var valid_object_id = objectID;
+      var valid_object_id = objectID + '-' + currentPage;
       self.slot_id = self.options.context_id.replace(/[^a-zA-Z0-9-.]/g, '-') + '--' + self.options.collection_id + '--' + valid_object_id.replace(/[^a-zA-Z0-9-]/g, '');
 
       if (self.socket) {
