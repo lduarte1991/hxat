@@ -50,8 +50,11 @@ class SessionAuthMiddleware(object):
         # parse path to get context_id, collection_id, target_source_id
         path = scope.get("path")
         room_name = path.split("/")[-2]  # assumes path ends with a '/'
-        (context, collection, tgt) = room_name.split("--")
-        target, _ = tgt.split("-")  # hxighliter appends a canvas-id
+        (context, collection, target) = room_name.split("--")
+        try:
+            tgt, _ = target.split("-")  # hxighliter appends a canvas-id
+        except ValueError:
+            tgt = target
 
         # parse query string for session-id and resource-link-id
         query_string = scope.get("query_string", "")
@@ -97,13 +100,13 @@ class SessionAuthMiddleware(object):
             clean_target_id = str(lti_launch.get("hx_object_id", ""))
             if clean_context_id == context:
                 if clean_collection_id == collection:
-                    if clean_target_id == target:
+                    if clean_target_id == tgt:
                         scope["hxat_auth"] = "authenticated"
                     else:
                         scope[
                             "hxat_auth"
                         ] = "403: unknown target-object-id({}|{})".format(
-                            target, clean_target_id
+                            tgt, clean_target_id
                         )
                 else:
                     scope["hxat_auth"] = "403: unknown collection-id({}|{})".format(
