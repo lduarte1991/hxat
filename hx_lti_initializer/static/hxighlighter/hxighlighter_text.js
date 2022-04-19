@@ -1,4 +1,4 @@
-// [AIV_SHORT]  Version: 1.4.1 - Monday, April 18th, 2022, 5:00:23 PM  
+// [AIV_SHORT]  Version: 1.5.0 - Tuesday, April 19th, 2022, 11:48:51 AM  
  /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -33321,7 +33321,6 @@ __webpack_require__(9);
     });
     $.subscribeEvent('objectIdUpdated', self.instance_id, function () {
       jQuery('.annotationsHolder.side').html('');
-      console.log(self.options);
     });
     $.subscribeEvent('wsAnnotationDeleted', self.instance_id, function (_, annotation) {
       var filteroptions = jQuery('.btn.user-filter.active').toArray().map(function (button) {
@@ -46198,7 +46197,6 @@ __webpack_require__(43);
     var annotation = eval("(" + message + ")");
 
     if (annotation.platform.target_source_id != self.currentObjectId) {
-      console.log(annotation.platform.target_source_id, self.currentObjectId);
       return;
     }
 
