@@ -6,11 +6,11 @@
 <h2>Import Assignments from Another Course</h2>
 
 <label class='subheading' for='import-course-chosen'>Course:</label>
-<select class='selectpicker form-control full-width' id='import-course-chosen'>
+<select class='selectpicker form-control full-width' id='import-course-chosen' data-live-search="true">
 	<option value="">-----------</option>
 {% for course in courses %}
 	{% if course.id != current_course_id %}
-	<option value="{{course.id}}" data-assignments-url="{% url 'hx_lti_assignment:assignments_from_course' course_id=course.id %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}">{{course.course_name}}</option>
+	<option value="{{course.id}}" data-assignments-url="{% url 'hx_lti_assignment:assignments_from_course' course_id=course.id %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}">{{course.course_name}} ({{course.course_id}})</option>
 	{% endif %}
 {% endfor %}
 </select>
