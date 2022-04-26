@@ -98,6 +98,7 @@ class LTICourse(models.Model):
 
     class Meta:
         verbose_name = _("Course")
+        ordering = ['course_name', 'course_id']
 
     def __unicode__(self):
         """
