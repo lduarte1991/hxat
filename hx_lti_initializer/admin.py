@@ -30,7 +30,6 @@ class LTICourseListAdmin(admin.ModelAdmin):
         "course_external_css_default",
         "course_users",
     ]
-    readonly_fields = ["course_id"]
 
     def course_id(self, instance):  # pragma: no cover
         return str(self.course_id)
