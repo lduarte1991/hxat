@@ -49,6 +49,10 @@ class LTIProfile(models.Model):
     def __unicode__(self):
         """ When asked to print itself, this object will print the username """
         return self.name or self.user.username
+    
+    def __str__(self):
+        return "%s (%s)" % (self.name or self.user.username, self.anon_id)
+
 
     class Meta:
         """ The name of this section within the admin site """
