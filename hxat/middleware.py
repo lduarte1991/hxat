@@ -21,8 +21,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from lti.contrib.django import DjangoToolProvider
+from django.shortcuts import render
 
 from .lti_validators import LTIRequestValidator
+from hx_lti_initializer.views import PlatformError
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,6 @@ def ip_address(request):
 
 class LTILaunchError(Exception):
     pass
-
 
 class LTILaunchSession(object):
     """
@@ -244,6 +245,11 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.error(metadata)
             self.logger.error(exception)
             return HttpResponse("LTI launch error. Please try re-launching the tool.")
+        elif isinstance(exception, PlatformError):
+            self.logger.error('Platform Error - %s' % exception)
+            return render(request, 'main/platform_error.html', context={'error_message': exception}, status=424)
+        elif isinstance(exception, PermissionDenied):
+            return render(request, 'main/permission_error.html', context={'error_message': exception}, status=403)
         return None
         # when moving to django2 and replacing MIDDLEWARE_CLASSES to MIDDLEWARE in
         # settings, the behavior of exceptions in middleware changed:
@@ -283,6 +289,11 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                 for k, v in vars(request.session).items():
                     self.logger.debug("*-*-*-*- SESSION[{}]: {}".format(k, v))
                 return HttpResponseBadRequest()
+            except PlatformError as e:
+                self.logger.error('Platform Error - %s' % e)
+                return render(request, 'main/platform_error.html', context={'error_message': e}, status=424)
+            except PermissionDenied as e:
+                return render(request, 'main/permission_error.html', context={'error_message': e}, status=403)
             except Exception as e:
                 self.logger.debug("Exception: {}".format(e))
                 # this potentially returns a 500:
@@ -337,7 +348,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
 
         if not request_is_valid:
             self.logger.error("signature check failed")
-            raise PermissionDenied
+            raise PermissionDenied("LTI Key and Secret are incorrect.")
 
         self.logger.info("signature verified")
 
@@ -349,7 +360,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.error(
                 "person identifier (i.e. username) or full name was not present in request"
             )
-            raise LTILaunchError("missing LTI param: person identifier")
+            raise PlatformError("Platform did not send username. Check LTI settings in platform to ensure username is getting sent")
 
     def _update_session(self, request):
         """
