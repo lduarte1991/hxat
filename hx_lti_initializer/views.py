@@ -68,7 +68,7 @@ def launch_lti(request):
     user_id = request.LTI["launch_params"]["user_id"]
     logger.debug("DEBUG - Found anonymous ID in request: %s" % user_id)
     if user_id == 'student':
-        raise PlatformError("Studio in edX is sending wrong User ID. Publish and view live.")
+        raise PlatformError("Studio is not supported. Please publish and complete content configuration in the live environment.")
     course = request.LTI["launch_params"][settings.LTI_COURSE_ID]
     logger.debug("DEBUG - Found course being accessed: %s" % course)
 
@@ -882,6 +882,11 @@ def change_starting_resource(request, assignment_id, object_id):
         data["response"] = "Success: Deleted"
 
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def csrf_failure(request, reason=""):
+    ctx = {'message': reason}
+    return render(request, 'main/csrf_error.html', context=ctx)
 
 
 def tool_config(request):

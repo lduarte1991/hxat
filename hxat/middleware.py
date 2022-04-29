@@ -250,6 +250,7 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             return render(request, 'main/platform_error.html', context={'error_message': exception}, status=424)
         elif isinstance(exception, PermissionDenied):
             return render(request, 'main/permission_error.html', context={'error_message': exception}, status=403)
+        self.logger.error(exception)
         return None
         # when moving to django2 and replacing MIDDLEWARE_CLASSES to MIDDLEWARE in
         # settings, the behavior of exceptions in middleware changed:

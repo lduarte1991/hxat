@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     "hx_lti_assignment",
     "target_object_database",
 )
+CSRF_FAILURE_VIEW = 'hx_lti_initializer.views.csrf_failure'
 
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",

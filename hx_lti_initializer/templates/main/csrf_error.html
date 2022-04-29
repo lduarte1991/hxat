@@ -1,0 +1,10 @@
+{% extends 'main/error_base.html' %}
+
+{% block title %} Platform Error {% endblock %}
+
+{% block content %}
+<div class="container text-center alert alert-danger" style="padding-top: 40px; padding-bottom: 40px; margin-top: 40px">
+    <h1>CSRF Error: {{message}}</h1>
+    <p style="margin-top:20px;">This error is more prevalent in Safari due to stricter privacy/security limits. Try doing this again in Chrome and if it still doesn't work, notify the tech team.</p>
+</div>
+{% endblock %}
