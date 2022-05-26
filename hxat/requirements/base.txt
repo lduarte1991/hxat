@@ -17,6 +17,6 @@ python-dateutil==2.8.1
 pytz==2019.3
 requests==2.23.0
 python_dotenv==0.14.0
-Twisted==20.3.0
+Twisted==22.4.0
 WhiteNoise==5.2.0
 git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk==0.2.0
