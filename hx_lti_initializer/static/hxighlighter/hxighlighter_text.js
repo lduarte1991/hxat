@@ -35685,7 +35685,7 @@ function isElement(node) {
 }
 /**
  * ex) br, col, embed, hr, img, input, ...
- * @see http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
  */
 
 
@@ -47695,7 +47695,7 @@ function isElement(node) {
 }
 /**
  * ex) br, col, embed, hr, img, input, ...
- * @see http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
  */
 function isVoid(node) {
     return node && /^BR|^IMG|^HR|^IFRAME|^BUTTON|^INPUT/.test(node.nodeName.toUpperCase());

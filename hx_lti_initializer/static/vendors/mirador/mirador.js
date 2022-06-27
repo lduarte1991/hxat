@@ -25,7 +25,7 @@ this._delay(function(){n===this.counter&&this.refreshPositions(!s)})},_clear:fun
  * http://getbootstrap.com/javascript/#modals
  * ========================================================================
  * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * ======================================================================== */
 
 
@@ -365,7 +365,7 @@ this._delay(function(){n===this.counter&&this.refreshPositions(!s)})},_clear:fun
  * http://getbootstrap.com/javascript/#transitions
  * ========================================================================
  * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * ======================================================================== */
 
 
@@ -1512,7 +1512,7 @@ var __module3__ = (function(__dependency1__) {
   __exports__.extend = extend;var toString = Object.prototype.toString;
   __exports__.toString = toString;
   // Sourced from lodash
-  // https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
+  // https://github.com/lodash/lodash/blob/master/LICENSE
   var isFunction = function(value) {
     return typeof value === 'function';
   };
@@ -26413,7 +26413,7 @@ return L[i](this._segments,this._closed,this,t,e)},statics:{getBounds:function(t
 
     /**
     * checkOffset - get the offset below/above and left/right element depending on screen position
-    * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
+    * Thanks https://github.com/jquery/jquery-ui/blob/main/ui/widgets/datepicker.js
     */
     function getOffset(picker, input) {
         var extraY = 0;
