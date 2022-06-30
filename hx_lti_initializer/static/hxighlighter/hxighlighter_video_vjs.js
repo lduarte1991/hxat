@@ -35685,7 +35685,7 @@ function isElement(node) {
 }
 /**
  * ex) br, col, embed, hr, img, input, ...
- * @see http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
  */
 
 
@@ -46405,7 +46405,7 @@ __webpack_require__(42);
  * Video.js 7.8.4 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
- * <https://github.com/videojs/video.js/blob/master/LICENSE>
+ * <https://github.com/videojs/video.js/blob/main/LICENSE>
  *
  * Includes vtt.js <https://github.com/mozilla/vtt.js>
  * Available under Apache License Version 2.0
@@ -71268,7 +71268,7 @@ var Player = /*#__PURE__*/function (_Component) {
    *
    * In addition to the W3C settings we allow adding additional info through options.
    *
-   * @see http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+   * @see https://html.spec.whatwg.org/multipage/media.html#dom-media-addtexttrack
    *
    * @param {string} [kind]
    *        the kind of TextTrack you are adding
@@ -71882,7 +71882,7 @@ var Player = /*#__PURE__*/function (_Component) {
 /**
  * Get the {@link TextTrackList}
  *
- * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+ * @link https://html.spec.whatwg.org/multipage/media.html#dom-media-texttracks
  *
  * @return {TextTrackList}
  *         the current text track list
@@ -93066,7 +93066,7 @@ function isElement(node) {
 }
 /**
  * ex) br, col, embed, hr, img, input, ...
- * @see http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
  */
 function isVoid(node) {
     return node && /^BR|^IMG|^HR|^IFRAME|^BUTTON|^INPUT/.test(node.nodeName.toUpperCase());

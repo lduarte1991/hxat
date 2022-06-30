@@ -587,7 +587,7 @@
 
     /**
      * ex) br, col, embed, hr, img, input, ...
-     * @see http://www.w3.org/html/wg/drafts/html/master/syntax.html#void-elements
+     * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
      */
     var isVoid = function (node) {
       return node && /^BR|^IMG|^HR/.test(node.nodeName.toUpperCase());
