@@ -105,7 +105,7 @@ jQuery(document).ready(function() {
 		
 		jQuery.each(checked_elements, function(index, element) {
 			var assignment_id = jQuery(element).data('id');
-			var assignment_import_url = '/lti_init/launch_lti/assignment/' + import_from_course_id + '/' + current_course_id + '/' + assignment_id + '/import';
+			var assignment_import_url = '/lti_init/launch_lti/assignment/' + import_from_course_id + '/' + current_course_id + '/' + assignment_id + '/import?resource_link_id=' + resource_link_id;
 			console.log("Importing assignment ID: ", assignment_id, "URL:", assignment_import_url);
 
 			var options = {
