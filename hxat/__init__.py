@@ -1,1 +1,1 @@
-__version__ = "5.1.0"  # request-id in log messages
+__version__ = "5.2.0"  # multi-page images, admin hub fixes
