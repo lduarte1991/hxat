@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     "hx_lti_assignment",
     "target_object_database",
 )
+CSRF_FAILURE_VIEW = 'hx_lti_initializer.views.csrf_failure'
 
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",
@@ -361,6 +362,8 @@ IMAGE_STORE_BACKEND_CONFIG = os.environ.get(
 # due to chrome 80.X, see https://www.chromium.org/updates/same-site
 SESSION_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SAMESITE = "None"
+# because some browsers are very strict about sending cookies from iframes?
+CSRF_USE_SESSIONS = True
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

@@ -61,7 +61,7 @@
 	display: -ms-flexbox;      /* TWEENER - IE 10 */
 	display: -webkit-flex;
     display: flex;
-    -webkit-justify-content: space-between; 
+    -webkit-justify-content: space-between;
     justify-content: space-between;
 	height: 50px;
 	padding-left: 11%;
@@ -207,7 +207,7 @@ li {
     height: 20px;
     width: 20px;
     background-repeat: no-repeat;
-    background-size: contain;    
+    background-size: contain;
 }
 
 .copypaste{
@@ -457,7 +457,7 @@ footer {
 
 .hx-textfield, .bootstrap-select > .dropdown-toggle {
 	display: block;
-	height: 34px;
+	height: 45px;
 	padding: 0px 12px;
 	font-size: 10pt;
 	width: 84%;
@@ -472,9 +472,16 @@ footer {
 .dropdown-toggle[data-id^="mirador-view-type"], .dropdown-toggle[data-id="default-tab"], .dropdown-toggle[data-id^="import"] {
 	width: 100%;
 }
+.bootstrap-select.btn-group:not(.input-group-btn), .bootstrap-select.btn-group[class*="col-"] {
+  margin-bottom: 30px;
+}
 
 .add-source-popup-background .dropdown-menu {
     width: 84%!important;
+}
+
+.dropdown-menu>li>a {
+  display: inline-block;
 }
 
 .full-width {
@@ -484,7 +491,7 @@ footer {
 .hx-textfield {
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .hx-textfield:focus, .bootstrap-select > .dropdown-toggle:focus, .bootstrap-select > .dropdown-toggle:focus:before, .open > .bs-searchbox:focus, .source-detail .instructions:focus {
@@ -914,7 +921,7 @@ p.help {
 	color: black!important;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .source-detail .button-collection {
@@ -1226,7 +1233,7 @@ input.ordernum {
 	width: 91px;
 }
 
-input[type=checkbox], input[type=radio] { 
+input[type=checkbox], input[type=radio] {
 	display:none;
 } /* to hide the checkbox itself */
 
@@ -1235,12 +1242,12 @@ input[type=checkbox] + label:before {
   display: inline-block;
   color: black;
   content: "\f096"; /* unchecked icon */
-  letter-spacing: 10px; 
+  letter-spacing: 10px;
 } /* space between checkbox and label */
 
-input[type=checkbox]:checked + label:before { 
+input[type=checkbox]:checked + label:before {
 	content: "\f046"; /* checked icon */
-	letter-spacing: 8px; 
+	letter-spacing: 8px;
 } /* allow space for check mark */
 
 input[type=radio] + label:before {
@@ -1248,15 +1255,15 @@ input[type=radio] + label:before {
   display: inline-block;
   color: black;
   content: "\f10c"; /* unchecked icon */
-  letter-spacing: 10px; 
+  letter-spacing: 10px;
 } /* space between checkbox and label */
 
-input[type=radio]:checked + label:before { 
+input[type=radio]:checked + label:before {
 	content: "\f192"; /* checked icon */
-	letter-spacing: 10px; 
+	letter-spacing: 10px;
 } /* allow space for check mark */
 
-input[type=radio] + label { 
+input[type=radio] + label {
 	margin-right: 20px;
 }
 
@@ -1290,6 +1297,7 @@ a {
 	border: 2px solid #5b96c6;
 	border-radius: 10px;
 	padding: 20px;
+  width: 100%;
 }
 
 progress[value] {
@@ -1308,15 +1316,15 @@ progress[value]::-webkit-progress-bar {
 
 progress[value]::-webkit-progress-value {
   background-image:
-	   -webkit-linear-gradient(-45deg, 
-	                           transparent 33%, rgba(0, 0, 0, .1) 33%, 
+	   -webkit-linear-gradient(-45deg,
+	                           transparent 33%, rgba(0, 0, 0, .1) 33%,
 	                           rgba(0,0, 0, .1) 66%, transparent 66%),
-	   -webkit-linear-gradient(top, 
-	                           rgba(255, 255, 255, .25), 
+	   -webkit-linear-gradient(top,
+	                           rgba(255, 255, 255, .25),
 	                           rgba(0, 0, 0, .25)),
 	   -webkit-linear-gradient(left, #09c, #f44);
 
-    border-radius: 2px; 
+    border-radius: 2px;
     background-size: 35px 20px, 100% 100%, 100% 100%;
     -webkit-animation: animate-stripes 5s linear infinite;
     animation: animate-stripes 5s linear infinite;
