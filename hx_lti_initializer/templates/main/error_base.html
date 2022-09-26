@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{# Make sure to load static files, jquery, and bootstrap select #}
+<html lang="en">
+    <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% load bootstrap3 %}
+    {% load static %}
+    {% load hx_lti_initializer_extras %}
+    <link rel="stylesheet" href="{% static "vendors/development/css/font-awesome.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/development/css/bootstrap-select.css" %}">
+    {% bootstrap_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}">
+    <script src="{% static "vendors/development/jquery-1.12.4.js" %}"></script>
+    <script src="{% static "vendors/development/bootstrap-select.js" %}"></script>
+    {% block css_file %}{% endblock %}
+    {% block javascript %}{% endblock %}
+
+    <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
+        {% block content %}
+        <h1 style="margin-top:40px;">Error</h1>
+        <p style="margin-top:20px;">{{ error_message }}</p>
+        {% endblock %}
+    </body>
+</html>
+
+

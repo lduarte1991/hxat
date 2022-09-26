@@ -1,0 +1,10 @@
+{% extends 'main/error_base.html' %}
+
+{% block title %} 403 Forbidden Error {% endblock %}
+
+{% block content %}
+<div class="container text-center alert alert-danger" style="padding-top: 40px; padding-bottom: 40px">
+    <h1>403 Forbidden</h1>
+    <p style="margin-top:20px;">{{ error_message }}</p>
+</div>
+{% endblock %}
