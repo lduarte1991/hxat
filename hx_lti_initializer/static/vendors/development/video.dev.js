@@ -5600,7 +5600,7 @@ vjs.Player.prototype.textTracks_;
 
 /**
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
- * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+ * https://html.spec.whatwg.org/multipage/media.html#dom-media-texttracks
  * @return {Array}           Array of track objects
  */
 vjs.Player.prototype.textTracks = function(){
@@ -5611,7 +5611,7 @@ vjs.Player.prototype.textTracks = function(){
 /**
  * Add a text track
  * In addition to the W3C settings we allow adding additional info through options.
- * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+ * https://html.spec.whatwg.org/multipage/media.html#dom-media-addtexttrack
  * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
  * @param {String=} label       Optional label
  * @param {String=} language    Optional language

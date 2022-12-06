@@ -107,6 +107,9 @@ def launch_lti(request):
     roles = request.LTI["launch_params"][settings.LTI_ROLES]
     logger.debug("DEBUG - user logging in with roles: " + str(roles))
 
+    # this is the short, human readable label for the course context
+    context_label = request.LTI["launch_params"].get("context_label", "")
+
     # This is the name that we will show on the UI if provided...
     # EDX-NOTE: edx does not return the person's name!
     display_name = request.LTI["launch_params"].get("lis_person_name_full", None)
@@ -122,7 +125,7 @@ def launch_lti(request):
         try:
             lti_profile = LTIProfile.objects.get(anon_id=str(course))
         except LTIProfile.DoesNotExist:
-            logger.error("username({}) not found.".format(course))
+            logger.error("username({}) not found for context({})".format(course, context_label))
             raise PermissionDenied("username not found in LTI launch")
         except MultipleObjectsReturned as e:
             logger.error(
