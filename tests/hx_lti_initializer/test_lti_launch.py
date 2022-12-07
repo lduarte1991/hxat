@@ -366,7 +366,7 @@ def test_launchLti_missing_required_param(
 
     client = Client(enforce_csrf_checks=False)
     response = client.post(lti_path, data=params,)
-    assert response.status_code == 400
+    assert response.status_code == 424
 
 
 @pytest.mark.django_db

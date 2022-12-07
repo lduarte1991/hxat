@@ -1,1 +1,1 @@
-__version__ = "5.2.0"  # multi-page images, admin hub fixes
+__version__ = "5.3.0"  # atg pr#164; fixes in unit tests

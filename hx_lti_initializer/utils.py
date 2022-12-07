@@ -267,9 +267,9 @@ def _fetch_annotations_by_course(
     logger.debug("fetch_annotations_by_course(): url: %s" % request_url)
 
     # make request
-    request_start_time = time.clock()
+    request_start_time = time.perf_counter()
     r = requests.get(request_url, headers=headers)
-    request_end_time = time.clock()
+    request_end_time = time.perf_counter()
     request_elapsed_time = request_end_time - request_start_time
 
     logger.debug(
