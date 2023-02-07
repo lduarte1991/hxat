@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 import logging
-
+import json
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from ast import literal_eval
@@ -283,7 +283,22 @@ LTI_TOOL_CONFIGURATION = {
 
 CONSUMER_KEY = os.environ.get("CONSUMER_KEY", "CONSUMER_KEY")
 LTI_SECRET = os.environ.get("LTI_SECRET", "LTI_SECRET")
-LTI_SECRET_DICT = literal_eval(os.environ.get("LTI_SECRET_DICT", str({})))
+#LTI_SECRET_DICT = literal_eval(os.environ.get("LTI_SECRET_DICT", str({})))
+LTI_SECRET_DICT_FILEPATH = os.environ.get("LTI_SECRET_DICT_FILEPATH", None)
+LTI_SECRET_DICT = {}
+if LTI_SECRET_DICT_FILEPATH is not None:
+    if os.path.exists(LTI_SECRET_DICT_FILEPATH):
+        try:
+            with open(LTI_SECRET_DICT_FILEPATH) as fh:
+                LTI_SECRET_DICT = json.load(fh)
+        except Exception as e:
+            logging.getLogger(__name__).error("unable to read lti_dict({}): {}".format(
+                LTI_SECRET_DICT_FILEPATH, e
+            ))
+    else:
+        logging.getLogger(__name__).error("lti_dict({}) does not exit".format(
+            LTI_SECRET_DICT_FILEPATH
+        ))
 
 SITE_ID = 1
 
