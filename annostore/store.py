@@ -11,7 +11,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from lti.contrib.django import DjangoToolProvider
 
-from annotation_store.models import AnnotationStoreConfig
 from hx_lti_assignment.models import Assignment
 from hx_lti_initializer.models import LTICourse
 from hxat.lti_validators import LTIRequestValidator
@@ -19,7 +18,7 @@ from hxat.lti_validators import LTIRequestValidator
 
 logger = logging.getLogger(__name__)
 
-
+"""
 class AnnotationStoreFactory(object):
     @classmethod
     def get_instance(cls, request):
@@ -102,7 +101,7 @@ class AnnotationStoreFactory(object):
         StoreClass = getattr(importlib.import_module(module_name), class_name)
         store_instance = StoreClass(request, context, assignment, cfg)
         return store_instance
-
+"""
 
 class AnnotationStore(object):
     """AnnotationStore implements a storage interface for annotations
@@ -115,7 +114,7 @@ class AnnotationStore(object):
     AnnotatorJs format, as well as a local database. As of oct22, the only annotation
     store backend supported is catchpy (https://github.com/nmaekawa/catchpy)
     """
-
+    """
     def __init__(self, request, course, assignment, store_cfg):
         self.request = request
         self.method = request.method
@@ -366,9 +365,84 @@ class AnnotationStore(object):
                 message_type, group, annotation.get("id", "unknown_id"), e
             )
             self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
+    """
+
+    @classmethod
+    def _valid_annostore_config(cls, assignment):
+        if not assignment.annotation_database_url and \
+            not assignment.annotation_database_apikey and \
+                not assignment.annotation_database_secret_token:
+                    # default config from settings
+                    return (
+                        settings.ANNOTATION_DB_URL,
+                        settings.ANNOTATION_DB_API_KEY,
+                        settings.ANNOTATION_DB_SECRET_TOKEN,
+                    )
+
+        # check for empty or blank configs
+        if assignment.annotation_database_url and \
+            len(assignment.annotation_database_url.strip()) > 0 and \
+                assignment.annotation_database_apikey and \
+                    len(assignment.annotation_database_apikey.strip()) > 0 and \
+                        assignment.annotation_database_secret_token and \
+                            len(assignment.annotation_database_secret_token.strip()) > 0:
+                                return (
+                                    assignment.annotation_database_url,
+                                    assignment.annotation_database_apikey,
+                                    assignment.annotation_database_secret_token,
+                                )
+        else:
+            return None
+
+
+    @classmethod
+    def _best_guess_for_annostore_config(cls, context_id):
+        # default config from settings
+        return (
+            settings.ANNOTATION_DB_URL,
+            settings.ANNOTATION_DB_API_KEY,
+            settings.ANNOTATION_DB_SECRET_TOKEN,
+        )
+        '''
+        try:
+            context = LTICourse.objects.get(course_id=context_id)
+        except LTICourse.DoesNotExist:
+            return None
+
+        dbconfig = {}
+        for a in context.assignments:
+            t = _valid_annotation_store_config(a)
+            if t is not None:  # config ignored if invalid
+                if dbconfig.get(t, None):
+                    dbconfig[t] += 1
+                else:
+                    dbconfig[t] = 1
+
+        # sort dict by count of how many times the config shows up in assigns
+        # note that in case of tie, it will return the first sorted config [1]
+        s = sorted(dbconfig.items(), key=lambda item: item[0], reverse=True)
+        return s[0][0]
+        '''
 
 
 """
-TODO: explanation on how LTI_SECRET_DICT was replaced
-TODO: some explanation on how annostore-config works now.
+13feb23 nmaekawa: annostore cfg in assignments
+Annostore cfg in assignment was created as a way to debug annotations in production. A
+special assignment would be created pointing to a devo annostore so test annotations
+would not go to the production db.
+Recently, due to intense traffic for the Rhetoric course, we setup a second annostore to
+divide traffic and relieve the main annostore database.
+The assumption is that debug annostore configs are rare and should be deleted as soon as
+the debugging session ends.
+Other assumption is that searches occur within an assignment. If no assignment comes in
+the search querystring, it means the search is over all assignments in the course --
+this is a problem since each assignment might have its own annotation config.
+
+For now, searches over the course is a special case and always use the default annostore
+config. In the future, this has to be changed:
+    - annostore config should be associated by course (to support our rhetoric use case)
+    - to select which annostore config: firt check course, then assignment
+
+Searches over all assignments in the course are used by ATG in instructor dashboard, but
+it is known that ATG configures one annostore per hxat.
 """
