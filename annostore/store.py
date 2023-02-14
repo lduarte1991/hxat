@@ -7,104 +7,71 @@ import uuid
 from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from lti.contrib.django import DjangoToolProvider
-
+from django.http import Http404, JsonResponse
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.models import LTICourse
 from hxat.lti_validators import LTIRequestValidator
-
+from lti.contrib.django import DjangoToolProvider
 
 logger = logging.getLogger(__name__)
 
-"""
-class AnnotationStoreFactory(object):
+
+class AnnostoreFactory(object):
     @classmethod
     def get_instance(cls, request):
-
-        # collection_id not in search params is search over multiple assignments
-        is_multi_assign_search = False
-        if request.method == "GET":
-            if len(request.GET) > 0:
-                if (
-                    request.GET.get(
-                        "collection_id", request.GET.get("collectionId", None)
-                    )
-                    is None
-                ):
-                    is_multi_assign_search = True
-
         if not hasattr(request, "LTI"):
             # needs session state in LTI object!
             msg = "cannot proceed: missing LTI dict in request"
             logger.error(msg)
             raise SuspiciousOperation(msg)
 
-        # get store config with priority from more specific to more general:
-        # collection-id, context-id, then default
-        # UNLESS it's a search over multiple assignments, then context-id then default
-        if request.LTI.get("hx_context_id", None) is not None:
-            conid = request.LTI["hx_context_id"]
+        asconfig = (  # default annostore config
+            settings.ANNOTATION_DB_URL,
+            settings.ANNOTATION_DB_API_KEY,
+            settings.ANNOTATION_DB_SECRET_TOKEN,
+        )
+
+        # try to get a collection_id
+        collection_id = request.LTI.get("hx_collection_id", None)
+        if request.method == "GET":  # search has priority to get collection_id
+            if len(request.GET) > 0:
+                c_id = request.GET.get(
+                    "collection_id", request.GET.get("collectionId", None)
+                )
+                # collection_id == None force to use default asconfig
+                # BEWARE that if a simple read comes with a querystring, it might be
+                #   redirected to the default asconfig!
+                collection_id = c_id if c_id else None
+
+        # at this point, should have a collection id from querystring or the session
+        # otherwise, it's a multi-assign search, and the default asconfig holds
+        if collection_id is not None:
             try:
-                context = get_object_or_404(LTICourse, course_id=conid)
-            except Exception as e:
-                logger.error("error fetching course({}): {}".format(conid, e))
-                raise e
-        if request.LTI.get("hx_collection_id", None) is not None:
-            assid = request.LTI["hx_collection_id"]
-            try:
-                assignment = get_object_or_404(Assignment, assignment_id=assid)
-            except Exception as e:
-                logger.error("error fetching assignment({}): {}".format(assid, e))
-                raise e
+                collection = Assignment.objects.get(assignment_id=collection_id)
+            except Assignment.DoesNotExist:
+                msg = "error fetching assignment({}): not found".format(collection_id)
+                logger.error(msg)
+                raise Http404(msg)
+            else:  # assignment asconfig never null!
+                asconfig = (
+                    collection.annotation_database_url,
+                    collection.annotation_database_apikey,
+                    collection.annotation_database_secret_token,
+                )
+        logger.info(
+            "asconfig: {} - {} - {}".format(
+                request.LTI.get("hx_context_id", "na"), collection_id, asconfig
+            )
+        )
 
-        if is_multi_assign_search:
-            if context.annotation_database_cfg is None:
-                try:  # get default annostore-cfg from settings
-                    cfg = get_object_or_404(
-                        AnnotationStoreConfig,
-                        pk=settings.ANNOTATION_DATABASE_CFG_DEFAULT,
-                    )
-                except Exception as e:
-                    logger.error(
-                        "error fetching annostore-cfg({}): {}".format(
-                            settings.ANNOTATION_DATABASE_CFG_DEFAULT, e
-                        )
-                    )
-                    raise e
-            else:
-                cfg = context.annotation_database_cfg
-
-        else:  # search within single assignment, or regular operations
-            if assignment.annotation_database_cfg is None:
-                if context.annotation_database_cfg is None:
-                    try:  # get default annostore-cfg from settings
-                        cfg = get_object_or_404(
-                            AnnotationStoreConfig,
-                            pk=settings.ANNOTATION_DATABASE_CFG_DEFAULT,
-                        )
-                    except Exception as e:
-                        logger.error(
-                            "error fetching annostore-cfg({}): {}".format(
-                                settings.ANNOTATION_DATABASE_CFG_DEFAULT, e
-                            )
-                        )
-                        raise e
-                else:
-                    cfg = context.annotation_database_cfg
-            else:
-                cfg = assignment.annotation_database_cfg
-
-        # based on store config, can instantiate the proper backend and return
-        (module_name, class_name) = cfg.classname.rsplit(".", 1)
+        # for now, we only support one backend
+        (module_name, class_name) = ("annostore.store_backend", "WebAnnostoreBackend")
         StoreClass = getattr(importlib.import_module(module_name), class_name)
-        store_instance = StoreClass(request, context, assignment, cfg)
+        store_instance = StoreClass(request, asconfig)
         return store_instance
-"""
 
-class AnnotationStore(object):
-    """AnnotationStore implements a storage interface for annotations
+
+class Annostore(object):
+    """Annostore implements a storage interface for annotations
 
     and is intended to abstract the details of the backend that is actually going to
     be storing the annotations.
@@ -114,21 +81,19 @@ class AnnotationStore(object):
     AnnotatorJs format, as well as a local database. As of oct22, the only annotation
     store backend supported is catchpy (https://github.com/nmaekawa/catchpy)
     """
-    """
-    def __init__(self, request, course, assignment, store_cfg):
+
+    def __init__(self, request, asconfig):
         self.request = request
         self.method = request.method
         self.LTI = request.LTI
         self.META = request.META
-        self.assignment = assignment
-        self.course = course
-        self.store_cfg = store_cfg
+        self.asconfig = asconfig
         self.logger = logging.getLogger(
             "{module}.{cls}".format(module=__name__, cls=self.__class__.__name__)
         )
 
     def dispatcher(self, annotation_id=None):
-        self.logger.info("annotation-store method: {}".format(self.request.method))
+        self.logger.info("annostore method: {}".format(self.request.method))
 
         if self.request.method == "GET":
             if annotation_id is None:
@@ -152,6 +117,8 @@ class AnnotationStore(object):
                 response = self.read(annotation_id)
                 return response
 
+        # TODO: possible in the future that hxat does not have to understand
+        # the annotation body? and behave as a dumb proxy?
         elif self.request.method in ["POST", "PUT"]:
             body = json.loads(str(self.request.body, "utf-8"))
             try:
@@ -162,7 +129,6 @@ class AnnotationStore(object):
             self._verify_user(body.get("user", body.get("creator", {})).get("id", None))
 
             if self.request.method == "POST":
-                self.logger.info("create annotation: {}".format(body))
                 response = self.create(annotation_id)
                 if response.status_code == 200:
                     is_graded = self.request.LTI["launch_params"].get(
@@ -177,9 +143,6 @@ class AnnotationStore(object):
                     )
                 return response
             else:  # request.method == "PUT"
-                self.logger.info(
-                    "update annotation({}): {}".format(annotation_id, body)
-                )
                 response = self.update(annotation_id)
                 # ws notification
                 cleaned_annotation = json.loads(response.content.decode())
@@ -228,7 +191,7 @@ class AnnotationStore(object):
 
     def _verify_user(self, user_id, raise_exception=True):
         expected = self.request.LTI["hx_user_id"]
-        result = user_id == expected or self.request.LTI["is_staff"]
+        result = str(user_id) == str(expected) or self.request.LTI["is_staff"]
         if not result:
             self.logger.warning(
                 "User verification failed. Expected({}) Actual({})".format(
@@ -248,7 +211,7 @@ class AnnotationStore(object):
             consumer_key = params["oauth_consumer_key"]
             context_id = self.request.LTI["hx_context_id"]
             lti_secret = LTIRequestValidator.fetch_lti_secret(
-                client_key=consumer_key, context_id=context_id, check_expiration=True
+                client_key=consumer_key, context_id=context_id
             )
 
             # the middleware includes an LTI dict with all lti params for
@@ -265,7 +228,7 @@ class AnnotationStore(object):
             self.logger.warning(
                 "missing launch_params in LTI session; using dummy secret"
             )
-            lti_secret =  uuid.uuid4().hex  # dummy secret
+            lti_secret = uuid.uuid4().hex  # dummy secret
             return DjangoToolProvider.from_django_request(
                 lti_secret, request=self.request
             )
@@ -365,64 +328,6 @@ class AnnotationStore(object):
                 message_type, group, annotation.get("id", "unknown_id"), e
             )
             self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
-    """
-
-    @classmethod
-    def _valid_annostore_config(cls, assignment):
-        if not assignment.annotation_database_url and \
-            not assignment.annotation_database_apikey and \
-                not assignment.annotation_database_secret_token:
-                    # default config from settings
-                    return (
-                        settings.ANNOTATION_DB_URL,
-                        settings.ANNOTATION_DB_API_KEY,
-                        settings.ANNOTATION_DB_SECRET_TOKEN,
-                    )
-
-        # check for empty or blank configs
-        if assignment.annotation_database_url and \
-            len(assignment.annotation_database_url.strip()) > 0 and \
-                assignment.annotation_database_apikey and \
-                    len(assignment.annotation_database_apikey.strip()) > 0 and \
-                        assignment.annotation_database_secret_token and \
-                            len(assignment.annotation_database_secret_token.strip()) > 0:
-                                return (
-                                    assignment.annotation_database_url,
-                                    assignment.annotation_database_apikey,
-                                    assignment.annotation_database_secret_token,
-                                )
-        else:
-            return None
-
-
-    @classmethod
-    def _best_guess_for_annostore_config(cls, context_id):
-        # default config from settings
-        return (
-            settings.ANNOTATION_DB_URL,
-            settings.ANNOTATION_DB_API_KEY,
-            settings.ANNOTATION_DB_SECRET_TOKEN,
-        )
-        '''
-        try:
-            context = LTICourse.objects.get(course_id=context_id)
-        except LTICourse.DoesNotExist:
-            return None
-
-        dbconfig = {}
-        for a in context.assignments:
-            t = _valid_annotation_store_config(a)
-            if t is not None:  # config ignored if invalid
-                if dbconfig.get(t, None):
-                    dbconfig[t] += 1
-                else:
-                    dbconfig[t] = 1
-
-        # sort dict by count of how many times the config shows up in assigns
-        # note that in case of tie, it will return the first sorted config [1]
-        s = sorted(dbconfig.items(), key=lambda item: item[0], reverse=True)
-        return s[0][0]
-        '''
 
 
 """
@@ -444,5 +349,6 @@ config. In the future, this has to be changed:
     - to select which annostore config: firt check course, then assignment
 
 Searches over all assignments in the course are used by ATG in instructor dashboard, but
-it is known that ATG configures one annostore per hxat.
+it is known that ATG configures one annostore per hxat. In HX case, we never use
+searches ove all assignments in the course.
 """

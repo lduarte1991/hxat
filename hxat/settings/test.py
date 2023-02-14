@@ -121,7 +121,17 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        "annostore": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
         "hxat.middleware": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "hxat": {
             "level": "DEBUG",
             "handlers": ["console"],
             "propagate": False,

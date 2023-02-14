@@ -116,13 +116,11 @@ def get_lti_value(key, request):
     return value
 
 
-def retrieve_token(userid, apikey, secret):
+def retrieve_token(userid, apikey, secret, ttl=1):
     """
-    Return a token for the backend of annotations.
-    It uses the course id to retrieve a variable that contains the secret
-    token found in inheritance.py. It also contains information of when
-    the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend.
+    generates a jwt for the backend of annotations.
+
+    default ttl = 1 sec
     """
     apikey = apikey
     secret = secret
@@ -139,7 +137,7 @@ def retrieve_token(userid, apikey, secret):
         )  # noqa
 
     token = jwt.encode(
-        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": 86400},
+        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl},
         secret,
     )
     return str(token, "utf-8")

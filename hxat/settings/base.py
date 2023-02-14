@@ -283,7 +283,6 @@ LTI_TOOL_CONFIGURATION = {
 
 CONSUMER_KEY = os.environ.get("CONSUMER_KEY", "CONSUMER_KEY")
 LTI_SECRET = os.environ.get("LTI_SECRET", "LTI_SECRET")
-#LTI_SECRET_DICT = literal_eval(os.environ.get("LTI_SECRET_DICT", str({})))
 LTI_SECRET_DICT_FILEPATH = os.environ.get("LTI_SECRET_DICT_FILEPATH", None)
 LTI_SECRET_DICT = {}
 if LTI_SECRET_DICT_FILEPATH is not None:

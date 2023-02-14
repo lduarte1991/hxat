@@ -1,29 +1,28 @@
 import logging
 
 import requests
+from annostore.store import Annostore
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
-
-from annotation_store.store import AnnotationStore
 from hx_lti_initializer.utils import retrieve_token
 
 logger = logging.getLogger(__name__)
 
 
-class WebAnnotationStoreBackend(AnnotationStore):
-    def __init__(self, request, course, assignment, store_cfg):
-        super().__init__(request, course, assignment, store_cfg)
+class WebAnnostoreBackend(Annostore):
+    def __init__(self, request, asconfig):
+        super().__init__(request, asconfig)
         self.timeout = 5.0  # timeout for most actions, other than search perhaps
         self.headers = {"content-type": "application/json"}
         self.headers["authorization"] = "token " + retrieve_token(
             userid=request.LTI["hx_user_id"],
-            apikey=self.store_cfg.apikey,
-            secret=self.store_cfg.secret,
-            ttl=60,  # 2m
+            apikey=self.asconfig[1],
+            secret=self.asconfig[2],
+            ttl=120,  # 2m
         )
 
     def _get_database_url(self, path="/"):
-        base_url = self.store_cfg.url
+        base_url = self.asconfig[0]
         return "{}{}".format(base_url, path)
 
     def _response_timeout(self):
@@ -39,8 +38,8 @@ class WebAnnotationStoreBackend(AnnotationStore):
             self.logger.info("updating auth token for admin")
             self.headers["authorization"] = "token " + retrieve_token(
                 userid=settings.ADMIN_GROUP_ID,
-                apikey=self.store_cfg.apikey,
-                secret=self.store_cfg.secret,
+                apikey=self.asconfig[1],
+                secret=self.asconfig[2],
                 ttl=300,  # 5m
             )
 
@@ -173,11 +172,4 @@ class WebAnnotationStoreBackend(AnnotationStore):
 ###################################################################################
 
 """
-05mar20 naomi: (item1) right now the assumption is that, at least at course
-level, all assignments use the same backend config (same url and credentials).
-This is tacit and not enforced in code, we are blindly trusting in the random
-goodness of users hearts. This requirement allows developers to create
-assignemnts with lti components pointing to other lti providers than prod and
-do debugging and tests.
-
 """

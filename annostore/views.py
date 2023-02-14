@@ -1,7 +1,7 @@
 import json
 import logging
 
-from django.contrib.auth.decorators import login_required
+from annostore.store import AnnostoreFactory
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import JsonResponse
@@ -9,8 +9,6 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-
-from annotation_store.store import AnnotationStoreFactory
 from hxat.middleware import CookielessSessionMiddleware, MultiLTILaunchMiddleware
 
 logger = logging.getLogger(__name__)
@@ -19,14 +17,14 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def api_root(request, annotation_id=None):
-    annostore = AnnotationStoreFactory.get_instance(request)
+    annostore = AnnostoreFactory.get_instance(request)
     return annostore.dispatcher(annotation_id)
 
 
 @require_http_methods("GET")
 def grade_me(request):
     """explicit request to send participation grades back to LMS"""
-    # have to fake a search request to pass to AnnotationStore
+    # have to fake a search request to pass to Annostore
     path = reverse("annotation_store:api_root_prefix")
     params = {
         "collection_id": request.LTI["hx_collection_id"],
@@ -48,7 +46,7 @@ def grade_me(request):
         m = mware(get_response=lambda request: request)
         m.process_request(search_request)
 
-    annostore = AnnotationStoreFactory.get_instance(search_request)
+    annostore = AnnostoreFactory.get_instance(search_request)
     response = api_root(search_request)  # this already do grade_passback!!!
     request_sent = False
 
