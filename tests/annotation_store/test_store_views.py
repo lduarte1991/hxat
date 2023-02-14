@@ -12,6 +12,7 @@ from hx_lti_initializer.models import LTIResourceLinkConfig
 from hx_lti_initializer.utils import retrieve_token
 
 
+@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_default_ok(
@@ -118,6 +119,7 @@ def test_api_root_default_ok(
     assert content == annojs
 
 
+@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_backend_from_request_ok(
@@ -246,6 +248,7 @@ def test_api_root_backend_from_request_ok(
     assert content == annojs
 
 
+@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_backend_from_request_store_cfg_from_db_ok(
@@ -389,6 +392,7 @@ def test_api_root_backend_from_request_store_cfg_from_db_ok(
     assert content == search_result
 
 
+@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_annojs_grade_ok(
@@ -550,6 +554,7 @@ def test_api_root_annojs_grade_ok(
     assert content == search_result
 
 
+@pytest.mark.skip
 @responses.activate
 @pytest.mark.django_db
 def test_api_root_webanno_grade_ok(

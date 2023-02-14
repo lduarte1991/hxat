@@ -64,7 +64,7 @@ class AnnostoreFactory(object):
         )
 
         # for now, we only support one backend
-        (module_name, class_name) = ("annostore.store_backend", "WebAnnostoreBackend")
+        (module_name, class_name) = ("annostore.store_backend", "CatchpyBackend")
         StoreClass = getattr(importlib.import_module(module_name), class_name)
         store_instance = StoreClass(request, asconfig)
         return store_instance
@@ -332,21 +332,24 @@ class Annostore(object):
 
 """
 13feb23 nmaekawa: annostore cfg in assignments
-Annostore cfg in assignment was created as a way to debug annotations in production. A
-special assignment would be created pointing to a devo annostore so test annotations
-would not go to the production db.
-Recently, due to intense traffic for the Rhetoric course, we setup a second annostore to
-divide traffic and relieve the main annostore database.
-The assumption is that debug annostore configs are rare and should be deleted as soon as
-the debugging session ends.
-Other assumption is that searches occur within an assignment. If no assignment comes in
-the search querystring, it means the search is over all assignments in the course --
-this is a problem since each assignment might have its own annotation config.
+Annostore cfg in assignment was created as a way to debug annotations in production.
+Debug assignments can be created in production and then manually made to point to a
+test annostore. This was meant to be sparsely used but, in 2020, due to intense traffic
+for the rhetoric course, we setup a second annostoreto divide traffic and relieve the
+main annostore database.
+
+One assumption is that searches, in general, occur within an assignment. If no
+assignment comes in the search querystring, it means the search is over multiple
+assignments in the course -- this is a problem since each assignment might have its own
+annostore config.
 
 For now, searches over the course is a special case and always use the default annostore
 config. In the future, this has to be changed:
     - annostore config should be associated by course (to support our rhetoric use case)
     - to select which annostore config: firt check course, then assignment
+    - implement these configs in separate tables than course and assignment; the code
+      then ignores configs within the assignment model. This makes the migration less
+      convoluted and prone to error.
 
 Searches over all assignments in the course are used by ATG in instructor dashboard, but
 it is known that ATG configures one annostore per hxat. In HX case, we never use

@@ -82,7 +82,7 @@ class LTIRequestValidator(RequestValidator):
                 log.error(
                     "unknown client-key({}) in lti-params; dummy.".format(client_key)
                 )
-                return self.dummy_secret
+                return cls.make_dummy_secret()
         else:  # all went well
             return secret
 

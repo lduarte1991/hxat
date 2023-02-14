@@ -9,7 +9,7 @@ from hx_lti_initializer.utils import retrieve_token
 logger = logging.getLogger(__name__)
 
 
-class WebAnnostoreBackend(Annostore):
+class CatchpyBackend(Annostore):
     def __init__(self, request, asconfig):
         super().__init__(request, asconfig)
         self.timeout = 5.0  # timeout for most actions, other than search perhaps
