@@ -25,7 +25,7 @@ def api_root(request, annotation_id=None):
 def grade_me(request):
     """explicit request to send participation grades back to LMS"""
     # have to fake a search request to pass to Annostore
-    path = reverse("annotation_store:api_root_prefix")
+    path = reverse("annotation_store:api_root_search")
     params = {
         "collection_id": request.LTI["hx_collection_id"],
         "context_id": request.LTI["hx_context_id"],

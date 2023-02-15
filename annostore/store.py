@@ -35,7 +35,7 @@ class AnnostoreFactory(object):
         collection_id = request.LTI.get("hx_collection_id", None)
         if request.method == "GET":  # search has priority to get collection_id
             if len(request.GET) > 0 and request.path == reverse(
-                "annotation_store:api_root_prefix"
+                "annotation_store:api_root_search"
             ):
                 c_id = request.GET.get(
                     "collection_id", request.GET.get("collectionId", None)

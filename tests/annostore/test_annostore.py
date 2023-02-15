@@ -85,7 +85,7 @@ def test_asconfig(
     assert (response.status_code) == 200
 
     # setup search request
-    path = reverse("annotation_store:api_root_prefix")
+    path = reverse("annotation_store:api_root_search")
     params = {
         "context_id": course.course_id,
         "source_id": target_object.id,
@@ -235,7 +235,7 @@ def test_api_ok(
         status=200,
     )
 
-    path = reverse("annotation_store:api_root_prefix")
+    path = reverse("annotation_store:api_root_search")
 
     # search request
     # needs resource_link_id to access LTI params
@@ -419,7 +419,7 @@ def test_api_grade_ok(
         status=200,
     )
 
-    path = reverse("annotation_store:api_root_prefix")
+    path = reverse("annotation_store:api_root_search")
 
     # create request
     response = client.post(
