@@ -56,7 +56,7 @@ INSTALLED_APPS = (
     "bootstrap3",
     "crispy_forms",
     "hx_lti_initializer",
-    "annotation_store",
+    "annostore",
     "hx_lti_assignment",
     "target_object_database",
 )
@@ -226,7 +226,7 @@ LOGGING = {
             "handlers": ["default", "console"],
             "propagate": False,
         },
-        "annotation_store": {
+        "annostore": {
             "level": _DEFAULT_LOG_LEVEL,
             "handlers": ["default", "console"],
             "propagate": False,
