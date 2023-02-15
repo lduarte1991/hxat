@@ -201,7 +201,7 @@ def test_api_ok(
             quote(str(assignment.assignment_id)),
             resource_link_id,
         )
-    for op in ["create", "update", "delete"]:
+    for op in ["create", "update", "delete", "read"]:
         annostore_urls[op] = "{}/{}".format(annostore_url, webann_id)
 
     responses.add(
@@ -219,6 +219,12 @@ def test_api_ok(
     responses.add(
         responses.DELETE,
         annostore_urls["delete"],
+        json=webann,
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        annostore_urls["read"],
         json=webann,
         status=200,
     )
@@ -283,6 +289,16 @@ def test_api_ok(
     assert response.status_code == 200
     content = json.loads(response.content.decode())
     assert len(responses.calls) == 4
+    assert content == webann
+
+    # read request
+    response = client.get(
+        path_with_id,
+        HTTP_AUTHORIZATION="token huhuhu",
+    )
+    assert response.status_code == 200
+    content = json.loads(response.content.decode())
+    assert len(responses.calls) == 5
     assert content == webann
 
 

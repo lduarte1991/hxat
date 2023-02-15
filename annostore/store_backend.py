@@ -79,6 +79,35 @@ class CatchpyBackend(Annostore):
         )
         return response
 
+    def read(self, annotation_id):
+        database_url = self._get_database_url("/{}".format(annotation_id))
+        self.logger.info(
+            "read: url({}) headers({}) id({})".format(
+                database_url, self.headers, annotation_id
+            )
+        )
+        try:
+            response = requests.get(
+                database_url, headers=self.headers, timeout=self.timeout
+            )
+        except requests.exceptions.Timeout as e:
+            self.logger.error(
+                "read: url({}) headers({}) exc({})".format(
+                    database_url, self.headers, e
+                )
+            )
+            return self._response_timeout()
+        self.logger.info(
+            "read: url({}) headers({}) status({})".format(
+                database_url, self.headers, response.status_code
+            )
+        )
+        return HttpResponse(
+            response.content,
+            status=response.status_code,
+            content_type="application/json",
+        )
+
     def create(self, annotation_id):
         database_url = self._get_database_url("/{}".format(annotation_id))
         data = self.request.body

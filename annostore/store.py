@@ -8,6 +8,7 @@ from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404, JsonResponse
+from django.urls import reverse
 from hx_lti_assignment.models import Assignment
 from hxat.lti_validators import LTIRequestValidator
 from lti.contrib.django import DjangoToolProvider
@@ -33,13 +34,15 @@ class AnnostoreFactory(object):
         # try to get a collection_id
         collection_id = request.LTI.get("hx_collection_id", None)
         if request.method == "GET":  # search has priority to get collection_id
-            if len(request.GET) > 0:
+            if len(request.GET) > 0 and request.path == reverse(
+                "annotation_store:api_root_prefix"
+            ):
                 c_id = request.GET.get(
                     "collection_id", request.GET.get("collectionId", None)
                 )
-                # collection_id == None force to use default asconfig
-                # BEWARE that if a simple read comes with a querystring, it might be
-                #   redirected to the default asconfig!
+                # collection_id == None means multi-assign search
+                # and forces to use default asconfig
+                # ... should check if c_id is same as session?
                 collection_id = c_id if c_id else None
 
         # at this point, should have a collection id from querystring or the session
