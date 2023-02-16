@@ -116,7 +116,7 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "annotation_store": {
+        "annostore": {
             "level": "DEBUG",
             "handlers": ["console"],
             "propagate": False,
