@@ -79,6 +79,7 @@ class CatchpyBackend(Annostore):
         )
         return response
 
+    # implemented for completion; hxat does not support READ requests!
     def read(self, annotation_id):
         database_url = self._get_database_url("/{}".format(annotation_id))
         self.logger.info(

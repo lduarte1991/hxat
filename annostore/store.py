@@ -5,6 +5,7 @@ import re
 import uuid
 
 from asgiref.sync import async_to_sync
+import channels.layers
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404, JsonResponse
@@ -34,16 +35,13 @@ class AnnostoreFactory(object):
         # try to get a collection_id
         collection_id = request.LTI.get("hx_collection_id", None)
         if request.method == "GET":  # search has priority to get collection_id
-            if len(request.GET) > 0 and request.path == reverse(
-                "annotation_store:api_root_search"
-            ):
-                c_id = request.GET.get(
-                    "collection_id", request.GET.get("collectionId", None)
-                )
-                # collection_id == None means multi-assign search
-                # and forces to use default asconfig
-                # ... should check if c_id is same as session?
-                collection_id = c_id if c_id else None
+            c_id = request.GET.get(
+                "collection_id", request.GET.get("collectionId", None)
+            )
+            # collection_id == None means multi-assign search
+            # and forces to use default asconfig
+            # ... should check if c_id is same as session?
+            collection_id = c_id if c_id else None
 
         # at this point, should have a collection id from querystring or the session
         # otherwise, it's a multi-assign search, and the default asconfig holds
@@ -94,31 +92,27 @@ class Annostore(object):
         self.logger = logging.getLogger(
             "{module}.{cls}".format(module=__name__, cls=self.__class__.__name__)
         )
+        self.channel_layer = channels.layers.get_channel_layer()  # ws notification
 
     def dispatcher(self, annotation_id=None):
         self.logger.info("annostore method: {}".format(self.request.method))
 
-        if self.request.method == "GET":
-            if annotation_id is None:
-                self.logger.info("search params: {}".format(self.request.GET))
-                self._verify_course(
-                    self.request.GET.get(
-                        "contextId", self.request.GET.get("context_id", None)
-                    )
+        if self.request.method == "GET":  # reads not supported!
+            self.logger.info("search params: {}".format(self.request.GET))
+            self._verify_course(
+                self.request.GET.get(
+                    "contextId", self.request.GET.get("context_id", None)
                 )
-                response = self.search()
+            )
+            response = self.search()
 
-                # retroactive participation grade
-                is_graded = self.request.LTI["launch_params"].get(
-                    "lis_outcome_service_url", False
-                )
-                if is_graded and self.did_retro_participation(response):
-                    self.lti_grade_passback(score=1)
-                return response
-
-            else:  # this is a read
-                response = self.read(annotation_id)
-                return response
+            # retroactive participation grade
+            is_graded = self.request.LTI["launch_params"].get(
+                "lis_outcome_service_url", False
+            )
+            if is_graded and self.did_retro_participation(response):
+                self.lti_grade_passback(score=1)
+            return response
 
         # TODO: possible in the future that hxat does not have to understand
         # the annotation body? and behave as a dumb proxy?

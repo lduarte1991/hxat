@@ -296,10 +296,10 @@ def test_api_ok(
         path_with_id,
         HTTP_AUTHORIZATION="token huhuhu",
     )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 5
-    assert content == webann
+    # read not supported; but fail as a search without context_id
+    assert response.status_code == 403
+    # don't even call annostore, so counter doesn't move
+    assert len(responses.calls) == 4
 
 
 @responses.activate
