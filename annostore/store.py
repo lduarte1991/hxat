@@ -4,12 +4,11 @@ import logging
 import re
 import uuid
 
-from asgiref.sync import async_to_sync
 import channels.layers
+from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404, JsonResponse
-from django.urls import reverse
 from hx_lti_assignment.models import Assignment
 from hxat.lti_validators import LTIRequestValidator
 from lti.contrib.django import DjangoToolProvider

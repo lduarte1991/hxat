@@ -1,1 +1,1 @@
-__version__ = "5.3.0"  # atg pr#164; fixes in unit tests
+__version__ = "5.4.0"  # drop secure.py; lti-dict json file; annostore refactor
