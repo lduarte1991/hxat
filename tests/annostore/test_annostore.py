@@ -121,14 +121,23 @@ def test_asconfig(
 @responses.activate
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "set_ascfg",
+    "set_ascfg, operation",
     [
-        pytest.param(True),
-        pytest.param(False),
+        pytest.param(True, "create"),
+        pytest.param(True, "read"),
+        pytest.param(True, "update"),
+        pytest.param(True, "delete"),
+        pytest.param(True, "search"),
+        pytest.param(False, "create"),
+        pytest.param(False, "read"),
+        pytest.param(False, "update"),
+        pytest.param(False, "delete"),
+        pytest.param(False, "search"),
     ],
 )
 def test_api_ok(
     set_ascfg,
+    operation,
     lti_path,
     lti_launch_url,
     course_user_lti_launch_params,
@@ -236,75 +245,91 @@ def test_api_ok(
     )
 
     path = reverse("annotation_store:api_root_search")
+    path_with_id = "{}{}?resource_link_id={}".format(
+        reverse("annotation_store:api_root"), webann_id, resource_link_id
+    )
 
     # search request
     # needs resource_link_id to access LTI params
-    response = client.get(
-        "{}?context_id={}&collection_id={}&resource_link_id={}".format(
-            path,
-            quote(course.course_id),
-            quote(str(assignment.assignment_id)),
-            resource_link_id,
-        ),
-        HTTP_AUTHORIZATION="token hohoho",
-    )
-    assert response.status_code == 200
-    print(response.content)
+    if operation == "search":
+        response = client.get(
+            "{}?context_id={}&collection_id={}&resource_link_id={}".format(
+                path,
+                quote(course.course_id),
+                quote(str(assignment.assignment_id)),
+                resource_link_id,
+            ),
+            HTTP_AUTHORIZATION="token hohoho",
+        )
+        assert response.status_code == 200
+        print(response.content)
 
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 1
-    assert content == search_result
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 1
+        assert content == search_result
 
     # create request
-    response = client.post(
-        "{}/{}?resource_link_id={}".format(path, webann_id, resource_link_id),
-        data=webann,
-        content_type="application/json",
-        HTTP_AUTHORIZATION="token hehehe",
-    )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 2
-    assert content == webann
+    elif operation == "create":
+        response = client.post(
+            "{}/{}?resource_link_id={}".format(path, webann_id, resource_link_id),
+            data=webann,
+            content_type="application/json",
+            HTTP_AUTHORIZATION="token hehehe",
+        )
+        assert response.status_code == 200
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 1
+        assert content == webann
 
     # update request
-    path_with_id = "{}/{}?resource_link_id={}".format(path, webann_id, resource_link_id)
-    response = client.put(
-        path_with_id,
-        data=webann,
-        content_type="application/json",
-        HTTP_AUTHORIZATION="token hihihi",
-    )
-    assert response.status_code == 200
+    elif operation == "update":
+        response = client.put(
+            path_with_id,
+            data=webann,
+            content_type="application/json",
+            HTTP_AUTHORIZATION="token hihihi",
+        )
+        assert response.status_code == 200
 
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 3
-    assert content == webann
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 1
+        assert content == webann
 
     # delete request
-    response = client.delete(
-        path_with_id,
-        HTTP_AUTHORIZATION="token hohoho",
-    )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 4
-    assert content == webann
+    elif operation == "delete":
+        response = client.delete(
+            path_with_id,
+            HTTP_AUTHORIZATION="token hohoho",
+        )
+        assert response.status_code == 200
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 1
+        assert content == webann
 
     # read request
-    response = client.get(
-        path_with_id,
-        HTTP_AUTHORIZATION="token huhuhu",
-    )
-    # read not supported; but fail as a search without context_id
-    assert response.status_code == 403
-    # don't even call annostore, so counter doesn't move
-    assert len(responses.calls) == 4
+    elif operation == "read":
+        response = client.get(
+            path_with_id,
+            HTTP_AUTHORIZATION="token huhuhu",
+        )
+        # read not supported; but fail as a search without context_id
+        assert response.status_code == 400
+        # don't even call annostore, so counter doesn't move
+        assert len(responses.calls) == 0
 
 
 @responses.activate
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "operation",
+    [
+        pytest.param("create"),
+        pytest.param("update"),
+        pytest.param("search"),
+    ],
+)
 def test_api_grade_ok(
+    operation,
     lti_path,
     lti_launch_url,
     course_user_lti_launch_params_with_grade,
@@ -420,44 +445,49 @@ def test_api_grade_ok(
     )
 
     path = reverse("annotation_store:api_root_search")
+    path_with_id = "{}{}?resource_link_id={}".format(
+        reverse("annotation_store:api_root"), webann_id, resource_link_id
+    )
 
     # create request
-    response = client.post(
-        "{}/{}?resource_link_id={}".format(path, webann_id, resource_link_id),
-        data=webann,
-        content_type="application/json",
-        HTTP_AUTHORIZATION="token hahaha",
-    )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 2
-    assert content == webann
+    if operation == "create":
+        response = client.post(
+            path_with_id,
+            data=webann,
+            content_type="application/json",
+            HTTP_AUTHORIZATION="token hahaha",
+        )
+        assert response.status_code == 200
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 2
+        assert content == webann
 
     # search request
     # needs resource_link_id to access LTI params for pass_grade
-    response = client.get(
-        "{}?context_id={}&resource_link_id={}&userid={}".format(
-            path, quote(course.course_id), resource_link_id, user.anon_id
-        ),
-        HTTP_AUTHORIZATION="token hohoho",
-    )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 4
-    assert content == search_result
+    elif operation == "search":
+        response = client.get(
+            "{}?context_id={}&resource_link_id={}&userid={}".format(
+                path, quote(course.course_id), resource_link_id, user.anon_id
+            ),
+            HTTP_AUTHORIZATION="token hohoho",
+        )
+        assert response.status_code == 200
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 2
+        assert content == search_result
 
     # update request
-    path_with_id = "{}/{}?resource_link_id={}".format(path, webann_id, resource_link_id)
-    response = client.put(
-        path_with_id,
-        data=webann,
-        content_type="application/json",
-        HTTP_AUTHORIZATION="token hehehe",
-    )
-    assert response.status_code == 200
-    content = json.loads(response.content.decode())
-    assert len(responses.calls) == 5  # does not issue a grade-passback
-    assert content == webann
+    elif operation == "update":
+        response = client.put(
+            path_with_id,
+            data=webann,
+            content_type="application/json",
+            HTTP_AUTHORIZATION="token hehehe",
+        )
+        assert response.status_code == 200
+        content = json.loads(response.content.decode())
+        assert len(responses.calls) == 1  # does not issue a grade-passback
+        assert content == webann
 
 
 @responses.activate

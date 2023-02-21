@@ -1,1 +1,1 @@
-__version__ = "5.4.0"  # drop secure.py; lti-dict json file; annostore refactor
+__version__ = "5.4.1"  # stricter checks on course for reruns

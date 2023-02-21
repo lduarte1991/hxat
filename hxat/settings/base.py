@@ -8,8 +8,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
-import logging
 import json
+import logging
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from ast import literal_eval
@@ -291,13 +292,13 @@ if LTI_SECRET_DICT_FILEPATH is not None:
             with open(LTI_SECRET_DICT_FILEPATH) as fh:
                 LTI_SECRET_DICT = json.load(fh)
         except Exception as e:
-            logging.getLogger(__name__).error("unable to read lti_dict({}): {}".format(
-                LTI_SECRET_DICT_FILEPATH, e
-            ))
+            logging.getLogger(__name__).error(
+                "unable to read lti_dict({}): {}".format(LTI_SECRET_DICT_FILEPATH, e)
+            )
     else:
-        logging.getLogger(__name__).error("lti_dict({}) does not exit".format(
-            LTI_SECRET_DICT_FILEPATH
-        ))
+        logging.getLogger(__name__).error(
+            "lti_dict({}) does not exit".format(LTI_SECRET_DICT_FILEPATH)
+        )
 
 SITE_ID = 1
 
@@ -365,3 +366,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # log request-id
 LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
 NO_REQUEST_ID = "none"
+
+# raise exception when context-id and collection-id inconsistent
+# this is to prevent rerun assignments configured as previous run
+RAISE_COURSE_INCONSISTENT_EXCEPTION = False  # for backcompat, just print errors

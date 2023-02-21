@@ -7,7 +7,7 @@ import uuid
 import channels.layers
 from asgiref.sync import async_to_sync
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import BadRequest
 from django.http import Http404, JsonResponse
 from hx_lti_assignment.models import Assignment
 from hxat.lti_validators import LTIRequestValidator
@@ -23,7 +23,7 @@ class AnnostoreFactory(object):
             # needs session state in LTI object!
             msg = "cannot proceed: missing LTI dict in request"
             logger.error(msg)
-            raise SuspiciousOperation(msg)
+            raise BadRequest(msg)
 
         asconfig = (  # default annostore config
             settings.ANNOTATION_DB_URL,
@@ -98,11 +98,21 @@ class Annostore(object):
 
         if self.request.method == "GET":  # reads not supported!
             self.logger.info("search params: {}".format(self.request.GET))
-            self._verify_course(
-                self.request.GET.get(
-                    "contextId", self.request.GET.get("context_id", None)
-                )
+            context_id = self.request.GET.get(
+                "contextId", self.request.GET.get("context_id", None)
             )
+            if not context_id:  # hxat does not do searches across courses
+                msg = "search param missing: context_id"
+                self.logger.error(msg)
+                raise BadRequest(msg)
+            collection_id = self.request.GET.get(
+                "collectionI", self.request.GET.get("collection_id", None)
+            )
+            if not collection_id:
+                self.logger.warning(
+                    "search across assignments for course({})".format(context_id)
+                )
+            self._verify_course(context_id, collection_id)
             response = self.search()
 
             # retroactive participation grade
@@ -119,10 +129,16 @@ class Annostore(object):
             body = json.loads(str(self.request.body, "utf-8"))
             try:
                 context_id = body["platform"]["context_id"]
+                collection_id = body["platform"]["collection_id"]
             except KeyError:
-                context_id = None
-            self._verify_course(context_id)
-            self._verify_user(body.get("user", body.get("creator", {})).get("id", None))
+                msg = "anno({}) missing context_id and/or collection_id in request".format(
+                    annotation_id
+                )
+                self.logger.error(msg)
+                raise BadRequest(msg)
+
+            self._verify_course(context_id, collection_id)
+            self._verify_user(body.get("user", body.get("creator", {})).get("id", ""))
 
             if self.request.method == "POST":
                 response = self.create(annotation_id)
@@ -172,31 +188,64 @@ class Annostore(object):
     def delete(self, annotation_id):
         raise NotImplementedError
 
-    def _verify_course(self, context_id, raise_exception=True):
+    def _verify_course(self, context_id, collection_id=None):
+        """raises BadRequest if cannot verify course."""
         expected = self.request.LTI["hx_context_id"]
-        result = context_id == expected
-        if not result:
-            self.logger.warning(
-                "Course verification failed. Expected({})  Actual({})".format(
-                    expected, context_id
-                )
+        if not context_id == expected:
+            msg = "Course verification expected({}) but got({})".format(
+                expected, context_id
             )
-        if raise_exception and not result:
-            raise PermissionDenied
-        return result
+            self.logger.error(msg)
+            raise BadRequest(
+                "course verification failed - unexpected course({})".format(context_id)
+            )
+        if not collection_id:
+            return
 
-    def _verify_user(self, user_id, raise_exception=True):
+        try:
+            collection = Assignment.objects.get(assignment_id=collection_id)
+        except Assignment.DoesNotExist:
+            msg = "Course verification failed: assignment({}) not found".format(
+                collection_id
+            )
+            self.logger.error(msg)
+            raise BadRequest(msg)
+        else:
+            is_course_inconsistent = False
+            if getattr(collection.course, "course_id", None):
+                if not collection.course.course_id == context_id:
+                    is_course_inconsistent = True
+                    self.logger.error(
+                        "Course verification failed: collection({}) expected course({}), found({})".format(
+                            collection.assignment_id,
+                            collection.course.course_id,
+                            context_id,
+                        )
+                    )
+            else:
+                is_course_inconsistent = True
+                self.logger.error(
+                    "Course verification failed: collection({}) not associated with any course".format(
+                        collection_id
+                    )
+                )
+            if settings.RAISE_COURSE_INCONSISTENT_EXCEPTION and is_course_inconsistent:
+                raise BadRequest(
+                    "inconsistent context_id({}) in request".format(context_id)
+                )
+
+        return  # all is well
+
+    def _verify_user(self, user_id):
+        """raises BadRequest if cannot verify user."""
         expected = self.request.LTI["hx_user_id"]
         result = str(user_id) == str(expected) or self.request.LTI["is_staff"]
         if not result:
             self.logger.warning(
-                "User verification failed. Expected({}) Actual({})".format(
-                    expected, user_id
-                )
+                "User verification expected({}) but got({})".format(expected, user_id)
             )
-        if raise_exception and not result:
-            raise PermissionDenied
-        return result
+            raise BadRequest("inconsistent user({}) in request".format(user_id))
+        return  # all is well
 
     def _get_tool_provider(self):
         # 06oct22 nmaekawa: always return some toolProvider
