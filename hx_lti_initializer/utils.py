@@ -251,7 +251,7 @@ def _fetch_annotations_by_course(
     """
     # build request
     headers = {
-        "x-annotator-auth-token": annotator_auth_token,
+        "Authorization": "token {}".format(annotator_auth_token),
         "Content-Type": "application/json",
     }
     limit = kwargs.get("limit", 1000)  # Note: -1 means get everything there is
