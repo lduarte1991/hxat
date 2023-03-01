@@ -1,4 +1,4 @@
-
+from datetime import datetime
 import json
 
 from hx_lti_assignment.models import Assignment, AssignmentTargets
@@ -125,6 +125,31 @@ def courses_with_oldui():
             result["none"]["summary"].append(c.course_id)
 
     return result
+
+
+def courses_with_annotations(concoll_list):
+    concoll = {}
+    for (cid, aid) in concoll_list:
+        if concoll.get(cid, None) is None:
+            concoll[cid] = []
+        concoll[cid].append(aid)
+
+    result = {}
+    all_courses = LTICourse.objects.all()
+    for c in all_courses:
+        result[c.course_id] = {}
+        if c.course_id in concoll:
+            for a in c.assignments.all():
+                if a.assignment_id in concoll[c.course_id]:
+                    result[c.course_id][a.assignment_id] = "{} - {}".format(
+                            "T" if a.use_hxighlighter else "F",
+                            a.assignment_name,
+                    )
+
+    return result
+
+
+
 
 
 

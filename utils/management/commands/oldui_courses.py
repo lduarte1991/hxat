@@ -4,7 +4,7 @@ import json
 from django.core.management.base import BaseCommand
 
 from hx_lti_initializer.models import LTICourse
-from utils.utilities import courses_with_oldui
+from utils.utilities import courses_with_oldui, assignments_being_accessed
 
 
 class Command(BaseCommand):
@@ -26,5 +26,8 @@ class Command(BaseCommand):
                 res[k] = result[k]["summary"]
             result = res
 
-        print(json.dumps(result, indent=4, sort_keys=True))
+        print(json.dumps(result, indent=4))
+
+
+
 
