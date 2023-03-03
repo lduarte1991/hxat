@@ -140,7 +140,7 @@ def retrieve_token(userid, apikey, secret, ttl=1):
         {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl},
         secret,
     )
-    return str(token, "utf-8")
+    return token
 
 
 def get_admin_ids(context_id):
@@ -379,7 +379,7 @@ def _fetch_annotations_by_course(
                 logger.warning(f"key error={e}")
         # Loop through the formatted_annotations and add parent_text if parent !=0
         for formatted_annote in formatted_annotations:
-            if formatted_annote["parent"] is not "0":
+            if formatted_annote["parent"] != "0":
                 id = formatted_annote["parent"]
                 formatted_annote["parent_text"] = parents_text_dict[id]
         result["rows"] =  formatted_annotations
@@ -568,7 +568,7 @@ class DashboardAnnotations(object):
         if media_type == "image":
             found = object_id.find("/canvas/")
             # in case there is capital letters in the URI
-            index = found if found is not -1 else object_id.find("/Canvas/")
+            index = found if found != -1 else object_id.find("/Canvas/")
             trimmed_object_id = object_id if index == -1 else object_id[0:index]
             # gets the data dict from the target_objects_by_content dictionary by trimmed_object_id else assign None
             if trimmed_object_id in self.target_objects_by_content:
