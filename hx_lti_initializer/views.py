@@ -282,6 +282,9 @@ def launch_lti(request):
             "DEBUG - User wants the index: {} --- {}".format(type(e), e),
             exc_info=False,
         )
+    is_staff = len( set(roles) & set(settings.ADMIN_ROLES)) > 0
+    if not is_staff and settings.ORGANIZATION == "HARVARDX":
+        return error_view(request, "This course is closed and not supported anymore.")
 
     try:
         userfound = LTICourseAdmin.objects.get(

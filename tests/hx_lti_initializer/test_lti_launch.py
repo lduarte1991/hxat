@@ -37,19 +37,16 @@ def test_launchLti_session_ok(
         resource_link_id=resource_link_id,
         launch_url=lti_launch_url,
     )
-
     client = Client(enforce_csrf_checks=False)
     response = client.post(lti_path, data=params,)
-    assert response.status_code == 302
-    assert response.cookies.get("sessionid")
-    expected_url = (
-        reverse("hx_lti_initializer:course_admin_hub")
-        + f"?resource_link_id={resource_link_id}"
-        + f"&utm_source={client.session.session_key}"
-    )
-    assert response.url == expected_url
+
+    # did not create resource_link_id so it falls on the "want the index" bag,
+    # but learner cannot access "the index" in edx and error is course does not exist
+    assert response.status_code == 200
+    assert "course is closed" in str(response.content, "utf-8")
 
     # check some info in session
+    assert response.cookies.get("sessionid")
     assert client.session is not None
     assert client.session.get("LTI_LAUNCH").get(resource_link_id).get("launch_params")
     launch_params = (
