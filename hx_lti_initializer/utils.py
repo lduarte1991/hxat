@@ -57,7 +57,7 @@ def create_new_user(
     except User.DoesNotExist:
         user = User.objects.create_user(username)
         user.is_superuser = False
-        user.is_staff = len(set(roles) & set(settings.ADMIN_ROLES)) > 0
+        user.is_staff = len(set(roles) & set(settings.LTI_ADMIN_ROLES)) > 0
         user.set_unusable_password()
         user.save()
     except User.MultipleObjectsReturned:
@@ -73,7 +73,7 @@ def create_new_user(
     return user, lti_profile
 
 
-def save_session(request, **kwargs):
+def save_session(request, resource_link_id, **kwargs):
     session_map = {
         "user_id": ["hx_user_id", None],
         "user_name": ["hx_user_name", None],
@@ -91,9 +91,9 @@ def save_session(request, **kwargs):
     }
 
     for k in kwargs:
-        assert k in session_map, "save_session kwarg=%s is not valid!" % k
-
-    resource_link_id = request.LTI["resource_link_id"]
+        assert k in session_map, "save_session({}) kwarg=({}) is not valid!".format(
+            resource_link_id, k
+        )
 
     for kwarg in kwargs:
         session_key, default_value = session_map[kwarg]

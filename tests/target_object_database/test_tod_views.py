@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.models import LTICourse, LTIProfile
+from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
 from lti import ToolConsumer
 from target_object_database.models import TargetObject
 
@@ -50,10 +50,18 @@ class TODViewsTests(TestCase):
             target_instructions="Fake Instructions",
             target_external_options="",
         )
+        self.aTarget.save()
 
         self.target_path = reverse("hx_lti_initializer:launch_lti")
         self.launch_url = "http://testserver{}".format(self.target_path)
         self.resource_link_id = "some_string_to_be_the_fake_resource_link_id"
+
+        # set the starting resource
+        lti_resource_link_config = LTIResourceLinkConfig.objects.create(
+            resource_link_id=self.resource_link_id,
+            assignment_target=self.aTarget,
+        )
+
         self.consumer = ToolConsumer(
             consumer_key=settings.CONSUMER_KEY,
             consumer_secret=settings.LTI_SECRET,

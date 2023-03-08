@@ -13,6 +13,7 @@ import logging
 import os
 
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -20,9 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "CHANGE_ME")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# disambiguation when reading from env: env vars always strings so if
-# DEBUG=False, it's still evaluated as boolean True. Some ways to read a
-# boolean from a string source in this related thread:
+# Some ways to read a boolean from a string source in this related thread:
 #   https://stackoverflow.com/questions/21732123/convert-true-false-value-read-from-file-to-boolean
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
@@ -251,14 +250,15 @@ LOGGING = {
 }
 
 ADMIN_GROUP_ID = "__admin__"
-LTI_COURSE_ID = "context_id"
-LTI_COLLECTION_ID = "custom_collection_id"
-LTI_OBJECT_ID = "custom_object_id"
-LTI_ROLES = "roles"
-LTI_DEBUG = os.environ.get("DEBUG", False)
-ADMIN_ROLES = json.loads(
+LTI_USER_ID = os.environ.get("LTI_LABEL_USER_ID", "user_id")
+LTI_COURSE_ID = os.environ.get("LTI_LABEL_COURSE_ID", "context_id")
+LTI_COLLECTION_ID = os.environ.get("LTI_LABEL_COLLECTION_ID", "custom_collection_id")
+LTI_OBJECT_ID = os.environ.get("LTI_LABEL_OBJECT_ID", "custom_object_id")
+LTI_ROLES = os.environ.get("LTI_LABEL_ROLES", "roles")
+LTI_ADMIN_ROLES = json.loads(
     os.environ.get("ADMIN_ROLES", '["Administrator", "Instructor"]')
 )
+
 LTI_UNIQUE_RESOURCE_ID = "resource_link_id"
 CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get(
     "CONTENT_SECURITY_POLICY_DOMAIN",
@@ -267,6 +267,10 @@ CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get(
 
 SERVER_NAME = os.environ.get("SERVER_NAME", "")
 ORGANIZATION = os.environ.get("ORGANIZATION", "ATG")
+SUPPORTED_PLATFORMS = ("canvas", "edx")
+PLATFORM = os.environ.get("PLATFORM", "canvas").lower()
+if PLATFORM not in SUPPORTED_PLATFORMS:
+    raise ImproperlyConfigured("PLATFORM({}) not supported".format(PLATFORM))
 
 LTI_TOOL_CONFIGURATION = {
     "title": "AnnotationsX",

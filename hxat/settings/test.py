@@ -4,6 +4,7 @@ from .base import *
 
 # for harvardx tests
 ORGANIZATION = "HARVARDX"
+PLATFORM = "edx"
 
 # django secret must not be empty
 SECRET_KEY = "SECRET"

@@ -30,7 +30,7 @@ def test_launchLti_session_ok(
     user = user_profile_factory(roles=user_roles)
     resource_link_id = "some_string_to_be_the_fake_resource_link_id"
     params = lti_launch_params_factory(
-        course_id=course.course_id,
+        course_id=course.course_id + "xuxu",
         user_name=user.name,
         user_id=user.anon_id,
         user_roles=user_roles,
@@ -40,10 +40,9 @@ def test_launchLti_session_ok(
     client = Client(enforce_csrf_checks=False)
     response = client.post(lti_path, data=params,)
 
-    # did not create resource_link_id so it falls on the "want the index" bag,
-    # but learner cannot access "the index" in edx and error is course does not exist
-    assert response.status_code == 200
-    assert "course is closed" in str(response.content, "utf-8")
+    # the course does not exist, but it should save a session
+    assert response.status_code == 424
+    assert "is not supported" in str(response.content, "utf-8")
 
     # check some info in session
     assert response.cookies.get("sessionid")
@@ -53,7 +52,7 @@ def test_launchLti_session_ok(
         client.session.get("LTI_LAUNCH").get(resource_link_id).get("launch_params")
     )
     assert launch_params.get("resource_link_id") == resource_link_id
-    assert launch_params.get("context_id") == course.course_id
+    assert launch_params.get("context_id") == course.course_id + "xuxu"
     assert launch_params.get("lis_person_sourcedid") == user.name
     assert launch_params.get("oauth_consumer_key") == settings.CONSUMER_KEY
 
@@ -131,8 +130,9 @@ def test_launchLti_user_course_created_ok(
 def test_launchLti_user_scope_canvas_created_ok(
     lti_path, lti_launch_url, lti_launch_params_factory,
 ):
-    # have to set ORGANIZATION to something else than HARVARDX
-    settings.ORGANIZATION = "ATG"
+    # have to set PLATFORM to canvas
+    original_platform = settings.PLATFORM
+    settings.PLATFORM = "canvas"
 
     # user and course don't exist yet
     instructor_name = "audre_lorde"
@@ -172,6 +172,9 @@ def test_launchLti_user_scope_canvas_created_ok(
     assert lti_profile.user.username == user.username
     # scope is consumer
     assert lti_profile.scope == "consumer:{}".format(tool_consumer_instance_guid)
+
+    # restore platform
+    settings.PLATFORM = original_platform
 
 
 @pytest.mark.django_db
@@ -272,7 +275,7 @@ def test_launchLti_user_course_ok_no_context_title(
     assert course is not None
     assert len(LTICourse.get_all_courses()) == 1
     assert course.course_admins.all()[0].anon_id == instructor_edxid
-    assert course.course_name.startswith("noname-")
+    assert course.course_name.startswith("changeme-")
 
 
 @pytest.mark.django_db
