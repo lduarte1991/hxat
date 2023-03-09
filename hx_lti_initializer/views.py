@@ -902,6 +902,7 @@ def tool_config(request):
     return HttpResponse(lti_tool_config.to_xml(), content_type="text/xml")
 
 
+@csrf_exempt
 def launch_lti(request):
     """
     Process lti-launch request.
@@ -924,12 +925,11 @@ def launch_lti(request):
     resource_link_id = request.LTI["launch_params"]["resource_link_id"]
     context_id = request.LTI["launch_params"][settings.LTI_COURSE_ID]
 
-    # scope in which the user_id is unique. In canvas this is the domain instance (one
-    # id per canvas instance) and edx this is the course instance (the same user will
+    # scope in which the user_id is unique. In canvas this is the domain instance
+    # (one id per canvas instance) and in edx,the course instance (the same user will
     # have different user_ids in different courses). The idea is that the combination
     # of the LTI user_id (anon_id in edx) and scope should be globally unique.
     # 28aug20 naomi: see [1] at the bottom of file
-    logger.info("------------------------------------- platform({})".format(settings.PLATFORM))
     user_scope = "course:{}".format(context_id)  # edx is default
     user_id = request.LTI["launch_params"][settings.LTI_USER_ID]
     if "canvas" == settings.PLATFORM:
@@ -970,6 +970,7 @@ def launch_lti(request):
         user_scope=user_scope,
         roles=roles,
         is_staff=is_staff,
+        context_id=context_id,
     )
 
     # checks course to be accessed; in canvas course can be None, meaning index/dashboard
@@ -980,17 +981,15 @@ def launch_lti(request):
         course_object = LTICourse.get_course_by_id(context_id)
     except LTICourse.DoesNotExist:
         if not is_staff:
-            logger.debug("lti_launch: course({}) NOT found".format(context_id))
-            if  "edx" == settings.PLATFORM:
-                logger.debug("lti_launch: access to closed or nonexistent course({})".format(context_id))
-                raise PlatformError(
-                    "Course \"{}\" is not supported.".format(
-                        request.LTI["launch_params"].get("context_title", context_id)
-                    )
+            logger.debug("lti_launch: access to closed or nonexistent course({})".format(context_id))
+            raise PlatformError(
+                "Course \"{}\" is not supported.".format(
+                    request.LTI["launch_params"].get("context_title", context_id)
                 )
+            )
         else:  # is instructor, so the course should be created
-            logger.debug("lti_launch: course({}) to be CREATED".format(context_id))
-            # skip tocreate course
+            logger.debug("lti_launch: course({}) to be CREATED by user({})".format(context_id, user_id))
+            # goto create course
 
     else:  # course found, save in session
         save_session(
@@ -1000,6 +999,8 @@ def launch_lti(request):
             course_name=course_object.course_name,
             course_id=course_object.id,
         )
+        # TODO: add user to course admins
+
         redirect_url = url2redirect_targetobject(
             request, resource_link_id, context_id, is_staff, user_id
         )
@@ -1009,10 +1010,6 @@ def launch_lti(request):
     lti_profile, course_object = course_first_access(
         request, resource_link_id, context_id, user_id, display_name, roles, user_scope
     )
-
-    # TODO: is this message displayed? necessary?
-    message_error = "course has been created; please refresh the page to begin editing your course."
-    messages.warning(request, message_error)
 
     # TODO: why do this with session? and model?
     # log the user into the Django backend
@@ -1103,6 +1100,7 @@ def course_first_access(
     course_object = LTICourse.create_course(
         context_id, lti_profile, name=context_title
     )
+    logger.debug("user({}) created course({})".format(user_id, context_id))
     return (lti_profile, course_object)
 
 
