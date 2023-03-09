@@ -999,7 +999,20 @@ def launch_lti(request):
             course_name=course_object.course_name,
             course_id=course_object.id,
         )
-        # TODO: add user to course admins
+        # have to login user if is_staff
+        if is_staff:
+            try:
+                # admin already exists?
+                lti_profile = LTIProfile.objects.get(anon_id=user_id)
+            except LTIProfile.DoesNotExist:
+                logger.debug("DEBUG - LTI Profile NOT found. New User to be created.")
+                # log the user into the Django backend
+                lti_profile = create_lti_admin(
+                    request, user_id, display_name, roles, user_scope
+                )
+            else:
+                login(request, lti_profile.user)
+                # TODO: add user to course admins
 
         redirect_url = url2redirect_targetobject(
             request, resource_link_id, context_id, is_staff, user_id
@@ -1007,9 +1020,8 @@ def launch_lti(request):
         return redirect(redirect_url)
 
     # by now we know: user is staff and course does not exist. First access to the course!
-    lti_profile, course_object = course_first_access(
-        request, resource_link_id, context_id, user_id, display_name, roles, user_scope
-    )
+    lti_profile = create_lti_admin(request, user_id, display_name, roles, user_scope)
+    course_object = create_lti_course(request, resource_link_id, context_id, lti_profile)
 
     # TODO: why do this with session? and model?
     # log the user into the Django backend
@@ -1072,11 +1084,9 @@ def url2redirect_targetobject(
         return url
 
 
-def course_first_access(
-    request, resource_link_id, context_id, user_id, display_name, roles, user_scope
+def create_lti_admin(
+    request, user_id, display_name, roles, user_scope
 ):
-    """assumes user_id is staff and course does not exist."""
-
     # user_id from platform:
     # canvas uses SIS user id; edX, the registered username
     # (lis_person_sourcedid is guaranteed by middleware)
@@ -1092,6 +1102,13 @@ def course_first_access(
         roles=roles,
         scope=user_scope,
     )
+    return lti_profile
+
+
+def create_lti_course(
+    request, resource_link_id, context_id, lti_profile
+):
+    """assumes user_id is staff and course does not exist."""
 
     # create course and adds user as course admin
     context_title = "changeme-{}".format(time.time())  # random name as anon_id
@@ -1100,7 +1117,9 @@ def course_first_access(
     course_object = LTICourse.create_course(
         context_id, lti_profile, name=context_title
     )
-    logger.debug("user({}) created course({})".format(user_id, context_id))
+    logger.debug("user({}) created course({})".format(
+        lti_profile.user.username, course_object.course_id
+    ))
     return (lti_profile, course_object)
 
 
