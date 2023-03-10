@@ -10,30 +10,21 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 import json
 import logging
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from ast import literal_eval
 
 from django.contrib import messages
 
-try:
-    from .secure import SECURE_SETTINGS
-except Exception:
-    SECURE_SETTINGS = dict()
-
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "CHANGE_ME")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 # disambiguation when reading from env: env vars always strings so if
 # DEBUG=False, it's still evaluated as boolean True. Some ways to read a
 # boolean from a string source in this related thread:
 #   https://stackoverflow.com/questions/21732123/convert-true-false-value-read-from-file-to-boolean
-debug = os.environ.get("DEBUG", "False")
-DEBUG = debug.lower() == "true"
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 allowed_other_hosts = os.environ.get("ALLOWED_HOSTS", "")
@@ -261,7 +252,9 @@ LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
 LTI_DEBUG = os.environ.get("DEBUG", False)
-ADMIN_ROLES = literal_eval(os.environ.get("ADMIN_ROLES", str({"Administrator"})))
+ADMIN_ROLES = json.loads(
+    os.environ.get("ADMIN_ROLES", '["Administrator", "Instructor"]')
+)
 LTI_UNIQUE_RESOURCE_ID = "resource_link_id"
 CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get(
     "CONTENT_SECURITY_POLICY_DOMAIN",
@@ -311,12 +304,13 @@ ANNOTATION_PAGINATION_LIMIT_DEFAULT = os.environ.get("ANNOTATION_LIMIT_DEFAULT",
 ANNOTATION_TRANSCRIPT_LINK_DEFAULT = os.environ.get(
     "ANNOTATION_TRANSCRIPT_DEFAULT", None
 )
-ANNOTATION_HTTPS_ONLY = literal_eval(os.environ.get("HTTPS_ONLY", "False"))
+ANNOTATION_HTTPS_ONLY = os.environ.get("HTTPS_ONLY", "False").lower() == "true"
 ANNOTATION_LOGGER_URL = os.environ.get("ANNOTATION_LOGGER_URL", "")
-ANNOTATION_STORE = os.environ.get("ANNOTATION_STORE", {})
-ACCESSIBILITY = literal_eval(os.environ.get("ACCESSIBILITY", "True"))
+ACCESSIBILITY = os.environ.get("ACCESSIBILITY", "True").lower() == "true"
 IMAGE_STORE_BACKEND = os.environ.get("IMAGE_STORE_BACKEND", "")
-IMAGE_STORE_BACKEND_CONFIG = os.environ.get("IMAGE_STORE_BACKEND_CONFIG", "")
+IMAGE_STORE_BACKEND_CONFIG = json.loads(
+    os.environ.get("IMAGE_STORE_BACKEND_CONFIG", "{}")
+)
 
 # https://docs.djangoproject.com/en/3.2/releases/3.1/#django-contrib-sessions
 # due to chrome 80.X, see https://www.chromium.org/updates/same-site
