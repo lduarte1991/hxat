@@ -939,14 +939,18 @@ def launch_lti(request):
         if tool_consumer_instance_guid:
             user_scope = "consumer:{}".format(tool_consumer_instance_guid)
 
+    # user_id from platform:
+    # canvas uses SIS user id; edX, the registered username
+    # (lis_person_sourcedid is guaranteed by middleware)
+    external_user_id = request.LTI["launch_params"].get("lis_person_sourcedid")
     display_name = request.LTI["launch_params"].get(
         # EDX-NOTE: edx does not send the lis_person_name_full
         "lis_person_name_full",
-        # lis_person_sourcedid is guaranteed by middleware
-        request.LTI["launch_params"]["lis_person_sourcedid"],
+        external_user_id,
     )
-    logger.debug("launch_lti: user_id({}) display_name({}) user_scope({})".format(
-        user_id, display_name, user_scope
+    logger.debug(
+        "launch_lti: user_id({}) external_user_id({}) display_name({}) user_scope({})".format(
+        user_id, external_user_id, display_name, user_scope
     ))
 
     # 'roles' field usually consists of just 'Instructor' or 'Learner'
@@ -1001,18 +1005,12 @@ def launch_lti(request):
         )
         # have to login user if is_staff
         if is_staff:
-            try:
-                # admin already exists?
-                lti_profile = LTIProfile.objects.get(anon_id=user_id)
-            except LTIProfile.DoesNotExist:
-                logger.debug("DEBUG - LTI Profile NOT found. New User to be created.")
-                # log the user into the Django backend
-                lti_profile = create_lti_admin(
-                    request, user_id, display_name, roles, user_scope
-                )
-            else:
-                login(request, lti_profile.user)
-                # TODO: add user to course admins
+            lti_profile = get_lti_admin(
+                user_id, external_user_id, display_name, roles, user_scope
+            )
+            # admin user django login
+            login(request, lti_profile.user)
+            # TODO: add user to course admins
 
         redirect_url = url2redirect_targetobject(
             request, resource_link_id, context_id, is_staff, user_id
@@ -1020,16 +1018,14 @@ def launch_lti(request):
         return redirect(redirect_url)
 
     # by now we know: user is staff and course does not exist. First access to the course!
-    lti_profile = create_lti_admin(request, user_id, display_name, roles, user_scope)
+    lti_profile = get_lti_admin(
+        user_id, external_user_id, display_name, roles, user_scope
+    )
+    # admin user django login
+    login(request, lti_profile.user)
     course_object = create_lti_course(request, resource_link_id, context_id, lti_profile)
 
-    # TODO: why do this with session? and model?
-    # log the user into the Django backend
-    #lti_profile.user.backend = "django.contrib.auth.backends.ModelBackend"
-    #saved_lti_launches = request.session["LTI_LAUNCH"]
-    login(request, lti_profile.user)
-    #request.session.setdefault("LTI_LAUNCH", saved_lti_launches)
-    # save the course name to the session so it auto-populate later.
+    # save the course_name in session
     save_session(
         request,
         resource_link_id,
@@ -1084,16 +1080,26 @@ def url2redirect_targetobject(
         return url
 
 
-def create_lti_admin(
-    request, user_id, display_name, roles, user_scope
+def get_lti_admin(
+    user_id, external_user_id, display_name, roles, user_scope
 ):
-    # user_id from platform:
-    # canvas uses SIS user id; edX, the registered username
-    # (lis_person_sourcedid is guaranteed by middleware)
-    external_user_id = request.LTI["launch_params"].get("lis_person_sourcedid")
-    logger.debug("lti_launch: display_name({}) external_user_id({})".format(
-        display_name, external_user_id
-    ))
+    """fetch lti_profile or create. Assumes is_staff == True."""
+    try:
+        # admin already exists?
+        lti_profile = LTIProfile.objects.get(anon_id=user_id, scope=user_scope)
+    except LTIProfile.DoesNotExist:
+        logger.debug("ltilaunch - creating LTIProfile({}, {}).".format(
+            external_user_id, user_scope
+        ))
+        lti_profile = create_lti_admin(
+            user_id, external_user_id, display_name, roles, user_scope
+        )
+    return lti_profile
+
+
+def create_lti_admin(
+    user_id, external_user_id, display_name, roles, user_scope
+):
     # first access means it has to create the user profile
     user, lti_profile = create_new_user(
         anon_id=user_id,
