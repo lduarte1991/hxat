@@ -3,6 +3,7 @@ import logging
 
 from annostore.store import AnnostoreFactory
 from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import JsonResponse
 from django.test import RequestFactory
@@ -68,3 +69,24 @@ def grade_me(request):
     return JsonResponse(
         data={"grade_request_sent": request_sent},
     )
+
+@login_required
+def transfer(request, instructor_only="1"):
+    user_id = request.LTI["hx_user_id"]
+
+    old_assignment_id = request.POST.get("old_assignment_id")
+    new_assignment_id = request.POST.get("new_assignment_id")
+    old_course_id = request.POST.get("old_course_id")
+    new_course_id = request.POST.get("new_course_id")
+    logger.debug((
+        "request to transfer annotation from old_course({}) to new_course({}) "
+        "old_assign({}) to new_assign({}), by user({}). Failing SILENTLY!"
+        ).format(
+            old_course_id,
+            new_course_id,
+            old_assignment_id,
+            new_assignment_id,
+            user_id,
+        )
+    )
+    return HttpResponse(json.dumps({}), content_type="application/json")
