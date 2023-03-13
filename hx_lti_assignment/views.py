@@ -318,7 +318,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         result.update({"object_ids": pks, "result": 200})
         data = json.dumps(result)
         return HttpResponse(data, content_type="application/json")
-    except:
+    except Exception:
         data = json.dumps(
             {
                 "result": 500,
