@@ -13,7 +13,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from hx_lti_assignment.forms import (
     AssignmentForm,
-    AssignmentTargetsForm,
     AssignmentTargetsFormSet,
     DeleteAssignmentForm,
 )
@@ -61,9 +60,10 @@ def create_new_assignment(request):
                     at.save()
                 assignment.save()
                 messages.success(request, "Assignment successfully created!")
-                url = (
-                    reverse("hx_lti_initializer:course_admin_hub")
-                    + "?resource_link_id=%s" % request.LTI["resource_link_id"]
+                url = "{}?resource_link_id={}&utm_source={}".format(
+                    reverse("hx_lti_initializer:course_admin_hub"),
+                    request.LTI["resource_link_id"],
+                    request.session.session_key,
                 )
                 return redirect(url)
             else:
@@ -190,9 +190,10 @@ def edit_assignment(request, id):
             assign1 = form.save(commit=False)
             assign1.save()
             messages.success(request, "Assignment was successfully edited!")
-            url = (
-                reverse("hx_lti_initializer:course_admin_hub")
-                + "?resource_link_id=%s" % request.LTI["resource_link_id"]
+            url = "{}?resource_link_id={}&utm_source={}".format(
+                reverse("hx_lti_initializer:course_admin_hub"),
+                request.LTI["resource_link_id"],
+                request.session.session_key,
             )
             return redirect(url)
         else:
@@ -221,11 +222,6 @@ def edit_assignment(request, id):
     else:
         targets_form = AssignmentTargetsFormSet(instance=assignment)
         form = AssignmentForm(instance=assignment)
-
-    try:
-        course_name = request.LTI["course_name"]
-    except:
-        course_name = None
 
     template_used = "hx_lti_assignment/create_new_assignment2.html"
     if assignment.use_hxighlighter:
@@ -260,9 +256,10 @@ def delete_assignment(request, id):
             for at in aTargets:
                 at.delete()
             assignment.delete()
-            url = (
-                reverse("hx_lti_initializer:course_admin_hub")
-                + "?resource_link_id=%s" % request.LTI["resource_link_id"]
+            url = "{}?resource_link_id={}&utm_source={}".format(
+                reverse("hx_lti_initializer:course_admin_hub"),
+                request.LTI["resource_link_id"],
+                request.session.session_key,
             )
             return redirect(url)
 

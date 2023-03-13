@@ -7,20 +7,23 @@ other information that will be rendered to the access/init screen to the user.
 """
 
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-from hxat.exceptions import AnnotationTargetDoesNotExist
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.templatetags.static import static
 from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.forms import CourseForm, EmbedLtiSelectionForm, EmbedLtiResponseForm
+from hx_lti_initializer.forms import (
+    CourseForm,
+    EmbedLtiResponseForm,
+    EmbedLtiSelectionForm,
+)
 from hx_lti_initializer.models import (
     LTICourse,
     LTICourseAdmin,
@@ -34,6 +37,7 @@ from hx_lti_initializer.utils import (
     retrieve_token,
     save_session,
 )
+from hxat.exceptions import AnnotationTargetDoesNotExist
 from lti import ToolConfig
 from target_object_database.models import TargetObject
 
@@ -463,7 +467,9 @@ def edit_course(request, id):
                             logger.info("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
-            save_session(request, course_name=course.course_name)
+            save_session(
+                request, request.LTI["resource_link_id"], course_name=course.course_name
+            )
 
             messages.success(request, "Course was successfully edited!")
             url = reverse(
@@ -968,7 +974,7 @@ def launch_lti(request):
     # saves in session what we have so far
     save_session(
         request,
-        resource_link_id=resource_link_id,
+        resource_link_id,
         user_id=user_id,
         user_name=display_name,
         user_scope=user_scope,
@@ -998,19 +1004,19 @@ def launch_lti(request):
     else:  # course found, save in session
         save_session(
             request,
-            resource_link_id=resource_link_id,
+            resource_link_id,
             context_id=context_id,
             course_name=course_object.course_name,
             course_id=course_object.id,
         )
-        # have to login user if is_staff
+        # login user if is_staff
         if is_staff:
+            # fetch or create and add profile to course admins
             lti_profile = get_lti_admin(
                 user_id, external_user_id, display_name, roles, user_scope
             )
             # admin user django login
             login(request, lti_profile.user)
-            # TODO: add user to course admins
 
         redirect_url = url2redirect_targetobject(
             request, resource_link_id, context_id, is_staff, user_id
@@ -1126,7 +1132,7 @@ def create_lti_course(
     logger.debug("user({}) created course({})".format(
         lti_profile.user.username, course_object.course_id
     ))
-    return (lti_profile, course_object)
+    return course_object
 
 
 

@@ -182,6 +182,7 @@ class CookielessSessionMiddleware(MiddlewareMixin):
         )
 
         check_ip = False
+
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if session_key is not None:
             self.logger.info(
@@ -192,7 +193,7 @@ class CookielessSessionMiddleware(MiddlewareMixin):
             self.logger.info(
                 "Session cookie '%s' not found!" % settings.SESSION_COOKIE_NAME
             )
-            session_key = request.GET.get("utm_source")
+            session_key = request.GET.get("utm_source", None)
             self.logger.info("Session get param returned key: %s" % session_key)
             check_ip = True
 

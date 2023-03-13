@@ -305,9 +305,11 @@ SITE_ID = 1
 
 ANNOTATION_MANUAL_URL = os.environ.get("MANUAL_URL", None)
 ANNOTATION_MANUAL_TARGET = os.environ.get("MANUAL_TARGET", None)
-ANNOTATION_DB_URL = os.environ.get("ANNOTATION_DB_URL", "")
-ANNOTATION_DB_API_KEY = os.environ.get("ANNOTATION_DB_KEY", "")
-ANNOTATION_DB_SECRET_TOKEN = os.environ.get("ANNOTATION_DB_SECRET", "")
+# defining dummies because if there's no default, the UI gets stuck when creating a new
+# assignment (annotation_store config is mandatory; but fields are not visible anymore)
+ANNOTATION_DB_URL = os.environ.get("ANNOTATION_DB_URL", "https://dummy.org/annotation")
+ANNOTATION_DB_API_KEY = os.environ.get("ANNOTATION_DB_KEY", "CHANGEME")
+ANNOTATION_DB_SECRET_TOKEN = os.environ.get("ANNOTATION_DB_SECRET", "CHANGEME")
 ANNOTATION_PAGINATION_LIMIT_DEFAULT = os.environ.get("ANNOTATION_LIMIT_DEFAULT", 20)
 ANNOTATION_TRANSCRIPT_LINK_DEFAULT = os.environ.get(
     "ANNOTATION_TRANSCRIPT_DEFAULT", None
