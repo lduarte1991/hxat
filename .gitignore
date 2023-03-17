@@ -70,3 +70,6 @@ production.py
 /.idea
 /pycharm-debug.egg
 .vscode
+.vagrant
+Vagrantfile
+*.box
