@@ -31,9 +31,11 @@ class AnnostoreFactory(object):
             settings.ANNOTATION_DB_SECRET_TOKEN,
         )
 
-        # try to get a collection_id
+        # get collection_id from session: it's a create, update, or transfer
         collection_id = request.LTI.get("hx_collection_id", None)
-        if request.method == "GET":  # search has priority to get collection_id
+
+        # get collection_id from querystring: it's a search or grademe
+        if request.method == "GET":
             c_id = request.GET.get(
                 "collection_id", request.GET.get("collectionId", None)
             )

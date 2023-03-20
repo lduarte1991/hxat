@@ -301,7 +301,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         assignment = Assignment.objects.get(pk=assignment_id)
         aTargets = AssignmentTargets.objects.filter(assignment=assignment)
         assignment.course = new_course
-        assignment.pk = None
+        assignment.pk = None  # sly way to duplicate an assignment
 
         result.update({"old_assignment_id": str(assignment.assignment_id)})
         assignment.assignment_id = uuid.uuid4()
@@ -313,6 +313,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         for at in aTargets:
             at.pk = None
             at.assignment = assignment
+            at.target_courses.add(assignment.course)
             at.save()
             pks.append(str(at.target_object.pk))
         result.update({"object_ids": pks, "result": 200})
