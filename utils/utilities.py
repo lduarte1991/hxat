@@ -90,6 +90,7 @@ def delete_course(cid):
         a.delete()
 
     course.delete()
+    return (True, "course({}) DELETED".format(cid))
 
 
 def courses_with_oldui():
