@@ -1,6 +1,7 @@
 import importlib
 import json
 import logging
+import os
 import re
 import uuid
 
@@ -10,6 +11,7 @@ from django.conf import settings
 from django.core.exceptions import BadRequest
 from django.http import Http404, JsonResponse
 from hx_lti_assignment.models import Assignment
+from hx_lti_initializer.models import LTICourse
 from hxat.lti_validators import LTIRequestValidator
 from lti.contrib.django import DjangoToolProvider
 
@@ -18,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class AnnostoreFactory(object):
     @classmethod
-    def get_instance(cls, request):
+    def get_instance(cls, request, col_id=None):
         if not hasattr(request, "LTI"):
             # needs session state in LTI object!
             msg = "cannot proceed: missing LTI dict in request"
@@ -31,18 +33,20 @@ class AnnostoreFactory(object):
             settings.ANNOTATION_DB_SECRET_TOKEN,
         )
 
-        # get collection_id from session: it's a create, update, or transfer
+        # get collection_id from session for create, update
         collection_id = request.LTI.get("hx_collection_id", None)
 
+        # if transfer, have to get collection_id from path
+        if request.method == "POST" and "transfer" in request.path:
+            collection_id = col_id if col_id else None
+
         # get collection_id from querystring: it's a search or grademe
+        #   collection_id == None means multi-assign search,
+        #   and forces to use default asconfig
         if request.method == "GET":
-            c_id = request.GET.get(
+            collection_id = request.GET.get(
                 "collection_id", request.GET.get("collectionId", None)
             )
-            # collection_id == None means multi-assign search
-            # and forces to use default asconfig
-            # ... should check if c_id is same as session?
-            collection_id = c_id if c_id else None
 
         # at this point, should have a collection id from querystring or the session
         # otherwise, it's a multi-assign search, and the default asconfig holds
@@ -98,7 +102,7 @@ class Annostore(object):
     def dispatcher(self, annotation_id=None):
         self.logger.info("annostore method: {}".format(self.request.method))
 
-        if self.request.method == "GET":  # reads not supported!
+        if self.method == "GET":  # reads not supported!
             self.logger.info("search params: {}".format(self.request.GET))
             context_id = self.request.GET.get(
                 "contextId", self.request.GET.get("context_id", None)
@@ -118,7 +122,7 @@ class Annostore(object):
             response = self.search()
 
             # retroactive participation grade
-            is_graded = self.request.LTI["launch_params"].get(
+            is_graded = self.LTI["launch_params"].get(
                 "lis_outcome_service_url", False
             )
             if is_graded and self.did_retro_participation(response):
@@ -127,7 +131,7 @@ class Annostore(object):
 
         # TODO: possible in the future that hxat does not have to understand
         # the annotation body? and behave as a dumb proxy?
-        elif self.request.method in ["POST", "PUT"]:
+        elif self.method in ["POST", "PUT"]:
             body = json.loads(str(self.request.body, "utf-8"))
             try:
                 context_id = body["platform"]["context_id"]
@@ -142,10 +146,10 @@ class Annostore(object):
             self._verify_course(context_id, collection_id)
             self._verify_user(body.get("user", body.get("creator", {})).get("id", ""))
 
-            if self.request.method == "POST":
+            if self.method == "POST":
                 response = self.create(annotation_id)
                 if response.status_code == 200:
-                    is_graded = self.request.LTI["launch_params"].get(
+                    is_graded = self.LTI["launch_params"].get(
                         "lis_outcome_service_url", False
                     )
                     if is_graded:  # participation grade
@@ -164,7 +168,7 @@ class Annostore(object):
                     "annotation_updated", cleaned_annotation
                 )
                 return response
-        elif self.request.method == "DELETE":
+        elif self.method == "DELETE":
             # TODO: is there any way to verify_course? or verify_user????
             self.logger.info("delete annotation({})".format(annotation_id))
             response = self.delete(annotation_id)
@@ -190,9 +194,13 @@ class Annostore(object):
     def delete(self, annotation_id):
         raise NotImplementedError
 
+    def transfer(self, source_collection_id):
+        # call self._verify_transfer_params(source_collection_id) to get validated params
+        raise NotImplementedError
+
     def _verify_course(self, context_id, collection_id=None):
         """raises BadRequest if cannot verify course."""
-        expected = self.request.LTI["hx_context_id"]
+        expected = self.LTI["hx_context_id"]
         if not context_id == expected:
             msg = "Course verification expected({}) but got({})".format(
                 expected, context_id
@@ -240,8 +248,8 @@ class Annostore(object):
 
     def _verify_user(self, user_id):
         """raises BadRequest if cannot verify user."""
-        expected = self.request.LTI["hx_user_id"]
-        result = str(user_id) == str(expected) or self.request.LTI["is_staff"]
+        expected = self.LTI["hx_user_id"]
+        result = str(user_id) == str(expected) or self.LTI["is_staff"]
         if not result:
             self.logger.warning(
                 "User verification expected({}) but got({})".format(expected, user_id)
@@ -253,10 +261,10 @@ class Annostore(object):
         # 06oct22 nmaekawa: always return some toolProvider
         # the reasoning is that we are failing just the "grade_passback" not the create
         # or search/participation request; sadly, this error is just logged on file
-        if "launch_params" in self.request.LTI:
-            params = self.request.LTI["launch_params"]
+        if "launch_params" in self.LTI:
+            params = self.LTI["launch_params"]
             consumer_key = params["oauth_consumer_key"]
-            context_id = self.request.LTI["hx_context_id"]
+            context_id = self.LTI["hx_context_id"]
             lti_secret = LTIRequestValidator.fetch_lti_secret(
                 client_key=consumer_key, context_id=context_id
             )
@@ -287,14 +295,14 @@ class Annostore(object):
         if not tool_provider.is_outcome_service():
             self.logger.info(
                 "LTI consumer not expecting grade for user({}) assignment({})".format(
-                    self.request.LTI["hx_user_id"], self.request.LTI["hx_collection_id"]
+                    self.LTI["hx_user_id"], self.LTI["hx_collection_id"]
                 )
             )
             return None
         self.logger.info(
             "lti_grade: user({}) assignment({}) score({})".format(
-                self.request.LTI["hx_user_id"],
-                self.request.LTI["hx_collection_id"],
+                self.LTI["hx_user_id"],
+                self.LTI["hx_collection_id"],
                 score,
             )
         )
@@ -304,8 +312,8 @@ class Annostore(object):
             if outcome.is_success():
                 self.logger.info(
                     "lti_grade successful. user({}) assignment({}) score({}) desc({})".format(
-                        self.request.LTI["hx_user_id"],
-                        self.request.LTI["hx_collection_id"],
+                        self.LTI["hx_user_id"],
+                        self.LTI["hx_collection_id"],
                         score,
                         outcome.description,
                     )
@@ -313,8 +321,8 @@ class Annostore(object):
             else:
                 self.logger.error(
                     "lti_grade ERROR. user({}) assignment({}) score({}) desc({})".format(
-                        self.request.LTI["hx_user_id"],
-                        self.request.LTI["hx_collection_id"],
+                        self.LTI["hx_user_id"],
+                        self.LTI["hx_collection_id"],
                         score,
                         outcome.description,
                     )
@@ -322,8 +330,8 @@ class Annostore(object):
         except Exception as e:
             self.logger.error(
                 "lti_grade FAILED. user({}) assignment({}) score({}) exc({})".format(
-                    self.request.LTI["hx_user_id"],
-                    self.request.LTI["hx_collection_id"],
+                    self.LTI["hx_user_id"],
+                    self.LTI["hx_collection_id"],
                     score,
                     e,
                 )
@@ -334,7 +342,7 @@ class Annostore(object):
     def did_retro_participation(self, response):
         # to give participation grades retroactively after instructor
         # forgets to turn it on initially
-        retrieved_self = self.request.LTI["launch_params"].get(
+        retrieved_self = self.LTI["launch_params"].get(
             "user_id", "*"
         ) in self.request.GET.getlist(
             "userid[]", self.request.GET.getlist("userid", [])
@@ -345,9 +353,9 @@ class Annostore(object):
         # target_source_id from session guarantees it's a sequential integer id from
         # hxat db; image annotations have the uri as target_source_id in `platform`
         pat = re.compile("[^a-zA-Z0-9-.]")
-        context_id = pat.sub("-", self.request.LTI["hx_context_id"])
-        collection_id = pat.sub("-", self.request.LTI["hx_collection_id"])
-        target_source_id = self.request.LTI["hx_object_id"]
+        context_id = pat.sub("-", self.LTI["hx_context_id"])
+        collection_id = pat.sub("-", self.LTI["hx_collection_id"])
+        target_source_id = self.LTI["hx_object_id"]
 
         group = "{}--{}--{}".format(
             re.sub("[^a-zA-Z0-9-.]", "-", context_id), collection_id, target_source_id
@@ -377,12 +385,152 @@ class Annostore(object):
             self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
 
 
+    def _verify_transfer_params(self, source_assignment_id):
+        """lots of checks to make sure we are not generating garbage.
+
+        if "payload" present in return dictionary, then there is an error or warning msg.
+        return dictionary:
+        transfer_data = {
+            "userid_map": userid_map,
+            "source_context_id": source_context_id,
+            "source_collection_id": source_collection_id,
+            "target_context_id": target_context_id,
+            "target_collection_id": target_collection_id,
+            "payload": ["msg1", "msg2", .., "msgN"],
+            "status": http_response_status_code,
+        }
+
+        """
+        request = self.request
+        user_id = request.LTI["hx_user_id"]
+        if not request.LTI["is_staff"]:
+            msg = "permission denied; user({}) not admin to transfer annotations".format(user_id)
+            logger.error(msg)
+            return {"status": 401, "payload": [msg]}
+
+        source_context_id = request.POST.get("old_course_id")
+        try:
+            source_course = LTICourse.objects.get(course_id=source_context_id)
+        except LTICourse.DoesNotExist:
+            # the course might have been deleted?
+            msg = "source course({}) for transfer_inst_anno not found".format(source_context_id)
+            logger.error(msg)
+            return {"status": 404, "payload": [msg]}
+
+        source_collection_id = request.POST.get("old_assignment_id")
+        if source_collection_id != source_assignment_id:
+            # sanity check: querystring and post body info must match!
+            msg = "conflict from qs and post; expected({}) got ({})".format(
+                source_assignment_id, source_collection_id
+            )
+            logger.error(msg)
+            return {"status": 409, "payload": [msg]}
+        try:
+            source_assignment = Assignment.objects.get(assignment_id=source_collection_id)
+        except Assignment.DoesNotExist:
+            msg = "source assign({}) for transfer_inst_anno not found".format(source_collection_id)
+            return {"status": 404, "payload": [msg]}
+        if source_assignment.course.course_id != source_course.course_id:
+            # sanity check: assignment pointing to previous run
+            msg = "expected source assignment({}) course to be({}), found({})".format(
+                source_assignment.assignment_id,
+                source_assignment.course.course_id,
+                source_course.course_id,
+            )
+            logger.error(msg)
+            return {"status": 409, "payload": [msg]}
+
+        target_context_id = request.POST.get("new_course_id")
+        try:
+            target_course = LTICourse.objects.get(course_id=target_context_id)
+        except LTICourse.DoesNotExist:
+            msg = "target course({}) for transfer_inst_anno not found".format(target_context_id)
+            logger.error(msg)
+            return {"status": 404, "payload": [msg]}
+        if target_context_id != self.LTI["hx_context_id"]:
+            # sanity check: session context_id must be target_context_id
+            # guarantee logged admin has write permissions to transfer
+            msg = "permission denied; target context_id expected({}) found({})".format(
+                self.LTI["hx_context_id"], target_context_id
+            )
+            logger.error(msg)
+            return {"status": 401, "payload": [msg]}
+
+        target_collection_id = request.POST.get("new_assignment_id")
+        try:
+            target_assignment = Assignment.objects.get(assignment_id=target_collection_id)
+        except Assignment.DoesNotExist:
+            msg = "target assign({}) for transfer_inst_anno not found".format(
+                target_collection_id
+            )
+            logger.error(msg)
+            return {"status": 404, "payload": [msg]}
+        if target_assignment.course.course_id != target_course.course_id:
+            # sanity check: assignment pointing to previous run
+            msg = "expected target assignment({}) course to be({}), found({})".format(
+                target_assignment.assignment_id,
+                target_assignment.course.course_id,
+                target_course.course_id,
+            )
+            logger.error(msg)
+            return {"status": 409, "payload": [msg]}
+
+        if target_assignment.annotation_database_url != source_assignment.annotation_database_url:
+            # sanity check: both assignments should point to the same annostore
+            msg = "expected same annostore found ({}):({}) -> ({}):({})".format(
+                source_assigment.assignment_id,
+                source_assignment.annotation_database_url,
+                target_assigment.assignment_id,
+                target_assignment.annotation_database_url,
+            )
+            logger.error(msg)
+            return {"status": 409, "payload": [msg]}
+
+        # gather old admins
+        userid_map = {}
+        for adm in source_course.course_admins.all():
+            userid_map[adm.anon_id] = user_id
+        # no admins found; not an error per se
+        if len(userid_map) == 0:
+            msg = "no annotations to be transferred; no admins in course({})".format(
+                source_course.course_id
+            )
+            logger.warn(msg)
+            return {
+                "original_total": 0, "total_success": 0, "total_failure": 0,
+                "success": [], "failure": [],
+                "payload": [msg], "status": 200,
+            }
+
+        # all checked and ready to go
+        transfer_params = {
+            "userid_map": userid_map,
+            "source_context_id": source_context_id,
+            "source_collection_id": source_collection_id,
+            "target_context_id": target_context_id,
+            "target_collection_id": target_collection_id,
+        }
+        logger.info((
+            "request to transfer annotation from source_course({}) to target_course({}) "
+            "source_assign({}) to target_assign({}), by user({}), to annostore({})."
+            ).format(
+                source_context_id,
+                target_context_id,
+                source_collection_id,
+                target_collection_id,
+                user_id,
+                source_assignment.annotation_database_url,
+            )
+        )
+        return transfer_params
+
+
 """
 13feb23 nmaekawa: annostore cfg in assignments
 Annostore cfg in assignment was created as a way to debug annotations in production.
 Debug assignments can be created in production and then manually made to point to a
 test annostore. This was meant to be sparsely used but, in 2020, due to intense traffic
-for the rhetoric course, we setup a second annostoreto divide traffic and relieve the
+for the rhetoric course, we setup a second annostore to divide traffic and relieve the
 main annostore database.
 
 One assumption is that searches, in general, occur within an assignment. If no

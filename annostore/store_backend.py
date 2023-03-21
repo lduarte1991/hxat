@@ -28,6 +28,15 @@ class CatchpyBackend(Annostore):
     def _response_timeout(self):
         return JsonResponse({"error": "request timeout"}, status=500)
 
+    def _response_from_catchpy(self, response):
+        if (response.headers.get("content-type", None) and
+            "application/json" in response.headers["content-type"]):
+            return JsonResponse(data=response.json(), status=response.status_code)
+        else:
+            return HttpResponse(response.content, status=response.status_code,
+                content_type=response.headers.get("content-type", "text/plain")
+            )
+
     def before_search(self):
         # Override the auth token when the user is a course administrator, so they can query annotations
         # that have set their read permissions to private (i.e. read: self-only).
@@ -72,12 +81,7 @@ class CatchpyBackend(Annostore):
                 response.headers.get("content-length", 0),
             )
         )
-        response = HttpResponse(
-            response.content,
-            status=response.status_code,
-            content_type="application/json",
-        )
-        return response
+        return self._response_from_catchpy(response)
 
     # implemented for completion; hxat does not support READ requests!
     def read(self, annotation_id):
@@ -103,11 +107,7 @@ class CatchpyBackend(Annostore):
                 database_url, self.headers, response.status_code
             )
         )
-        return HttpResponse(
-            response.content,
-            status=response.status_code,
-            content_type="application/json",
-        )
+        return self._response_from_catchpy(response)
 
     def create(self, annotation_id):
         database_url = self._get_database_url("/{}".format(annotation_id))
@@ -133,11 +133,7 @@ class CatchpyBackend(Annostore):
                 database_url, self.headers, data, response.status_code
             )
         )
-        return HttpResponse(
-            response.content,
-            status=response.status_code,
-            content_type="application/json",
-        )
+        return self._response_from_catchpy(response)
 
     def update(self, annotation_id):
         database_url = self._get_database_url("/%s" % annotation_id)
@@ -163,11 +159,7 @@ class CatchpyBackend(Annostore):
                 database_url, self.headers, data, response.status_code
             )
         )
-        return HttpResponse(
-            response.content,
-            status=response.status_code,
-            content_type="application/json",
-        )
+        return self._response_from_catchpy(response)
 
     def delete(self, annotation_id):
         database_url = self._get_database_url("/{}".format(annotation_id))
@@ -192,11 +184,37 @@ class CatchpyBackend(Annostore):
                 database_url, self.headers, response.status_code
             )
         )
-        return HttpResponse(
-            response.content,
-            status=response.status_code,
-            content_type="application/json",
+        return self._response_from_catchpy(response)
+
+    def transfer(self, source_collection_id):
+        valid_params = self._verify_transfer_params(source_collection_id)
+        if "payload" in valid_params:  # means something went wrong
+            return JsonResponse(data=valid_params, status=valid_params["status"])
+
+        database_url = self._get_database_url("/copy")
+        self.logger.info(
+            "copy: url({}) headers({}) params({})".format(
+                database_url, self.headers, valid_params,
+            )
         )
+        try:
+            response = requests.post(
+                database_url, data=valid_params, headers=self.headers, timeout=self.timeout
+            )
+        except requests.exceptions.Timeout as e:
+            self.logger.error(
+                "copy: url({}) headers({}) data({}) exc({})".format(
+                    database_url, self.headers, valid_paramas, e
+                )
+            )
+            return self._response_timeout()
+        self.logger.info(
+            "transfer: url({}) headers({}) status({})".format(
+                database_url, self.headers, response.status_code
+            )
+        )
+        return self._response_from_catchpy(response)
+
 
 
 ###################################################################################
