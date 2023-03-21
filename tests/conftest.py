@@ -257,6 +257,34 @@ def course_user_lti_launch_params(
 
 
 @pytest.fixture
+def course_user_lti_launch_params_factory(
+    user_profile_factory,
+    course_instructor_factory,
+    lti_path,
+    lti_launch_url,
+    lti_launch_params_factory,
+):
+    def _cupa_factory(is_staff=False):
+        course, i = course_instructor_factory()
+        if is_staff:
+            user_roles = ["Instructor"]
+            user = i
+        else:
+            user_roles = ["Learner"]
+            user = user_profile_factory(roles=user_roles)
+        resource_link_id = uuid.uuid4().hex
+        params = lti_launch_params_factory(
+            course_id=course.course_id,
+            user_name=user.name,
+            user_id=user.anon_id,
+            user_roles=user_roles,
+            resource_link_id=resource_link_id,
+            launch_url=lti_launch_url,
+        )
+        return (course, user, params)
+    return _cupa_factory
+
+@pytest.fixture
 def course_user_lti_launch_params_with_grade(
     user_profile_factory,
     course_instructor_factory,

@@ -186,20 +186,16 @@ class CatchpyBackend(Annostore):
         )
         return self._response_from_catchpy(response)
 
-    def transfer(self, source_collection_id):
-        valid_params = self._verify_transfer_params(source_collection_id)
-        if "payload" in valid_params:  # means something went wrong
-            return JsonResponse(data=valid_params, status=valid_params["status"])
-
+    def transfer(self, transfer_params):
         database_url = self._get_database_url("/copy")
         self.logger.info(
             "copy: url({}) headers({}) params({})".format(
-                database_url, self.headers, valid_params,
+                database_url, self.headers, transfer_params,
             )
         )
         try:
             response = requests.post(
-                database_url, data=valid_params, headers=self.headers, timeout=self.timeout
+                database_url, data=transfer_params, headers=self.headers, timeout=self.timeout
             )
         except requests.exceptions.Timeout as e:
             self.logger.error(
@@ -219,5 +215,3 @@ class CatchpyBackend(Annostore):
 
 ###################################################################################
 
-"""
-"""
