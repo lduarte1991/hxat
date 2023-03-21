@@ -313,7 +313,7 @@ def moving_assignment(request, old_course_id, new_course_id, assignment_id):
         for at in aTargets:
             at.pk = None
             at.assignment = assignment
-            at.target_courses.add(assignment.course)
+            at.target_object.target_courses.add(assignment.course)
             at.save()
             pks.append(str(at.target_object.pk))
         result.update({"object_ids": pks, "result": 200})
