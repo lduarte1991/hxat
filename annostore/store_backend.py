@@ -29,12 +29,16 @@ class CatchpyBackend(Annostore):
         return JsonResponse({"error": "request timeout"}, status=500)
 
     def _response_from_catchpy(self, response):
-        if (response.headers.get("content-type", None) and
-            "application/json" in response.headers["content-type"]):
+        if (
+            response.headers.get("content-type", None)
+            and "application/json" in response.headers["content-type"]
+        ):
             return JsonResponse(data=response.json(), status=response.status_code)
         else:
-            return HttpResponse(response.content, status=response.status_code,
-                content_type=response.headers.get("content-type", "text/plain")
+            return HttpResponse(
+                response.content,
+                status=response.status_code,
+                content_type=response.headers.get("content-type", "text/plain"),
             )
 
     def before_search(self):
@@ -190,17 +194,22 @@ class CatchpyBackend(Annostore):
         database_url = self._get_database_url("/copy")
         self.logger.info(
             "copy: url({}) headers({}) params({})".format(
-                database_url, self.headers, transfer_params,
+                database_url,
+                self.headers,
+                transfer_params,
             )
         )
         try:
             response = requests.post(
-                database_url, data=transfer_params, headers=self.headers, timeout=self.timeout
+                database_url,
+                data=transfer_params,
+                headers=self.headers,
+                timeout=self.timeout,
             )
         except requests.exceptions.Timeout as e:
             self.logger.error(
                 "copy: url({}) headers({}) data({}) exc({})".format(
-                    database_url, self.headers, valid_paramas, e
+                    database_url, self.headers, transfer_params, e
                 )
             )
             return self._response_timeout()
@@ -212,6 +221,4 @@ class CatchpyBackend(Annostore):
         return self._response_from_catchpy(response)
 
 
-
 ###################################################################################
-

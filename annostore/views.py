@@ -2,17 +2,17 @@ import json
 import logging
 
 from annostore.store import AnnostoreFactory
-from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import JsonResponse
 from django.test import RequestFactory
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from hxat.middleware import CookielessSessionMiddleware, MultiLTILaunchMiddleware
-from hx_lti_initializer.models import LTICourse
 from hx_lti_assignment.models import Assignment
+from hx_lti_initializer.models import LTICourse
+from hxat.middleware import CookielessSessionMiddleware, MultiLTILaunchMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -82,11 +82,10 @@ def transfer_instructor_annotations(request, source_assignment_id):
     """
     transfer_params = _verify_transfer_params(request, source_assignment_id)
     if "payload" in transfer_params:  # means something went wrong
-        return JsonResponse(data=valid_params, status=valid_params["status"])
+        return JsonResponse(data=transfer_params, status=transfer_params["status"])
 
     annostore = AnnostoreFactory.get_instance(request, col_id=source_assignment_id)
     return annostore.transfer(transfer_params)
-
 
 
 def _verify_transfer_params(request, source_assignment_id):
@@ -107,7 +106,9 @@ def _verify_transfer_params(request, source_assignment_id):
     """
     user_id = request.LTI["hx_user_id"]
     if not request.LTI["is_staff"]:
-        msg = "permission denied; user({}) not admin to transfer annotations".format(user_id)
+        msg = "permission denied; user({}) not admin to transfer annotations".format(
+            user_id
+        )
         logger.error(msg)
         return {"status": 401, "payload": [msg]}
 
@@ -116,7 +117,9 @@ def _verify_transfer_params(request, source_assignment_id):
         source_course = LTICourse.objects.get(course_id=source_context_id)
     except LTICourse.DoesNotExist:
         # the course might have been deleted?
-        msg = "source course({}) for transfer_inst_anno not found".format(source_context_id)
+        msg = "source course({}) for transfer_inst_anno not found".format(
+            source_context_id
+        )
         logger.error(msg)
         return {"status": 404, "payload": [msg]}
 
@@ -131,7 +134,9 @@ def _verify_transfer_params(request, source_assignment_id):
     try:
         source_assignment = Assignment.objects.get(assignment_id=source_collection_id)
     except Assignment.DoesNotExist:
-        msg = "source assign({}) for transfer_inst_anno not found".format(source_collection_id)
+        msg = "source assign({}) for transfer_inst_anno not found".format(
+            source_collection_id
+        )
         return {"status": 404, "payload": [msg]}
     if source_assignment.course.course_id != source_course.course_id:
         # sanity check: assignment pointing to previous run
@@ -147,7 +152,9 @@ def _verify_transfer_params(request, source_assignment_id):
     try:
         target_course = LTICourse.objects.get(course_id=target_context_id)
     except LTICourse.DoesNotExist:
-        msg = "target course({}) for transfer_inst_anno not found".format(target_context_id)
+        msg = "target course({}) for transfer_inst_anno not found".format(
+            target_context_id
+        )
         logger.error(msg)
         return {"status": 404, "payload": [msg]}
     if target_context_id != request.LTI["hx_context_id"]:
@@ -178,12 +185,15 @@ def _verify_transfer_params(request, source_assignment_id):
         logger.error(msg)
         return {"status": 409, "payload": [msg]}
 
-    if target_assignment.annotation_database_url != source_assignment.annotation_database_url:
+    if (
+        target_assignment.annotation_database_url
+        != source_assignment.annotation_database_url
+    ):
         # sanity check: both assignments should point to the same annostore
         msg = "expected same annostore found ({}):({}) -> ({}):({})".format(
-            source_assigment.assignment_id,
+            source_assignment.assignment_id,
             source_assignment.annotation_database_url,
-            target_assigment.assignment_id,
+            target_assignment.assignment_id,
             target_assignment.annotation_database_url,
         )
         logger.error(msg)
@@ -200,9 +210,13 @@ def _verify_transfer_params(request, source_assignment_id):
         )
         logger.warning(msg)
         return {
-            "original_total": 0, "total_success": 0, "total_failure": 0,
-            "success": [], "failure": [],
-            "payload": [msg], "status": 200,
+            "original_total": 0,
+            "total_success": 0,
+            "total_failure": 0,
+            "success": [],
+            "failure": [],
+            "payload": [msg],
+            "status": 200,
         }
 
     # all checked and ready to go
@@ -213,9 +227,10 @@ def _verify_transfer_params(request, source_assignment_id):
         "target_context_id": target_context_id,
         "target_collection_id": target_collection_id,
     }
-    logger.info((
-        "request to transfer annotation from source_course({}) to target_course({}) "
-        "source_assign({}) to target_assign({}), by user({}), to annostore({})."
+    logger.info(
+        (
+            "request to transfer annotation from source_course({}) to target_course({}) "
+            "source_assign({}) to target_assign({}), by user({}), to annostore({})."
         ).format(
             source_context_id,
             target_context_id,

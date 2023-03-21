@@ -1,7 +1,6 @@
 import importlib
 import json
 import logging
-import os
 import re
 import uuid
 
@@ -11,7 +10,6 @@ from django.conf import settings
 from django.core.exceptions import BadRequest
 from django.http import Http404, JsonResponse
 from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.models import LTICourse
 from hxat.lti_validators import LTIRequestValidator
 from lti.contrib.django import DjangoToolProvider
 
@@ -122,9 +120,7 @@ class Annostore(object):
             response = self.search()
 
             # retroactive participation grade
-            is_graded = self.LTI["launch_params"].get(
-                "lis_outcome_service_url", False
-            )
+            is_graded = self.LTI["launch_params"].get("lis_outcome_service_url", False)
             if is_graded and self.did_retro_participation(response):
                 self.lti_grade_passback(score=1)
             return response
@@ -382,7 +378,6 @@ class Annostore(object):
                 message_type, group, annotation.get("id", "unknown_id"), e
             )
             self.logger.error(msg, exc_info=settings.HXAT_NOTIFY_ERRORLOG)
-
 
 
 """
