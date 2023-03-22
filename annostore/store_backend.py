@@ -199,10 +199,24 @@ class CatchpyBackend(Annostore):
                 transfer_params,
             )
         )
+        self.logger.info(
+            "adds override in transfer({})->({}) jwt({})".format(
+                transfer_params["source_collection_id"],
+                transfer_params["target_collection_id"],
+                list(transfer_params["userid_map"].values())[0],
+            )
+        )
+        self.headers["authorization"] = "token " + retrieve_token(
+            list(transfer_params["userid_map"].values())[0],
+            apikey=self.asconfig[1],
+            secret=self.asconfig[2],
+            ttl=300,  # 5m
+            override=["CAN_COPY"],
+        )
         try:
             response = requests.post(
                 database_url,
-                data=transfer_params,
+                json=transfer_params,
                 headers=self.headers,
                 timeout=self.timeout,
             )

@@ -116,11 +116,12 @@ def get_lti_value(key, request):
     return value
 
 
-def retrieve_token(userid, apikey, secret, ttl=1):
+def retrieve_token(userid, apikey, secret, ttl=1, override=None):
     """
     generates a jwt for the backend of annotations.
 
     default ttl = 1 sec
+    override must be a list of strings
     """
     apikey = apikey
     secret = secret
@@ -135,11 +136,10 @@ def retrieve_token(userid, apikey, secret, ttl=1):
             .replace(microsecond=0)
             .isoformat()
         )  # noqa
-
-    token = jwt.encode(
-        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl},
-        secret,
-    )
+    payload = {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl}
+    if override:
+        payload["override"] = [str(x) for x in override]
+    token = jwt.encode(payload, secret)
     return token
 
 
