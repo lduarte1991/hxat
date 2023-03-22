@@ -781,6 +781,8 @@ def launch_lti(request):
             lti_profile = get_lti_admin(
                 user_id, external_user_id, display_name, roles, user_scope
             )
+            course_object.course_admins.add(lti_profile)
+            course_object.save()
             # admin user django login
             login(request, lti_profile.user)
 
