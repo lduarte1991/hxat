@@ -101,6 +101,9 @@ def embed_lti(request):
         )
 
     try:
+        # TODO: use unique-together (user_id, scope) cause might return multiple profiles
+        # not sure at this point we can grab scope from request
+        # lti_profile = LTIProfile.objects.get(anon_id=user_id, scope=request.LTI["hx_user_scope"]
         lti_profile = LTIProfile.objects.get(anon_id=user_id)
         login(
             request, lti_profile.user
