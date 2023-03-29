@@ -8,6 +8,7 @@ Image Annotation Tool | {{ target_object.target_title }}
 {% endblock %}
 
 {% block cssfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'vendors/mirador/css/mirador-combined.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'hxighlighter/hxighlighter_image_m2.css' %}">
 {% endblock %}
 
@@ -78,6 +79,11 @@ Image Annotation Tool | {{ target_object.target_title }}
 
         #viewer { position: fixed; width: 100%; height:100%; height: calc(100% - 50px); height: -webkit-calc(100% - 50px); height:-moz-calc(100% - 50px);}
     </style>
+    <script
+    src="https://code.jquery.com/jquery-3.6.3.min.js"
+    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+    crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'vendors/mirador/mirador.js' %}"></script>
     <script type="text/javascript" src="{% static 'hxighlighter/hxighlighter_image_m2.js' %}"></script>
     <script>
             var tags = "{{ assignment.highlights_options }}".split(',');
