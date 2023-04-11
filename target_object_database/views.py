@@ -27,7 +27,7 @@ def get_course_id(request):
 
 
 def get_lti_profile(request):
-    return LTIProfile.objects.get(anon_id=request.LTI["hx_user_id"])
+    return LTIProfile.objects.get(anon_id=request.LTI["hx_user_id"], scope=request.LTI["hx_user_scope"])
 
 
 def get_lti_profile_id(request):

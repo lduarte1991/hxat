@@ -48,3 +48,36 @@ def test_AssignmentTargets_get_canvas_id_for_mirador_manifest_returns_canvas_id_
     actual_canvas_id = assignment_target.get_canvas_id_for_mirador()
     assert not requests_mock.called
     assert actual_canvas_id == expected_canvas_id
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "initial_options, new_options_list, expected_options",
+    [
+        pytest.param("ImageView,,true", [], ",,false,false,false,false"),
+        pytest.param("ImageView,,true", ["ImageView", "xuxu"], "ImageView,xuxu,false,false,false,false"),
+        pytest.param(",,true", ["", "xuxu"], ",xuxu,false,false,false,false"),
+        pytest.param(",,true,,,", ["", "", "true", "true", "", "true"], ",,true,true,false,true"),
+        pytest.param("UnsupportedView,blah,true,,,", ["", "", "true", "true", "", "true"], ",,true,true,false,true"),
+    ],
+)
+def test_save_target_external_options_list(
+    initial_options, new_options_list, expected_options, user_profile_factory, assignment_target_factory
+):
+    manifest_url = "http://localhost:8000/non-existent/manifest.json"
+    instructor = user_profile_factory(roles=["Instructor"])
+    course_object = LTICourse.create_course("test_course_id", instructor)
+    assignment_target = assignment_target_factory(
+        course_object,
+        target_type="ig",
+        target_content=manifest_url,
+        target_external_options=initial_options,
+    )
+    assignment_target.save_target_external_options_list(new_options_list)
+    at = AssignmentTargets.objects.get(pk=assignment_target.id)
+    assert at.target_external_options == expected_options
+
+
+
+
+
+

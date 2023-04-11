@@ -13,6 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 class AssignmentTargets(models.Model):
+    # defaults for target_external_options
+    VIEWTYPE_DEFAULT = ""
+    CANVASID_DEFAULT = ""
+    DASHBOARDHIDDEN_DEFAULT = "false"
+    TRANSCRIPTHIDDEN_DEFAULT = "false"
+    TRANSCRIPTDOWNLOAD_DEFAULT = "false"
+    VIDEODOWNLOAD_DEFAULT = "false"
+    TARGET_OPTIONS_LEN = 6
+
     assignment = models.ForeignKey(
         "Assignment", verbose_name="Assignment", on_delete=models.CASCADE
     )
@@ -50,12 +59,11 @@ class AssignmentTargets(models.Model):
         in CSV format.
 
         Notes:
-        - since the model attribute could be null in the database, we have to
-          check if it's None before trying parse it.
-        - this field does not contain user-supplied values, so we don't need industrial-strength
-          CSV parsing.
+        - since the model attribute could be null in the database, we have to check if it's None before trying parse it.
+          07apr23 nmaekawa: setting default values to always have all options present
+        - this field does not contain user-supplied values, so we don't need industrial-strength CSV parsing.
 
-        Order of options:
+        Order of options:  # note that these are javaSCRIPT types!
           1. ViewType for mirador: string
           2. CanvasID for mirador: string|integer
           3. DashboardHidden: boolean
@@ -63,28 +71,55 @@ class AssignmentTargets(models.Model):
           5. TranscriptDownload: boolean
           6. VideoDownload: boolean
         """
-        if self.target_external_options is None:
-            return []
+        opts = self.target_external_options.split(",") if self.target_external_options else []
+        if len(opts) < type(self).TARGET_OPTIONS_LEN:
+            self.save_target_external_options_list(opts)  # self-healing defaults
         return self.target_external_options.split(",")
 
-    def get_view_type_for_mirador(self):
-        """
-        """
-        options = self.get_target_external_options_list()
-        if len(options) == 1:
-            return "ImageView"
+    def get_target_external_options_default(self):
+        return "{},{},{},{},{},{}".format(
+            type(self).VIEWTYPE_DEFAULT,
+            type(self).CANVASID_DEFAULT,
+            type(self).DASHBOARDHIDDEN_DEFAULT,
+            type(self).TRANSCRIPTHIDDEN_DEFAULT,
+            type(self).TRANSCRIPTDOWNLOAD_DEFAULT,
+            type(self).VIDEODOWNLOAD_DEFAULT,
+        )
+
+    def save_target_external_options_list(self, options_list):
+        new_value = self.get_target_external_options_default()
+        new_value_list = new_value.split(",")  # set defaults
+        if len(options_list) == 0:
+            logger.warning("target_external_options to default, empty NOT ALLOWED")
         else:
-            return options[0] if options[0] != "" else "ImageView"
+            for i in range(6):
+                try:
+                    if options_list[i]:  # only replace if not blank
+                        new_value_list[i] = options_list[i]
+                except IndexError:
+                    break  # keep default values
+            new_value = ",".join([x.strip() for x in new_value_list])
+        self.target_external_options = new_value
+        self.save()
+
+    def get_view_type_for_mirador(self):
+        options = self.get_target_external_options_list()
+        if not options[0]:  # self-healing default
+            options[0] = "ImageView"
+            self.save_target_external_options_list(options)
+        return options[0]
 
     def get_canvas_id_for_mirador(self):
-        """
-        """
         options = self.get_target_external_options_list()
         logger.debug("OPTIONS: %s " % options)
 
-        # Retrieve first canvas ID in the IIIF manifest if none
-        # is specified in the options list.
-        if options is None or len(options) <= 1 or options[1] == "":
+        # Retrieve first canvas ID in the IIIF manifest if none is specified in the options list.
+        # 07apr23 nmaekawa: SAVING canvas_id in the db!!!
+        # -- canvas-id is saved as source_id in annotations and used as a search parameter
+        #    when we moved iiif infrastructure to huit, all canvas-ids changed rendering
+        #    past annotations unsearchable! Besides, we don't need to pull the manifest every time
+        #    to have the canvas-id.
+        if not options[1]:
             manifest_url = self.target_object.target_content
             try:
                 req = requests.get(manifest_url, timeout=10)
@@ -103,47 +138,28 @@ class AssignmentTargets(models.Model):
                 return None
 
             try:
-                return manifest["sequences"][0]["canvases"][0]["@id"]
+                options[1] = manifest["sequences"][0]["canvases"][0]["@id"]
             except (KeyError, IndexError) as e:
                 logger.error(f"Failed to extract canvas ID from manifest: AssignmentTarget {self.pk}")
                 return None
+            self.save_target_external_options_list(options)  # self-healing
         return options[1]
 
     def get_dashboard_hidden(self):
-        """
-        """
         options = self.get_target_external_options_list()
-        if len(options) < 3:
-            return "false"
-        else:
-            return options[2] if options[2] != "" else "false"
+        return options[2]
 
     def get_transcript_hidden(self):
-        """
-        """
         options = self.get_target_external_options_list()
-        if len(options) < 4:
-            return "false"
-        else:
-            return options[3] if options[3] != "" else "false"
+        return options[3]
 
     def get_transcript_download(self):
-        """
-        """
         options = self.get_target_external_options_list()
-        if len(options) < 5:
-            return "false"
-        else:
-            return options[4] if options[4] != "" else "false"
+        return options[4]
 
     def get_video_download(self):
-        """
-        """
         options = self.get_target_external_options_list()
-        if len(options) < 6:
-            return "false"
-        else:
-            return options[5] if options[5] != "" else "false"
+        return options[5]
 
     @classmethod
     def get_by_assignment_id(cls, assignment_id, target_object_id):
