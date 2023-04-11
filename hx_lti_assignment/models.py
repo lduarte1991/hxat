@@ -1,12 +1,11 @@
 import json
 import logging
-import sys
 import uuid
 
 import requests
-from requests.exceptions import HTTPError, Timeout
 from django.db import models
 from hx_lti_initializer.models import LTICourse
+from requests.exceptions import HTTPError, Timeout
 from target_object_database.models import TargetObject
 
 logger = logging.getLogger(__name__)
@@ -31,7 +30,9 @@ class AssignmentTargets(models.Model):
         unique=False,
         on_delete=models.CASCADE,
     )
-    order = models.IntegerField(verbose_name="Order",)
+    order = models.IntegerField(
+        verbose_name="Order",
+    )
     target_external_css = models.CharField(
         max_length=255,
         blank=True,
@@ -42,7 +43,10 @@ class AssignmentTargets(models.Model):
         null=True,
         help_text="Add instructions for this object in this assignment.",
     )
-    target_external_options = models.TextField(blank=True, null=True,)
+    target_external_options = models.TextField(
+        blank=True,
+        null=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -71,7 +75,11 @@ class AssignmentTargets(models.Model):
           5. TranscriptDownload: boolean
           6. VideoDownload: boolean
         """
-        opts = self.target_external_options.split(",") if self.target_external_options else []
+        opts = (
+            self.target_external_options.split(",")
+            if self.target_external_options
+            else []
+        )
         if len(opts) < type(self).TARGET_OPTIONS_LEN:
             self.save_target_external_options_list(opts)  # self-healing defaults
         return self.target_external_options.split(",")
@@ -124,23 +132,29 @@ class AssignmentTargets(models.Model):
             try:
                 req = requests.get(manifest_url, timeout=10)
                 req.raise_for_status()
-            except Timeout as e:
-                logger.warning(f"Request for manifest timed out: AssignmentTarget {self.pk} manifest: {manifest_url}")
+            except Timeout:
+                logger.warning(
+                    f"Request for manifest timed out: AssignmentTarget {self.pk} manifest: {manifest_url}"
+                )
                 return None
             except HTTPError as e:
-                logger.error(f"Failed to request manifest: AssignmentTarget {self.pk} status {e.response.status_code} manifest: {manifest_url}")
+                logger.error(
+                    f"Failed to request manifest: AssignmentTarget {self.pk} status {e.response.status_code} manifest: {manifest_url}"
+                )
                 return None
 
             try:
                 manifest = json.loads(req.text)
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 logger.error(f"Failed to parse manifest: AssignmentTarget {self.pk}")
                 return None
 
             try:
                 options[1] = manifest["sequences"][0]["canvases"][0]["@id"]
-            except (KeyError, IndexError) as e:
-                logger.error(f"Failed to extract canvas ID from manifest: AssignmentTarget {self.pk}")
+            except (KeyError, IndexError):
+                logger.error(
+                    f"Failed to extract canvas ID from manifest: AssignmentTarget {self.pk}"
+                )
                 return None
             self.save_target_external_options_list(options)  # self-healing
         return options[1]
@@ -272,7 +286,7 @@ class Assignment(models.Model):
                     return AssignmentTargets.objects.get(
                         assignment=self, order=new_order
                     )
-            except:
+            except (TargetObject.DoesNotExist, AssignmentTargets.DoesNotExist):
                 return None
         return None
 
@@ -292,7 +306,7 @@ class Assignment(models.Model):
                     return AssignmentTargets.objects.get(
                         assignment=self, order=new_order
                     )
-            except:
+            except (TargetObject.DoesNotExist, AssignmentTargets.DoesNotExist):
                 return None
         return None
 
@@ -362,7 +376,7 @@ class Assignment(models.Model):
                 try:
                     result.append((concat_tag_name + res[0], getColorValues(res[1])))
                     concat_tag_name = ""
-                except:
+                except Exception:
                     concat_tag_name += res[0] + " "
             return result
 

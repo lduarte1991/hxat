@@ -1,21 +1,23 @@
 import glob
 import json
-import traceback
 import os
+import traceback
 
 from django.core.management import BaseCommand
-
 from hx_lti_assignment.models import AssignmentTargets
-from hx_lti_initializer.models import LTICourse
 
 
 class Command(BaseCommand):
-    def add_arguments(self,parser):
+    def add_arguments(self, parser):
         parser.add_argument(
-            "--manifest-dir", dest="mani_dir", required=False,
+            "--manifest-dir",
+            dest="mani_dir",
+            required=False,
         )
         parser.add_argument(
-            "--mani-filepath", dest="mani_filepath", required=False,
+            "--mani-filepath",
+            dest="mani_filepath",
+            required=False,
         )
 
     def gather_mani(self, mani_dir):
@@ -31,7 +33,7 @@ class Command(BaseCommand):
         img_at = []
         all_at = AssignmentTargets.objects.all()
         for at in all_at:
-            if at.target_object.target_type == 'ig':
+            if at.target_object.target_type == "ig":
                 # collect
                 img_at.append(at)
         return img_at
@@ -42,12 +44,12 @@ class Command(BaseCommand):
         if mani_dir:
             all_mani = self.gather_mani(mani_dir)
             print(json.dumps(all_mani, indent=4, sort_keys=True))
-            return(0)
+            return 0
 
         mani_filepath = kwargs.get("mani_filepath", None)
         if not mani_filepath:
             print("---------- unable to rename the canvases, missing manifests info")
-            return(1)
+            return 1
 
         with open(mani_filepath, "r") as fd:
             all_mani = json.load(fd)
@@ -69,20 +71,14 @@ class Command(BaseCommand):
                 if len(options_list) == 1:
                     options_list.append("placeholder")
                 options_list[0] = "ImageView"  # only view_type supported
-                options_list[1] = canvas_id    # original canvas_id
+                options_list[1] = canvas_id  # original canvas_id
                 at.save_target_external_options_list(options_list)
                 item = result.get(at.assignment.course.course_id, {})
                 item[manifest_id] = options_list
                 result[at.assignment.course.course_id] = item
-            except Exception as e:
+            except Exception:
                 item = result.get(at.assignment.course.course_id, {})
                 item[manifest_id] = traceback.format_exc()
                 result[at.assignment.course.course_id] = item
 
         print(json.dumps(result, indent=4, sort_keys=True))
-
-
-
-
-
-
