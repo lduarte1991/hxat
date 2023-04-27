@@ -116,13 +116,11 @@ def get_lti_value(key, request):
     return value
 
 
-def retrieve_token(userid, apikey, secret):
+def retrieve_token(userid, apikey, secret, ttl=1):
     """
-    Return a token for the backend of annotations.
-    It uses the course id to retrieve a variable that contains the secret
-    token found in inheritance.py. It also contains information of when
-    the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend.
+    generates a jwt for the backend of annotations.
+
+    default ttl = 1 sec
     """
     apikey = apikey
     secret = secret
@@ -139,10 +137,10 @@ def retrieve_token(userid, apikey, secret):
         )  # noqa
 
     token = jwt.encode(
-        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": 86400},
+        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl},
         secret,
     )
-    return str(token, "utf-8")
+    return token
 
 
 def get_admin_ids(context_id):
@@ -253,7 +251,7 @@ def _fetch_annotations_by_course(
     """
     # build request
     headers = {
-        "x-annotator-auth-token": annotator_auth_token,
+        "Authorization": "token {}".format(annotator_auth_token),
         "Content-Type": "application/json",
     }
     limit = kwargs.get("limit", 1000)  # Note: -1 means get everything there is
@@ -381,7 +379,7 @@ def _fetch_annotations_by_course(
                 logger.warning(f"key error={e}")
         # Loop through the formatted_annotations and add parent_text if parent !=0
         for formatted_annote in formatted_annotations:
-            if formatted_annote["parent"] is not "0":
+            if formatted_annote["parent"] != "0":
                 id = formatted_annote["parent"]
                 formatted_annote["parent_text"] = parents_text_dict[id]
         result["rows"] =  formatted_annotations
@@ -570,7 +568,7 @@ class DashboardAnnotations(object):
         if media_type == "image":
             found = object_id.find("/canvas/")
             # in case there is capital letters in the URI
-            index = found if found is not -1 else object_id.find("/Canvas/")
+            index = found if found != -1 else object_id.find("/Canvas/")
             trimmed_object_id = object_id if index == -1 else object_id[0:index]
             # gets the data dict from the target_objects_by_content dictionary by trimmed_object_id else assign None
             if trimmed_object_id in self.target_objects_by_content:

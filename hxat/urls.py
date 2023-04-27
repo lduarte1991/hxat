@@ -17,7 +17,7 @@ urlpatterns = [
     path(
         "annotation_store/",
         include(
-            ("annotation_store.urls", "annotation_store.urls"),
+            ("annostore.urls", "annostore.urls"),
             namespace="annotation_store",
         ),
     ),

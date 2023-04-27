@@ -1,11 +1,11 @@
 -r base.txt
 
-pytest==5.3.5
-pytest-django==3.8.0
-pytest-env==0.6.2
+pytest==7.2.2
+pytest-django==4.5.2
+pytest-env==0.8.1
 
-iso8601==0.1.12
-mock==4.0.2
-responses==0.10.11
-requests-mock==1.9.3
+iso8601==1.1.0
+mock==5.0.1
+responses==0.22.0
+requests-mock==1.10.0
 

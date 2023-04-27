@@ -8,15 +8,13 @@ django-braces==1.14.0
 django-crispy-forms==1.9.0
 django-extensions==2.2.8
 django-log-request-id==2.0.0
-djangorestframework==3.11.0
-httplib2==0.18.0
+djangorestframework==3.11.2
 lti==0.9.5
 psycopg2-binary==2.8.4
-PyJWT==1.7.1
+PyJWT==2.4.0
 python-dateutil==2.8.1
 pytz==2019.3
 requests==2.23.0
 python_dotenv==0.14.0
-Twisted==20.3.0
 WhiteNoise==5.2.0
 git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk==0.2.0

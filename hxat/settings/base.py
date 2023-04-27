@@ -8,46 +8,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+import json
 import logging
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from ast import literal_eval
 
 from django.contrib import messages
 
-try:
-    from .secure import SECURE_SETTINGS
-except Exception as e:
-    SECURE_SETTINGS = dict()
-
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY", SECURE_SETTINGS.get("django_secret_key", "")
-)
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "CHANGE_ME")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 # disambiguation when reading from env: env vars always strings so if
 # DEBUG=False, it's still evaluated as boolean True. Some ways to read a
 # boolean from a string source in this related thread:
 #   https://stackoverflow.com/questions/21732123/convert-true-false-value-read-from-file-to-boolean
-debug = os.environ.get("DEBUG", None)
-if debug is None:
-    DEBUG = SECURE_SETTINGS.get("debug", False)
-else:
-    DEBUG = debug.lower() == "true"
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-other_hosts = os.environ.get("ALLOWED_HOSTS", None)
-if other_hosts is None:  # no envvar, secure.py already has a list object
-    allowed_hosts_other = SECURE_SETTINGS.get("allowed_hosts", [])
-else:  # space as separator if envvar
-    allowed_hosts_other = other_hosts.split()
-
-if allowed_hosts_other:
-    ALLOWED_HOSTS.extend(allowed_hosts_other)
+allowed_other_hosts = os.environ.get("ALLOWED_HOSTS", "")
+if allowed_other_hosts:
+    ALLOWED_HOSTS.extend(allowed_other_hosts.split())
 
 
 # Application definition
@@ -66,11 +48,11 @@ INSTALLED_APPS = (
     "bootstrap3",
     "crispy_forms",
     "hx_lti_initializer",
-    "annotation_store",
+    "annostore",
     "hx_lti_assignment",
     "target_object_database",
 )
-CSRF_FAILURE_VIEW = 'hx_lti_initializer.views.csrf_failure'
+CSRF_FAILURE_VIEW = "hx_lti_initializer.views.csrf_failure"
 
 MIDDLEWARE = (
     "log_request_id.middleware.RequestIDMiddleware",
@@ -83,7 +65,6 @@ MIDDLEWARE = (
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "hxat.middleware.ContentSecurityPolicyMiddleware",
     "hxat.middleware.MultiLTILaunchMiddleware",
-    #'hxat.middleware.SessionMiddleware',
     "hxat.middleware.ExceptionLoggingMiddleware",
 )
 
@@ -96,21 +77,11 @@ DATABASES = {
         # django.db.backends.postgresql_psycopg2 module is deprecated in favor of django.db.backends.postgresq
         # https://docs.djangoproject.com/en/3.0/releases/2.0/#id1
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get(
-            "HXAT_DB_NAME", SECURE_SETTINGS.get("db_default_name", "annotationsx")
-        ),
-        "USER": os.environ.get(
-            "HXAT_DB_USER", SECURE_SETTINGS.get("db_default_user", "annotationsx")
-        ),
-        "PASSWORD": os.environ.get(
-            "HXAT_DB_PASSWORD", SECURE_SETTINGS.get("db_default_password")
-        ),
-        "HOST": os.environ.get(
-            "HXAT_DB_HOST", SECURE_SETTINGS.get("db_default_host", "localhost")
-        ),
-        "PORT": os.environ.get(
-            "HXAT_DB_PORT", SECURE_SETTINGS.get("db_default_port", "5432")
-        ),
+        "NAME": os.environ.get("HXAT_DB_NAME", "annotationsx"),
+        "USER": os.environ.get("HXAT_DB_USER", "annotationsx"),
+        "PASSWORD": os.environ.get("HXAT_DB_PASSWORD", "annotationsx"),
+        "HOST": os.environ.get("HXAT_DB_HOST", "localhost"),
+        "PORT": os.environ.get("HXAT_DB_PORT", "5432"),
     }
 }
 
@@ -165,15 +136,10 @@ JENKINS_TASKS = (
 
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 
-_DEFAULT_LOG_LEVEL = os.environ.get(
-    "LOG_LEVEL",
-    SECURE_SETTINGS.get("log_level", SECURE_SETTINGS.get("django_log_level", "DEBUG")),
-)
-_LOG_QUERIES = os.environ.get("LOG_QUERIES", SECURE_SETTINGS.get("log_queries", False))
-_LOG_ROOT = os.environ.get("LOG_ROOT", SECURE_SETTINGS.get("log_root", ""))
-_LOG_FILENAME = os.environ.get(
-    "LOG_FILENAME", SECURE_SETTINGS.get("log_filename", "app.log")
-)
+_DEFAULT_LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+_LOG_QUERIES = os.environ.get("LOG_QUERIES", False)
+_LOG_ROOT = os.environ.get("LOG_ROOT", "")
+_LOG_FILENAME = os.environ.get("LOG_FILENAME", "app.log")
 
 LOGGING = {
     "version": 1,
@@ -188,7 +154,9 @@ LOGGING = {
             "format": "[%(request_id)s]:%(levelname)s\t%(asctime)s.%(msecs)03dZ\t%(name)s:%(lineno)s\t%(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S",
         },
-        "simple": {"format": "[%(request_id)s]:%(levelname)s\t%(name)s:%(lineno)s\t%(message)s",},
+        "simple": {
+            "format": "[%(request_id)s]:%(levelname)s\t%(name)s:%(lineno)s\t%(message)s",
+        },
     },
     "handlers": {
         "console": {
@@ -212,7 +180,10 @@ LOGGING = {
     # setting an empty string logger in the loggers dict below, but the separation
     # here is a bit more explicit.  See link for more details:
     # https://docs.python.org/2.7/library/logging.config.html#dictionary-schema-details
-    "root": {"level": logging.INFO, "handlers": ["default", "console"],},
+    "root": {
+        "level": logging.INFO,
+        "handlers": ["default", "console"],
+    },
     "loggers": {
         # Add app-specific loggers below.
         # Make sure that propagate is False so that the root logger doesn't get involved
@@ -247,7 +218,7 @@ LOGGING = {
             "handlers": ["default", "console"],
             "propagate": False,
         },
-        "annotation_store": {
+        "annostore": {
             "level": _DEFAULT_LOG_LEVEL,
             "handlers": ["default", "console"],
             "propagate": False,
@@ -280,20 +251,18 @@ LTI_COURSE_ID = "context_id"
 LTI_COLLECTION_ID = "custom_collection_id"
 LTI_OBJECT_ID = "custom_object_id"
 LTI_ROLES = "roles"
-LTI_DEBUG = os.environ.get("DEBUG", SECURE_SETTINGS.get("debug", False))
-ADMIN_ROLES = literal_eval(
-    os.environ.get(
-        "ADMIN_ROLES", str(SECURE_SETTINGS.get("ADMIN_ROLES", {"Administrator"}))
-    )
+LTI_DEBUG = os.environ.get("DEBUG", False)
+ADMIN_ROLES = json.loads(
+    os.environ.get("ADMIN_ROLES", '["Administrator", "Instructor"]')
 )
 LTI_UNIQUE_RESOURCE_ID = "resource_link_id"
 CONTENT_SECURITY_POLICY_DOMAIN = os.environ.get(
     "CONTENT_SECURITY_POLICY_DOMAIN",
-    SECURE_SETTINGS.get("content_security_policy_domain", None),
+    None,
 )
 
-SERVER_NAME = os.environ.get("SERVER_NAME", SECURE_SETTINGS.get("SERVER_NAME", ""))
-ORGANIZATION = os.environ.get("ORGANIZATION", SECURE_SETTINGS.get("ORGANIZATION", ""))
+SERVER_NAME = os.environ.get("SERVER_NAME", "")
+ORGANIZATION = os.environ.get("ORGANIZATION", "ATG")
 
 LTI_TOOL_CONFIGURATION = {
     "title": "AnnotationsX",
@@ -306,56 +275,41 @@ LTI_TOOL_CONFIGURATION = {
     "embed_icon_url": "img/HxAT-16x16.png",
 }
 
-CONSUMER_KEY = os.environ.get("CONSUMER_KEY", SECURE_SETTINGS.get("CONSUMER_KEY", ""))
-LTI_SECRET = os.environ.get(
-    "LTI_SECRET", SECURE_SETTINGS.get("LTI_SECRET", "")
-)  # ignored if using django_auth_lti
-LTI_SECRET_DICT = literal_eval(
-    os.environ.get("LTI_SECRET_DICT", str(SECURE_SETTINGS.get("LTI_SECRET_DICT", {})))
-)
+CONSUMER_KEY = os.environ.get("CONSUMER_KEY", "CONSUMER_KEY")
+LTI_SECRET = os.environ.get("LTI_SECRET", "LTI_SECRET")
+LTI_SECRET_DICT_FILEPATH = os.environ.get("LTI_SECRET_DICT_FILEPATH", None)
+LTI_SECRET_DICT = {}
+if LTI_SECRET_DICT_FILEPATH is not None:
+    if os.path.exists(LTI_SECRET_DICT_FILEPATH):
+        try:
+            with open(LTI_SECRET_DICT_FILEPATH) as fh:
+                LTI_SECRET_DICT = json.load(fh)
+        except Exception as e:
+            logging.getLogger(__name__).error(
+                "unable to read lti_dict({}): {}".format(LTI_SECRET_DICT_FILEPATH, e)
+            )
+    else:
+        logging.getLogger(__name__).error(
+            "lti_dict({}) does not exit".format(LTI_SECRET_DICT_FILEPATH)
+        )
 
 SITE_ID = 1
 
-ANNOTATION_MANUAL_URL = os.environ.get(
-    "MANUAL_URL", SECURE_SETTINGS.get("annotation_manual_url", None)
-)
-ANNOTATION_MANUAL_TARGET = os.environ.get(
-    "MANUAL_TARGET", SECURE_SETTINGS.get("annotation_manual_target", None)
-)
-ANNOTATION_DB_URL = os.environ.get(
-    "ANNOTATION_DB_URL", SECURE_SETTINGS.get("annotation_database_url", "")
-)
-ANNOTATION_DB_API_KEY = os.environ.get(
-    "ANNOTATION_DB_KEY", SECURE_SETTINGS.get("annotation_db_api_key", "")
-)
-ANNOTATION_DB_SECRET_TOKEN = os.environ.get(
-    "ANNOTATION_DB_SECRET", SECURE_SETTINGS.get("annotation_db_secret_token")
-)
-ANNOTATION_PAGINATION_LIMIT_DEFAULT = os.environ.get(
-    "ANNOTATION_LIMIT_DEFAULT",
-    SECURE_SETTINGS.get("annotation_pagination_limit_default", 20),
-)
+ANNOTATION_MANUAL_URL = os.environ.get("MANUAL_URL", None)
+ANNOTATION_MANUAL_TARGET = os.environ.get("MANUAL_TARGET", None)
+ANNOTATION_DB_URL = os.environ.get("ANNOTATION_DB_URL", "")
+ANNOTATION_DB_API_KEY = os.environ.get("ANNOTATION_DB_KEY", "")
+ANNOTATION_DB_SECRET_TOKEN = os.environ.get("ANNOTATION_DB_SECRET", "")
+ANNOTATION_PAGINATION_LIMIT_DEFAULT = os.environ.get("ANNOTATION_LIMIT_DEFAULT", 20)
 ANNOTATION_TRANSCRIPT_LINK_DEFAULT = os.environ.get(
-    "ANNOTATION_TRANSCRIPT_DEFAULT",
-    SECURE_SETTINGS.get("annotation_transcript_link_default", None),
+    "ANNOTATION_TRANSCRIPT_DEFAULT", None
 )
-ANNOTATION_HTTPS_ONLY = literal_eval(
-    os.environ.get("HTTPS_ONLY", str(SECURE_SETTINGS.get("https_only", False)))
-)
-ANNOTATION_LOGGER_URL = os.environ.get(
-    "ANNOTATION_LOGGER_URL", SECURE_SETTINGS.get("annotation_logger_url", "")
-)
-ANNOTATION_STORE = os.environ.get(
-    "ANNOTATION_STORE", SECURE_SETTINGS.get("annotation_store", {})
-)
-ACCESSIBILITY = literal_eval(
-    os.environ.get("ACCESSIBILITY", str(SECURE_SETTINGS.get("accessibility", True)))
-)
-IMAGE_STORE_BACKEND = os.environ.get(
-    "IMAGE_STORE_BACKEND", str(SECURE_SETTINGS.get("image_store_backend", ""))
-)
-IMAGE_STORE_BACKEND_CONFIG = os.environ.get(
-    "IMAGE_STORE_BACKEND_CONFIG", SECURE_SETTINGS.get("image_store_backend_config", "")
+ANNOTATION_HTTPS_ONLY = os.environ.get("HTTPS_ONLY", "False").lower() == "true"
+ANNOTATION_LOGGER_URL = os.environ.get("ANNOTATION_LOGGER_URL", "")
+ACCESSIBILITY = os.environ.get("ACCESSIBILITY", "True").lower() == "true"
+IMAGE_STORE_BACKEND = os.environ.get("IMAGE_STORE_BACKEND", "")
+IMAGE_STORE_BACKEND_CONFIG = json.loads(
+    os.environ.get("IMAGE_STORE_BACKEND_CONFIG", "{}")
 )
 
 # https://docs.djangoproject.com/en/3.2/releases/3.1/#django-contrib-sessions
@@ -385,14 +339,14 @@ elif ORGANIZATION == "HARVARDX":
 
 # channels for notification
 ASGI_APPLICATION = "hxat.routing.application"
-REDIS_HOST = os.environ.get(
-    "REDIS_HOST", SECURE_SETTINGS.get("redis_host", "localhost")
-)
-REDIS_PORT = os.environ.get("REDIS_PORT", SECURE_SETTINGS.get("redis_port", "6379"))
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(REDIS_HOST, REDIS_PORT)],},
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
     }
 }
 HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() == "true"
@@ -401,9 +355,12 @@ HXAT_NOTIFY_ERRORLOG = os.environ.get("HXAT_NOTIFY_ERRORLOG", "false").lower() =
 WS_JWT_TTL = os.environ.get("WS_JWT_TTL", 300)
 
 # https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # log request-id
 LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
 NO_REQUEST_ID = "none"
 
+# raise exception when context-id and collection-id inconsistent
+# this is to prevent rerun assignments configured as previous run
+RAISE_COURSE_INCONSISTENT_EXCEPTION = False  # for backcompat, just print errors

@@ -99,7 +99,7 @@ Annotation Tool | Video | {{ target_object.target_title }}
         //'Touch',
         'TimeRangeEditor',
       ],
-      'database_url': "{% url 'annotation_store:api_root_prefix' %}",
+      'database_url': "{% url 'annotation_store:api_root_search' %}",
       'database_params': {
         "resource_link_id": "{{ resource_link_id }}",
         "utm_source": "{{ utm_source }}"

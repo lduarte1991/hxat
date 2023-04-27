@@ -108,7 +108,7 @@ var mir = Mirador({
     "options": {
       token: "{{ token }}",
       // The endpoint of the store on your server.
-			prefix: "{% url 'annotation_store:api_root_prefix' %}",
+			prefix: "{% url 'annotation_store:api_root_search' %}",
       {% if utm_source %}
       params: "?utm_source={{ utm_source }}&resource_link_id={{ resource_link_id }}",
       {% else %}

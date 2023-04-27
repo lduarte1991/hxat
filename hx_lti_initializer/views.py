@@ -175,14 +175,7 @@ def launch_lti(request):
             is_staff=True,
             resource_link_id=resource_link_id,
         )
-    else:
-        # For HX, students only access one object or collection, and don't
-        # have an index
-        # For ATG, students have the index  to choose where to go, so
-        # collection_id and object_id are probably blank for their session
-        # right now.
-        collection_id = request.LTI["launch_params"].get(settings.LTI_COLLECTION_ID)
-        object_id = request.LTI["launch_params"].get(settings.LTI_OBJECT_ID)
+    else:  # it's a learner
         save_session(
             request,
             user_id=user_id,
@@ -285,56 +278,10 @@ def launch_lti(request):
         raise e  # make sure to re-raise this exception since we shouldn't proceed
     except Exception as e:
         logger.debug("****** exception: {}".format(e))
-        # For the use case where the course head wants to display an assignment object instead
-        # of the admin_hub upon launch (i.e. for embedded use), this allows the user
-        # to be routed directly to an assignment given the correct POST parameters,
-        # as by Luis' original method of putting collection_id and object_id in the
-        # LTI tool launch params.
-        try:
-            # Keeping the HX functionality whereby students are routed to specific assignment objects
-            # This is motivated by the Poetry in America Course
-
-            # If there are variables passed into the launch indicating a desired target object, render that object
-            assignment_id = request.LTI["launch_params"].get(settings.LTI_COLLECTION_ID)
-            object_id = request.LTI["launch_params"].get(settings.LTI_OBJECT_ID)
-            if not assignment_id and not object_id:
-                assignment_id = request.GET.get(settings.LTI_COLLECTION_ID)
-                object_id = request.GET.get(settings.LTI_OBJECT_ID)
-                if not assignment_id and not object_id:
-                    logger.debug("no assignment object")
-                    raise Exception("Assignment object not specified")
-            course_id = str(course)
-            if set(roles) & set(settings.ADMIN_ROLES):
-                try:
-                    userfound = LTICourseAdmin.objects.get(
-                        admin_unique_identifier=lti_profile.user.username,
-                        new_admin_course_id=course,
-                    )
-                    course_object.add_admin(lti_profile)
-                    logger.info("CourseAdmin Pending found: %s" % userfound)
-                    userfound.delete()
-                except Exception as e:
-                    logger.info(
-                        "Not waiting to be added as admin: {}".format(e), exc_info=False
-                    )
-            logger.debug(
-                "DEBUG - User wants to go directly to annotations for a specific target object({}--{}--{}".format(
-                    course_id, assignment_id, object_id
-                )
-            )
-            url = reverse(
-                "hx_lti_initializer:access_annotation_target",
-                args=[course_id, assignment_id, object_id],
-            )
-            url += "?resource_link_id={}&utm_source={}".format(
-                resource_link_id, request.session.session_key
-            )
-            return redirect(url)
-        except Exception as e:
-            logger.debug(
-                "DEBUG - User wants the index: {} --- {}".format(type(e), e),
-                exc_info=False,
-            )
+        logger.debug(
+            "DEBUG - User wants the index: {} --- {}".format(type(e), e),
+            exc_info=False,
+        )
 
     try:
         userfound = LTICourseAdmin.objects.get(
