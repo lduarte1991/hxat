@@ -5,11 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import ValidationError
 from django.http import Http404, HttpResponse
-from django.shortcuts import (  # noqa
-    get_object_or_404,
-    redirect,
-    render,
-)
+from django.shortcuts import get_object_or_404, redirect, render  # noqa
 from django.urls import reverse
 from django.utils.html import escape
 from hx_lti_initializer.models import LTIProfile
@@ -27,7 +23,9 @@ def get_course_id(request):
 
 
 def get_lti_profile(request):
-    return LTIProfile.objects.get(anon_id=request.LTI["hx_user_id"])
+    return LTIProfile.objects.get(
+        anon_id=request.LTI["hx_user_id"], scope=request.LTI["hx_user_scope"]
+    )
 
 
 def get_lti_profile_id(request):
@@ -47,8 +45,7 @@ def open_target_object(request, collection_id, target_obj_id):
 
 @login_required
 def create_new_source(request):
-    """
-    """
+    """ """
     if request.method == "POST":
         form = SourceForm(request.POST)
         if form.is_valid():
@@ -79,8 +76,7 @@ def create_new_source(request):
 
 @login_required
 def edit_source(request, id):
-    """
-    """
+    """ """
     source = get_object_or_404(TargetObject, pk=id)
     if request.method == "POST":
         form = SourceForm(request.POST, instance=source)
