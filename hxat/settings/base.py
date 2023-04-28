@@ -27,9 +27,12 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "CHANGE_ME")
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-allowed_other_hosts = os.environ.get("ALLOWED_HOSTS", "")
+try:  # try json, otherwise, it's a comma-separated string
+    allowed_other_hosts = json.loads(os.environ.get("ALLOWED_HOSTS", "[]"))
+except json.decoder.JSONDecodeError:
+    allowed_other_hosts = os.environ.get("ALLOWED_HOSTS", "").split()
 if allowed_other_hosts:
-    ALLOWED_HOSTS.extend(allowed_other_hosts.split())
+    ALLOWED_HOSTS.extend(allowed_other_hosts)
 
 
 # Application definition
