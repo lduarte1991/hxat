@@ -1,2 +1,2 @@
-__version__ = "5.4.0"  # fix canvas-id
+__version__ = "6.0.0"  # drop oldui, lti dict as json, drop secure.py
 
