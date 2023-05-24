@@ -14,7 +14,7 @@ class CatchpyBackend(Annostore):
         super().__init__(request, asconfig)
         self.timeout = 5.0  # timeout for most actions, other than search perhaps
         self.headers = {"content-type": "application/json"}
-        self.headers["authorization"] = "token " + retrieve_token(
+        self.headers["authorization"] = b"token " + retrieve_token(
             userid=request.LTI["hx_user_id"],
             apikey=self.asconfig[1],
             secret=self.asconfig[2],
@@ -49,7 +49,7 @@ class CatchpyBackend(Annostore):
         # value, ADMIN_GROUP_ID is configurable in catchpy) in jwt.
         if self.request.LTI["is_staff"]:
             self.logger.info("updating auth token for admin")
-            self.headers["authorization"] = "token " + retrieve_token(
+            self.headers["authorization"] = b"token " + retrieve_token(
                 userid=settings.ADMIN_GROUP_ID,
                 apikey=self.asconfig[1],
                 secret=self.asconfig[2],
