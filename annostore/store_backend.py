@@ -206,7 +206,7 @@ class CatchpyBackend(Annostore):
                 list(transfer_params["userid_map"].values())[0],
             )
         )
-        self.headers["authorization"] = "token " + retrieve_token(
+        self.headers["authorization"] = b"token " + retrieve_token(
             list(transfer_params["userid_map"].values())[0],
             apikey=self.asconfig[1],
             secret=self.asconfig[2],
