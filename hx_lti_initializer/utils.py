@@ -134,6 +134,8 @@ def retrieve_token(userid, apikey, secret, ttl=1, override=None):
     if override:
         payload["override"] = [str(x) for x in override]
     token = jwt.encode(payload, secret)
+    if isinstance(token, bytes):
+        token = token.decode()
     return token
 
 
