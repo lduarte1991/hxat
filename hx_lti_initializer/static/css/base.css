@@ -729,6 +729,10 @@ p.help {
 	cursor: pointer;
 }
 
+.save.requested {
+	display: none;
+}
+
 .save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button, .save#import-button {
 	color: white;
 	background-color: #285b85;

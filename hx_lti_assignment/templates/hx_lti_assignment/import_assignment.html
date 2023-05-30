@@ -89,7 +89,7 @@ jQuery(document).ready(function() {
 	});
 	
 	jQuery('#import-button').click(function(event) {
-		jQuery('#import-button').hide();
+		jQuery('#import-button').addClass('requested');
 		jQuery('#import-cancel').html('Done');
 		jQuery('#pBar').show();
 		jQuery('.progress-bar').show();
