@@ -724,7 +724,7 @@ p.help {
 	text-align: center;
 	border-radius: 7px;
 	text-decoration: none;
-	display: inline-block;
+	display: inline-block !important;
 	font-size: 11pt;
 	cursor: pointer;
 }
