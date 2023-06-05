@@ -482,6 +482,7 @@ footer {
 
 .dropdown-menu>li>a {
   display: inline-block;
+  max-width: 95%;
 }
 
 .full-width {
