@@ -482,6 +482,7 @@ footer {
 
 .dropdown-menu>li>a {
   display: inline-block;
+  max-width: 95%;
 }
 
 .full-width {
@@ -566,7 +567,7 @@ body {
 	position: relative;
 }
 
-.bootstrap-select.form-control:before {
+/* .bootstrap-select.form-control:before {
 	content: '\f0d7';
     font-family: FontAwesome;
     color: black;
@@ -578,7 +579,7 @@ body {
     border: 2px solid lightgray;
     cursor: pointer;
     pointer-events: none;
-}
+} */
 
 .bootstrap-select.form-control.firefox.win:before {
     font-size: 15pt;
@@ -600,6 +601,7 @@ body {
 	background-color: white;
 	border: 2px solid lightgray;
 	margin-top:-17px;
+	max-width: 100%;
 }
 
 .dropdown-toggle[data-id^="id_select_existing_user"] + .dropdown-menu,
@@ -723,9 +725,13 @@ p.help {
 	text-align: center;
 	border-radius: 7px;
 	text-decoration: none;
-	display: inline-block;
+	display: inline-block !important;
 	font-size: 11pt;
 	cursor: pointer;
+}
+
+.save.requested#import-button {
+	display: none!important;
 }
 
 .save#save-button, .save#annotation-settings-save-button, .save#database-settings-cancel-button, .save#source-save-button, .save#import-button {

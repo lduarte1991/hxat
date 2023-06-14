@@ -52,7 +52,7 @@
                 {% if 'studio.edx' in request.META.HTTP_REFERER or 'studio.edge.edx' in request.META.HTTP_REFERER %}
                    You are in Studio, please use live or preview to access the admin hub.
                 {% else  %}
-                <p>ObjectID is missing: Contact your instructor immediately.</p>
+                <p>Starting document not configured: Contact your instructor immediately.</p>
                 {% endif %}
             {% endif %}
         </main>

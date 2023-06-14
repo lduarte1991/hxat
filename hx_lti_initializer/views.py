@@ -7,20 +7,23 @@ other information that will be rendered to the access/init screen to the user.
 """
 
 from abstract_base_classes.target_object_database_api import TOD_Implementation
-from hxat.exceptions import AnnotationTargetDoesNotExist
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.templatetags.static import static
 from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from hx_lti_assignment.models import Assignment, AssignmentTargets
-from hx_lti_initializer.forms import CourseForm, EmbedLtiSelectionForm, EmbedLtiResponseForm
+from hx_lti_initializer.forms import (
+    CourseForm,
+    EmbedLtiResponseForm,
+    EmbedLtiSelectionForm,
+)
 from hx_lti_initializer.models import (
     LTICourse,
     LTICourseAdmin,
@@ -34,6 +37,7 @@ from hx_lti_initializer.utils import (
     retrieve_token,
     save_session,
 )
+from hxat.exceptions import AnnotationTargetDoesNotExist
 from lti import ToolConfig
 from target_object_database.models import TargetObject
 
@@ -54,260 +58,11 @@ logger = logging.getLogger(__name__)
 class PlatformError(Exception):
     pass
 
-@csrf_exempt
-def launch_lti(request):
-    """
-    Gets a request from an LTI consumer.
-    Passes along information to render a welcome screen to the user.
-
-    Assumptions: LTI launch request has already been validated by middleware
-    """
-
-    # collect anonymous_id and consumer key in order to fetch LTIProfile
-    # if it exists, we initialize the tool otherwise, we create a new user
-    user_id = request.LTI["launch_params"]["user_id"]
-    logger.debug("DEBUG - Found anonymous ID in request: %s" % user_id)
-    if user_id == 'student':
-        raise PlatformError("Studio is not supported. Please publish and complete content configuration in the live environment.")
-    course = request.LTI["launch_params"][settings.LTI_COURSE_ID]
-    logger.debug("DEBUG - Found course being accessed: %s" % course)
-
-    resource_link_id = request.LTI["launch_params"]["resource_link_id"]
-
-    # This is where we identify the "scope" of the LTI user_id (anon_id), meaning
-    # the scope in which the identifier is unique. In canvas this is the domain instance,
-    # where as in edX this is the course instance.
-    #
-    # The idea is that the combination of the LTI user_id (anon_id) and scope should be
-    # globally unique.
-    # 28aug20 naomi: see [1] at the bottom of file
-    if settings.ORGANIZATION == "HARVARDX":  # meaning, edx
-        user_scope = "course:{}".format(course)
-    else:  # assumes canvas
-        tool_consumer_instance_guid = request.LTI["launch_params"].get(
-            "tool_consumer_instance_guid", None
-        )
-        if tool_consumer_instance_guid:
-            user_scope = "consumer:{}".format(tool_consumer_instance_guid)
-        else:
-            logger.debug(
-                "organization({}) using user_scope:course({})".format(
-                    settings.ORGANIZATION, course
-                )
-            )
-            user_scope = "course:{}".format(course)
-    logger.debug("DEBUG - user scope is: %s" % user_scope)
-
-    # default to student
-    save_session(request, is_staff=False)
-
-    # this is where canvas will tell us what level individual is coming into
-    # the tool the 'roles' field usually consists of just 'Instructor'
-    # or 'Learner'
-    roles = request.LTI["launch_params"][settings.LTI_ROLES]
-    logger.debug("DEBUG - user logging in with roles: " + str(roles))
-
-    # this is the short, human readable label for the course context
-    context_label = request.LTI["launch_params"].get("context_label", "")
-
-    # This is the name that we will show on the UI if provided...
-    # EDX-NOTE: edx does not return the person's name!
-    display_name = request.LTI["launch_params"].get("lis_person_name_full", None)
-    if not display_name:
-        display_name = request.LTI["launch_params"].get("lis_person_sourcedid", "")
-
-    # This is the unique identifier for the person in the source system
-    # In canvas this would be the SIS user id, in edX the registered username
-    external_user_id = request.LTI["launch_params"].get("lis_person_sourcedid", "")
-
-    # This handles the rare case in which we have neither display name nor external user id
-    if not (display_name or external_user_id):
-        try:
-            lti_profile = LTIProfile.objects.get(anon_id=str(course))
-        except LTIProfile.DoesNotExist:
-            logger.error("username({}) not found for context({})".format(course, context_label))
-            raise PermissionDenied("username not found in LTI launch")
-        except MultipleObjectsReturned as e:
-            logger.error(
-                "unable to guess username for course({}): {}".format(course, e)
-            )
-            raise PermissionDenied("unable to find username")
-        else:
-            roles = ["student"]
-            display_name = lti_profile.user.username
-            messages.warning(
-                request, "edX still has not fixed issue with no user_id in studio."
-            )
-            messages.error(
-                request,
-                "Warning: you are logged in as a Preview user. Please view this in live to access admin hub.",
-            )
-    logger.debug("DEBUG - user name: " + display_name)
-
-    # Check whether user is a admin, instructor or teaching assistant
-    if set(roles) & set(settings.ADMIN_ROLES):
-        try:
-            # See if the user already has a profile, and use it if so.
-            lti_profile = LTIProfile.objects.get(anon_id=user_id)
-            logger.debug("DEBUG - LTI Profile was found via anonymous id.")
-        except LTIProfile.DoesNotExist:
-            # if it's a new user (profile doesn't exist), set up and save a new LTI Profile
-            logger.debug("DEBUG - LTI Profile NOT found. New User to be created.")
-            user, lti_profile = create_new_user(
-                anon_id=user_id,
-                username=external_user_id,
-                display_name=display_name,
-                roles=roles,
-                scope=user_scope,
-            )
-            # log the user into the Django backend
-        lti_profile.user.backend = "django.contrib.auth.backends.ModelBackend"
-        saved_lti_launches = request.session["LTI_LAUNCH"]
-        login(request, lti_profile.user)
-        request.session.setdefault("LTI_LAUNCH", saved_lti_launches)
-        save_session(
-            request,
-            user_id=user_id,
-            user_name=display_name,
-            user_scope=user_scope,
-            context_id=course,
-            roles=roles,
-            is_staff=True,
-            resource_link_id=resource_link_id,
-        )
-    else:  # it's a learner
-        save_session(
-            request,
-            user_id=user_id,
-            user_name=display_name,
-            user_scope=user_scope,
-            context_id=course,
-            roles=roles,
-            is_staff=False,
-            resource_link_id=resource_link_id,
-        )
-
-    # now it's time to deal with the course_id it does not associate
-    # with users as they can flow in and out in a MOOC
-    try:
-        course_object = LTICourse.get_course_by_id(course)
-        logger.debug("DEBUG - Course was found %s" % course)
-
-        # save the course name to the session so it auto-populate later.
-        save_session(
-            request,
-            course_name=course_object.course_name,
-            course_id=course_object.id,
-        )
-
-    except LTICourse.DoesNotExist:
-        logger.debug("DEBUG - Course {} was NOT found. Will be created.".format(course))
-
-        # Put a message on the screen to indicate to the user that the course doesn't exist
-        message_error = "Sorry, the course you are trying to reach does not exist."
-        messages.error(request, message_error)
-
-        if set(roles) & set(settings.ADMIN_ROLES):
-            # This must be the instructor's first time accessing the annotation tool
-            # Make him/her a new course within the tool
-
-            message_error = "Because you are an instructor, a course has been created for you, please refresh the page to begin editing your course."
-            messages.warning(request, message_error)
-
-            # create and save a new course for the instructor, with a default name of their canvas course's name
-            context_title = "noname-{}".format(time.time())  # random name as anon_id
-            if "context_title" in request.LTI["launch_params"]:
-                context_title = request.LTI["launch_params"]["context_title"]
-            course_object = LTICourse.create_course(
-                course, lti_profile, name=context_title
-            )
-            create_new_user(
-                anon_id=str(course),
-                username="preview:{}".format(course_object.id),
-                display_name="Preview {}".format(course_object),
-                roles=["student"],
-                scope=user_scope,
-            )
-
-            # save the course name to the session so it auto-populate later.
-            save_session(
-                request,
-                course_name=course_object.course_name,
-                course_id=course_object.id,
-            )
-        else:
-            logger.info("Course not created because user does not have an admin role")
-    try:
-        logger.debug("DEBUG *-* resource_link_id={}".format(resource_link_id))
-        config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
-        collection_id = config.assignment_target.assignment.assignment_id
-        object_id = config.assignment_target.target_object_id
-        logger.debug(
-            "DEBUG - LTIResourceLinkConfig: resource_link_id=%s collection_id=%s object_id=%s"
-            % (resource_link_id, collection_id, object_id)
-        )
-        course_id = str(course)
-        if set(roles) & set(settings.ADMIN_ROLES):
-            try:
-                userfound = LTICourseAdmin.objects.get(
-                    admin_unique_identifier=lti_profile.user.username,
-                    new_admin_course_id=course,
-                )
-                course_object.add_admin(lti_profile)
-                logger.info("CourseAdmin Pending found: %s" % userfound)
-                userfound.delete()
-            except Exception as e:
-                logger.info("Not waiting to be added as Admin: {}".format(e))
-        logger.debug(
-            "DEBUG - User wants to go directly to annotations for a specific target object using UI"
-        )
-        url = reverse(
-            "hx_lti_initializer:access_annotation_target",
-            args=[course_id, collection_id, object_id],
-        )
-        url += "?resource_link_id={}&utm_source={}".format(
-            resource_link_id, request.session.session_key
-        )
-        return redirect(url)
-    except AnnotationTargetDoesNotExist as e:
-        logger.warning("Could not access annotation target using resource config.")
-        logger.info("Deleting resource config because it is invalid.")
-        LTIResourceLinkConfig.objects.filter(resource_link_id=resource_link_id).delete()
-        logger.info("Proceed to the admin hub.")
-    except PermissionDenied as e:
-        raise e  # make sure to re-raise this exception since we shouldn't proceed
-    except Exception as e:
-        logger.debug("****** exception: {}".format(e))
-        logger.debug(
-            "DEBUG - User wants the index: {} --- {}".format(type(e), e),
-            exc_info=False,
-        )
-
-    try:
-        userfound = LTICourseAdmin.objects.get(
-            admin_unique_identifier=lti_profile.user.username,
-            new_admin_course_id=course,
-        )
-        course_object.add_admin(lti_profile)
-        logger.info("CourseAdmin Pending found: %s" % userfound)
-        userfound.delete()
-    except Exception as e:
-        logger.debug(
-            "DEBUG - Not waiting to be added as admin: {}".format(e), exc_info=False
-        )
-
-    url = reverse(
-        "hx_lti_initializer:course_admin_hub"
-    ) + "?resource_link_id={}&utm_source={}".format(
-        resource_link_id, request.session.session_key
-    )
-    return redirect(url)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def embed_lti(request):
-    '''
+    """
     Generates a content selection view to insert the LTI tool into a page in the LMS.
     Assumes that the LTI ContentItemSelectionRequest has been validated (e.g. oauth signature).
 
@@ -315,33 +70,49 @@ def embed_lti(request):
     See also:
     - https://www.imsglobal.org/specs/lticiv1p0-intro
     - https://www.imsglobal.org/specs/lticiv1p0/specification
-    '''
-    user_id = request.POST.get('user_id')
-    roles = request.POST.get('roles', '').split(",")
-    context_id = request.POST.get('context_id')
-    content_item_return_url = request.POST.get('content_item_return_url')
+    """
+    user_id = request.POST.get("user_id")
+    roles = request.POST.get("roles", "").split(",")
+    context_id = request.POST.get("context_id")
+    content_item_return_url = request.POST.get("content_item_return_url")
 
     # initial checks to ensure we have a return URL for the content selection
     # and that the user has permission
     if not content_item_return_url:
-        return HttpResponse(status=400, content="Error: ContentItemSelectionRequest is missing content_item_return_url")
+        return HttpResponse(
+            status=400,
+            content="Error: ContentItemSelectionRequest is missing content_item_return_url",
+        )
 
-    is_admin = set(roles) & set(settings.ADMIN_ROLES)
+    is_admin = set(roles) & set(settings.LTI_ADMIN_ROLES)
     if not is_admin:
-        return HttpResponse(status=403, content="You must be a course admin to insert content items")
+        return HttpResponse(
+            status=403, content="You must be a course admin to insert content items"
+        )
 
     # ensure that the course and user profile exist, otherwise we can't proceed
     # TODO: refactor the course/user profile creation logic in launch_lti() so that we can automatically do that here too.
     try:
         course_instance = LTICourse.objects.get(course_id=context_id)
     except LTICourse.DoesNotExist:
-        return HttpResponse(status=404, content="Content not found for course. Please launch the tool through the course navigation and create some content.")
+        return HttpResponse(
+            status=404,
+            content="Content not found for course. Please launch the tool through the course navigation and create some content.",
+        )
 
     try:
+        # TODO: use unique-together (user_id, scope) cause might return multiple profiles
+        # not sure at this point we can grab scope from request
+        # lti_profile = LTIProfile.objects.get(anon_id=user_id, scope=request.LTI["hx_user_scope"]
         lti_profile = LTIProfile.objects.get(anon_id=user_id)
-        login(request, lti_profile.user)  # required since the form is POSTed to embed_lti_response
+        login(
+            request, lti_profile.user
+        )  # required since the form is POSTed to embed_lti_response
     except LTIProfile.DoesNotExist:
-        return HttpResponse(status=404, content="User profile not found. Please launch the tool through the course navigation so that your profile is created automatically.")
+        return HttpResponse(
+            status=404,
+            content="User profile not found. Please launch the tool through the course navigation so that your profile is created automatically.",
+        )
 
     # render a form with the content items (annotation objects) that can be selected
     selection_form = EmbedLtiSelectionForm(
@@ -357,7 +128,7 @@ def embed_lti(request):
 @login_required
 @require_http_methods(["POST"])
 def embed_lti_response(request):
-    '''
+    """
     This view returns a POSTed response back to the tool consumer that is oauth
     signed to verify its authenticity.
 
@@ -369,8 +140,8 @@ def embed_lti_response(request):
     The reason is that an embedded LTI link item will NOT have a distinct resource link ID
     compared to a module item, assignment item or course navigation item. So if the tool is
     embedded on multiple pages, they will all share the same resource_link_id.
-    '''
-    content_item_return_url = request.POST.get('content_item_return_url')
+    """
+    content_item_return_url = request.POST.get("content_item_return_url")
     content_item = request.POST.get("content_item", "")
     (collection_id, object_id) = content_item.split("/", 2)
 
@@ -401,7 +172,7 @@ def embed_lti_response(request):
                     "object_id": object_id,
                 },
             }
-        ]
+        ],
     }
     data = {
         "lti_message_type": "ContentItemSelection",
@@ -455,12 +226,14 @@ def edit_course(request, id):
                                 new_admin_course_id=course.course_id,
                             )
                             new_course_admin.save()
-                        except:
+                        except Exception:
                             # admin already pending
                             logger.info("Admin already pending.")
 
             # save the course name to the session so it auto-populate later.
-            save_session(request, course_name=course.course_name)
+            save_session(
+                request, request.LTI["resource_link_id"], course_name=course.course_name
+            )
 
             messages.success(request, "Course was successfully edited!")
             url = reverse(
@@ -472,13 +245,7 @@ def edit_course(request, id):
     else:
         form = CourseForm(instance=course, user_scope=user_scope)
 
-    try:
-        pending_admins = LTICourseAdmin.objects.filter(
-            new_admin_course_id=course.course_id
-        )
-    except:
-        pending_admins = None
-
+    pending_admins = LTICourseAdmin.objects.filter(new_admin_course_id=course.course_id)
     return render(
         request,
         "hx_lti_initializer/edit_course.html",
@@ -497,7 +264,6 @@ def course_admin_hub(request):
     The index view for both students and instructors. Without the 'is_instructor' flag,
     students are directed to a version of admin_hub with reduced privileges
     """
-    is_instructor = request.LTI["is_staff"]
     courses_for_user = LTICourse.objects.filter(course_id=request.LTI["hx_context_id"])
     files_in_courses = TOD_Implementation.get_dict_of_files_from_courses(
         courses_for_user
@@ -512,8 +278,7 @@ def course_admin_hub(request):
         object_id = config.assignment_target.target_object_id
         to = TargetObject.objects.get(pk=object_id)
         starter_object = to.target_title
-
-    except:
+    except (LTIResourceLinkConfig.DoesNotExist, TargetObject.DoesNotExist):
         object_id = None
         collection_id = None
         to = None
@@ -584,11 +349,12 @@ def access_annotation_target(
         hide_sidebar = request.LTI["launch_params"][
             "custom_hide_sidebar_instance"
         ].split(",")
-    except:
+    except KeyError:
         hide_sidebar = []
 
     save_session(
         request,
+        request.LTI["resource_link_id"],
         collection_id=assignment_id,
         object_id=object_id,
         object_uri=object_uri,
@@ -679,7 +445,9 @@ def access_annotation_target(
 
     original.update(get_paras)
     if (
-        targ_obj.target_type == "tx" or targ_obj.target_type == "ig" or targ_obj.target_type == "vd"
+        targ_obj.target_type == "tx"
+        or targ_obj.target_type == "ig"
+        or targ_obj.target_type == "vd"
     ) and assignment.use_hxighlighter:
         return render(
             request, "%s/detail_hxighlighter.html" % targ_obj.target_type, original
@@ -696,8 +464,6 @@ def instructor_dashboard_view(request):
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
     resource_link_id = request.LTI["resource_link_id"]
-    context_id = request.LTI["hx_context_id"]
-    user_id = request.LTI["hx_user_id"]
     context = {
         "username": request.LTI["hx_user_name"],
         "is_instructor": request.LTI["is_staff"],
@@ -728,7 +494,6 @@ def instructor_dashboard_student_list_view(request):
         raise PermissionDenied("You must be a staff member to view the dashboard.")
 
     context_id = request.LTI["hx_context_id"]
-    user_id = request.LTI["hx_user_id"]
     resource_link_id = request.LTI["resource_link_id"]
 
     # Fetch the annotations and time how long the request takes
@@ -820,7 +585,7 @@ def change_starting_resource(request, assignment_id, object_id):
             )
             config.assignment_target = assignment_target
             created = False
-        except:
+        except LTIResourceLinkConfig.DoesNotExist:
             config = LTIResourceLinkConfig(
                 resource_link_id=resource_link_id, assignment_target=assignment_target
             )
@@ -835,24 +600,28 @@ def change_starting_resource(request, assignment_id, object_id):
 
 
 def csrf_failure(request, reason=""):
-    ctx = {'message': reason}
-    return render(request, 'main/csrf_error.html', context=ctx)
+    ctx = {"message": reason}
+    return render(request, "main/csrf_error.html", context=ctx)
 
 
 def tool_config(request):
-    '''
+    """
     Generates XML tool config.
     See also: https://canvas.instructure.com/doc/api/file.tools_xml.html
-    '''
+    """
     base_url = request.build_absolute_uri("/")[:-1]
 
     title = settings.LTI_TOOL_CONFIGURATION["title"]
     description = settings.LTI_TOOL_CONFIGURATION["description"]
-    course_navigation_enabled = settings.LTI_TOOL_CONFIGURATION.get("course_navigation_enabled", False)
+    course_navigation_enabled = settings.LTI_TOOL_CONFIGURATION.get(
+        "course_navigation_enabled", False
+    )
     new_tab = settings.LTI_TOOL_CONFIGURATION.get("new_tab", False)
     embed_enabled = settings.LTI_TOOL_CONFIGURATION.get("embed_enabled", False)
     embed_url = base_url + reverse(settings.LTI_TOOL_CONFIGURATION["embed_url"])
-    embed_icon_url = base_url + static(settings.LTI_TOOL_CONFIGURATION["embed_icon_url"])
+    embed_icon_url = base_url + static(
+        settings.LTI_TOOL_CONFIGURATION["embed_icon_url"]
+    )
     launch_url = base_url + reverse(settings.LTI_TOOL_CONFIGURATION["launch_url"])
 
     lti_tool_config = ToolConfig(
@@ -867,11 +636,9 @@ def tool_config(request):
                 # copied to the POST body. Note that this is required if the launch URL includes GET parameters,
                 # such as passing a custom assignment ID and object ID.
                 "oauth_compliant": "true",
-
                 # The privacy_level parameter determines what personal information to provide to the tool.
                 # Valid values include: "anonymous", "name_only", "public"
                 "privacy_level": "public",
-
                 # Configuration for course navigation link
                 "course_navigation": {
                     "enabled": "true" if course_navigation_enabled else "false",
@@ -879,7 +646,6 @@ def tool_config(request):
                     "text": title,
                     "windowTarget": "_blank" if new_tab else "_self",
                 },
-
                 # Configuration for WYSIWYG editor button
                 "editor_button": {
                     "enabled": "true" if embed_enabled else "false",
@@ -898,13 +664,251 @@ def tool_config(request):
     return HttpResponse(lti_tool_config.to_xml(), content_type="text/xml")
 
 
+@csrf_exempt
+def launch_lti(request):
+    """
+    Process lti-launch request.
+    Assumptions: LTI launch request has already been validated by middleware
+
+    - identifies the user
+    - identifies the course, assignment, target-object user wants to access
+    - redirects to the assignment page
+    - or creates the course, if it does not exist and user is staff
+    - or redirects to the index if not course in request, user is not staff, and canvas
+    - if user is staff and user not in db, create user in db
+    - if user is staff, adds user as course admin
+
+    1. learner wants to access target object
+    2. learner wants to access the index
+    3. instructor first access to the course
+    4. instructor wants to configure first assignment
+    5. instructor wants to access target object
+    """
+    resource_link_id = request.LTI["launch_params"]["resource_link_id"]
+    context_id = request.LTI["launch_params"][settings.LTI_COURSE_ID]
+
+    # scope in which the user_id is unique. In canvas this is the domain instance
+    # (one id per canvas instance) and in edx,the course instance (the same user will
+    # have different user_ids in different courses). The idea is that the combination
+    # of the LTI user_id (anon_id in edx) and scope should be globally unique.
+    # 28aug20 naomi: see [1] at the bottom of file
+    user_scope = "course:{}".format(context_id)  # edx is default
+    user_id = request.LTI["launch_params"][settings.LTI_USER_ID]
+    if "canvas" == settings.PLATFORM:
+        tool_consumer_instance_guid = request.LTI["launch_params"].get(
+            "tool_consumer_instance_guid", None
+        )
+        if tool_consumer_instance_guid:
+            user_scope = "consumer:{}".format(tool_consumer_instance_guid)
+
+    # user_id from platform:
+    # canvas uses SIS user id; edX, the registered username
+    # (lis_person_sourcedid is guaranteed by middleware)
+    external_user_id = request.LTI["launch_params"].get("lis_person_sourcedid")
+    display_name = request.LTI["launch_params"].get(
+        # EDX-NOTE: edx does not send the lis_person_name_full
+        "lis_person_name_full",
+        external_user_id,
+    )
+    logger.debug(
+        "launch_lti: user_id({}) external_user_id({}) display_name({}) user_scope({})".format(
+            user_id, external_user_id, display_name, user_scope
+        )
+    )
+
+    # 'roles' field usually consists of just 'Instructor' or 'Learner'
+    roles = request.LTI["launch_params"][settings.LTI_ROLES]
+    is_staff = len(set(roles) & set(settings.LTI_ADMIN_ROLES)) > 0
+    logger.debug(
+        "lti_launch: user({}) roles({}) is_staff({})".format(user_id, roles, is_staff)
+    )
+
+    # edx studio: prevents user to see any hxat content in "non-live lti env"
+    # ATT: this case should not happen when user is a learner
+    if "student" == user_id.lower() and "edx" == settings.PLATFORM:
+        raise PlatformError(
+            "Studio is not supported. Please publish and complete content configuration in the live environment."
+        )
+
+    # saves in session what we have so far
+    save_session(
+        request,
+        resource_link_id,
+        user_id=user_id,
+        user_name=display_name,
+        user_scope=user_scope,
+        roles=roles,
+        is_staff=is_staff,
+        context_id=context_id,
+    )
+
+    # checks course to be accessed; in canvas course can be None, meaning index/dashboard
+    logger.debug(
+        "lti_launch: context_id({}) resource_link_id({})".format(
+            context_id, resource_link_id
+        )
+    )
+    try:
+        course_object = LTICourse.get_course_by_id(context_id)
+    except LTICourse.DoesNotExist:
+        if not is_staff:
+            logger.debug(
+                "lti_launch: access to closed or nonexistent course({})".format(
+                    context_id
+                )
+            )
+            raise PlatformError(
+                'Course "{}" is not supported.'.format(
+                    request.LTI["launch_params"].get("context_title", context_id)
+                )
+            )
+        else:  # is instructor, so the course should be created
+            logger.debug(
+                "lti_launch: course({}) to be CREATED by user({})".format(
+                    context_id, user_id
+                )
+            )
+            # goto create course
+
+    else:  # course found, save in session
+        save_session(
+            request,
+            resource_link_id,
+            context_id=context_id,
+            course_name=course_object.course_name,
+            course_id=course_object.id,
+        )
+        # login user if is_staff
+        if is_staff:
+            # fetch or create and add profile to course admins
+            lti_profile = get_lti_admin(
+                user_id, external_user_id, display_name, roles, user_scope
+            )
+            course_object.course_admins.add(lti_profile)
+            course_object.save()
+            # admin user django login
+            login(request, lti_profile.user)
+
+        redirect_url = url2redirect_targetobject(
+            request, resource_link_id, context_id, is_staff, user_id
+        )
+        return redirect(redirect_url)
+
+    # by now we know: user is staff and course does not exist. First access to the course!
+    lti_profile = get_lti_admin(
+        user_id, external_user_id, display_name, roles, user_scope
+    )
+    # admin user django login
+    login(request, lti_profile.user)
+    course_object = create_lti_course(
+        request, resource_link_id, context_id, lti_profile
+    )
+
+    # save the course_name in session
+    save_session(
+        request,
+        resource_link_id,
+        course_name=course_object.course_name,
+        course_id=course_object.id,
+    )
+    url = "{}?resource_link_id={}&utm_source={}".format(
+        reverse("hx_lti_initializer:course_admin_hub"),
+        resource_link_id,
+        request.session.session_key,
+    )
+    return redirect(url)
+
+
+def url2redirect_targetobject(request, resource_link_id, context_id, is_staff, user_id):
+    try:
+        config = LTIResourceLinkConfig.objects.get(resource_link_id=resource_link_id)
+    except LTIResourceLinkConfig.DoesNotExist:  # no starting object for this course
+        if not is_staff and "edx" == settings.PLATFORM:
+            raise PlatformError(
+                request,
+                "course({}) is missing intial document. Contact your instructor".format(
+                    context_id
+                ),
+            )
+        logger.debug("lti_launch: user({}) wants the INDEX".format(user_id))
+        url = "{}?resource_link_id={}&utm_source={}".format(
+            reverse("hx_lti_initializer:course_admin_hub"),
+            resource_link_id,
+            request.session.session_key,
+        )
+        return url
+
+    else:  # found a resourceLinkConfig
+        collection_id = config.assignment_target.assignment.assignment_id
+        object_id = config.assignment_target.target_object_id
+        logger.debug(
+            "lti_launch: resource_link_idi({}) collection_id({}) object_idi({})".format(
+                resource_link_id, collection_id, object_id
+            )
+        )
+        url = "{}?resource_link_id={}&utm_source={}".format(
+            reverse(
+                "hx_lti_initializer:access_annotation_target",
+                args=[context_id, collection_id, object_id],
+            ),
+            resource_link_id,
+            request.session.session_key,
+        )
+        return url
+
+
+def get_lti_admin(user_id, external_user_id, display_name, roles, user_scope):
+    """fetch lti_profile or create. Assumes is_staff == True."""
+    try:
+        # admin already exists?
+        lti_profile = LTIProfile.objects.get(anon_id=user_id, scope=user_scope)
+    except LTIProfile.DoesNotExist:
+        logger.debug(
+            "ltilaunch - creating LTIProfile({}, {}).".format(
+                external_user_id, user_scope
+            )
+        )
+        lti_profile = create_lti_admin(
+            user_id, external_user_id, display_name, roles, user_scope
+        )
+    return lti_profile
+
+
+def create_lti_admin(user_id, external_user_id, display_name, roles, user_scope):
+    # first access means it has to create the user profile
+    user, lti_profile = create_new_user(
+        anon_id=user_id,
+        username=external_user_id,
+        display_name=display_name,
+        roles=roles,
+        scope=user_scope,
+    )
+    return lti_profile
+
+
+def create_lti_course(request, resource_link_id, context_id, lti_profile):
+    """assumes user_id is staff and course does not exist."""
+
+    # create course and adds user as course admin
+    context_title = "changeme-{}".format(time.time())  # random name as anon_id
+    if "context_title" in request.LTI["launch_params"]:
+        context_title = request.LTI["launch_params"]["context_title"]
+    course_object = LTICourse.create_course(context_id, lti_profile, name=context_title)
+    logger.debug(
+        "user({}) created course({})".format(
+            lti_profile.user.username, course_object.course_id
+        )
+    )
+    return course_object
+
+
 """
 [1] tool_consumer_instance_id and user-scope
 
-* tool_consumer_instance_id is an OPTIONAL lti-param that identifies an instance of the
+* tool_consumer_instance_guid is an OPTIONAL lti-param that identifies an instance of the
   consumer/platform (because lti specs covers multi-tenancy, say, a hxat connected to 2
   instances of edx: one from HUGSE and other from HX
-* hxat creates user/profile with lti-role in settings.ADMIN_ROLES (e.g. "Administrator",
+* hxat creates user/profile with lti-role in settings.LTI_ADMIN_ROLES (e.g. "Administrator",
   "Instructor", "urn:lti:instrole:ims/lis/Administrator"). This is for authorization for
   editing course, assignments, target objects, etc.
 * in edx, each course has a set of user-ids, meaning the same person can register for
@@ -913,15 +917,16 @@ def tool_config(request):
 * in canvas, the user-id is the same across the platform; so a canvas user-id identifies
   the person.
 * So, hxat needs a user-id and user-scope to identify a person, for edx the user-scope
-  is the course, for canvas is the platform or the tool_consumer_instance_id.
-* as stated, tool_consumer_instance_id is OPTIONAL and the fact that the platform does
+  is the course, for canvas is the platform or the tool_consumer_instance_guid.
+* as stated, tool_consumer_instance_guid is OPTIONAL and the fact that the platform does
   not include it in its lti-params means the platform expects the tool to be
   single-tenancy and doesn't refer at all of to the user-scope.
 * this all means that settings.ORGANIZATION implies that, regarding user-scope:
   . HARVARDX == user_scope is course as in edx
   . !HARVARDX and consumer_instance == user_scope is platform_instance as in canvas
   . !HARVARDX and !consumer_instance == user_scope assumes course as in edx
-* TODO: review user of ORGANIZATION; maybe lti 1.3 solves it? still depends on the
-  platform implementation of lti 1.3 though...
 
+07mar23: nmaekawa
+ regarding user_scope to be an unique id: there is no restriction in the model that
+ enforces that...
 """

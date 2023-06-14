@@ -6,12 +6,11 @@ import pytest
 from dateutil import tz
 from django.conf import settings
 from django.urls import reverse
-from lti import ToolConsumer
-from lti.tool_outbound import ToolOutbound
-
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse
 from hx_lti_initializer.utils import create_new_user
+from lti import ToolConsumer
+from lti.tool_outbound import ToolOutbound
 from target_object_database.models import TargetObject
 
 
@@ -50,14 +49,20 @@ def course_instructor_factory(user_profile_factory):
 def assignment_target_factory():
     def _assignment_target_factory(course, **kwargs):
         target_object = TargetObject.objects.create(
-            target_title=kwargs.get("target_title", "{} Title".format(uuid.uuid4().hex)),
-            target_author=kwargs.get("target_author", "John {}".format(uuid.uuid4().int)),
+            target_title=kwargs.get(
+                "target_title", "{} Title".format(uuid.uuid4().hex)
+            ),
+            target_author=kwargs.get(
+                "target_author", "John {}".format(uuid.uuid4().int)
+            ),
             target_type=kwargs.get("target_type", "tx"),
             target_content=kwargs.get("target_content", ""),
         )
         assignment = Assignment.objects.create(
             course=course,
-            assignment_name=kwargs.get("assignment_name", "Assignment {}".format(uuid.uuid4().hex)),
+            assignment_name=kwargs.get(
+                "assignment_name", "Assignment {}".format(uuid.uuid4().hex)
+            ),
             pagination_limit=settings.ANNOTATION_PAGINATION_LIMIT_DEFAULT,
             # default from settings, this is set by UI
             annotation_database_url=settings.ANNOTATION_DB_URL,
@@ -102,7 +107,9 @@ def random_assignment_target():
         pagination_limit=100,
     )
     assignment_target = AssignmentTargets.objects.create(
-        assignment=assignment, target_object=target_object, order=1,
+        assignment=assignment,
+        target_object=target_object,
+        order=1,
     )
 
     return {
@@ -186,29 +193,28 @@ def lti_launch_params_factory():
 @pytest.fixture
 def lti_content_item_request_factory():
     def _params_factory(
-            course_id,
-            user_name,
-            user_id,
-            user_roles,
-            launch_url,
-            course_name=None,
-            consumer_key=None,
-            consumer_secret=None,
-            tool_consumer_instance_guid=None,
+        course_id,
+        user_name,
+        user_id,
+        user_roles,
+        launch_url,
+        course_name=None,
+        consumer_key=None,
+        consumer_secret=None,
+        tool_consumer_instance_guid=None,
     ):
         # See also:
         #   https://www.imsglobal.org/specs/lticiv1p0/specification
         # Note: The resource_link_id should NOT be passed.
         params = {
-            'lti_message_type': 'ContentItemSelectionRequest',
-            'lti_version': 'LTI-1p0',
-            'accept_media_types': 'image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*',
-            'accept_presentation_document_targets': 'embed,frame,iframe,window',
-            'accept_unsigned': 'true',
-            'accept_multiple': 'true',
-            'auto_create': 'false',
-            'content_item_return_url': 'https://lms.fake/courses/123456/external_content/success/external_tool_dialog',
-            'context_id': uuid.uuid4().hex,
+            "lti_message_type": "ContentItemSelectionRequest",
+            "lti_version": "LTI-1p0",
+            "accept_media_types": "image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*",
+            "accept_presentation_document_targets": "embed,frame,iframe,window",
+            "accept_unsigned": "true",
+            "accept_multiple": "true",
+            "auto_create": "false",
+            "content_item_return_url": "https://lms.fake/courses/123456/external_content/success/external_tool_dialog",
             "lis_person_sourcedid": user_name,
             "user_id": user_id,
             "roles": user_roles,
@@ -254,6 +260,36 @@ def course_user_lti_launch_params(
         launch_url=lti_launch_url,
     )
     return (course, user, params)
+
+
+@pytest.fixture
+def course_user_lti_launch_params_factory(
+    user_profile_factory,
+    course_instructor_factory,
+    lti_path,
+    lti_launch_url,
+    lti_launch_params_factory,
+):
+    def _cupa_factory(is_staff=False):
+        course, i = course_instructor_factory()
+        if is_staff:
+            user_roles = ["Instructor"]
+            user = i
+        else:
+            user_roles = ["Learner"]
+            user = user_profile_factory(roles=user_roles)
+        resource_link_id = uuid.uuid4().hex
+        params = lti_launch_params_factory(
+            course_id=course.course_id,
+            user_name=user.name,
+            user_id=user.anon_id,
+            user_roles=user_roles,
+            resource_link_id=resource_link_id,
+            launch_url=lti_launch_url,
+        )
+        return (course, user, params)
+
+    return _cupa_factory
 
 
 @pytest.fixture
@@ -358,7 +394,10 @@ def make_annotatorjs_object(age_in_hours=0, media="Text", user=None):
             "id": uuid.uuid4().int,
             "created": created_at,
             "updated": created_at,
-            "user": {"id": creator_id, "name": "user_{}".format(creator_id),},
+            "user": {
+                "id": creator_id,
+                "name": "user_{}".format(creator_id),
+            },
         }
     else:
         created = {}
@@ -393,7 +432,10 @@ def make_wa_object(age_in_hours=0, media="Text", user=None):
             "id": uuid.uuid4().hex,
             "created": created_at,
             "modified": created_at,
-            "creator": {"id": creator_id, "name": "user_{}".format(creator_id),},
+            "creator": {
+                "id": creator_id,
+                "name": "user_{}".format(creator_id),
+            },
             "platform": {
                 "platform_name": "CATCH_DEFAULT_PLATFORM_NAME",
                 "context_id": "fake_context",

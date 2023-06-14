@@ -21,15 +21,14 @@
 	</div>
 	<div class='assignment-list'>
 	</div>
-	<div class='subheading' style="display: none;">Import annotations</div>
-	<div class='import-choices' style="display: none;">
+	<div class='subheading' style="display: block;">Import annotations</div>
+	<div class='import-choices' style="display: block;">
 		<input type='radio' class='form-control' name='import-choice' value='inst' id='inst' ><label for='inst'>Instructor only</label>
-		<input type='radio' class='form-control' name='import-choice' value='all' id='all'><label for='all'>All</label>
 		<input type='radio' class='form-control' name='import-choice' value='none' id='none' checked><label for='none'>None</label>
 	</div>
 </div>
 <div class='button-collection'>
-	<div type="submit" class="save" id='import-button' role="button" style='display:none;'>
+	<div type="submit" class="save" id='import-button' role="button" style='display:block;'>
 		Import
 	</div>
 	<div class="save" id='import-cancel' role='button' onclick='window.location="{% url "hx_lti_initializer:course_admin_hub" %}?resource_link_id={{ resource_link_id }}&{{utm_source_param}}"'>
@@ -90,7 +89,7 @@ jQuery(document).ready(function() {
 	});
 	
 	jQuery('#import-button').click(function(event) {
-		jQuery('#import-button').hide();
+		jQuery('#import-button').addClass('requested');
 		jQuery('#import-cancel').html('Done');
 		jQuery('#pBar').show();
 		jQuery('.progress-bar').show();
@@ -122,7 +121,7 @@ jQuery(document).ready(function() {
 						jQuery('.current-progress').prepend(parseInt(perc, 10) + "% . . . &quot;" + data['assignment_name'] + "&quot; -- Successfully added to current course<br>");
 						if(import_annotations != "none") {
 							var instructor_only = (import_annotations === "inst" ? "1" : "0");
-							var transfer_annotations_url = base_transfer_annotations_url + instructor_only + "?resource_link_id=" + resource_link_id;
+							var transfer_annotations_url = base_transfer_annotations_url + data["old_assignment_id"] + "?resource_link_id=" + resource_link_id;
 							var finaldata  = jQuery.extend({}, data, {'csrfmiddlewaretoken': csrfmiddlewaretoken});
 							console.log("Starting import of annotations for assignment ID: ", assignment_id);
 							jQuery.ajax({

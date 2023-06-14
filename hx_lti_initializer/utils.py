@@ -2,22 +2,15 @@
 These functions will be used for the initializer module, but may also be
 helpful elsewhere.
 """
-import base64
 import datetime
 import logging
-import re
-import sys
 import time
 import urllib
-from os.path import basename, splitext
-from urllib.parse import urlparse
 
-import django.shortcuts
 import jwt
 import requests
-from abstract_base_classes.target_object_database_api import *
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.urls import reverse
 
@@ -25,7 +18,7 @@ from django.urls import reverse
 from hx_lti_assignment.models import Assignment
 from target_object_database.models import TargetObject
 
-from .models import *
+from .models import LTICourse, LTIProfile
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +50,7 @@ def create_new_user(
     except User.DoesNotExist:
         user = User.objects.create_user(username)
         user.is_superuser = False
-        user.is_staff = len(set(roles) & set(settings.ADMIN_ROLES)) > 0
+        user.is_staff = len(set(roles) & set(settings.LTI_ADMIN_ROLES)) > 0
         user.set_unusable_password()
         user.save()
     except User.MultipleObjectsReturned:
@@ -73,7 +66,7 @@ def create_new_user(
     return user, lti_profile
 
 
-def save_session(request, **kwargs):
+def save_session(request, resource_link_id, **kwargs):
     session_map = {
         "user_id": ["hx_user_id", None],
         "user_name": ["hx_user_name", None],
@@ -91,9 +84,9 @@ def save_session(request, **kwargs):
     }
 
     for k in kwargs:
-        assert k in session_map, "save_session kwarg=%s is not valid!" % k
-
-    resource_link_id = request.LTI["resource_link_id"]
+        assert k in session_map, "save_session({}) kwarg=({}) is not valid!".format(
+            resource_link_id, k
+        )
 
     for kwarg in kwargs:
         session_key, default_value = session_map[kwarg]
@@ -116,11 +109,12 @@ def get_lti_value(key, request):
     return value
 
 
-def retrieve_token(userid, apikey, secret, ttl=1):
+def retrieve_token(userid, apikey, secret, ttl=1, override=None):
     """
     generates a jwt for the backend of annotations.
 
     default ttl = 1 sec
+    override must be a list of strings
     """
     apikey = apikey
     secret = secret
@@ -136,16 +130,18 @@ def retrieve_token(userid, apikey, secret, ttl=1):
             .isoformat()
         )  # noqa
 
-    token = jwt.encode(
-        {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl},
-        secret,
-    )
+    payload = {"consumerKey": apikey, "userId": userid, "issuedAt": _now(), "ttl": ttl}
+    if override:
+        payload["override"] = [str(x) for x in override]
+    token = jwt.encode(payload, secret)
+    if isinstance(token, bytes):
+        token = token.decode()
     return token
 
 
 def get_admin_ids(context_id):
     """
-        Returns a set of the user ids of all users with an admin role
+    Returns a set of the user ids of all users with an admin role
     """
     course_object = LTICourse.get_course_by_id(context_id)
     admins = course_object.course_admins.all()
@@ -289,19 +285,19 @@ def _fetch_annotations_by_course(
         formatted_annotations = []
         parents_text_dict = {}
         total = annotations["total"] or 0
-        result = {
-            "totalCount": total
-        }
+        result = {"totalCount": total}
 
-        #Note: there are other fields i left out since it did not seem to be required for what we need 
+        # Note: there are other fields i left out since it did not seem to be required for what we need
         for annote in annotations["rows"]:
             # add text to parent_text_dict text dict for quick lookup
             try:
                 # look up index for correct nested catchpy object with accepted types due to uncertain order of dict in list
-                index_of_target_items = find_target_object_index(annote["target"]["items"])
+                index_of_target_items = find_target_object_index(
+                    annote["target"]["items"]
+                )
                 if index_of_target_items is None:
-                    raise KeyError(f"media type")
-                id = annote['id']
+                    raise KeyError("media type")
+                id = annote["id"]
                 text = annote["body"]["items"][0]["value"]
                 parents_text_dict[id] = text
                 created = annote["created"]
@@ -316,7 +312,7 @@ def _fetch_annotations_by_course(
                 contextId = annote["platform"]["context_id"]
                 collectionId = annote["platform"]["collection_id"]
                 uri = annote["platform"]["target_source_id"]
-                media =  annote["target"]["items"][index_of_target_items]["type"].lower()
+                media = annote["target"]["items"][index_of_target_items]["type"].lower()
                 target_items = annote["target"]["items"]
                 quote = ""
                 formatted = {
@@ -336,10 +332,12 @@ def _fetch_annotations_by_course(
                     "media": media,
                     "quote": quote,
                     # added manifest_url for better matching in get_target_id
-                    "manifest_url": ""
+                    "manifest_url": "",
                 }
                 if "selector" in target_items[index_of_target_items]:
-                    for item in target_items[index_of_target_items]["selector"]["items"]:
+                    for item in target_items[index_of_target_items]["selector"][
+                        "items"
+                    ]:
                         if "type" in item and item["type"] == "TextQuoteSelector":
                             formatted["quote"] = item["exact"]
                 # check if the annotation has a parent text
@@ -350,22 +348,33 @@ def _fetch_annotations_by_course(
                 # check images annotation fields
                 if media == "image":
                     # not guarenteed correct order
-                    if index_of_target_items == 1 and target_items[0]["type"] == "Thumbnail":
+                    if (
+                        index_of_target_items == 1
+                        and target_items[0]["type"] == "Thumbnail"
+                    ):
                         formatted["thumb"] = target_items[0]["source"]
                     elif target_items[1]["type"] == "Thumbnail":
                         formatted["thumb"] = target_items[1]["source"]
                     if "selector" in target_items[index_of_target_items]:
-                        formatted["rangePosition"] = target_items[index_of_target_items]["selector"]["items"]
+                        formatted["rangePosition"] = target_items[
+                            index_of_target_items
+                        ]["selector"]["items"]
                         # added field for image manifest for lookup in get_target_id function
                         bounds = ""
                         # Data structure is different between old highlighter and new highlighter e.g. newhighlighter assignment data does not have scope field
-                        if "type" in formatted['rangePosition'][0]:
-                            formatted["manifest_url"] = target_items[index_of_target_items]["source"]
-                            bounds = formatted['rangePosition'][0]["value"]
-                        else:    
-                            formatted["manifest_url"] = formatted["rangePosition"][0]["within"]["@id"]
-                            bounds = target_items[index_of_target_items]["scope"]["value"]
-                        formatted_bounds = bounds.split("=")[1].split(',')
+                        if "type" in formatted["rangePosition"][0]:
+                            formatted["manifest_url"] = target_items[
+                                index_of_target_items
+                            ]["source"]
+                            bounds = formatted["rangePosition"][0]["value"]
+                        else:
+                            formatted["manifest_url"] = formatted["rangePosition"][0][
+                                "within"
+                            ]["@id"]
+                            bounds = target_items[index_of_target_items]["scope"][
+                                "value"
+                            ]
+                        formatted_bounds = bounds.split("=")[1].split(",")
                         x, y, width, height = formatted_bounds
                         formatted["bounds"] = {
                             "x": x,
@@ -382,14 +391,14 @@ def _fetch_annotations_by_course(
             if formatted_annote["parent"] != "0":
                 id = formatted_annote["parent"]
                 formatted_annote["parent_text"] = parents_text_dict[id]
-        result["rows"] =  formatted_annotations
+        result["rows"] = formatted_annotations
     except KeyError as ke:
         logger.error(f"missing {ke} field in response body")
-    except:
+    except Exception:
         # If there are no annotations, the database should return a dictionary with empty rows,
         # but in the event of another exception such as an authentication error, fail
         # gracefully by manually passing in that empty response
-        annotations = {"rows": [], "totalCount": 0} 
+        annotations = {"rows": [], "totalCount": 0}
     return result
 
 
@@ -398,15 +407,22 @@ def get_distinct_users_from_annotations(annotations, sort_key=None):
     Given a set of annotation objects returned by the CATCH database,
     this function returns a list of distinct user objects.
     """
+
+    def _default_sort_key(user):
+        return user["id"]
+
     rows = annotations["rows"]
     annotations_by_user = {}
     for r in rows:
         user_id = r["user"]["id"]
         if user_id not in annotations_by_user:
             annotations_by_user[user_id] = r["user"]
-    if sort_key is None:
-        sort_key = lambda user: user["id"]
-    users = list(sorted(annotations_by_user.values(), key=sort_key))
+    users = list(
+        sorted(
+            annotations_by_user.values(),
+            key=sort_key if sort_key else _default_sort_key,
+        )
+    )
     return users
 
 
@@ -501,14 +517,18 @@ class DashboardAnnotations(object):
             if x["target_type"] == "ig"
         }
         self.preview_url_cache = {}
+
     def get_annotations_by_id(self):
         return get_annotations_keyed_by_annotation_id(self.annotations)
 
     def get_distinct_users(self):
-        sort_key = lambda user: user.get("name", "").strip().lower()
-        return get_distinct_users_from_annotations(self.annotations, sort_key)
+        return get_distinct_users_from_annotations(
+            self.annotations, sort_key=lambda user: user.get("name", "").strip().lower()
+        )
 
-    def get_assignments_dict(self,):
+    def get_assignments_dict(
+        self,
+    ):
         return dict(Assignment.objects.values_list("assignment_id", "assignment_name"))
 
     def get_target_objects_list(self):
@@ -560,10 +580,11 @@ class DashboardAnnotations(object):
         object_id=https://digital.library.villanova.edu/Item/vudl:92879/Canvas/p0
         target_objects_by_content key=https://digital.library.villanova.edu/Item/vudl:92879/Manifest
     """
+
     def get_target_id(self, media_type, object_id):
         object_id = str(
             object_id
-        ) # ensure we have the target id as a string, not an int
+        )  # ensure we have the target id as a string, not an int
         target_id = ""
         if media_type == "image":
             found = object_id.find("/canvas/")
@@ -588,7 +609,7 @@ class DashboardAnnotations(object):
         media_type = annotation.get("media", None)
         object_id = annotation["uri"]
         # fix to find correct id using manifest_url instead
-        if media_type == 'image':
+        if media_type == "image":
             object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         # the keys in self.target_objects_by_id are strings so the lookup will fail if we pass an int
@@ -641,7 +662,7 @@ class DashboardAnnotations(object):
         media_type = annotation.get("media", None)
         collection_id = annotation["collectionId"]
         object_id = annotation["uri"]
-        if media_type == 'image':
+        if media_type == "image":
             object_id = annotation["manifest_url"]
         target_id = self.get_target_id(media_type, object_id)
         return (collection_id in self.assignment_name_of) and target_id
@@ -659,6 +680,7 @@ class DashboardAnnotations(object):
         if annotation_id in self.annotation_by_id:
             return self.annotation_by_id[annotation_id]
         return None
+
 
 def find_target_object_index(anno_target_items):
     # note: left out "Thumbnail" and "Annotations"

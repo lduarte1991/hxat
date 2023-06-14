@@ -20,11 +20,11 @@ import logging
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
-from lti.contrib.django import DjangoToolProvider
 from django.shortcuts import render
+from hx_lti_initializer.views import PlatformError
+from lti.contrib.django import DjangoToolProvider
 
 from .lti_validators import LTIRequestValidator
-from hx_lti_initializer.views import PlatformError
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ except ImportError:
 
 
 def ip_address(request):
-    """ Returns the real IP address from a request, or if that fails, returns 1.2.3.4."""
+    """Returns the real IP address from a request, or if that fails, returns 1.2.3.4."""
     meta = request.META
     # Not using HTTP_X_FORWARDED_FOR because it returns a list: client, proxy1, proxy2, ...
     # which is more prone to varying between requests from the same client
@@ -49,6 +49,7 @@ def ip_address(request):
 
 class LTILaunchError(Exception):
     pass
+
 
 class LTILaunchSession(object):
     """
@@ -182,6 +183,7 @@ class CookielessSessionMiddleware(MiddlewareMixin):
         )
 
         check_ip = False
+
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if session_key is not None:
             self.logger.info(
@@ -192,7 +194,7 @@ class CookielessSessionMiddleware(MiddlewareMixin):
             self.logger.info(
                 "Session cookie '%s' not found!" % settings.SESSION_COOKIE_NAME
             )
-            session_key = request.GET.get("utm_source")
+            session_key = request.GET.get("utm_source", None)
             self.logger.info("Session get param returned key: %s" % session_key)
             check_ip = True
 
@@ -246,10 +248,20 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.error(exception)
             return HttpResponse("LTI launch error. Please try re-launching the tool.")
         elif isinstance(exception, PlatformError):
-            self.logger.error('Platform Error - %s' % exception)
-            return render(request, 'main/platform_error.html', context={'error_message': exception}, status=424)
+            self.logger.error("Platform Error - %s" % exception)
+            return render(
+                request,
+                "main/platform_error.html",
+                context={"error_message": exception},
+                status=424,
+            )
         elif isinstance(exception, PermissionDenied):
-            return render(request, 'main/permission_error.html', context={'error_message': exception}, status=403)
+            return render(
+                request,
+                "main/permission_error.html",
+                context={"error_message": exception},
+                status=403,
+            )
         self.logger.error(exception)
         return None
         # when moving to django2 and replacing MIDDLEWARE_CLASSES to MIDDLEWARE in
@@ -291,10 +303,20 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
                     self.logger.debug("*-*-*-*- SESSION[{}]: {}".format(k, v))
                 return HttpResponseBadRequest()
             except PlatformError as e:
-                self.logger.error('Platform Error - %s' % e)
-                return render(request, 'main/platform_error.html', context={'error_message': e}, status=424)
+                self.logger.error("Platform Error - %s" % e)
+                return render(
+                    request,
+                    "main/platform_error.html",
+                    context={"error_message": e},
+                    status=424,
+                )
             except PermissionDenied as e:
-                return render(request, 'main/permission_error.html', context={'error_message': e}, status=403)
+                return render(
+                    request,
+                    "main/permission_error.html",
+                    context={"error_message": e},
+                    status=403,
+                )
             except Exception as e:
                 self.logger.debug("Exception: {}".format(e))
                 # this potentially returns a 500:
@@ -361,7 +383,9 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
             self.logger.error(
                 "person identifier (i.e. username) or full name was not present in request"
             )
-            raise PlatformError("Platform did not send username. Check LTI settings in platform to ensure username is getting sent")
+            raise PlatformError(
+                "Platform did not send username. Check LTI settings in platform to ensure username is getting sent"
+            )
 
     def _update_session(self, request):
         """
@@ -432,8 +456,8 @@ class MultiLTILaunchMiddleware(MiddlewareMixin):
 
     def _set_current_session(self, request, resource_link_id=None):
         """
-         Sets the current session on the request object based on the given resource_link_id.
-         The current session is available via the 'LTI' attribute on the request (e.g. request.LTI).
+        Sets the current session on the request object based on the given resource_link_id.
+        The current session is available via the 'LTI' attribute on the request (e.g. request.LTI).
         """
 
         setattr(request, "LTI", LTILaunchSession(request.session, resource_link_id))

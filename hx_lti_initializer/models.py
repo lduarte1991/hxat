@@ -58,6 +58,7 @@ class LTIProfile(models.Model):
         """ The name of this section within the admin site """
 
         verbose_name = _("Instructor/Administrator")
+        unique_together = ["anon_id", "scope"]
 
     def get_id(self):
         """Returns Canvas user_id of LTIProfile"""
