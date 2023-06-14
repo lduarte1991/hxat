@@ -1,2 +1,2 @@
-__version__ = "6.0.0"  # drop oldui, lti dict as json, drop secure.py
+__version__ = "6.1.0"  # transfer in UI; profile (anon_id, scope) uniq restriction (require catchpy 2.6.0)
 
