@@ -52,6 +52,7 @@ def create_new_assignment(request):
             assignment = None
             if form.is_valid():
                 assignment = form.save(commit=False)
+                assignment.use_hxighlighter = True
                 random_id = uuid.uuid4()
                 assignment.assignment_id = str(random_id)
                 assignment.save()
