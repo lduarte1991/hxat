@@ -611,7 +611,7 @@ AssignmentEditor.prototype = {
         jQuery('#id_assignment_name').val(jQuery('#assignment-name-input').val());
         jQuery('#id_common_inst_name').val(jQuery('#common_inst_name').val().trim());
         jQuery("#id_is_published").attr("checked", jQuery("#assignment-published").is(":checked") ? true : false);
-        jQuery('#id_use_hxighlighter').attr("checked", jQuery('#use_hxighlighter').is(":checked") ? true : false);
+        jQuery('#id_use_hxighlighter').attr("checked", true)
         jQuery('form').submit();
     },
     save_annotation_settings: function() {
