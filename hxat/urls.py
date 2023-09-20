@@ -43,4 +43,5 @@ urlpatterns = [
     ),
     path("lti/config", tool_config, name="tool_config"),
     path("notification/", include("notification.urls")),
+    path("api/", include("hxat.apps.api.urls")),
 ]
