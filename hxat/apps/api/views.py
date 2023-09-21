@@ -1,16 +1,9 @@
-import json
 import logging
 
-from django.conf import settings
-from django.db import IntegrityError, transaction
-from rest_framework import generics, status
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
+from hx_lti_initializer.models import LTICourse
 from hxat.apps.api.serializers import LTICourseSerializer
-
+from rest_framework import generics
+from rest_framework.authentication import SessionAuthentication
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -21,11 +14,10 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 
 
 class LTICourseDetail(generics.RetrieveAPIView):
+    queryset = LTICourse.objects.all()
     serializer_class = LTICourseSerializer
     lookup_field = "course_id"
 
-    authentication_classes = (CsrfExemptSessionAuthentication)
-    #authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
-    #permission_classes = (IsKondoEditorOrReadOnly,)
-
-
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    # authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
+    # permission_classes = (IsKondoEditorOrReadOnly,)

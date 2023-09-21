@@ -1,12 +1,8 @@
-import json
 import logging
-from collections import OrderedDict
 
-from django.db import IntegrityError
+from hx_lti_assignment.models import Assignment, AssignmentTargets
+from hx_lti_initializer.models import LTICourse, LTIProfile, LTIResourceLinkConfig
 from rest_framework import serializers
-
-from hx_lti_assignment.models import Assignment
-from hx_lti_initializer.models import LTICourse, LTIProfile
 from target_object_database.models import TargetObject
 
 
@@ -15,8 +11,12 @@ class LTIProfileSerializer(serializers.ModelSerializer):
     anon_id = serializers.CharField(required=False, allow_blank=True, max_length=255)
     name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     scope = serializers.CharField(required=False, allow_blank=True, max_length=1024)
-    created_at = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
-    updated_at = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
+    created_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    updated_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
 
     class Meta:
         model = LTIProfile
@@ -32,9 +32,15 @@ class LTIProfileSerializer(serializers.ModelSerializer):
 
 class TargetObjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
-    target_title = serializers.CharField(required=False, allow_blank=True, max_length=255)
-    target_created = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
-    target_updated = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
+    target_title = serializers.CharField(
+        required=False, allow_blank=True, max_length=255
+    )
+    target_created = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    target_updated = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
     target_creator = LTIProfileSerializer(required=False)
     target_type = serializers.CharField(max_length=2, default="TX")
 
@@ -50,12 +56,63 @@ class TargetObjectSerializer(serializers.ModelSerializer):
         ]
 
 
+class LTIResourceLinkConfigSerializer(serializers.ModelSerializer):
+    resource_link_id = serializers.CharField(
+        required=True, allow_blank=False, max_length=255
+    )
+    created_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    updated_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+
+    class Meta:
+        model = LTIResourceLinkConfig
+        fields = [
+            "resource_link_id",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class AssignmentTargetsSerializer(serializers.ModelSerializer):
+    target_object = TargetObjectSerializer(required=True)
+    target_instructions = serializers.CharField(
+        required=False, allow_blank=True, max_length=2048
+    )
+    target_external_options = serializers.CharField(
+        required=False, allow_blank=True, max_length=1024
+    )
+    ltiresourcelinkconfig_set = LTIResourceLinkConfigSerializer(many=True)
+    created_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    updated_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+
+    class Meta:
+        model = AssignmentTargets
+        fields = [
+            "target_object",
+            "target_instructions",
+            "target_external_options",
+            "ltiresourcelinkconfig_set",
+            "created_at",
+            "updated_at",
+        ]
+
+
 class AssignmentSerializer(serializers.ModelSerializer):
-    assignment_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
+    assignment_id = serializers.CharField(
+        required=True, allow_blank=False, max_length=100
+    )
     assignment_name = serializers.CharField(
         required=False, allow_blank=True, max_length=255
     )
-    assignment_objects = TargetObjectSerializer(many=True)
+    # assignment_objects = TargetObjectSerializer(many=True)
+    assignmenttargets_set = AssignmentTargetsSerializer(many=True)
     annotation_database_url = serializers.CharField(
         required=False, allow_blank=True, max_length=255
     )
@@ -65,15 +122,19 @@ class AssignmentSerializer(serializers.ModelSerializer):
     annotation_database_secret_token = serializers.CharField(
         required=False, allow_blank=True, max_length=255
     )
-    created_at = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
-    updated_at = serializers.DateTimeField(format="iso-8601", required=False, allow_null=True)
+    created_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    updated_at = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
 
     class Meta:
         model = Assignment
         fields = [
             "assignment_id",
             "assignment_name",
-            "assignment_objects",
+            "assignmenttargets_set",
             "annotation_database_url",
             "annotation_database_apikey",
             "annotation_database_secret_token",
@@ -83,9 +144,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 
 class LTICourseSerializer(serializers.ModelSerializer):
-    course_id = serializers.CharField(
-        required=True, allow_blank=False, max_length=255
-    )
+    course_id = serializers.CharField(required=True, allow_blank=False, max_length=255)
     course_name = serializers.CharField(
         required=False, allow_blank=True, max_length=255
     )
@@ -100,7 +159,3 @@ class LTICourseSerializer(serializers.ModelSerializer):
             "course_admins",
             "assignments",
         ]
-
-
-
-
