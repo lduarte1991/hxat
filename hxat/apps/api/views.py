@@ -21,3 +21,12 @@ class LTICourseDetail(generics.RetrieveAPIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
     # authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
     # permission_classes = (IsKondoEditorOrReadOnly,)
+
+class LTICourseList(generics.ListAPIView):
+    queryset = LTICourse.objects.all()
+    serializer_class = LTICourseSerializer
+    lookup_field = "course_id"
+
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    # authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
+    # permission_classes = (IsKondoEditorOrReadOnly,)

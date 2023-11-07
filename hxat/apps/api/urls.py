@@ -9,6 +9,11 @@ urlpatterns = [
         views.LTICourseDetail.as_view(),
         name="lticourse-detail",
     ),
+    path(
+        "v1/course/",
+        views.LTICourseList.as_view(),
+        name="lticourse-list",
+    ),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
