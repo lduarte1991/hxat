@@ -1,10 +1,11 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from random import randint
 
 import pytest
 from dateutil import tz
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.urls import reverse
 from hx_lti_assignment.models import Assignment, AssignmentTargets
 from hx_lti_initializer.models import LTICourse
@@ -12,6 +13,8 @@ from hx_lti_initializer.utils import create_new_user
 from lti import ToolConsumer
 from lti.tool_outbound import ToolOutbound
 from target_object_database.models import TargetObject
+from hxat.apps.vpaljwt.jwt import encode_token
+from hxat.apps.vpaljwt.models import APIKey
 
 
 @pytest.fixture
@@ -499,3 +502,80 @@ def make_wa_object(age_in_hours=0, media="Text", user=None):
     wa["body"] = body
     wa["target"] = target
     return wa
+
+
+@pytest.fixture
+def user_factory():
+    def ufac(username=None):
+        u = User(
+            username="user-{}".format(randint(1, 65534))
+            if username is None
+            else username
+        )
+        u.set_unusable_password()
+        u.is_staff = False
+        u.is_superuser = False
+        u.save()
+        return u
+
+    return ufac
+
+
+@pytest.fixture
+def apikey_factory():
+    def kfac(user, audience, expire_in=None):
+        # expired_in might be a negative integer!
+        expiration = (
+            None
+            if expire_in is None
+            else datetime.now(tz=timezone.utc) + timedelta(seconds=expire_in)
+        )
+        k = APIKey(user=user, audience=audience, expire_on=expiration)
+        k.save()
+        return k
+
+    return kfac
+
+
+@pytest.fixture
+def jwt_factory():
+    def jfac(apikey, iat=None):
+        if iat is None:
+            iat = int(datetime.now(tz=timezone.utc).timestamp())
+        payload = {
+            "iss": apikey.user.username,
+            "sub": str(apikey.key),
+            "iat": iat,
+        }
+        return encode_token(payload, str(apikey.secret))
+
+    return jfac
+
+
+@pytest.fixture
+def vpaljwt_audience():
+    aud = [
+        reverse("api:lticourse-detail", args=["courseX"]),
+        reverse("api:lticourse-list"),
+    ]
+    return aud
+
+
+@pytest.fixture
+def vpaljwt_makejwt(
+    vpaljwt_audience,
+    user_factory,
+    apikey_factory,
+    jwt_factory,
+):
+    def makejwt(username, expire_in):
+        u = user_factory(username)
+        key = apikey_factory(
+            user=u,
+            audience=vpaljwt_audience,
+            expire_in=expire_in,
+        )
+        jwt = jwt_factory(key)
+        return (u, key, jwt)
+
+    return makejwt

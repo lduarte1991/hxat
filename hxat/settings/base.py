@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     "hx_lti_assignment",
     "target_object_database",
     "utils",
+    "hxat.apps.vpaljwt",
 )
 CSRF_FAILURE_VIEW = "hx_lti_initializer.views.csrf_failure"
 
@@ -63,6 +64,7 @@ MIDDLEWARE = (
     "hxat.middleware.CookielessSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "hxat.apps.vpaljwt.middleware.VpaljwtMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -374,3 +376,15 @@ NO_REQUEST_ID = "none"
 # raise exception when context-id and collection-id inconsistent
 # this is to prevent rerun assignments configured as previous run
 RAISE_COURSE_INCONSISTENT_EXCEPTION = False  # for backcompat, just print errors
+
+# http header to get api jwt credentials from
+VPALJWT_HTTP_HEADER = os.environ.get(
+    "VPALJWT_HTTP_HEADER", "HTTP_AUTHORIZATION"
+).upper()
+
+# print jwt and errors in vpaljwt middleware
+VPALJWT_LOG_JWT_ERROR = (
+    os.environ.get("VPALJWT_LOG_JWT_ERROR", "false").lower() == "true"
+)
+VPALJWT_LOG_JWT = os.environ.get("VPALJWT_LOG_JWT", "false").lower() == "true"
+

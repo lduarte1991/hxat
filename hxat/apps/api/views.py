@@ -2,6 +2,7 @@ import logging
 
 from hx_lti_initializer.models import LTICourse
 from hxat.apps.api.serializers import LTICourseSerializer
+from hxat.apps.vpaljwt.jwt import VpaljwtAuthentication
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication
 
@@ -18,15 +19,12 @@ class LTICourseDetail(generics.RetrieveAPIView):
     serializer_class = LTICourseSerializer
     lookup_field = "course_id"
 
-    authentication_classes = (CsrfExemptSessionAuthentication,)
-    # authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
-    # permission_classes = (IsKondoEditorOrReadOnly,)
+    authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
+
 
 class LTICourseList(generics.ListAPIView):
     queryset = LTICourse.objects.all()
     serializer_class = LTICourseSerializer
     lookup_field = "course_id"
 
-    authentication_classes = (CsrfExemptSessionAuthentication,)
-    # authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)
-    # permission_classes = (IsKondoEditorOrReadOnly,)
+    authentication_classes = (CsrfExemptSessionAuthentication, VpaljwtAuthentication)

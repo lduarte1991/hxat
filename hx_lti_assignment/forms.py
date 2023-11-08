@@ -4,6 +4,7 @@ from crispy_forms.bootstrap import Tab, TabHolder
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Fieldset, Hidden, Layout
 from django import forms
+from django.core.validators import URLValidator
 from django.forms.models import inlineformset_factory, modelformset_factory
 from django.utils.html import strip_tags
 from hx_lti_assignment.models import Assignment, AssignmentTargets
@@ -49,16 +50,9 @@ class AssignmentForm(forms.ModelForm):
         )
 
     def clean_annotation_database_url(self):
-        # noqa from http://stackoverflow.com/questions/6883049/regex-to-find-urls-in-string-in-python
         url = self.cleaned_data["annotation_database_url"]
-        urls = re.findall(
-            "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
-            url,
-        )  # noqa
-
-        if len(urls) == 0:
-            raise forms.ValidationError("Did not type in a URL for the db!")
-
+        validator = URLValidator()
+        validator(url)  # forms.ValidationError == core.exceptions.ValidationError
         return url
 
     class Meta:

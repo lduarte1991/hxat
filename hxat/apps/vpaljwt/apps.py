@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ApiConfig(AppConfig):
+class VpaljwtConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "hxat.apps.api"
+    name = "hxat.apps.vpaljwt"

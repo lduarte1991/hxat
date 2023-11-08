@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+
+import hxat.views as hxat_views
 from hx_lti_initializer.views import tool_config
+
 
 admin.autodiscover()
 
@@ -44,4 +47,6 @@ urlpatterns = [
     path("lti/config", tool_config, name="tool_config"),
     path("notification/", include("notification.urls")),
     path("api/", include("hxat.apps.api.urls")),
+    path("jwt/", include("hxat.apps.vpaljwt.urls")),
+    path("info/", hxat_views.info, name="hxat_info"),
 ]
