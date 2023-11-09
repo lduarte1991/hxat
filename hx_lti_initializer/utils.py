@@ -124,8 +124,7 @@ def retrieve_token(userid, apikey, secret, ttl=1, override=None):
 
     def _now():
         return (
-            datetime.datetime.utcnow()
-            .replace(tzinfo=simple_utc())
+            datetime.datetime.now(tz=datetime.timezone.utc)
             .replace(microsecond=0)
             .isoformat()
         )  # noqa
