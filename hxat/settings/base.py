@@ -377,6 +377,10 @@ NO_REQUEST_ID = "none"
 # this is to prevent rerun assignments configured as previous run
 RAISE_COURSE_INCONSISTENT_EXCEPTION = False  # for backcompat, just print errors
 
+
+# bypass auth for api, note that DEBUG should be true
+HXAT_BYPASS_API_AUTH = os.environ.get("HXAT_BYPASS_API_AUTH", "false").lower() == "true"
+
 # http header to get api jwt credentials from
 VPALJWT_HTTP_HEADER = os.environ.get(
     "VPALJWT_HTTP_HEADER", "HTTP_AUTHORIZATION"
@@ -387,4 +391,5 @@ VPALJWT_LOG_JWT_ERROR = (
     os.environ.get("VPALJWT_LOG_JWT_ERROR", "false").lower() == "true"
 )
 VPALJWT_LOG_JWT = os.environ.get("VPALJWT_LOG_JWT", "false").lower() == "true"
+
 
