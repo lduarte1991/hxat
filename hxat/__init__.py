@@ -1,2 +1,2 @@
-__version__ = "6.1.1"  # set hxighlighter to true
+__version__ = "6.1.2"  # set hxighlighter to true (fix jquery in AssignmentEditor.js)
 
