@@ -1,0 +1,61 @@
+
+services:
+  db:
+    image: postgres
+    ports:
+      - "8001:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: 'hxat,catchpy'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+  redis:
+    image: redis
+    ports:
+      - "8002:6379"
+  hxat:
+    build:
+      context: .
+    image: hx/hxat:dev
+    command: ["./wait-for-it.sh", "db:5432", "--", "./docker_entrypoint.sh"]
+    volumes:
+      - .:/hxat
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      HXAT_DOTENV_PATH: "/hxat/docker_dotenv.env"
+    networks:
+      default:
+      public:
+        aliases:
+          - hxat.localhost
+  catchpy:
+    build:
+      context: ../catchpy
+    image: hx/catchpy:dev
+    command: ["./wait-for-it.sh", "db:5432", "--", "./docker_entrypoint.sh"]
+    volumes:
+      - ../catchpy:/catchpy
+    ports:
+      - "9000:8000"
+    depends_on:
+      - db
+    environment:
+      CATCHPY_DOTENV_PATH: "/catchpy/docker_dotenv.env"
+    networks:
+      default:
+      public:
+        aliases:
+          - catchpy.localhost
+
+volumes:
+  postgres_data:
+
+networks:
+  public:
+

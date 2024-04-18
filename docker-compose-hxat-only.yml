@@ -1,0 +1,44 @@
+
+services:
+  db:
+    image: postgres
+    ports:
+      - "8001:5432"
+    environment:
+      POSTGRES_USER: hxat
+      POSTGRES_PASSWORD: hxat
+      POSTGRES_DB: hxat
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  redis:
+    image: redis
+    ports:
+      - "8002:6379"
+  hxat:
+    build:
+      context: .
+      args:
+        REQUIREMENTS_FILE: hxat/requirements/base.txt
+    image: hx/hxat:dev
+    command: ["./wait-for-it.sh", "db:5432", "--", "./docker_entrypoint.sh"]
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      HXAT_DOTENV_PATH: "/code/docker_dotenv.env"
+    networks:
+      default:
+      public:
+        aliases:
+          - hxat.localhost
+
+volumes:
+  postgres_data:
+
+networks:
+  public:
+
