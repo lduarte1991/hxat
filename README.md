@@ -39,10 +39,12 @@ $> source venv/bin/activate
 (venv) $>  # now using venv
 
 # run lti-consumer on port 8088; docker-compose uses 8000, 8001, 8002, 9000.
-(venv) $> cd local-lti-consumer/lti-consumer
+(venv) $> cd local-lti-consumer
+(venv) $> pip install -r requirements.txt
+(venv) $> cd lti-consumer
 (venv) $> python manage.py migrate
 (venv) $> python manage.py runserver 8088
-(venv) $> opens http://localhost:8088
+(venv) $> open http://localhost:8088
 ```
 
 See below how to config the local-lti-consumer to talk to hxat.
