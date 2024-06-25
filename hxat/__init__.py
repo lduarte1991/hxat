@@ -1,2 +1,2 @@
-__version__ = "6.1.2"  # set hxighlighter to true (fix jquery in AssignmentEditor.js)
+__version__ = "6.1.3"  # fix for image redirects in chrome cors security
 
