@@ -36,6 +36,7 @@ if allowed_other_hosts:
 
 # Application definition
 INSTALLED_APPS = (
+    "daphne",
     "channels",
     "notification",
     "django.contrib.admin",
