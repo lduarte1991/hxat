@@ -348,7 +348,7 @@ elif ORGANIZATION == "HARVARDX":
     pass
 
 # channels for notification
-ASGI_APPLICATION = "hxat.routing.application"
+ASGI_APPLICATION = "hxat.asgi.application"
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = os.environ.get("REDIS_PORT", "6379")
 CHANNEL_LAYERS = {

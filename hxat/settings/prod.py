@@ -1,6 +1,6 @@
 # 18nov24 nmaekawa: temporarily not using Manifest Static Files
-#from .aws import *
-from .base import *
+from .aws import *
+#from .base import *
 
 #
 # for production, we log to stdout, and then redirect to syslog

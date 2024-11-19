@@ -4,8 +4,8 @@ defined in the ASGI_APPLICATION setting
 """
 import os
 
-import django
-from channels.routing import get_default_application
+from channels.routing import ProtocolTypeRouter
+from django.core.asgi import get_asgi_application
 from dotenv import load_dotenv
 
 # default settings_module is prod
@@ -20,5 +20,10 @@ if not dotenv_path:
 if dotenv_path:
     load_dotenv(dotenv_path=dotenv_path, override=True)
 
-django.setup()
-application = get_default_application()
+# init django asgi application early to ensure the AppRegistry
+# is populated before importing code that may import ORM models
+django_asgi_app = get_asgi_application()
+
+application = ProtocolTypeRouter({
+    "http": django_asgi_app,
+})
