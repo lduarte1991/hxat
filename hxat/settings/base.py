@@ -36,8 +36,8 @@ if allowed_other_hosts:
 
 # Application definition
 INSTALLED_APPS = (
-    "channels",
-    "notification",
+    #"channels",
+    #"notification",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
