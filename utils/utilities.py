@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 
 from hx_lti_assignment.models import Assignment, AssignmentTargets

@@ -6,6 +6,7 @@ import datetime
 import logging
 import time
 import urllib
+from zoneinfo import ZoneInfo
 
 import jwt
 import requests
@@ -124,8 +125,7 @@ def retrieve_token(userid, apikey, secret, ttl=1, override=None):
 
     def _now():
         return (
-            datetime.datetime.utcnow()
-            .replace(tzinfo=simple_utc())
+            datetime.datetime.now(tz=ZoneInfo("UTC"))
             .replace(microsecond=0)
             .isoformat()
         )  # noqa
@@ -148,14 +148,6 @@ def get_admin_ids(context_id):
     admin_ids = [admin.get_id() for admin in admins]
 
     return admin_ids
-
-
-class simple_utc(datetime.tzinfo):
-    def tzname(self):
-        return "UTC"
-
-    def utcoffset(self, dt):
-        return datetime.timedelta(0)
 
 
 def get_annotation_db_credentials_by_course(context_id):

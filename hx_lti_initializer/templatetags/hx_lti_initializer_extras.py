@@ -1,5 +1,6 @@
 import dateutil.parser
-import dateutil.tz
+from zoneinfo import ZoneInfo
+
 from django.conf import settings
 from django.template.defaulttags import register
 from django.templatetags.static import static
@@ -10,8 +11,8 @@ def convert_tz(datetimeobj):
     """
 		Converts a datetimeobj from UTC to the local timezone
 	"""
-    from_zone = dateutil.tz.tzutc()
-    to_zone = dateutil.tz.gettz("America/New_York")
+    from_zone = ZoneInfo("UTC")
+    to_zone = ZoneInfo("America/New_York")
     # Tell datetime object it's in UTC
     utc = datetimeobj.replace(tzinfo=from_zone)
     # Convert to local time

@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime, timedelta
 from random import randint
+from zoneinfo import ZoneInfo
 
 import pytest
-from dateutil import tz
 from django.conf import settings
 from django.urls import reverse
 from hx_lti_assignment.models import Assignment, AssignmentTargets
@@ -381,7 +381,7 @@ def make_lti_replaceResultResponse():
 # some of this is copied from catchpy/anno/tests/conftest.py
 #
 def get_past_datetime(age_in_hours):
-    now = datetime.now(tz.tzutc())
+    now = datetime.now(ZoneInfo("UTC"))
     delta = timedelta(hours=age_in_hours)
     return (now - delta).replace(microsecond=0).isoformat()
 
