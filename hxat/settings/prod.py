@@ -1,4 +1,6 @@
-from .aws import *
+# 18nov24 nmaekawa: temporarily not using Manifest Static Files
+#from .aws import *
+from hxat.settings.base import *
 
 #
 # for production, we log to stdout, and then redirect to syslog
