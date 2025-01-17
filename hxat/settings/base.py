@@ -91,7 +91,6 @@ DATABASES = {
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
@@ -322,12 +321,13 @@ IMAGE_STORE_BACKEND_CONFIG = json.loads(
     os.environ.get("IMAGE_STORE_BACKEND_CONFIG", "{}")
 )
 
-# https://docs.djangoproject.com/en/3.2/releases/3.1/#django-contrib-sessions
-# due to chrome 80.X, see https://www.chromium.org/updates/same-site
 SESSION_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SAMESITE = "None"
-# because some browsers are very strict about sending cookies from iframes?
+CSRF_COOKIE_SAMESITE = "None; Secure"
 CSRF_USE_SESSIONS = True
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS", "https://*.harvard.edu"
+).split()  # it's a list!
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 if ANNOTATION_HTTPS_ONLY:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
