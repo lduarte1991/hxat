@@ -1,6 +1,6 @@
 Django~=4.2.18
-channels~=3.0.4
-channels_redis==3.3.0
+channels~=4.2.0
+channels_redis~=4.2.1
 coverage==7.6.10
 coverage-badge==1.1.2
 django-bootstrap3==24.3
@@ -16,4 +16,4 @@ python-dateutil==2.9.0
 requests==2.32.3
 python_dotenv==1.0.1
 WhiteNoise==6.8.0
-git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk==0.2.0
+git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk

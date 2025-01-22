@@ -4,9 +4,11 @@ defined in the ASGI_APPLICATION setting
 """
 import os
 
-import django
-from channels.routing import get_default_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import OriginValidatoR
+from django.core.asgi import get_asgi_application
 from dotenv import load_dotenv
+
 
 # default settings_module is prod
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hxat.settings.prod")
@@ -20,5 +22,23 @@ if not dotenv_path:
 if dotenv_path:
     load_dotenv(dotenv_path=dotenv_path, override=True)
 
-django.setup()
-application = get_default_application()
+# initialize django asgi application early to ensure the AppRegistry
+# is populated before importing code that may import ORM models
+django_asgi_app = get_asgi_application()
+
+
+from notification.middleware import SessionAuthMiddleware
+from notification.routing import websocket_urlpatterns
+
+application = ProtocolTypeRouter({
+    # django's asgi apps to handle traditional http requests
+    "http": django_asgi_app,
+
+    # websocket notification app
+    "websocket": OriginValidator(
+        SessionAuthMiddleware(
+            URLRouter(websocket_urlpatterns)
+        ),
+        settings.CSRF_TRUSTED_ORIGINS,  # todo: include localhost?
+     ),
+})
