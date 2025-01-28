@@ -3,6 +3,7 @@
 pytest==8.3.4
 pytest-django==4.8.0
 pytest-env==1.1.5
+pytest-asyncio==0.25.2
 
 # uncomment if using locust tests
 #iso8601==1.1.0

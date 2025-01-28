@@ -14,6 +14,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "hxat-test-sqlite3.db"),
+        "TEST": {
+            "NAME": os.path.join(BASE_DIR, "hxat-test-sqlite3.db"),
+        },
     },
 }
 
@@ -151,3 +154,8 @@ LOGGING = {
         },
     },
 }
+
+# trying session in files for async session handling in notification tests
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_FILE_PATH = str(BASE_DIR)
+

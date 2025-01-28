@@ -14,10 +14,21 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             )
 
         self.group_name = self.scope["url_route"]["kwargs"]["room_name"]
-        (self.context, self.collection, self.target) = self.group_name.split("--")
         self.wsid = "{}--{}".format(
             self.group_name, self.scope.get("hx_user_id", "unknown")
         )
+
+        # check that this connection is authorized
+        (self.context, self.collection, self.target) = self.scope["hx_auth"]
+        """
+        if auth != "authenticated":
+            logging.getLogger(__name__).debug(
+                "{}|ws auth FAILED: {}, dropping connection".format(self.wsid, auth)
+            )
+            raise DenyConnection()  # return status_code=403
+
+        (self.context, self.collection, self.target) = self.group_name.split("--")
+        """
 
         logging.getLogger(__name__).debug(
             "{}|channel_name({}), context({}), collection({}), object({}), user({})".format(
@@ -30,22 +41,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             )
         )
 
-        auth = self.scope["hxat_auth"]
-        if auth != "authenticated":
-            logging.getLogger(__name__).debug(
-                "{}|ws auth FAILED: {}, dropping connection".format(self.wsid, auth)
-            )
-            raise DenyConnection()  # return status_code=403
-        else:
-            # join room group
-            await self.channel_layer.group_add(self.group_name, self.channel_name)
-            logging.getLogger(__name__).debug(
-                "{}|added group to channel({})".format(self.wsid, self.channel_name)
-            )
-            await self.accept()
-            logging.getLogger(__name__).debug(
-                "{}|CONNECTION ACCEPTED".format(self.wsid)
-            )
+        # join room group
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        logging.getLogger(__name__).debug(
+            "{}|added group to channel({})".format(self.wsid, self.channel_name)
+        )
+        await self.accept()
+        logging.getLogger(__name__).debug(
+            "{}|CONNECTION ACCEPTED".format(self.wsid)
+        )
 
     async def disconnect(self, close_code):
         # leave room group
