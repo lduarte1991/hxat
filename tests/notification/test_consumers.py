@@ -1,4 +1,5 @@
 
+import json
 import pytest
 import pytest_asyncio
 import re
@@ -8,6 +9,7 @@ from django import db
 from django.conf import settings
 from django.test import Client
 from django.urls import reverse
+from channels.layers import get_channel_layer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
 from channels.testing import WebsocketCommunicator
@@ -17,37 +19,6 @@ from hx_lti_initializer.models import LTIResourceLinkConfig
 from notification.middleware import NotificationMiddlewareStack
 from notification.routing import websocket_urlpatterns
 
-
-"""
-@pytest.mark.asyncio
-@pytest.mark.django_db(transaction=True)
-async def test_authentication():
-    application = ProtocolTypeRouter({
-        "websocket": OriginValidator(
-            NotificationMiddlewareStack(
-                URLRouter(websocket_urlpatterns)
-            ),
-            ["*"],
-        ),
-    })
-
-    room_name = "xuxu---lulu---bubu"
-    settings.ALLOWED_HOSTS = ["*"]
-
-    communicator = WebsocketCommunicator(
-        application,
-        "/ws/notification/{}/".format(room_name),
-    )
-    connected, _ = await communicator.connect()
-
-    assert connected
-    await communicator.disconnect()
-"""
-
-@sync_to_async
-def _async_save_session(session):
-    print("&&&&&&&&&&&&&&&&&&&& scope session({})".format(session.keys()))
-    session.save()
 
 @pytest_asyncio.fixture(loop_scope="session", scope="function")
 def ltilaunch_setup(random_assignment_target):
@@ -97,8 +68,6 @@ def ltilaunch_setup(random_assignment_target):
     )
     assert response.url == expected_url
     assert client.session.get("LTI_LAUNCH", None)
-    print("******* session {}".format(client.session.keys()))
-    print("******* multi_launch: {}".format(client.session.get("LTI_LAUNCH", {})))
     assert response.cookies.get(settings.SESSION_COOKIE_NAME, None)
 
     response = client.get(expected_url)
@@ -120,24 +89,15 @@ def ltilaunch_setup(random_assignment_target):
 
 @pytest.mark.asyncio
 @pytest.mark.django_db
-async def test_launchLti_starting_resource(ltilaunch_setup):
-
-    assert ltilaunch_setup["multi_launch"]
-    print("multi_launch keys: {}".format(ltilaunch_setup["multi_launch"].keys()))
-    print("launch keys: {}".format(ltilaunch_setup["multi_launch"].get(
-        ltilaunch_setup["resource_link_id"], {}
-        )))
-    assert ltilaunch_setup["session_id"]
-    print("********************************* SESSION_ID: {}".format(ltilaunch_setup["session_id"]))
-    print("********************************* COOKIES: {}".format(ltilaunch_setup["cookies"]))
-
-    #await _async_save_session(ltilaunch_setup["session"])
+async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
 
     application = ProtocolTypeRouter({
-        "websocket":
+        "websocket": OriginValidator(
             NotificationMiddlewareStack(
                 URLRouter(websocket_urlpatterns)
             ),
+            ["*"],
+        ),
     })
 
     pat = re.compile("[^a-zA-Z0-9-.]")
@@ -148,7 +108,6 @@ async def test_launchLti_starting_resource(ltilaunch_setup):
         launch["hx_object_id"],
     )
     settings.ALLOWED_HOSTS = ["*"]  # revert to original value!
-
 
     communicator = WebsocketCommunicator(
         application,
@@ -164,9 +123,26 @@ async def test_launchLti_starting_resource(ltilaunch_setup):
             ),
         ],
     )
-    print("********************************* BEFORE connect")
     connected, _ = await communicator.connect()
-    print("********************************* AFTER connect({})".format(connected))
-
     assert connected
+
+    webann = webannotation_annotation_factory(ltilaunch_setup["instructor"])
+    channel_layer = get_channel_layer()  # ws notification
+    await channel_layer.group_send(
+        room_name,
+        {
+            "type": "annotation_notification",
+            "message": json.dumps(webann),
+            "action": "annotation_created",
+        },
+    )
+
+    response = await communicator.receive_json_from()
+
+    assert response["type"] == "annotation_created"
+    msg = json.loads(response["message"])
+    # we can send annotation from a different context/collection/object !!!!
+    assert msg["platform"]["context_id"] == webann["platform"]["context_id"]
+    assert msg["platform"]["collection_id"] == webann["platform"]["collection_id"]
+
     await communicator.disconnect()

@@ -15,49 +15,23 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 
 @sync_to_async
-def _async_session_exists(session_id):
-    '''
-    Returns an awaitable for checking if a session exists.
-
-    NOTE: `sync_to_async` is necessary because the SessionStore
-    uses the DB, and therefore is a synchronous operation. The `sync_to_async`
-    utility turns `session.exists()` into an awaitable.
-    '''
-    return SessionStore(session_id).exists(session_id)
-
-
-@sync_to_async
-def _async_session_get_ltilaunch(session=None, session_id=None):
+def _async_get_ltilaunch(session_id):
     '''
     Returns an awaitable for loading the LTI_LAUNCH data from the session.
-
-    expect either session or session_id non-null
 
     NOTE: `sync_to_async` is necessary because the SessionStore
     uses the DB, and therefore is a synchronous operation. The `sync_to_async`
     utility turns `session.get()` into an awaitable.
     '''
-    logging.getLogger(__name__).info("################ lti_launch from session_id({})".format(session_id))
     SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
     exists = SessionStore(session_id).exists(session_id)
-    logging.getLogger(__name__).info("################ EXISTS ({})".format(exists))
-    session = SessionStore(session_id)
-    logging.getLogger(__name__).info("################ session ({})".format(session.keys()))
-
-    multi_launch = SessionStore(session_id).get("LTI_LAUNCH", {})
-    logging.getLogger(__name__).info("################ launch ({})".format(multi_launch))
-
-    return SessionStore(session_id).get("LTI_LAUNCH", {})
-
-
-    if session is None:
-        logging.getLogger(__name__).info("################ lti_launch({}) from session in scope".format(session.get("LTI_LAUNCH")))
-        return session.get("LTI_LAUNCH")
-    elif session_id:
-        logging.getLogger(__name__).info("################ lti_launch from session_id")
-        return SessionStore(session_id).get("LTI_LAUNCH")
+    if exists:
+        multi_launch = SessionStore(session_id).get("LTI_LAUNCH", {})
+        if not multi_launch:
+            logging.getLogger(__name__).warning("NOTIFY lti_launch empty")
+        return multi_launch
     else:
-        logging.getLogger(__name__).info("################ lti_launch empty")
+        logging.getLogger(__name__).warning("NOTIFY connect without session")
         return {}
 
 
@@ -95,41 +69,6 @@ class NotificationAuthMiddleware(BaseMiddleware):
         else:
             logging.getLogger(__name__).error("NOTIFY: missing querystring")
             return (None, None)
-
-
-    async def get_ltilaunch(self, scope, session_id=None):
-        # pull session from scope or querystring
-        try:
-            # prefer session from scope
-            session = scope["session"]
-            logging.getLogger(__name__).error("--------------- session from scope({})")
-        except ValueError:
-            # not available via cookie, trying session_id from query_string
-            if session_id is not None:
-                # close old db conn to prevent usage of timed out conn
-                # see https://channels.readthedocs.io/en/latest/topics/authentication.html#custom-authentication
-                close_old_connections()
-                session_exists = await _async_session_exists(session_id)
-                if session_exists:
-                    # get lti launch from session
-                    multi_launch = await _async_session_get_ltilaunch(session_id=session_id)
-                else:
-                    # no session found!
-                    logging.getLogger(__name__).error(
-                        "NOTIFY: session_id({}) not found".format(session_id)
-                    )
-                    return {}
-            else:  # no session via cookie nor querystring
-                logging.getLogger(__name__).error(
-                    "NOTIFY: missing session_id from querystring"
-                )
-                return {}
-        else:  # session from scope, note that multi-launch might be empty!
-            close_old_connections()
-            multi_launch = await _async_session_get_ltilaunch(session=session)
-            logging.getLogger(__name__).error("--------------- mlaunch from scope({})".format(multi_launch.keys()))
-
-        return multi_launch
 
 
     def check_lti_launch(self, scope, lti_launch):
@@ -178,7 +117,6 @@ class NotificationAuthMiddleware(BaseMiddleware):
                             context, clean_context_id
                         )
                     )
-
         # if we've got here is because NOT authenticated
         return (None, None, None)
 
@@ -196,11 +134,8 @@ class NotificationAuthMiddleware(BaseMiddleware):
         if session_key:
             session_id = session_key
 
-        logging.getLogger(__name__).error("&&&&&&&&&&&&&&&&&&&& scope({})".format(scope.keys()))
-
         # get lti launch
-        #multi_launch = await self.get_ltilaunch(scope, session_id=session_id)
-        multi_launch = await  _async_session_get_ltilaunch(session=None, session_id=session_id)
+        multi_launch = await _async_get_ltilaunch(session_id=session_id)
         if multi_launch and resource_link_id:
             lti_launch = multi_launch.get(resource_link_id, {})
             if not lti_launch:

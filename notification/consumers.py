@@ -20,16 +20,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # check that this connection is authorized
         (self.context, self.collection, self.target) = self.scope["hx_auth"]
-        """
-        if auth != "authenticated":
-            logging.getLogger(__name__).debug(
-                "{}|ws auth FAILED: {}, dropping connection".format(self.wsid, auth)
-            )
-            raise DenyConnection()  # return status_code=403
-
-        (self.context, self.collection, self.target) = self.group_name.split("--")
-        """
-
         logging.getLogger(__name__).debug(
             "{}|channel_name({}), context({}), collection({}), object({}), user({})".format(
                 self.wsid,
@@ -40,6 +30,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 self.scope["hx_user_id"],
             )
         )
+        if not self.context or not self.collection or not self.target:
+            logging.getLogger(__name__).warning(
+                "{}|ws auth FAILED, dropping connection".format(self.wsid)
+            )
+            raise DenyConnection()  # return status_code=403
 
         # join room group
         await self.channel_layer.group_add(self.group_name, self.channel_name)
