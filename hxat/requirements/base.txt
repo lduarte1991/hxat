@@ -15,6 +15,7 @@ PyJWT==2.4.0
 python-dateutil==2.8.1
 pytz==2019.3
 requests==2.32.3
+urllib3==2.3.0
 python_dotenv==0.14.0
 WhiteNoise==5.2.0
 git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk==0.2.0
