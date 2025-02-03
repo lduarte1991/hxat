@@ -12,10 +12,12 @@ from django.urls import reverse
 from channels.layers import get_channel_layer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
+from channels.sessions import SessionMiddlewareStack
 from channels.testing import WebsocketCommunicator
 from lti import ToolConsumer
 
 from hx_lti_initializer.models import LTIResourceLinkConfig
+from notification.consumers import NotificationSyncConsumer
 from notification.middleware import NotificationMiddlewareStack
 from notification.routing import websocket_urlpatterns
 
@@ -87,6 +89,7 @@ def ltilaunch_setup(random_assignment_target):
     }
 
 
+@pytest.mark.skip
 @pytest.mark.asyncio
 @pytest.mark.django_db
 async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
@@ -94,6 +97,68 @@ async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
     application = ProtocolTypeRouter({
         "websocket": OriginValidator(
             NotificationMiddlewareStack(
+                URLRouter(websocket_urlpatterns)
+            ),
+            ["*"],
+        ),
+    })
+
+    pat = re.compile("[^a-zA-Z0-9-.]")
+    launch = ltilaunch_setup["multi_launch"].get(ltilaunch_setup["resource_link_id"])
+    room_name = "{}--{}--{}".format(
+        pat.sub("-", launch["hx_context_id"]),
+        pat.sub("-", launch["hx_collection_id"]),
+        launch["hx_object_id"],
+    )
+    settings.ALLOWED_HOSTS = ["*"]  # revert to original value!
+
+    communicator = WebsocketCommunicator(
+        application,
+        "/ws/notification/{}/?resource_link_id={}".format(
+            room_name, ltilaunch_setup["resource_link_id"],
+        ),
+        headers=[
+            (
+                b"cookie",
+                bytes("{}={}".format(
+                    settings.SESSION_COOKIE_NAME, ltilaunch_setup["session_id"]
+                ), "utf-8")
+            ),
+        ],
+    )
+    connected, _ = await communicator.connect()
+    assert connected
+
+    webann = webannotation_annotation_factory(ltilaunch_setup["instructor"])
+    channel_layer = get_channel_layer()  # ws notification
+    await channel_layer.group_send(
+        room_name,
+        {
+            "type": "annotation_notification",
+            "message": json.dumps(webann),
+            "action": "annotation_created",
+        },
+    )
+
+    response = await communicator.receive_json_from()
+
+    assert response["type"] == "annotation_created"
+    msg = json.loads(response["message"])
+    # we can send annotation from a different context/collection/object !!!!
+    assert msg["platform"]["context_id"] == webann["platform"]["context_id"]
+    assert msg["platform"]["collection_id"] == webann["platform"]["collection_id"]
+
+    await communicator.disconnect()
+
+
+
+@pytest.mark.asyncio
+@pytest.mark.django_db
+async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
+
+    application = ProtocolTypeRouter({
+        "websocket": OriginValidator(
+            SessionMiddlewareStack(
                 URLRouter(websocket_urlpatterns)
             ),
             ["*"],
