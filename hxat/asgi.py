@@ -36,10 +36,16 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
 
     # websocket notification app
+    '''
     "websocket": OriginValidator(
         NotificationMiddlewareStack(
             URLRouter(websocket_urlpatterns)
         ),
         settings.CSRF_TRUSTED_ORIGINS,  # todo: include localhost?
      ),
+    '''
+    "websocket": OriginValidator(
+        URLRouter(websocket_urlpatterns),
+        settings.CSRF_TRUSTED_ORIGINS,
+    ),
 })

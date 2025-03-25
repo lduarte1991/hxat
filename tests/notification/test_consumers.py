@@ -3,6 +3,7 @@ import json
 import pytest
 import pytest_asyncio
 import re
+import sys
 
 from asgiref.sync import sync_to_async
 from django import db
@@ -151,7 +152,6 @@ async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
     await communicator.disconnect()
 
 
-
 @pytest.mark.asyncio
 @pytest.mark.django_db
 async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
@@ -174,6 +174,10 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
     )
     settings.ALLOWED_HOSTS = ["*"]  # revert to original value!
 
+    webann = webannotation_annotation_factory(ltilaunch_setup["instructor"])
+    channel_layer = get_channel_layer()  # ws notification
+    print("------------- created webann OK")
+
     communicator = WebsocketCommunicator(
         application,
         "/ws/notification/{}/?resource_link_id={}".format(
@@ -190,9 +194,9 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
     )
     connected, _ = await communicator.connect()
     assert connected
+    print("------------- CONNECTED OK")
+    sys.stdout.flush()
 
-    webann = webannotation_annotation_factory(ltilaunch_setup["instructor"])
-    channel_layer = get_channel_layer()  # ws notification
     await channel_layer.group_send(
         room_name,
         {
@@ -201,8 +205,10 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
             "action": "annotation_created",
         },
     )
+    print("------------- SENT to CHANNEL OK")
 
     response = await communicator.receive_json_from()
+    print("------------- RECEIVE from  CHANNEL OK")
 
     assert response["type"] == "annotation_created"
     msg = json.loads(response["message"])
@@ -211,3 +217,5 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
     assert msg["platform"]["collection_id"] == webann["platform"]["collection_id"]
 
     await communicator.disconnect()
+
+

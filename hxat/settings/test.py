@@ -122,10 +122,16 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        "daphne": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 
-# trying session in files for async session handling in notification tests
+# using session in files for async session handling in notification tests
+# sqlite3 does not support this much concurrency/async?
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 SESSION_FILE_PATH = str(BASE_DIR)
 

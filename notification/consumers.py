@@ -231,7 +231,7 @@ class NotificationSyncConsumer(WebsocketConsumer):
                         "{}|added group to channel({})".format(self.wsid, self.channel_name)
                     )
 
-                    #self.accept()
+                    self.accept()
 
                     logging.getLogger(__name__).info(
                         "{}|CONNECTION ACCEPTED".format(self.wsid)
