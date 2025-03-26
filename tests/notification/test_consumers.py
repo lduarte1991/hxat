@@ -4,13 +4,11 @@ import sys
 
 import pytest
 import pytest_asyncio
-from asgiref.sync import sync_to_async
 from channels.layers import get_channel_layer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
 from channels.sessions import SessionMiddlewareStack
 from channels.testing import WebsocketCommunicator
-from django import db
 from django.conf import settings
 from django.test import Client
 from django.urls import reverse

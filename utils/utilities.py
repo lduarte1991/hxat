@@ -1,9 +1,5 @@
-import json
-import pdb
-
-from hx_lti_assignment.models import Assignment, AssignmentTargets
+from hx_lti_assignment.models import AssignmentTargets
 from hx_lti_initializer.models import LTICourse, LTIResourceLinkConfig
-from target_object_database.models import TargetObject
 
 
 def report_relationships_for_course(cid):

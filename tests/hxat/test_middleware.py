@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.sessions.backends.db import SessionStore
 from django.test import RequestFactory
-from django.urls import reverse
 from hxat.middleware import LTILaunchSession, MultiLTILaunchMiddleware
 
 
