@@ -93,15 +93,15 @@ def get_lti_frame_resize_js(**kwargs):
     javascript = """
 // Sends message to parent to resize the iframe so we don't have scrolling issues
 jQuery(document).ready(function() {
-	var receiver = "%s";
-	var h = jQuery("#viewer").height() || jQuery("body").height();
-	var height = %s;
-	var message = {
-	  subject: "lti.frameResize",
-	  height: height
-	};
-	console.log("sending lti.frameResize message", message, receiver);
-	window.parent.postMessage(JSON.stringify(message), receiver);
+    var receiver = "%s";
+    var h = jQuery("#viewer").height() || jQuery("body").height();
+    var height = %s;
+    var message = {
+      subject: "lti.frameResize",
+      height: height
+    };
+    console.log("sending lti.frameResize message", message, receiver);
+    window.parent.postMessage(JSON.stringify(message), receiver);
 }, 1000);
 """ % (
         receiver,
