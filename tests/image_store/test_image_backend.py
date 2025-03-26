@@ -1,7 +1,7 @@
 import html
 import logging
 import unittest
-from unittest.mock import Mock, patch, call
+from unittest.mock import Mock, call, patch
 
 import media_management_sdk
 from image_store import backends
@@ -108,7 +108,11 @@ class TestIMMImageStoreBackend(unittest.TestCase):
         }
         title = "Untitled Test"
 
-        mock_file = Mock(name="testfile.jpg", file=None, content_type="image/jpeg",)
+        mock_file = Mock(
+            name="testfile.jpg",
+            file=None,
+            content_type="image/jpeg",
+        )
         mock_api = Mock(
             upload_images=Mock(return_value=images_response),
             create_collection=Mock(return_value=collection_response),
@@ -126,10 +130,16 @@ class TestIMMImageStoreBackend(unittest.TestCase):
 
         self.assertEqual(manifest_url, collection_response["iiif_manifest"]["url"])
 
-        mock_client.authenticate.assert_has_calls([
-            call(user_id=self.user_id),
-            call(user_id=self.user_id, course_id=course_response["id"], course_permission="write")
-        ])
+        mock_client.authenticate.assert_has_calls(
+            [
+                call(user_id=self.user_id),
+                call(
+                    user_id=self.user_id,
+                    course_id=course_response["id"],
+                    course_permission="write",
+                ),
+            ]
+        )
         mock_client.find_or_create_course.assert_called_with(
             lti_context_id=self.lti_params["context_id"],
             lti_tool_consumer_instance_guid=self.lti_params[
@@ -147,7 +157,9 @@ class TestIMMImageStoreBackend(unittest.TestCase):
             title=title,
         )
         mock_client.api.create_collection.assert_called_with(
-            course_id=course_response["id"], title=title, description="",
+            course_id=course_response["id"],
+            title=title,
+            description="",
         )
         mock_client.api.update_collection.assert_called_with(
             collection_id=collection_response["id"],

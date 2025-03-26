@@ -1,6 +1,6 @@
-import dateutil.parser
 from zoneinfo import ZoneInfo
 
+import dateutil.parser
 from django.conf import settings
 from django.template.defaulttags import register
 from django.templatetags.static import static
@@ -9,8 +9,8 @@ from django.utils.safestring import mark_safe
 
 def convert_tz(datetimeobj):
     """
-		Converts a datetimeobj from UTC to the local timezone
-	"""
+    Converts a datetimeobj from UTC to the local timezone
+    """
     from_zone = ZoneInfo("UTC")
     to_zone = ZoneInfo("America/New_York")
     # Tell datetime object it's in UTC
@@ -37,17 +37,17 @@ def format_date(str):
 @register.filter
 def format_tags(tagslist):
     """
-		Pretty-prints list of tags
-	"""
+    Pretty-prints list of tags
+    """
     return ", ".join(tagslist)
 
 
 @register.simple_tag
 def get_annotation_manual(**kwargs):
     """
-	Returns the URL to the annotation manual. When the URL is present in the django settings,
-	it returns this URL, otherwise it will return the default url passed in to this function.
-	"""
+    Returns the URL to the annotation manual. When the URL is present in the django settings,
+    it returns this URL, otherwise it will return the default url passed in to this function.
+    """
     url = kwargs.get("default_url", "")
     target = kwargs.get("default_target", "_self")
     if settings.ANNOTATION_MANUAL_URL is not None:

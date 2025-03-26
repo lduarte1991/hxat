@@ -19,7 +19,9 @@ from notification.middleware import SessionAuthMiddleware
 async def test_wsauth_missing_querystring():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [
+            re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),
+        ]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -41,7 +43,9 @@ async def test_wsauth_missing_querystring():
 async def test_wsauth_missing_session():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [
+            re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),
+        ]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -63,7 +67,9 @@ async def test_wsauth_missing_session():
 async def test_wsauth_unknown_session():
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [
+            re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),
+        ]
     )
     mut = SessionAuthMiddleware(application)
     utm_source = "333333"
@@ -115,14 +121,19 @@ def test_wsauth_unknown_contextid():
     params = consumer.generate_launch_data()
 
     client = Client(enforce_csrf_checks=False)
-    response = client.post(target_path, data=params,)
+    response = client.post(
+        target_path,
+        data=params,
+    )
     utm_source = response.cookies.get("sessionid").value
 
     # prep to create lti session
     ###
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [
+            re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),
+        ]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -175,13 +186,18 @@ def test_wsauth_ok():
     params = consumer.generate_launch_data()
 
     client = Client(enforce_csrf_checks=False)
-    response = client.post(target_path, data=params,)
+    response = client.post(
+        target_path,
+        data=params,
+    )
     utm_source = response.cookies.get("sessionid").value
     # prep to create lti session
     ###
 
     application = URLRouter(
-        [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+        [
+            re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),
+        ]
     )
     mut = SessionAuthMiddleware(application)
 
@@ -231,14 +247,21 @@ async def test_wsconn_ok():
     params = consumer.generate_launch_data()
 
     client = Client(enforce_csrf_checks=False)
-    response = client.post(target_path, data=params,)
+    response = client.post(
+        target_path,
+        data=params,
+    )
     utm_source = response.cookies.get("sessionid").value
     # prep to create lti session
     ###
 
     application = SessionAuthMiddleware(
         URLRouter(
-            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+            [
+                re_path(
+                    r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer
+                ),
+            ]
         )
     )
     path = "/ws/notification/{}--dvorak--1/?utm_source={}&resource_link_id={}".format(
@@ -286,18 +309,27 @@ async def test_wsconn_denied():
     params = consumer.generate_launch_data()
 
     client = Client(enforce_csrf_checks=False)
-    response = client.post(target_path, data=params,)
+    response = client.post(
+        target_path,
+        data=params,
+    )
     utm_source = response.cookies.get("sessionid").value
     # prep to create lti session
     ###
 
     application = SessionAuthMiddleware(
         URLRouter(
-            [re_path(r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer),]
+            [
+                re_path(
+                    r"^ws/notification/(?P<room_name>[^/]+)/$", NotificationConsumer
+                ),
+            ]
         )
     )
-    path = "/ws/notification/qwerty--dvorak--1/?utm_source={}&resource_link_id={}".format(
-        utm_source, resource_link_id
+    path = (
+        "/ws/notification/qwerty--dvorak--1/?utm_source={}&resource_link_id={}".format(
+            utm_source, resource_link_id
+        )
     )
 
     communicator = WebsocketCommunicator(application, path)

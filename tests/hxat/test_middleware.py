@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.sessions.backends.db import SessionStore
 from django.test import RequestFactory
 from django.urls import reverse
@@ -8,9 +7,7 @@ from hxat.middleware import LTILaunchSession, MultiLTILaunchMiddleware
 
 @pytest.mark.django_db
 def test_MultiLTILaunchMiddleware_is_basic_lti_launch(
-    lti_path,
-    lti_launch_url,
-    lti_launch_params_factory
+    lti_path, lti_launch_url, lti_launch_params_factory
 ):
 
     resource_link_id = "resource_link_id_1234567"
@@ -41,9 +38,7 @@ def test_MultiLTILaunchMiddleware_is_basic_lti_launch(
 
 @pytest.mark.django_db
 def test_MultiLTILaunchMiddleware_is_lti_content_item_message(
-    embed_lti_path,
-    embed_lti_launch_url,
-    lti_content_item_request_factory
+    embed_lti_path, embed_lti_launch_url, lti_content_item_request_factory
 ):
 
     params = lti_content_item_request_factory(

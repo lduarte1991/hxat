@@ -1,23 +1,21 @@
-
 import json
-import pytest
-import pytest_asyncio
 import re
 import sys
 
+import pytest
+import pytest_asyncio
 from asgiref.sync import sync_to_async
-from django import db
-from django.conf import settings
-from django.test import Client
-from django.urls import reverse
 from channels.layers import get_channel_layer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
 from channels.sessions import SessionMiddlewareStack
 from channels.testing import WebsocketCommunicator
-from lti import ToolConsumer
-
+from django import db
+from django.conf import settings
+from django.test import Client
+from django.urls import reverse
 from hx_lti_initializer.models import LTIResourceLinkConfig
+from lti import ToolConsumer
 from notification.consumers import NotificationSyncConsumer
 from notification.middleware import NotificationMiddlewareStack
 from notification.routing import websocket_urlpatterns
@@ -37,7 +35,8 @@ def ltilaunch_setup(random_assignment_target):
     launch_url = "http://testserver{}".format(target_path)
 
     lti_resource_link_config = LTIResourceLinkConfig.objects.create(
-        resource_link_id=resource_link_id, assignment_target=assignment_target,
+        resource_link_id=resource_link_id,
+        assignment_target=assignment_target,
     )
 
     consumer = ToolConsumer(
@@ -59,7 +58,10 @@ def ltilaunch_setup(random_assignment_target):
     params = consumer.generate_launch_data()
 
     client = Client(enforce_csrf_checks=False)
-    response = client.post(target_path, data=params,)
+    response = client.post(
+        target_path,
+        data=params,
+    )
     assert response.status_code == 302
     expected_url = (
         reverse(
@@ -95,14 +97,14 @@ def ltilaunch_setup(random_assignment_target):
 @pytest.mark.django_db
 async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
 
-    application = ProtocolTypeRouter({
-        "websocket": OriginValidator(
-            NotificationMiddlewareStack(
-                URLRouter(websocket_urlpatterns)
+    application = ProtocolTypeRouter(
+        {
+            "websocket": OriginValidator(
+                NotificationMiddlewareStack(URLRouter(websocket_urlpatterns)),
+                ["*"],
             ),
-            ["*"],
-        ),
-    })
+        }
+    )
 
     pat = re.compile("[^a-zA-Z0-9-.]")
     launch = ltilaunch_setup["multi_launch"].get(ltilaunch_setup["resource_link_id"])
@@ -116,14 +118,18 @@ async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
     communicator = WebsocketCommunicator(
         application,
         "/ws/notification/{}/?resource_link_id={}".format(
-            room_name, ltilaunch_setup["resource_link_id"],
+            room_name,
+            ltilaunch_setup["resource_link_id"],
         ),
         headers=[
             (
                 b"cookie",
-                bytes("{}={}".format(
-                    settings.SESSION_COOKIE_NAME, ltilaunch_setup["session_id"]
-                ), "utf-8")
+                bytes(
+                    "{}={}".format(
+                        settings.SESSION_COOKIE_NAME, ltilaunch_setup["session_id"]
+                    ),
+                    "utf-8",
+                ),
             ),
         ],
     )
@@ -156,14 +162,14 @@ async def test_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
 @pytest.mark.django_db
 async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory):
 
-    application = ProtocolTypeRouter({
-        "websocket": OriginValidator(
-            SessionMiddlewareStack(
-                URLRouter(websocket_urlpatterns)
+    application = ProtocolTypeRouter(
+        {
+            "websocket": OriginValidator(
+                SessionMiddlewareStack(URLRouter(websocket_urlpatterns)),
+                ["*"],
             ),
-            ["*"],
-        ),
-    })
+        }
+    )
 
     pat = re.compile("[^a-zA-Z0-9-.]")
     launch = ltilaunch_setup["multi_launch"].get(ltilaunch_setup["resource_link_id"])
@@ -181,14 +187,18 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
     communicator = WebsocketCommunicator(
         application,
         "/ws/notification/{}/?resource_link_id={}".format(
-            room_name, ltilaunch_setup["resource_link_id"],
+            room_name,
+            ltilaunch_setup["resource_link_id"],
         ),
         headers=[
             (
                 b"cookie",
-                bytes("{}={}".format(
-                    settings.SESSION_COOKIE_NAME, ltilaunch_setup["session_id"]
-                ), "utf-8")
+                bytes(
+                    "{}={}".format(
+                        settings.SESSION_COOKIE_NAME, ltilaunch_setup["session_id"]
+                    ),
+                    "utf-8",
+                ),
             ),
         ],
     )
@@ -217,5 +227,3 @@ async def test_sync_wsconn_ok(ltilaunch_setup, webannotation_annotation_factory)
     assert msg["platform"]["collection_id"] == webann["platform"]["collection_id"]
 
     await communicator.disconnect()
-
-

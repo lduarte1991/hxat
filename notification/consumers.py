@@ -1,14 +1,13 @@
-
-from importlib import import_module
 import json
 import logging
 import re
+from importlib import import_module
 from urllib.parse import parse_qs
 
 from asgiref.sync import async_to_sync
-from django.conf import settings
 from channels.exceptions import DenyConnection
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
+from django.conf import settings
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
@@ -48,9 +47,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             "{}|added group to channel({})".format(self.wsid, self.channel_name)
         )
         await self.accept()
-        logging.getLogger(__name__).debug(
-            "{}|CONNECTION ACCEPTED".format(self.wsid)
-        )
+        logging.getLogger(__name__).debug("{}|CONNECTION ACCEPTED".format(self.wsid))
 
     async def disconnect(self, close_code):
         # leave room group
@@ -84,12 +81,16 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # send message to websocket
         await self.send(
-            text_data=json.dumps({"type": action, "message": "{}".format(message),})
+            text_data=json.dumps(
+                {
+                    "type": action,
+                    "message": "{}".format(message),
+                }
+            )
         )
 
 
 class NotificationSyncConsumer(WebsocketConsumer):
-
 
     def parse_querystring(self, scope):
         # parse query string for session-id and resource-link-id
@@ -104,7 +105,6 @@ class NotificationSyncConsumer(WebsocketConsumer):
         else:
             logging.getLogger(__name__).error("CONSUMER: missing querystring")
             return (None, None)
-
 
     def lti_launch_valid(self, lti_launch, context, collection, target):
         # validate room_name from path with session info
@@ -126,7 +126,9 @@ class NotificationSyncConsumer(WebsocketConsumer):
                 if clean_collection_id == collection:
                     if clean_target_id == target:
                         # AUTHENTICATED!
-                        logging.getLogger(__name__).info("CONSUMER AUTHENTICATED AUTHENTICATED AUTHENTICATED AUTHENTICATED")
+                        logging.getLogger(__name__).info(
+                            "CONSUMER AUTHENTICATED AUTHENTICATED AUTHENTICATED AUTHENTICATED"
+                        )
                         return True
                     else:
                         logging.getLogger(__name__).error(
@@ -149,7 +151,6 @@ class NotificationSyncConsumer(WebsocketConsumer):
         # if we've got here is because NOT authenticated
         return False
 
-
     def connect(self):
         for key in self.scope.keys():
             logging.getLogger(__name__).debug(
@@ -168,7 +169,9 @@ class NotificationSyncConsumer(WebsocketConsumer):
         (sessionid_qs, resource_link_id) = self.parse_querystring(self.scope)
 
         # check session_id from cookie
-        sessionid_cookie = self.scope.get("cookies", {}).get(settings.SESSION_COOKIE_NAME, None)
+        sessionid_cookie = self.scope.get("cookies", {}).get(
+            settings.SESSION_COOKIE_NAME, None
+        )
         session_id = sessionid_cookie if sessionid_cookie else sessionid_qs
         if not session_id:
             logging.getLogger(__name__).error("CONSUMER 403: missing session_id")
@@ -197,7 +200,9 @@ class NotificationSyncConsumer(WebsocketConsumer):
             lti_launch = multi_launch.get(resource_link_id, {})
             if not lti_launch:
                 logging.getLogger(__name__).error(
-                    "CONSUMER 403: resource_link_id({}) not found".format(resource_link_id)
+                    "CONSUMER 403: resource_link_id({}) not found".format(
+                        resource_link_id
+                    )
                 )
                 # disconnect
                 raise DenyConnection()
@@ -208,11 +213,15 @@ class NotificationSyncConsumer(WebsocketConsumer):
                     )
                 self.scope["hx_user_id"] = lti_launch.get("hx_user_id", "anonymous")
 
-                if self.lti_launch_valid(lti_launch, context_id, collection_id, target_id):
+                if self.lti_launch_valid(
+                    lti_launch, context_id, collection_id, target_id
+                ):
                     self.group_name = "{}--{}--{}".format(
                         context_id, collection_id, target_id
                     )
-                    self.wsid = "{}--{}".format(self.group_name, self.scope["hx_user_id"])
+                    self.wsid = "{}--{}".format(
+                        self.group_name, self.scope["hx_user_id"]
+                    )
 
                     logging.getLogger(__name__).debug(
                         "{}|channel_name({}), context({}), collection({}), object({}), user({})".format(
@@ -226,9 +235,13 @@ class NotificationSyncConsumer(WebsocketConsumer):
                     )
 
                     # join room group
-                    async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
+                    async_to_sync(self.channel_layer.group_add)(
+                        self.group_name, self.channel_name
+                    )
                     logging.getLogger(__name__).info(
-                        "{}|added group to channel({})".format(self.wsid, self.channel_name)
+                        "{}|added group to channel({})".format(
+                            self.wsid, self.channel_name
+                        )
                     )
 
                     self.accept()
@@ -237,7 +250,9 @@ class NotificationSyncConsumer(WebsocketConsumer):
                         "{}|CONNECTION ACCEPTED".format(self.wsid)
                     )
                 else:
-                    logging.getLogger(__name__).error("CONSUMER 403: LTI_LAUNCH not valid")
+                    logging.getLogger(__name__).error(
+                        "CONSUMER 403: LTI_LAUNCH not valid"
+                    )
                     # disconnect
                     raise DenyConnection()
 
@@ -252,7 +267,6 @@ class NotificationSyncConsumer(WebsocketConsumer):
                 )
             # disconnect, return 403
             raise DenyConnection()
-
 
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
@@ -271,16 +285,17 @@ class NotificationSyncConsumer(WebsocketConsumer):
         #    }
         # )
 
-
     def disconnect(self, close_code):
         # leave room group
         logging.getLogger(__name__).debug(
             "{}|DISCONNECT[{}]".format(self.wsid, close_code)
         )
-        async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)(
+            self.group_name, self.channel_name
+        )
 
     def annotation_notification(self, event):
-        """ receives msg from room group and respond to ws to display badge."""
+        """receives msg from room group and respond to ws to display badge."""
         message = event["message"]
         action = event["action"]
 
@@ -288,4 +303,3 @@ class NotificationSyncConsumer(WebsocketConsumer):
         self.send(
             text_data=json.dumps({"type": action, "message": "{}".format(message)})
         )
-

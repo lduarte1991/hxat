@@ -3,26 +3,25 @@ import re
 from importlib import import_module
 from urllib.parse import parse_qs
 
-from django.conf import settings
-from django.contrib.sessions.models import Session
-from django.db import close_old_connections
-
 from asgiref.sync import sync_to_async
 from channels.middleware import BaseMiddleware
 from channels.sessions import CookieMiddleware, SessionMiddleware
+from django.conf import settings
+from django.contrib.sessions.models import Session
+from django.db import close_old_connections
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 
 @sync_to_async
 def _async_get_ltilaunch(session_id):
-    '''
+    """
     Returns an awaitable for loading the LTI_LAUNCH data from the session.
 
     NOTE: `sync_to_async` is necessary because the SessionStore
     uses the DB, and therefore is a synchronous operation. The `sync_to_async`
     utility turns `session.get()` into an awaitable.
-    '''
+    """
     SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
     exists = SessionStore(session_id).exists(session_id)
     if exists:
@@ -55,7 +54,6 @@ class NotificationAuthMiddleware(BaseMiddleware):
             tgt = target
         return (context, collection, tgt)
 
-
     def parse_querystring(self, scope):
         # parse query string for session-id and resource-link-id
         parsed_query = parse_qs(scope.get("query_string", ""))
@@ -69,7 +67,6 @@ class NotificationAuthMiddleware(BaseMiddleware):
         else:
             logging.getLogger(__name__).error("NOTIFY: missing querystring")
             return (None, None)
-
 
     def check_lti_launch(self, scope, lti_launch):
         # validate room_name from path with session info
@@ -97,7 +94,9 @@ class NotificationAuthMiddleware(BaseMiddleware):
                     if clean_collection_id == collection:
                         if clean_target_id == target:
                             # AUTHENTICATED!
-                            logging.getLogger(__name__).info("NOTIFY AUTHENTICATED AUTHENTICATED AUTHENTICATED AUTHENTICATED")
+                            logging.getLogger(__name__).info(
+                                "NOTIFY AUTHENTICATED AUTHENTICATED AUTHENTICATED AUTHENTICATED"
+                            )
                             return (context, collection, target)
                         else:
                             logging.getLogger(__name__).error(
@@ -120,7 +119,6 @@ class NotificationAuthMiddleware(BaseMiddleware):
         # if we've got here is because NOT authenticated
         return (None, None, None)
 
-
     async def __call__(self, scope, receive, send):
         scope = dict(scope)
         scope["hx_user_id"] = "anonymous"
@@ -140,7 +138,9 @@ class NotificationAuthMiddleware(BaseMiddleware):
             lti_launch = multi_launch.get(resource_link_id, {})
             if not lti_launch:
                 logging.getLogger(__name__).error(
-                    "NOTIFY 403: resource_link_id({}) not in multi_launch".format(resource_link_id)
+                    "NOTIFY 403: resource_link_id({}) not in multi_launch".format(
+                        resource_link_id
+                    )
                 )
             else:
                 for key in lti_launch:

@@ -1,7 +1,7 @@
-from hxat.lti_validators import LTIRequestValidator
 from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
+from hxat.lti_validators import LTIRequestValidator
 from lti import ToolConsumer
 from lti.contrib.django import DjangoToolProvider
 
