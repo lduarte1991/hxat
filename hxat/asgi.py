@@ -5,7 +5,7 @@ defined in the ASGI_APPLICATION setting
 import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import OriginValidator
+from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 from dotenv import load_dotenv
 
@@ -36,16 +36,7 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
 
     # websocket notification app
-    '''
-    "websocket": OriginValidator(
-        NotificationMiddlewareStack(
-            URLRouter(websocket_urlpatterns)
-        ),
-        settings.CSRF_TRUSTED_ORIGINS,  # todo: include localhost?
-     ),
-    '''
-    "websocket": OriginValidator(
+    "websocket": AllowedHostsOriginValidator(
         URLRouter(websocket_urlpatterns),
-        settings.CSRF_TRUSTED_ORIGINS,
     ),
 })
