@@ -1,8 +1,9 @@
-Django~=4.2.18
 channels~=4.2.0
 channels_redis~=4.2.1
 coverage==7.6.10
 coverage-badge==1.1.2
+daphne==3.0.2
+django~=4.2.18
 django-bootstrap3==24.3
 django-braces==1.16.0
 django-crispy-forms==2.3
