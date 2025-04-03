@@ -1,6 +1,6 @@
 import logging
 
-from .base import *
+from hxat.settings.base import *
 
 # for harvardx tests
 ORGANIZATION = "HARVARDX"
@@ -14,43 +14,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "hxat-test-sqlite3.db"),
+        "TEST": {
+            "NAME": os.path.join(BASE_DIR, "hxat-test-sqlite3.db"),
+        },
     },
 }
-
-logging = LOGGING["loggers"].update(
-    {
-        "oauthlib.oauth1.rfc5849": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-        "oauthlib.oauth1.rfc5849.request_validator": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-        "oauthlib.oauth1.rfc5849.utils": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-        "oauthlib.oauth1.rfc5849.endpoints": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-        "oauthlib.oauth1.rfc5849.endpoints.base": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-        "oauthlib.oauth1.rfc5849.endpoints.signature_only": {
-            "level": "DEBUG",
-            "handlers": ["default", "console"],
-            "propagate": False,
-        },
-    }
-)
 
 # test lti consumer keys
 CONSUMER_KEY = "consumer_key_for_test"
@@ -149,5 +117,21 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        "notification": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "daphne": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
+
+# using session in files for async session handling in notification tests
+# sqlite3 does not support this much concurrency/async?
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_FILE_PATH = str(BASE_DIR)
+

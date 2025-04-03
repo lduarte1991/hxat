@@ -1,9 +1,9 @@
 import os
 from datetime import datetime
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 import jwt
-from dateutil import tz
 from locust import HttpLocust
 from utils import Console
 
@@ -12,7 +12,7 @@ def make_jwt(apikey, secret, user, iat=None, ttl=36000, override=[], backcompat=
     payload = {
         "consumerKey": apikey if apikey else str(uuid4()),
         "userId": user if user else str(uuid4()),
-        "issuedAt": iat if iat else datetime.now(tz.tzutc()).isoformat(),
+        "issuedAt": iat if iat else datetime.now(ZoneInfo("UTC")).isoformat(),
         "ttl": ttl,
     }
     if not backcompat:

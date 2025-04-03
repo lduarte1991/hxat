@@ -1,18 +1,17 @@
-import pytest
 import json
-from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
-from django.conf import settings
+import pytest
 from django import forms
-
+from django.conf import settings
+from hx_lti_initializer.forms import EmbedLtiResponseForm, EmbedLtiSelectionForm
 from hx_lti_initializer.models import LTICourse
-from hx_lti_initializer.forms import EmbedLtiSelectionForm, EmbedLtiResponseForm
+from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
 
 class LtiContentItemReturnValidator(RequestValidator):
-    '''
+    """
     Used for testing that the response from the tool back to the LMS is valid:
-    
+
         Tool Provider (HxAT) --(oauth-signed)--> Tool Consumer (Canvas/EdX)
 
     With the LTI 1.1 Content-Item Process, the tool provider receives a *ContentItemSelectionRequest*
@@ -20,7 +19,8 @@ class LtiContentItemReturnValidator(RequestValidator):
     the content-items, which in our case would be a HxAT assignment object to embed in a page.
     That return message must be oauth-signed in order for it to be accepted, so this is used
     to test that oauth-signed request.
-    '''
+    """
+
     @property
     def enforce_ssl(self):
         return False
@@ -64,17 +64,19 @@ def test_EmbedLtiSelectionForm_fields(user_profile_factory, assignment_target_fa
         content_item_return_url=content_item_return_url,
     )
 
-    assert 'content_item_return_url' in form.fields
-    assert isinstance(form.fields['content_item_return_url'], forms.CharField)
-    assert form.fields['content_item_return_url'].initial == content_item_return_url
+    assert "content_item_return_url" in form.fields
+    assert isinstance(form.fields["content_item_return_url"], forms.CharField)
+    assert form.fields["content_item_return_url"].initial == content_item_return_url
 
-    assert 'content_item' in form.fields
-    assert isinstance(form.fields['content_item'], forms.ChoiceField)
-    assert len(form.fields['content_item'].choices) == num_assignments
+    assert "content_item" in form.fields
+    assert isinstance(form.fields["content_item"], forms.ChoiceField)
+    assert len(form.fields["content_item"].choices) == num_assignments
 
 
 def test_EmbedLtiResponseForm_set_oauth_signature():
-    launch_url = "https://testserver/lti/launch?custom_collection_id=1&custom_object_id=2"
+    launch_url = (
+        "https://testserver/lti/launch?custom_collection_id=1&custom_object_id=2"
+    )
     content_item_return_url = "https://canvas.test/courses/123456/external_content/success/external_tool_dialog"
     content_items = {
         "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
@@ -102,16 +104,16 @@ def test_EmbedLtiResponseForm_set_oauth_signature():
         consumer_secret=settings.LTI_SECRET,
     )
 
-    assert form.data['lti_message_type'] == "ContentItemSelection"
-    assert form.data['lti_version'] == "LTI-1p0"
-    assert form.data['content_items'] == content_items_json
-    assert form.data['oauth_version'] == "1.0"
-    assert form.data['oauth_nonce'] != ""
-    assert form.data['oauth_timestamp'] != ""
-    assert form.data['oauth_consumer_key'] == settings.CONSUMER_KEY
-    assert form.data['oauth_callback'] == 'about:blank'
-    assert form.data['oauth_signature_method'] == 'HMAC-SHA1'
-    assert form.data['oauth_signature'] != ""
+    assert form.data["lti_message_type"] == "ContentItemSelection"
+    assert form.data["lti_version"] == "LTI-1p0"
+    assert form.data["content_items"] == content_items_json
+    assert form.data["oauth_version"] == "1.0"
+    assert form.data["oauth_nonce"] != ""
+    assert form.data["oauth_timestamp"] != ""
+    assert form.data["oauth_consumer_key"] == settings.CONSUMER_KEY
+    assert form.data["oauth_callback"] == "about:blank"
+    assert form.data["oauth_signature_method"] == "HMAC-SHA1"
+    assert form.data["oauth_signature"] != ""
 
 
 def test_EmbedLtiResponseForm_oauth_request_validates():
@@ -128,5 +130,7 @@ def test_EmbedLtiResponseForm_oauth_request_validates():
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     body = dict(form.data)
-    valid, request = endpoint.validate_request(content_item_return_url, 'POST', body, headers)
+    valid, request = endpoint.validate_request(
+        content_item_return_url, "POST", body, headers
+    )
     assert valid

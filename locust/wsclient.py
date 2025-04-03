@@ -11,10 +11,10 @@ import threading
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 import iso8601
 import websocket
-from dateutil import tz
 from locust import events
 from utils import Console
 
@@ -217,7 +217,7 @@ class SocketClient(object):
                 weba = ast.literal_eval(ws_msg["message"])
                 self.log("^^^^^^^^^^^^^^^^^^^^^^^^^ recv anno: {}".format(weba["id"]))
                 created = iso8601.parse_date(weba["created"])
-                ts_delta = (datetime.now(tz.tzutc()) - created) / (
+                ts_delta = (datetime.now(ZoneInfo("UTC")) - created) / (
                     timedelta(microseconds=1) * 1000
                 )
                 response_length = self.calc_response_length(data)

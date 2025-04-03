@@ -132,7 +132,7 @@ class LTILaunchSession(object):
         return repr(self.session["LTI_LAUNCH"][self.resource_link_id])
 
 
-class ContentSecurityPolicyMiddleware(MiddlewareMixin):
+class ContentSecurityPolicyMiddleware:
     """
     Sets the Content-Security-Policy header to restrict webpages from being
     embedded on other domains. This is better supported and more flexible than X-Frame-Options.
@@ -144,19 +144,23 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         self.get_response = get_response
         self.logger = logging.getLogger(__name__)
 
-    def process_response(self, request, response):
+    def __call__(self, request):
+        response = self.get_response(request)
         if "content-type" in response and response["content-type"].startswith(
             "text/html"
         ):
             self.logger.info(
-                "Inside %s process_response: %s"
-                % (self.__class__.__name__, request.path)
+                "Inside {}s process_response: {}".format(
+                    self.__class__.__name__, request.path
+                )
             )
             domain = getattr(settings, "CONTENT_SECURITY_POLICY_DOMAIN", None)
             if domain:
                 policy = "frame-ancestors 'self' {domain}".format(domain=domain)
                 response["Content-Security-Policy"] = policy
-                self.logger.info("Content-Security-Policy header set to: %s" % policy)
+                self.logger.info(
+                    "Content-Security-Policy header set to: {}".format(policy)
+                )
             else:
                 self.logger.warning("Content-Security-Policy header not set")
         return response

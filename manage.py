@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 try:
     from dotenv import load_dotenv
-except:
+except ImportError:
     pass
 import os
 import sys
