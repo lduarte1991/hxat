@@ -1,0 +1,173 @@
+{
+    "rows": [
+        {
+            "@context": "http://catchpy.harvardx.harvard.edu.s3.amazonaws.com/jsonld/catch_context_jsonld.json",
+            "type": "Annotation",
+            "schema_version": "1.1.0",
+            "id": "134daf13-3dd8-4dd2-cc3f-b16cf9b77e03",
+            "creator": {
+                "id": "HxStaff",
+                "name": "HxStaff"
+            },
+            "created": "2019-08-12T17:53:02.785Z",
+            "permissions": {
+                "can_read": [],
+                "can_update": [
+                    "HxStaff"
+                ],
+                "can_delete": [
+                    "HxStaff"
+                ],
+                "can_admin": [
+                    "HxStaff"
+                ]
+            },
+            "platform": {
+                "platform_name": "edX",
+                "context_id": "00311e34-5f2f-b2f6-e98b-7f7b66146cd2",
+                "collection_id": "9da190c9-aff6-8d8b-2f6e-b1edaa42f819",
+                "target_source_id": "d0e64c1b-b472-4658-44c4-f03a65176bd9"
+            },
+            "body": {
+                "type": "List",
+                "items": [
+                    {
+                        "type": "TextualBody",
+                        "format": "text/html",
+                        "language": "en",
+                        "value": "test",
+                        "purpose": "commenting"
+                    }
+                ]
+            },
+            "target": {
+                "type": "List",
+                "items": [
+                    {
+                        "source": "http://sample.com/fake_content/preview",
+                        "type": "Text",
+                        "selector": {
+                            "type": "Choice",
+                            "items": [
+                                {
+                                    "type": "RangeSelector",
+                                    "startSelector": {
+                                        "type": "XPathSelector",
+                                        "value": "/p[1]"
+                                    },
+                                    "endSelector": {
+                                        "type": "XPathSelector",
+                                        "value": "/p[1]"
+                                    },
+                                    "refinedBy": {
+                                        "type": "TextPositionSelector",
+                                        "start": 85,
+                                        "end": 228
+                                    }
+                                },
+                                {
+                                    "type": "TextPositionSelector",
+                                    "start": 164,
+                                    "end": 307
+                                },
+                                {
+                                    "type": "TextQuoteSelector",
+                                    "exact": "uaint and curious volume of forgotten lore,\n    While I nodded, nearly napping, suddenly there came a tapping,\n    As of some one gently rappin",
+                                    "prefix": ", weak and weary,\n    Over many a q",
+                                    "suffix": "g, rapping at my chamber door.\n    "
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "@context": "http://catchpy.harvardx.harvard.edu.s3.amazonaws.com/jsonld/catch_context_jsonld.json",
+            "type": "Annotation",
+            "schema_version": "1.1.0",
+            "id": "8664e19a-d9af-98d1-71fe-23ecace51728",
+            "creator": {
+                "id": "HxStaff",
+                "name": "HxStaff"
+            },
+            "created": "2019-08-12T17:48:10.943Z",
+            "permissions": {
+                "can_read": [],
+                "can_update": [
+                    "HxStaff"
+                ],
+                "can_delete": [
+                    "HxStaff"
+                ],
+                "can_admin": [
+                    "HxStaff"
+                ]
+            },
+            "platform": {
+                "platform_name": "edX",
+                "context_id": "e7708708-fd9b-b10b-f259-3c99ea144c9d",
+                "collection_id": "6b4c671a-57e0-50e4-1b89-61efbc1a0695",
+                "target_source_id": "8011f032-fed2-92c9-5936-5d64319d3eda"
+            },
+            "body": {
+                "type": "List",
+                "items": [
+                    {
+                        "type": "TextualBody",
+                        "format": "text/html",
+                        "language": "en",
+                        "value": "test",
+                        "purpose": "commenting"
+                    },
+                    {
+                        "type": "TextualBody",
+                        "value": "test1",
+                        "purpose": "tagging"
+                    }
+                ]
+            },
+            "target": {
+                "type": "List",
+                "items": [
+                    {
+                        "source": "http://sample.com/fake_content/preview",
+                        "type": "Text",
+                        "selector": {
+                            "type": "Choice",
+                            "items": [
+                                {
+                                    "type": "RangeSelector",
+                                    "startSelector": {
+                                        "type": "XPathSelector",
+                                        "value": "/p[2]"
+                                    },
+                                    "endSelector": {
+                                        "type": "XPathSelector",
+                                        "value": "/p[2]"
+                                    },
+                                    "refinedBy": {
+                                        "type": "TextPositionSelector",
+                                        "start": 73,
+                                        "end": 84
+                                    }
+                                },
+                                {
+                                    "type": "TextPositionSelector",
+                                    "start": 560,
+                                    "end": 571
+                                },
+                                {
+                                    "type": "TextQuoteSelector",
+                                    "exact": "separate d",
+                                    "prefix": "in the bleak December,\n    And each",
+                                    "suffix": "ying ember wrought its ghost upon t"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- Each page should have its own title -->
+        <title>Hxighlighter</title>
+        <link rel="stylesheet" type="text/css" href="./hxighlighter_text.css">
+        <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico"/>
+    </head>
+    <body>
+        <main class="hxighlighter-container" role="main">
+
+            <section class='container1' aria-labelledby="to-title" role="region" accesskey="t">
+                <aside labelledby='aside-title' role="complementary" class="sr-only" accesskey="h" id='key-help' tabindex="-1">
+                    <h3 id='aside-title'>Keyboard Help</h3>
+                    <details>
+                        <summary>Quick Navigation Links</summary>
+                        <ul>
+                            <li><a href="#to-title">Text to be Annotated</a></li>
+                            <li><a href="#annotationsHolder">Annotation List</a></li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>Making Annotations via Keyboard Instructions</summary>
+                        <ol>
+                            <li>Use the shortcut or the <a href="#ma-button">Make Annotation</a> button to make text editable.</li>
+                            <li>This should automatically send the focus to the text, but tab may also be used to focus if that should fail.</li>
+                            <li>Find the start of text to be annotated and press the "*" (asterisk) key. A message will appear showing that you have successfully marked the start of the annotation (unless you have turned Hint Text off).
+                            </li>
+                            <li>Move to the end of the text to be annotated and again press "*". Now you have an entry in the annotations list at the bottom of the page.</li>
+                        </ol>
+                    </details>
+                    <details>
+                        <summary>Keyboard Shortcuts</summary>
+                        <ul>
+                            <li><strong>"Ctrl + 1"</strong>: Turn text to be editable to make annotations. (You can also use the "Make Keyboard Annotation" Button)</li>
+                            <li><strong>"Ctrl + 2"</strong>: Repeat/Receive tool-specific instructions.</li>
+                            <li><strong>"Ctrl + 3"</strong>: Toggle Hint Text On/Off. <span class="sr-only">(You can also use the "Turn Hint Text On/Off" button below)</span></li>
+                            <li><strong>"Esc"</strong>: Make the text not editable.</li>
+                        </ul>
+                    </details>
+                    <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
+
+                    
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="assertive">
+                        <div class='sr-real-alert'></div>
+                        <div class="sr-alert"></div>
+                        <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
+                    </div>
+                </aside>
+                <h3 id='to-title'>The Raven</h3>
+                <h4>by Edgar Allan Poe</h4>
+                <div class='annotations-section'>
+                    <img src="./testimage.png" alt="Cropped screenshot from Mac OSX High Sierra">
+                    <p>
+                    Once upon a midnight dreary, while I pondered, weak and weary,<br>
+                    Over many a quaint and curious volume of forgotten lore,<br>
+                    While I nodded, nearly napping, suddenly there came a tapping,<br>
+                    As of some one gently rapping, rapping at my chamber door.<br>
+                    "'T is some visiter," I muttered, "tapping at my chamber door--<br>
+                                                              Only this, and nothing more."</p>
+
+                    <p>
+                    Ah, distinctly I remember it was in the bleak December,<br>
+                    And each separate dying ember wrought its ghost upon the floor.<br>
+                    Eagerly I wished the morrow:--vainly I had sought to borrow<br>
+                    From my books surcease of sorrow--sorrow for the lost Lenore--<br>
+                    For the rare and radiant maiden whom the angels name Lenore--<br>
+                                                              Nameless here for evermore.</p>
+
+                    <p>
+                    And the silken sad uncertain rustling of each purple curtain<br>
+                    Thrilled me--filled me with fantastic terrors never felt before;<br>
+                    So that now, to still the beating of my heart, I stood repeating<br>
+                    "'T is some visiter entreating entrance at my chamber door<br>
+                    Some late visiter entreating entrance at my chamber door;--<br>
+                                                              This it is, and nothing more."</p>
+
+                    <p>
+                    Presently my soul grew stronger; hesitating then no longer,<br>
+                    "Sir," said I, "or Madam, truly your forgiveness I implore;<br>
+                    But the fact is I was napping, and so gently you came rapping,<br>
+                    And so faintly you came tapping, tapping at my chamber door,<br>
+                    That I scarce was sure I heard you"--here I opened wide the door;--<br>
+                                                              Darkness there, and nothing more.</p>
+
+                    <p>
+                    Deep into that darkness peering, long I stood there wondering, fearing,<br>
+                    Doubting, dreaming dreams no mortal ever dared to dream before;<br>
+                    But the silence was unbroken, and the darkness gave no token,<br>
+                    And the only word there spoken was the whispered word, "Lenore!"<br>
+                    This I whispered, and an echo murmured back the word, "Lenore!"<br>
+                                                              Merely this and nothing more.</p>
+
+                    <p>
+                    Back into the chamber turning, all my soul within me burning,<br>
+                    Soon again I heard a tapping, somewhat louder than before.<br>
+                    "Surely," said I, "surely that is something at my window lattice;<br>
+                    Let me see, then, what thereat is, and this mystery explore--<br>
+                    Let my heart be still a moment and this mystery explore;--<br>
+                                                              'T is the wind and nothing more!"</p>
+
+                    <p>
+                    Open here I flung the shutter, when, with many a flirt and flutter,<br>
+                    In there stepped a stately Raven of the saintly days of yore.<br>
+                    Not the least obeisance made he; not a minute stopped or stayed he;<br>
+                    But, with mien of lord or lady, perched above my chamber door--<br>
+                    Perched upon a bust of Pallas just above my chamber door--<br>
+                                                              Perched, and sat, and nothing more.</p>
+
+                    <p>
+                    Then this ebony bird beguiling my sad fancy into smiling,<br>
+                    By the grave and stern decorum of the countenance it wore,<br>
+                    "Though thy crest be shorn and shaven, thou," I said, "art sure no craven,<br>
+                    Ghastly grim and ancient Raven wandering from the Nightly shore,--<br>
+                    Tell me what thy lordly name is on the Night's Plutonian shore!"<br>
+                                                              Quoth the Raven, "Nevermore."</p>
+
+                    <p>
+                    Much I marvelled this ungainly fowl to hear discourse so plainly,<br>
+                    Though its answer little meaning--little relevancy bore;<br>
+                    For we cannot help agreeing that no living human being<br>
+                    Ever yet was blessed with seeing bird above his chamber door--<br>
+                    Bird or beast upon the sculptured bust above his chamber door,<br>
+                                                              With such name as "Nevermore."</p>
+
+                    <p>
+                    But the Raven, sitting lonely on the placid bust, spoke only<br>
+                    That one word, as if his soul in that one word he did outpour.<br>
+                    Nothing further then he uttered--not a feather then he fluttered--<br>
+                    Till I scarcely more than muttered, "Other friends have flown before--<br>
+                    On the morrow _he_ will leave me, as my hopes have flown before."<br>
+                                                              Then the bird said, "Nevermore."</p>
+
+                    <p>
+                    Startled at the stillness broken by reply so aptly spoken,<br>
+                    "Doubtless," said I, "what it utters is its only stock and store,<br>
+                    Caught from some unhappy master whom unmerciful Disaster<br>
+                    Followed fast and followed faster till his songs one burden bore--<br>
+                    Till the dirges of his Hope that melancholy burden bore<br>
+                                                              Of 'Never--nevermore.'"</p>
+
+                    <p>
+                    But the Raven still beguiling all my sad soul into smiling,<br>
+                    Straight I wheeled a cushioned seat in front of bird and bust and door;<br>
+                    Then, upon the velvet sinking, I betook myself to linking<br>
+                    Fancy unto fancy, thinking what this ominous bird of yore--<br>
+                    What this grim, ungainly, ghastly, gaunt and ominous bird of yore<br>
+                                                              Meant in croaking "Nevermore."</p>
+
+                    <p>
+                    This I sat engaged in guessing, but no syllable expressing<br>
+                    To the fowl whose fiery eyes now burned into my bosom's core;<br>
+                    This and more I sat divining, with my head at ease reclining<br>
+                    On the cushion's velvet lining that the lamplight gloated o'er,<br>
+                    But whose velvet violet lining with the lamplight gloating o'er<br>
+                                                              _She_ shall press, ah, nevermore!</p>
+                    <img src="./testimage.png" alt="Cropped screenshot from Mac OSX High Sierra">
+                    <p>
+                    Then, methought, the air grew denser, perfumed from an unseen censer<br>
+                    Swung by seraphim whose foot-falls tinkled on the tufted floor.<br>
+                    "Wretch," I cried, "thy God hath lent thee--by these angels he hath sent thee<br>
+                    Respite--respite and nepenthe from thy memories of Lenore!<br>
+                    Quaff, oh quaff this kind nepenthe, and forget this lost Lenore!"<br>
+                                                              Quoth the Raven, "Nevermore."</p>
+
+                    <p>
+                    "Prophet!" said I, "thing of evil!--prophet still, if bird or devil!--<br>
+                    Whether Tempter sent, or whether tempest tossed thee here ashore,<br>
+                    Desolate yet all undaunted, on this desert land enchanted--<br>
+                    On this home by Horror haunted--tell me truly, I implore--<br>
+                    Is there--_is_ there balm in Gilead?--tell me--tell me, I implore!"<br>
+                                                              Quoth the Raven, "Nevermore."</p>
+
+                    <p>
+                    "Prophet!" said I, "thing of evil--prophet still, if bird or devil!<br>
+                    By that Heaven that bends above, us--by that God we both adore--<br>
+                    Tell this soul with sorrow laden if, within the distant Aidenn,<br>
+                    It shall clasp a sainted maiden whom the angels name Lenore--<br>
+                    Clasp a rare and radiant maiden whom the angels name Lenore."<br>
+                                                              Quoth the Raven, "Nevermore."</p>
+
+                    <p>
+                    "Be that word our sign of parting, bird or fiend!" I shrieked, upstarting--<br>
+                    "Get thee back into the tempest and the Night's Plutonian shore!<br>
+                    Leave no black plume as a token of that lie thy soul hath spoken!<br>
+                    Leave my loneliness unbroken!--quit the bust above my door!<br>
+                    Take thy beak from out my heart, and take thy form from off my door!"<br>
+                                                              Quoth the Raven, "Nevermore."</p>
+
+                    <p>
+                    And the Raven, never flitting, still is sitting, still is sitting<br>
+                    On the pallid bust of Pallas just above my chamber door;<br>
+                    And his eyes have all the seeming of a demon's that is dreaming,<br>
+                    And the lamplight o'er him streaming throws his shadow on the floor;<br>
+                    And my soul from out that shadow that lies floating on the floor<br>
+                                                              Shall be lifted--nevermore!</p>
+                </div>
+            </section>
+        </main>
+        <footer class="hx-footer"></footer>
+    <style>
+        .hx-footer {
+            width: 100%;
+            height: 15px;
+            height: var(--footer-height);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 9999999999999;
+            /* background: black; */
+            background: #ededed;
+            /*-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+            box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.39);*/
+            border: 1px solid #c0c0c0;
+        }
+
+        :root {
+            --footer-height: 15px;
+        };
+    </style>
+        <script type="text/javascript" src="./hxighlighter_text.js"></script>
+        <script>
+            var hxighlighter_object1 = {
+                "commonInfo": {
+                    "mediaType": "text",
+                    "context_id": "fake-course-id.2",
+                    "collection_id": "e-a-poe-section",
+                    "object_id": "the-raven-id",
+                    "username": "Instructor",
+                    "user_id": "fake-anonymous-id-student",
+                    "instructors": ['fake-anonymous-id-student'],
+                    "common_instructor_name": "HxStaff"
+                },
+                "targets": [{
+                    'mediaType': "text",
+                    'method': 'inline',
+                    'object_source': '.container1',
+                    "template_urls": 'https://gracious-noether-988002.netlify.com/src/js/viewers/templates/',
+                    "DropdownTags": {
+                        'tags': ['test1', 'test2', 'parallelism', 'imagery'],
+                        'folksonomy': true,
+                    },
+                    "InstructionPanel": {
+                        'instructions': "<p>In the area below, mark every other word as <span style='background-color:rgba(255,0,0,0.2);'>test1</span> in order get a score.</p>"
+                    },
+                    "ColorTags": {
+                        // 'allTags': '#FF0000',
+                        'test1': '#00FF00',
+                        'parallelism': '#0000FF'
+                    },
+                    "SidebarTagTokens": {
+                        'tagList': ['test1', 'test2', 'parallelism', 'imagery']
+                    },
+                    "HxPermissions": {
+                        has_staff_permissions: true
+                    },
+                    viewerOptions: {
+                        filterTabCount: 4,
+                        defaultTab: 'instructor',
+                        tabsAvailable: ['search', 'mine', 'instructor', 'peer' ],
+                        sidebarversion: 'sidemenu',
+                        pagination: 100,
+                    },
+                    Badges: {
+                    },
+                    Websockets: {
+                        wsUrl: ""
+                    },
+                    AdminButton: {
+                        homeURL: 'http://google.com',
+                        has_staff_permissions: false
+                    },
+                    PrevNextButton: {
+                        prevUrl: "/index_vd.html",
+                        nextUrl: "/index_img.html"
+                    },
+                    storageOptions: {
+                        external_url: {
+                            catchpy: 'https://devo.catchpy.harvardx.harvard.edu/annos/'
+                        },
+                        token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6Imxhbm5pc3RlciIsInVzZXJJZCI6ImZha2UtYW5vbnltb3VzLWlkLXN0dWRlbnQiLCJpc3N1ZWRBdCI6IjIwMjEtMDMtMzFUMDE6MjQ6MTYuMTgxNDA4KzAwOjAwIiwidHRsIjoyNTkyMDAsIm92ZXJyaWRlIjpbXX0.YK4mjWdcWvfu7nzGBDDcEhTB-w7p5iQ4fEjrHbB8iwM",
+                        pagination: 100,
+                        database_params: {
+                            resource_link_id: "",
+                            utm_source: "",
+                            version: "catchpy"
+                        }
+                    }
+                }],
+            };
+            Hxighlighter(hxighlighter_object1);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- Each page should have its own title -->
+        <title>Hxighlighter</title>
+        <link rel="stylesheet" type="text/css" href="./hxighlighter_video_vjs.css">
+        <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico"/>
+    </head>
+    <body>
+        <main class="hxighlighter-container" role="main">
+        <section class='container1' aria-labelledby="to-title" role="region" accesskey="t">
+                <aside labelledby='aside-title' role="complementary" class="sr-only" accesskey="h" id='key-help' tabindex="-1">
+                    <h3 id='aside-title'>Keyboard Help</h3>
+                    <details>
+                        <summary>Quick Navigation Links</summary>
+                        <ul>
+                            <li><a href="#vid1" class="focus-on-location" data-link-to="#vid1">Video Player</a></li>
+                            <li><a href="#annotationsHolder">Annotation List</a></li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>Making Annotations via Keyboard Instructions</summary>
+                        <p>
+                            <span>Use the shortcut instructions below or the <a href="#ma-button">Make Annotation</a> to select a region of time to annotate in the video. Then confirm your selection to open up the editor</span>
+                        </p>
+                    </details>
+                    <details>
+                        <summary>Keyboard Shortcuts</summary>
+                        <ul>
+                            <li><strong>"Ctrl + 1"</strong>: Trigger form to note beginning and end time selection for annotation.</li>
+                            <li><strong>"Ctrl + 2"</strong>: Repeat instructions/messages/hints from tool</li>
+                            <li><strong>"Ctrl + 3"</strong>: Toggle Hints on/off</li>
+                        </ul>
+                    </details>
+                    <button id='ma-button' class="make-annotation-button btn btn-default">Make Annotation</button>
+
+                    
+                    <div id="hx-sr-notifications" class='sr-only' aria-live="assertive">
+                        <div class='sr-real-alert'></div>
+                        <div class="sr-alert"></div>
+                        <button role="button" class="toggle-alerts on">Turn Hint Text Off</button>
+                    </div>
+                </aside>
+                <div class='annotations-section'>
+                    <div id="viewer" class="hx-mirador"></div>
+                </div>
+                <footer class="hx-footer"></footer>
+                <style>
+                     .hx-footer {
+                        width: 100%;
+                        height: 15px;
+                        height: var(--footer-height);
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        z-index: 9999999999999;
+                        /* background: black; */
+                        background: #ededed;
+                        /*-webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+                        -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.39);
+                        box-shadow: 0px -3px 5px 0px rgba(0,0,0,0.39);*/
+                        border: 1px solid #c0c0c0;
+                    }
+
+                    :root {
+                        --footer-height: 15px;
+                        --sidebar-footer-height: 15px;
+                    };
+                </style>
+            </section>
+        </main>
+        <script type="text/javascript" src="./hxighlighter_video_vjs.js"></script>
+        <script>
+            var hxighlighter_object1 = {
+                "commonInfo": {
+                    "mediaType": "video",
+                    "context_id": "fake-course-id.3",
+                    "collection_id": "e-a-poe-section.3",
+                    "object_id": "http://127.0.0.1:8080/sample.mp4",
+                    "username": "Student",
+                    "user_id": "fake-anonymous-id-inst",
+                    "instructors": ['fake-anonymous-id-inst'],
+                    "common_instructor_name": "HxStaff"
+                },
+                "targets": [{
+                    'mediaType': "video",
+                    'method': 'manifest',
+                    'object_source': '.container1',
+                    //http://127.0.0.1:8080/sample.srt
+                    'transcript_url': 'http://127.0.0.1:8080/sample.srt',
+                    'source_type': 'video/mp4',
+                    "readonly": false,
+                    "DropdownTags": {
+                        'tags': ['test1', 'test2', 'parallelism', 'imagery'],
+                        'folksonomy': true,
+                    },
+                    "InstructionPanel": {
+                        'instructions': "<p>In the area below, mark every other word as <span style='background-color:rgba(255,0,0,0.2);'>test1</span> in order get a score.</p>"
+                    },
+                    "ColorTags": {
+                        // 'allTags': '#FF0000',
+                        'test1': '#00FF00',
+                        'parallelism': '#0000FF'
+                    },
+                    "SidebarTagTokens": {
+                        'tagList': ['test1', 'test2', 'parallelism', 'imagery']
+                    },
+                    "HxPermissions": {
+                        has_staff_permissions: false
+                    },
+                    viewerOptions: {
+                        filterTabCount: 4,
+                        defaultTab: 'mine',
+                        tabsAvailable: [ 'search', 'mine', 'instructor', 'peer' ],
+                        sidebarversion: 'sidemenu',
+                        pagination: 5,
+                    },
+                    Badges: {
+                    },
+                    Websockets: {
+                        wsUrl: ""
+                    },
+                    AdminButton: {
+                        homeURL: 'http://google.com',
+                        has_staff_permissions: false
+                    },
+                    PrevNextButton: {
+                        prevUrl: "/index_img.html",
+                        nextUrl: "/index.html"
+                    },
+                    storageOptions: {
+                        external_url: {
+                            catchpy: 'https://devo.catchpy.harvardx.harvard.edu/annos/'
+                        },
+                        //student
+                        //token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6Imxhbm5pc3RlciIsInVzZXJJZCI6ImZha2UtYW5vbnltb3VzLWlkLXN0dWRlbnQyIiwiaXNzdWVkQXQiOiIyMDIxLTAyLTAxVDAxOjA0OjE2LjE4MTQwOCswMDowMCIsInR0bCI6MjU5MjAwLCJvdmVycmlkZSI6W119.O81Emb-Hkcm3_AYfR3DggqJTUAsKAztiAY4x8qk_OJQ",
+                        //instructor
+                        token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb25zdW1lcktleSI6Imxhbm5pc3RlciIsInVzZXJJZCI6ImZha2UtYW5vbnltb3VzLWlkLWluc3QiLCJpc3N1ZWRBdCI6IjIwMjEtMDQtMTNUMDE6MDQ6MTYuMTgxNDA4KzAwOjAwIiwidHRsIjoyNTkyMDAsIm92ZXJyaWRlIjpbXX0.nqqRJf_NMnRBSwUt5s_mV7T4nEGsN-QDNVE6jXC6uDM",
+                        pagination: 5,
+                        database_params: {
+                            resource_link_id: "",
+                            utm_source: "",
+                            version: "catchpy"
+                        }
+                    }
+                }],
+            };
+            Hxighlighter(hxighlighter_object1);
+        </script>
+    </body>
+</html>
