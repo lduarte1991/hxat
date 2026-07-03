@@ -35,6 +35,7 @@ from hx_lti_initializer.utils import (
     DashboardAnnotations,
     create_new_user,
     fetch_annotations_by_course,
+    require_api_key,
     retrieve_token,
     save_session,
 )
@@ -600,7 +601,7 @@ def change_starting_resource(request, assignment_id, object_id):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@login_required
+@require_api_key
 @require_http_methods(["GET", "POST"])
 def course_credential(request, course_id):
     try:

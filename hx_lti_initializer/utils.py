@@ -6,6 +6,7 @@ import datetime
 import logging
 import time
 import urllib
+from functools import wraps
 from zoneinfo import ZoneInfo
 
 import jwt
@@ -13,6 +14,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import JsonResponse
 from django.urls import reverse
 
 # import Sample Target Object Model
@@ -672,6 +674,17 @@ class DashboardAnnotations(object):
         if annotation_id in self.annotation_by_id:
             return self.annotation_by_id[annotation_id]
         return None
+
+
+def require_api_key(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        auth = request.META.get("HTTP_AUTHORIZATION", "")
+        expected = settings.HXAT_API_KEY
+        if not expected or auth != f"Bearer {expected}":
+            return JsonResponse({"error": "Unauthorized"}, status=401)
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 def find_target_object_index(anno_target_items):
