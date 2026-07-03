@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -27,6 +27,7 @@ from hx_lti_initializer.forms import (
 from hx_lti_initializer.models import (
     LTICourse,
     LTICourseAdmin,
+    LTICourseCredential,
     LTIProfile,
     LTIResourceLinkConfig,
 )
@@ -597,6 +598,46 @@ def change_starting_resource(request, assignment_id, object_id):
         data["response"] = "Success: Deleted"
 
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def course_credential(request, course_id):
+    try:
+        course = LTICourse.get_course_by_id(course_id)
+    except LTICourse.DoesNotExist:
+        return JsonResponse({"error": "Course not found"}, status=404)
+
+    if request.method == "GET":
+        try:
+            cred = course.credential
+            return JsonResponse({
+                "course_id": course.course_id,
+                "lti_key": cred.lti_key,
+                "lti_secret": str(cred.lti_secret),
+            })
+        except LTICourseCredential.DoesNotExist:
+            return JsonResponse({"error": "No credential found for this course"}, status=404)
+
+    # POST — create (errors if one already exists)
+    body = json.loads(request.body)
+    lti_key = body.get("lti_key", "").strip()
+    if not lti_key:
+        return JsonResponse({"error": "lti_key is required"}, status=400)
+
+    try:
+        cred = LTICourseCredential.objects.create(
+            course=course,
+            lti_key=lti_key,
+        )
+    except Exception:
+        return JsonResponse({"error": "A credential already exists for this course"}, status=409)
+
+    return JsonResponse({
+        "course_id": course.course_id,
+        "lti_key": cred.lti_key,
+        "lti_secret": str(cred.lti_secret),
+    }, status=201)
 
 
 def csrf_failure(request, reason=""):
