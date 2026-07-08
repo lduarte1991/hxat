@@ -612,10 +612,21 @@ def course_credential(request, course_id):
     if request.method == "GET":
         try:
             cred = course.credential
+            if cred.deactivated:
+                return JsonResponse({
+                    "deactivated": True,
+                    "message": "These credentials have been deactivated. Contact tech team if they need to be reinstated.",
+                })
+            if not cred.approved:
+                return JsonResponse({
+                    "approved": False,
+                    "message": "Request has been sent to tech team, but not yet approved.",
+                })
             return JsonResponse({
                 "course_id": course.course_id,
                 "lti_key": cred.lti_key,
                 "lti_secret": str(cred.lti_secret),
+                "approved": True,
             })
         except LTICourseCredential.DoesNotExist:
             return JsonResponse({"error": "No credential found for this course"}, status=404)

@@ -52,9 +52,9 @@ class LTIPendingAdmin(admin.ModelAdmin):
 
 
 class LTICourseCredentialAdmin(admin.ModelAdmin):
-    list_display = ("course", "lti_key", "lti_secret", "allowed_rerun", "deactivated")
+    list_display = ("course", "lti_key", "lti_secret", "allowed_rerun", "deactivated", "approved")
     search_fields = ("course__course_name", "course__course_id", "lti_key")
-    list_filter = ("allowed_rerun", "deactivated")
+    list_filter = ("allowed_rerun", "deactivated", "approved")
 
 
 admin.site.register(Session, SessionAdmin)
