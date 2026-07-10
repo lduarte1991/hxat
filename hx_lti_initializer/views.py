@@ -601,6 +601,19 @@ def change_starting_resource(request, assignment_id, object_id):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+def _migrate_dict_credential(course, course_id):
+    """Idempotently create a LTICourseCredential from LTI_SECRET_DICT values."""
+    secret = settings.LTI_SECRET_DICT[course_id]
+    cred, _ = LTICourseCredential.objects.get_or_create(
+        course=course,
+        defaults={
+            "lti_secret": secret,
+            "approved": True,
+        },
+    )
+    return cred
+
+
 @require_api_key
 @require_http_methods(["GET", "POST"])
 def course_credential(request, course_id):
@@ -629,19 +642,45 @@ def course_credential(request, course_id):
                 "approved": True,
             })
         except LTICourseCredential.DoesNotExist:
+            # Auto-migrate from LTI_SECRET_DICT if the course is known there
+            dict_secret = settings.LTI_SECRET_DICT.get(course_id)
+            if dict_secret:
+                cred = _migrate_dict_credential(course, course_id)
+                return JsonResponse({
+                    "course_id": course.course_id,
+                    "lti_key": cred.lti_key,
+                    "lti_secret": str(cred.lti_secret),
+                    "approved": True,
+                })
             return JsonResponse({"error": "No credential found for this course"}, status=404)
 
     # POST — create (errors if one already exists)
+    # If course is in LTI_SECRET_DICT, seed from dict values (body not needed)
+    dict_secret = settings.LTI_SECRET_DICT.get(course_id)
+    if dict_secret:
+        cred, created = LTICourseCredential.objects.get_or_create(
+            course=course,
+            defaults={
+                "lti_secret": dict_secret,
+                "approved": True,
+            },
+        )
+        if not created:
+            return JsonResponse({"error": "A credential already exists for this course"}, status=409)
+        return JsonResponse({
+            "course_id": course.course_id,
+            "lti_key": cred.lti_key,
+            "lti_secret": str(cred.lti_secret),
+        }, status=201)
+
     body = json.loads(request.body)
     lti_key = body.get("lti_key", "").strip()
-    if not lti_key:
-        return JsonResponse({"error": "lti_key is required"}, status=400)
+    create_kwargs = {"course": course}
+    if lti_key:
+        create_kwargs["lti_key"] = lti_key
 
     try:
-        cred = LTICourseCredential.objects.create(
-            course=course,
-            lti_key=lti_key,
-        )
+        cred = LTICourseCredential.objects.create(**create_kwargs)
     except Exception:
         return JsonResponse({"error": "A credential already exists for this course"}, status=409)
 
