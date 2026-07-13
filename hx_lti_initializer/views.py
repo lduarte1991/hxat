@@ -614,13 +614,20 @@ def _migrate_dict_credential(course, course_id):
     return cred
 
 
+@csrf_exempt
 @require_api_key
 @require_http_methods(["GET", "POST"])
 def course_credential(request, course_id):
-    try:
-        course = LTICourse.get_course_by_id(course_id)
-    except LTICourse.DoesNotExist:
-        return JsonResponse({"error": "Course not found"}, status=404)
+    if request.method == "GET":
+        try:
+            course = LTICourse.get_course_by_id(course_id)
+        except LTICourse.DoesNotExist:
+            return JsonResponse({"error": "Course not found"}, status=404)
+    else:
+        body = json.loads(request.body) if request.body else {}
+        course_name = body.get("course_name", "").strip()
+        defaults = {"course_name": course_name} if course_name else {}
+        course, _ = LTICourse.objects.get_or_create(course_id=course_id, defaults=defaults)
 
     if request.method == "GET":
         try:
@@ -673,21 +680,41 @@ def course_credential(request, course_id):
             "lti_secret": str(cred.lti_secret),
         }, status=201)
 
-    body = json.loads(request.body)
     lti_key = body.get("lti_key", "").strip()
     create_kwargs = {"course": course}
     if lti_key:
         create_kwargs["lti_key"] = lti_key
+
+    previous_course_id = body.get("previous_course_id", "").strip()
+    if previous_course_id:
+        try:
+            prev_cred = LTICourse.objects.get(course_id=previous_course_id).credential
+            if prev_cred.allowed_rerun:
+                create_kwargs["allowed_rerun"] = True
+                create_kwargs["approved"] = True
+        except (LTICourse.DoesNotExist, LTICourseCredential.DoesNotExist):
+            pass
 
     try:
         cred = LTICourseCredential.objects.create(**create_kwargs)
     except Exception:
         return JsonResponse({"error": "A credential already exists for this course"}, status=409)
 
+    if cred.deactivated:
+        return JsonResponse({
+            "deactivated": True,
+            "message": "These credentials have been deactivated. Contact tech team if they need to be reinstated.",
+        }, status=201)
+    if not cred.approved:
+        return JsonResponse({
+            "approved": False,
+            "message": "Request has been sent to tech team, but not yet approved.",
+        }, status=201)
     return JsonResponse({
         "course_id": course.course_id,
         "lti_key": cred.lti_key,
         "lti_secret": str(cred.lti_secret),
+        "approved": True,
     }, status=201)
 
 
