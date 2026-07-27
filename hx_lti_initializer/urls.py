@@ -10,6 +10,7 @@ from hx_lti_initializer.views import (
     access_annotation_target,
     change_starting_resource,
     course_admin_hub,
+    course_credential,
     delete_assignment,
     edit_course,
     instructor_dashboard_student_list_view,
@@ -42,6 +43,7 @@ urlpatterns = [
         name="instructor_dashboard_student_list_view",
     ),
     path("delete_assignment/", delete_assignment, name="delete_assignment",),
+    path("course/<str:course_id>/credential/", course_credential, name="course_credential",),
     path(
         "admin_hub/<slug:assignment_id>/<int:object_id>/starting_resource/",
         change_starting_resource,

@@ -6,6 +6,8 @@ Django. It sets up the attributes for the model and any functions related to
 saving/retrieving data from the database.
 """
 
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.functions import Lower
@@ -222,3 +224,24 @@ class LTIResourceLinkConfig(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+def _default_lti_key():
+    from django.conf import settings
+    return settings.CONSUMER_KEY
+
+
+class LTICourseCredential(models.Model):
+    course = models.OneToOneField(
+        LTICourse,
+        on_delete=models.CASCADE,
+        related_name="credential",
+    )
+    lti_key = models.CharField(max_length=255, default=_default_lti_key)
+    lti_secret = models.CharField(max_length=36, default=uuid.uuid4)
+    allowed_rerun = models.BooleanField(default=False)
+    deactivated = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Credential for {self.course}"

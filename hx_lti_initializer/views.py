@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import MultipleObjectsReturned, PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -27,6 +27,7 @@ from hx_lti_initializer.forms import (
 from hx_lti_initializer.models import (
     LTICourse,
     LTICourseAdmin,
+    LTICourseCredential,
     LTIProfile,
     LTIResourceLinkConfig,
 )
@@ -34,6 +35,7 @@ from hx_lti_initializer.utils import (
     DashboardAnnotations,
     create_new_user,
     fetch_annotations_by_course,
+    require_api_key,
     retrieve_token,
     save_session,
 )
@@ -597,6 +599,123 @@ def change_starting_resource(request, assignment_id, object_id):
         data["response"] = "Success: Deleted"
 
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def _migrate_dict_credential(course, course_id):
+    """Idempotently create a LTICourseCredential from LTI_SECRET_DICT values."""
+    secret = settings.LTI_SECRET_DICT[course_id]
+    cred, _ = LTICourseCredential.objects.get_or_create(
+        course=course,
+        defaults={
+            "lti_secret": secret,
+            "approved": True,
+        },
+    )
+    return cred
+
+
+@csrf_exempt
+@require_api_key
+@require_http_methods(["GET", "POST"])
+def course_credential(request, course_id):
+    if request.method == "GET":
+        try:
+            course = LTICourse.get_course_by_id(course_id)
+        except LTICourse.DoesNotExist:
+            return JsonResponse({"error": "Course not found"}, status=404)
+    else:
+        body = json.loads(request.body) if request.body else {}
+        course_name = body.get("course_name", "").strip()
+        defaults = {"course_name": course_name} if course_name else {}
+        course, _ = LTICourse.objects.get_or_create(course_id=course_id, defaults=defaults)
+
+    if request.method == "GET":
+        try:
+            cred = course.credential
+            if cred.deactivated:
+                return JsonResponse({
+                    "deactivated": True,
+                    "message": "These credentials have been deactivated. Contact tech team if they need to be reinstated.",
+                })
+            if not cred.approved:
+                return JsonResponse({
+                    "approved": False,
+                    "message": "Request has been sent to tech team, but not yet approved.",
+                })
+            return JsonResponse({
+                "course_id": course.course_id,
+                "lti_key": cred.lti_key,
+                "lti_secret": str(cred.lti_secret),
+                "approved": True,
+            })
+        except LTICourseCredential.DoesNotExist:
+            # Auto-migrate from LTI_SECRET_DICT if the course is known there
+            dict_secret = settings.LTI_SECRET_DICT.get(course_id)
+            if dict_secret:
+                cred = _migrate_dict_credential(course, course_id)
+                return JsonResponse({
+                    "course_id": course.course_id,
+                    "lti_key": cred.lti_key,
+                    "lti_secret": str(cred.lti_secret),
+                    "approved": True,
+                })
+            return JsonResponse({"error": "No credential found for this course"}, status=404)
+
+    # POST — create (errors if one already exists)
+    # If course is in LTI_SECRET_DICT, seed from dict values (body not needed)
+    dict_secret = settings.LTI_SECRET_DICT.get(course_id)
+    if dict_secret:
+        cred, created = LTICourseCredential.objects.get_or_create(
+            course=course,
+            defaults={
+                "lti_secret": dict_secret,
+                "approved": True,
+            },
+        )
+        if not created:
+            return JsonResponse({"error": "A credential already exists for this course"}, status=409)
+        return JsonResponse({
+            "course_id": course.course_id,
+            "lti_key": cred.lti_key,
+            "lti_secret": str(cred.lti_secret),
+        }, status=201)
+
+    lti_key = body.get("lti_key", "").strip()
+    create_kwargs = {"course": course}
+    if lti_key:
+        create_kwargs["lti_key"] = lti_key
+
+    previous_course_id = body.get("previous_course_id", "").strip()
+    if previous_course_id:
+        try:
+            prev_cred = LTICourse.objects.get(course_id=previous_course_id).credential
+            if prev_cred.allowed_rerun:
+                create_kwargs["allowed_rerun"] = True
+                create_kwargs["approved"] = True
+        except (LTICourse.DoesNotExist, LTICourseCredential.DoesNotExist):
+            pass
+
+    try:
+        cred = LTICourseCredential.objects.create(**create_kwargs)
+    except Exception:
+        return JsonResponse({"error": "A credential already exists for this course"}, status=409)
+
+    if cred.deactivated:
+        return JsonResponse({
+            "deactivated": True,
+            "message": "These credentials have been deactivated. Contact tech team if they need to be reinstated.",
+        }, status=201)
+    if not cred.approved:
+        return JsonResponse({
+            "approved": False,
+            "message": "Request has been sent to tech team, but not yet approved.",
+        }, status=201)
+    return JsonResponse({
+        "course_id": course.course_id,
+        "lti_key": cred.lti_key,
+        "lti_secret": str(cred.lti_secret),
+        "approved": True,
+    }, status=201)
 
 
 def csrf_failure(request, reason=""):
