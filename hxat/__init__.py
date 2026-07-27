@@ -1,2 +1,2 @@
-__version__ = "6.1.3"  # fix for image redirects in chrome cors security
+__version__ = "7.1.0"  # lti creds in db [hx509], lti creds api
 
