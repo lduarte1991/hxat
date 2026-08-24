@@ -130,19 +130,18 @@ class Command(BaseCommand):
         }
 
         output = json.dumps(result, indent=2)
+        summary = {
+            "courses": len(courses_data),
+            "target_objects": len(target_objects_by_pk),
+            "assignments": len(assignments_data),
+            "assignment_targets": len(assignment_targets_data),
+            "warnings": warnings,
+        }
 
         if output_path:
             with open(output_path, "w") as fd:
                 fd.write(output)
-            summary = {
-                "courses": len(courses_data),
-                "target_objects": len(target_objects_by_pk),
-                "assignments": len(assignments_data),
-                "assignment_targets": len(assignment_targets_data),
-                "warnings": warnings,
-            }
             self.stdout.write(json.dumps(summary, indent=2))
         else:
             sys.stdout.write(output)
-            if warnings:
-                self.stderr.write(json.dumps({"warnings": warnings}, indent=2))
+            self.stderr.write(json.dumps(summary, indent=2))
