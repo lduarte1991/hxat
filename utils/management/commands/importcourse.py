@@ -23,7 +23,12 @@ class Command(BaseCommand):
         "Uses update_or_create on natural keys; re-running is idempotent. "
         "Creates a fixed 'seed-loader' identity as target_creator for TargetObjects. "
         "NOTE: the target DB should be fresh or previously seeded from the same file "
-        "to avoid TargetObject PK collisions."
+        "to avoid TargetObject PK collisions. "
+        "Use --admin-profile-name to add an admin to every imported course. "
+        "If the named auth.User or LTIProfile does not exist it will be created. "
+        "If a real user with that username already exists, it will be reused. "
+        "Use --annox-db-url/key/secret to override annotation-database credentials "
+        "on every imported Assignment (prevents prod credentials from leaking into dev)."
     )
 
     def add_arguments(self, parser):
@@ -33,9 +38,41 @@ class Command(BaseCommand):
             required=True,
             help="Path to the seed JSON file produced by exportcourse",
         )
+        parser.add_argument(
+            "--admin-profile-name",
+            dest="admin_profile_name",
+            default=None,
+            help=(
+                "Username to resolve or create as course admin. "
+                "When supplied, the matching auth.User and LTIProfile are found or "
+                "created, then added to course_admins for every course in the import."
+            ),
+        )
+        parser.add_argument(
+            "--annox-db-url",
+            dest="annox_db_url",
+            default=None,
+            help="Override annotation_database_url on every imported Assignment.",
+        )
+        parser.add_argument(
+            "--annox-db-key",
+            dest="annox_db_key",
+            default=None,
+            help="Override annotation_database_apikey on every imported Assignment.",
+        )
+        parser.add_argument(
+            "--annox-db-secret",
+            dest="annox_db_secret",
+            default=None,
+            help="Override annotation_database_secret_token on every imported Assignment.",
+        )
 
     def handle(self, *args, **options):
         json_file = options["input_json"]
+        admin_profile_name = options.get("admin_profile_name")
+        annox_db_url = options.get("annox_db_url")
+        annox_db_key = options.get("annox_db_key")
+        annox_db_secret = options.get("annox_db_secret")
 
         with open(json_file, "r") as fd:
             seed = json.loads(fd.read())
@@ -63,6 +100,22 @@ class Command(BaseCommand):
         )
         _tally("LTIProfile", c)
 
+        # step 1b: optional admin identity
+        admin_profile = None
+        if admin_profile_name:
+            admin_user, c = User.objects.get_or_create(
+                username=admin_profile_name,
+                defaults={"is_staff": False},
+            )
+            _tally("auth.User", c)
+
+            admin_profile, c = LTIProfile.objects.get_or_create(
+                anon_id=admin_profile_name,
+                scope=admin_profile_name,
+                defaults={"user": admin_user},
+            )
+            _tally("LTIProfile", c)
+
         # step 2: courses
         course_map = {}
         for c_data in data.get("courses", []):
@@ -74,6 +127,8 @@ class Command(BaseCommand):
                 course_id=course_id,
                 defaults=defaults,
             )
+            if admin_profile:
+                course.course_admins.add(admin_profile)
             course_map[course_id] = course
             _tally("LTICourse", c)
 
@@ -109,6 +164,12 @@ class Command(BaseCommand):
                 k: v for k, v in a_data.items() if k != "assignment_id"
             })
             defaults["course"] = course
+            if annox_db_url is not None:
+                defaults["annotation_database_url"] = annox_db_url
+            if annox_db_key is not None:
+                defaults["annotation_database_apikey"] = annox_db_key
+            if annox_db_secret is not None:
+                defaults["annotation_database_secret_token"] = annox_db_secret
             assignment, c = Assignment.objects.update_or_create(
                 assignment_id=assignment_id,
                 defaults=defaults,

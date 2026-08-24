@@ -118,3 +118,7 @@ As much as possible, the policy of the tool is to avoid storing user information
 
 In edX, the opaque `user_id` is unique within the scope of a course. In Canvas, the opaque `user_id` is unique within the scope of the platform. In other words, you can't assume that the same user will have the same `user_id` in two different courses when the tool is being used in edX.
 
+## Seeding a development or staging database
+
+See [seed-data-readme.md](seed-data-readme.md) for instructions on using the `exportcourse` and `importcourse` management commands to populate a fresh database from an existing environment.
+
