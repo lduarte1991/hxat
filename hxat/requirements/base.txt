@@ -17,4 +17,4 @@ python-dateutil==2.9.0
 requests==2.32.3
 python_dotenv==1.0.1
 WhiteNoise==6.8.0
-git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk
+#git+https://github.com/Harvard-ATG/media_management_sdk.git@v0.2.0#egg=media_management_sdk

@@ -1,0 +1,132 @@
+erDiagram
+    User {
+        int id PK
+        string username
+        string email
+    }
+
+    LTIProfile {
+        int id PK
+        int user_id FK
+        string roles
+        string anon_id
+        string name
+        string scope
+        datetime created_at
+        datetime updated_at
+    }
+
+    LTICourse {
+        int id PK
+        string course_id
+        string course_name
+        string course_external_css_default
+        datetime created_at
+        datetime updated_at
+    }
+
+    LTICourseCredential {
+        int id PK
+        int course_id FK
+        string lti_key
+        string lti_secret
+        bool allowed_rerun
+        bool deactivated
+        bool approved
+    }
+
+    LTICourseAdmin {
+        int id PK
+        string admin_unique_identifier
+        string new_admin_course_id
+        datetime created_at
+        datetime updated_at
+    }
+
+    TargetObject {
+        int id PK
+        int target_creator_id FK
+        string target_title
+        string target_author
+        text target_content
+        text target_citation
+        string target_type
+        datetime target_created
+        datetime target_updated
+    }
+
+    Assignment {
+        int id PK
+        int course_id FK
+        string assignment_id
+        string assignment_name
+        string annotation_database_url
+        string annotation_database_apikey
+        string annotation_database_secret_token
+        bool include_instructor_tab
+        bool include_mynotes_tab
+        bool include_public_tab
+        bool allow_highlights
+        bool allow_touch
+        int pagination_limit
+        bool allow_flags
+        bool is_published
+        string default_tab
+        bool hidden
+        bool use_hxighlighter
+        string common_inst_name
+        datetime created_at
+        datetime updated_at
+    }
+
+    AssignmentTargets {
+        int id PK
+        int assignment_id FK
+        int target_object_id FK
+        int order
+        string target_external_css
+        text target_instructions
+        text target_external_options
+        datetime created_at
+        datetime updated_at
+    }
+
+    LTIResourceLinkConfig {
+        int id PK
+        int assignment_target_id FK
+        string resource_link_id
+        datetime created_at
+        datetime updated_at
+    }
+
+    LTICourse_course_admins {
+        int id PK
+        int lticourse_id FK
+        int ltiprofile_id FK
+    }
+
+    LTICourse_course_users {
+        int id PK
+        int lticourse_id FK
+        int ltiprofile_id FK
+    }
+
+    TargetObject_target_courses {
+        int id PK
+        int targetobject_id FK
+        int lticourse_id FK
+    }
+
+    User ||--o{ LTIProfile : "user"
+    LTIProfile ||--o{ TargetObject : "target_creator"
+    LTIProfile ||--o{ LTICourse_course_admins : ""
+    LTIProfile ||--o{ LTICourse_course_users : ""
+    LTICourse ||--o{ LTICourse_course_admins : ""
+    LTICourse ||--o{ LTICourse_course_users : ""
+    LTICourse ||--|| LTICourseCredential : "credential"
+    LTICourse ||--o{ Assignment : "assignments"
+    LTICourse ||--o{ TargetObject_target_courses : ""
+    TargetObject ||--o{ TargetObject_target_courses : ""
+    Assignment ||--o{ AssignmentTargets : ""
+    TargetObject ||--o{ AssignmentTargets : ""
+    AssignmentTargets ||--o{ LTIResourceLinkConfig : "assignment_target"
